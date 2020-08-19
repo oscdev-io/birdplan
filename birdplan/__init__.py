@@ -114,23 +114,23 @@ class BirdPlan:
                 birdconf.static.add_route(route)
 
         # Check if we're exporting routes from the master tables to the kernel tables
-        if 'export_kernel' in self.config:
+        if "export_kernel" in self.config:
             # Loop with export_kernel items
-            for export, export_config in self.config['export_kernel'].items():
+            for export, export_config in self.config["export_kernel"].items():
                 # Static routes
-                if export == 'static':
+                if export == "static":
                     birdconf.master.export_kernel_static = export_config
                 # Static device routes
-                elif export == 'static_device':
+                elif export == "static_device":
                     birdconf.master.export_kernel_static_device = export_config
                 # RIP routes
-                elif export == 'rip':
+                elif export == "rip":
                     birdconf.master.export_kernel_rip = export_config
                 # OSPF routes
-                elif export == 'ospf':
+                elif export == "ospf":
                     birdconf.master.export_kernel_ospf = export_config
                 # BGP routes
-                elif export == 'bgp':
+                elif export == "bgp":
                     birdconf.master.export_kernel_bgp = export_config
                 # If we don't understand this 'accept' entry, throw an error
                 else:

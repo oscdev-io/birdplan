@@ -18,6 +18,8 @@
 
 """Bird configuration package."""
 
+# pylint:disable=too-many-lines
+
 from typing import List, Optional
 import requests
 from ..bgpq3 import BGPQ3
@@ -1808,7 +1810,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         self._ospf_to_master_import_filter(6)
 
         # OSPF protocol configuration
-        # FIXME - assigned but not used?
+        # FIXME - assigned but not used?  # pylint:disable=fixme
         # area_lines = self._area_config()
         self._setup_protocol(4)
         self._setup_protocol(6)

@@ -85,7 +85,6 @@ def run_birdplan():
     # Try load and configure
     try:
         birdplan.load(args.generate[0])
-        # FIXME output destination option
         birdplan.generate("")
     except BirdPlanError as err:
         logging.error("Failed to create configuration: %s", err)
