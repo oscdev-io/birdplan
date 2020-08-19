@@ -16,12 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Basic static route test case."""
+"""Basic static route test cases."""
 
-# pylint: disable=import-error,too-few-public-methods,no-self-use,too-many-locals
+# pylint: disable=import-error,too-few-public-methods,no-self-use
 
 import pprint
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 import pytest
 from nsnetsim.topology import Topology
 from nsnetsim.bird_router_node import BirdRouterNode, RouterNode
@@ -61,6 +61,13 @@ def fixture_sim():
 class TestBasicStatic:
     """Basic set of tests for static routing."""
 
+    def output_config(self, sim: Simulation):
+        """Dump config for debugging if tests fail."""
+
+        # Output router configuration
+        for router in ["r1", "r2"]:
+            print("CONFIG(%s):\n%s" % (router, sim.config[router]))
+
     def test_configure(self, sim: Simulation, tmpdir: str):
         """Create our configuration files."""
         birdplan = BirdPlan()
@@ -69,12 +76,10 @@ class TestBasicStatic:
             birdplan.load(f"tests/test_basic/test_basic_static-{router}.yaml", {"@TMPDIR@": f"{tmpdir}"})
             sim.config[router] = birdplan.generate(f"{tmpdir}/bird.conf.{router}")
 
-    def test_basic_static(self, sim: Simulation, tmpdir: str, helpers):
-        """Test basic static route configuration."""
+    def test_create_topology(self, sim: Simulation, tmpdir: str):
+        """Test topology creation."""
 
-        # Output router configuration
-        for router in ["r1", "r2"]:
-            print("CONFIG(%s):\n%s" % (router, sim.config[router]))
+        self.output_config(sim)
 
         print("Adding routers...")
         sim.router1 = BirdRouterNode(name="router1", configfile=f"{tmpdir}/bird.conf.r1")
@@ -104,45 +109,25 @@ class TestBasicStatic:
         print("Simulate topology...")
         sim.topology.run()
 
-        # Grab data for testing
+    def test_bird_status(self, sim: Simulation):
+        """Grab data from the simulation."""
+
+        # Quick test to make sure sim.router1 and sim.router2 is defined
+        if not sim.router1:
+            raise RuntimeError("Simulation router1 should of been setup")
+        if not sim.router2:
+            raise RuntimeError("Simulation router2 should of been setup")
+
+        self.output_config(sim)
+
         r1_status_output = sim.router1.birdc_show_status()
-        r1_protocols_output = sim.router1.birdc_show_protocols()
-
         r2_status_output = sim.router2.birdc_show_status()
-        r2_protocols_output = sim.router2.birdc_show_protocols()
 
-        # BIRD tables
-        r1_bird_tables = {}
-        r2_bird_tables = {}
-        for bird_table in ["t_static4", "t_static6", "master4", "master6", "t_kernel4", "t_kernel6"]:
-            r1_bird_tables[bird_table] = sim.router1.birdc_show_route_table(bird_table)
-            r2_bird_tables[bird_table] = sim.router2.birdc_show_route_table(bird_table)
+        print("STATUS(r1):")
+        pprint.pprint(r1_status_output)
 
-        # OS RIB
-        r1_os_rib = {}
-        r2_os_rib = {}
-        for os_rib in ["inet", "inet6"]:
-            r1_os_rib[os_rib] = sim.router1.run_ip(["--family", os_rib, "route", "list"])
-            r2_os_rib[os_rib] = sim.router2.run_ip(["--family", os_rib, "route", "list"])
-
-        print("PROTOCOLS(r1):")
-        pprint.pprint(r1_protocols_output)
-        print("PROTOCOLS(r2):")
-        pprint.pprint(r2_protocols_output)
-
-        for table, contents in sorted(r1_bird_tables.items()):
-            print(f"BIRD(r1)[{table}]:")
-            pprint.pprint(contents)
-        for table, contents in sorted(r2_bird_tables.items()):
-            print(f"BIRD(r2)[{table}]:")
-            pprint.pprint(contents)
-
-        for table, contents in sorted(r1_os_rib.items()):
-            print(f"OS(r1)[{table}]:")
-            pprint.pprint(contents)
-        for table, contents in sorted(r2_os_rib.items()):
-            print(f"OS(r2)[{table}]:")
-            pprint.pprint(contents)
+        print("STATUS(r2):")
+        pprint.pprint(r2_status_output)
 
         # Check BIRD router ID
         assert "router_id" in r1_status_output, "The status output should have 'router_id'"
@@ -151,7 +136,24 @@ class TestBasicStatic:
         assert "router_id" in r2_status_output, "The status output should have 'router_id'"
         assert r2_status_output["router_id"] == "0.0.0.1", "The router ID should be '0.0.0.1'"
 
-        correct_result: Any
+    def test_bird_tables_static4(self, sim: Simulation, helpers):
+        """Test BIRD static4 tables."""
+
+        # Quick test to make sure sim.router1 and sim.router2 is defined
+        if not sim.router1:
+            raise RuntimeError("Simulation router1 should of been setup")
+        if not sim.router2:
+            raise RuntimeError("Simulation router2 should of been setup")
+
+        self.output_config(sim)
+
+        r1_table = sim.router1.birdc_show_route_table("t_static4")
+        r2_table = sim.router2.birdc_show_route_table("t_static4")
+
+        print("BIRD(r1)[t_static4]:")
+        pprint.pprint(r1_table)
+        print("BIRD(r2)[t_static4]:")
+        pprint.pprint(r2_table)
 
         # Check static4 BIRD table
         correct_result = {
@@ -166,12 +168,27 @@ class TestBasicStatic:
                 }
             ]
         }
-        assert (
-            r1_bird_tables["t_static4"] == correct_result
-        ), "Result for R1 BIRD t_static4 routing table does not match what it should be"
-        assert (
-            r2_bird_tables["t_static4"] == correct_result
-        ), "Result for R2 BIRD t_static4 routing table does not match what it should be"
+        assert r1_table == correct_result, "Result for R1 BIRD t_static4 routing table does not match what it should be"
+        assert r2_table == correct_result, "Result for R2 BIRD t_static4 routing table does not match what it should be"
+
+    def test_bird_tables_static6(self, sim: Simulation, helpers):
+        """Test BIRD static6 tables."""
+
+        # Quick test to make sure sim.router1 and sim.router2 is defined
+        if not sim.router1:
+            raise RuntimeError("Simulation router1 should of been setup")
+        if not sim.router2:
+            raise RuntimeError("Simulation router2 should of been setup")
+
+        self.output_config(sim)
+
+        r1_table = sim.router1.birdc_show_route_table("t_static6")
+        r2_table = sim.router2.birdc_show_route_table("t_static6")
+
+        print("BIRD(r1)[t_static6]:")
+        pprint.pprint(r1_table)
+        print("BIRD(r2)[t_static6]:")
+        pprint.pprint(r2_table)
 
         # Check static6 BIRD table
         correct_result = {
@@ -186,12 +203,27 @@ class TestBasicStatic:
                 }
             ]
         }
-        assert (
-            r1_bird_tables["t_static6"] == correct_result
-        ), "Result for R1 BIRD t_static6 routing table does not match what it should be"
-        assert (
-            r2_bird_tables["t_static6"] == correct_result
-        ), "Result for R2 BIRD t_static6 routing table does not match what it should be"
+        assert r1_table == correct_result, "Result for R1 BIRD t_static6 routing table does not match what it should be"
+        assert r2_table == correct_result, "Result for R2 BIRD t_static6 routing table does not match what it should be"
+
+    def test_bird_tables_master4(self, sim: Simulation, helpers):
+        """Test BIRD master4 tables."""
+
+        # Quick test to make sure sim.router1 and sim.router2 is defined
+        if not sim.router1:
+            raise RuntimeError("Simulation router1 should of been setup")
+        if not sim.router2:
+            raise RuntimeError("Simulation router2 should of been setup")
+
+        self.output_config(sim)
+
+        r1_table = sim.router1.birdc_show_route_table("master4")
+        r2_table = sim.router2.birdc_show_route_table("master4")
+
+        print("BIRD(r1)[master4]:")
+        pprint.pprint(r1_table)
+        print("BIRD(r2)[master4]:")
+        pprint.pprint(r2_table)
 
         # Check master4 BIRD table
         correct_result = {
@@ -206,12 +238,27 @@ class TestBasicStatic:
                 }
             ]
         }
-        assert (
-            r1_bird_tables["master4"] == correct_result
-        ), "Result for R1 BIRD master4 routing table does not match what it should be"
-        assert (
-            r2_bird_tables["master4"] == correct_result
-        ), "Result for R2 BIRD master4 routing table does not match what it should be"
+        assert r1_table == correct_result, "Result for R1 BIRD master4 routing table does not match what it should be"
+        assert r2_table == correct_result, "Result for R2 BIRD master4 routing table does not match what it should be"
+
+    def test_bird_tables_master6(self, sim: Simulation, helpers):
+        """Test BIRD master6 tables."""
+
+        # Quick test to make sure sim.router1 and sim.router2 is defined
+        if not sim.router1:
+            raise RuntimeError("Simulation router1 should of been setup")
+        if not sim.router2:
+            raise RuntimeError("Simulation router2 should of been setup")
+
+        self.output_config(sim)
+
+        r1_table = sim.router1.birdc_show_route_table("master6")
+        r2_table = sim.router2.birdc_show_route_table("master6")
+
+        print("BIRD(r1)[master6]:")
+        pprint.pprint(r1_table)
+        print("BIRD(r2)[master6]:")
+        pprint.pprint(r2_table)
 
         # Check master6 BIRD table
         correct_result = {
@@ -226,12 +273,27 @@ class TestBasicStatic:
                 }
             ]
         }
-        assert (
-            r1_bird_tables["master6"] == correct_result
-        ), "Result for R1 BIRD master6 routing table does not match what it should be"
-        assert (
-            r2_bird_tables["master6"] == correct_result
-        ), "Result for R2 BIRD master6 routing table does not match what it should be"
+        assert r1_table == correct_result, "Result for R1 BIRD master6 routing table does not match what it should be"
+        assert r2_table == correct_result, "Result for R2 BIRD master6 routing table does not match what it should be"
+
+    def test_bird_tables_kernel4(self, sim: Simulation, helpers):
+        """Test BIRD kernel4 tables."""
+
+        # Quick test to make sure sim.router1 and sim.router2 is defined
+        if not sim.router1:
+            raise RuntimeError("Simulation router1 should of been setup")
+        if not sim.router2:
+            raise RuntimeError("Simulation router2 should of been setup")
+
+        self.output_config(sim)
+
+        r1_table = sim.router1.birdc_show_route_table("t_kernel4")
+        r2_table = sim.router2.birdc_show_route_table("t_kernel4")
+
+        print("BIRD(r1)[t_kernel4]:")
+        pprint.pprint(r1_table)
+        print("BIRD(r2)[t_kernel4]:")
+        pprint.pprint(r2_table)
 
         # Check kernel4 BIRD table
         correct_result = {
@@ -246,14 +308,29 @@ class TestBasicStatic:
                 }
             ]
         }
-        assert (
-            r1_bird_tables["t_kernel4"] == correct_result
-        ), "Result for R1 BIRD t_kernel4 routing table does not match what it should be"
+        assert r1_table == correct_result, "Result for R1 BIRD t_kernel4 routing table does not match what it should be"
 
         correct_result = {}
-        assert (
-            r2_bird_tables["t_kernel4"] == correct_result
-        ), "Result for R2 BIRD t_kernel4 routing table does not match what it should be"
+        assert r2_table == correct_result, "Result for R2 BIRD t_kernel4 routing table does not match what it should be"
+
+    def test_bird_tables_kernel6(self, sim: Simulation, helpers):
+        """Test BIRD kernel6 tables."""
+
+        # Quick test to make sure sim.router1 and sim.router2 is defined
+        if not sim.router1:
+            raise RuntimeError("Simulation router1 should of been setup")
+        if not sim.router2:
+            raise RuntimeError("Simulation router2 should of been setup")
+
+        self.output_config(sim)
+
+        r1_table = sim.router1.birdc_show_route_table("t_kernel6")
+        r2_table = sim.router2.birdc_show_route_table("t_kernel6")
+
+        print("BIRD(r1)[t_kernel6]:")
+        pprint.pprint(r1_table)
+        print("BIRD(r2)[t_kernel6]:")
+        pprint.pprint(r2_table)
 
         # Check kernel6 BIRD table
         correct_result = {
@@ -268,26 +345,62 @@ class TestBasicStatic:
                 }
             ]
         }
-        assert (
-            r1_bird_tables["t_kernel6"] == correct_result
-        ), "Result for R1 BIRD t_kernel6 routing table does not match what it should be"
+        assert r1_table == correct_result, "Result for R1 BIRD t_kernel6 routing table does not match what it should be"
 
         correct_result = {}
-        assert (
-            r2_bird_tables["t_kernel6"] == correct_result
-        ), "Result for R2 BIRD t_kernel6 routing table does not match what it should be"
+        assert r2_table == correct_result, "Result for R2 BIRD t_kernel6 routing table does not match what it should be"
+
+    def test_os_rib_inet(self, sim: Simulation):
+        """Test OS rib inet tables."""
+
+        # Quick test to make sure sim.router1 and sim.router2 is defined
+        if not sim.router1:
+            raise RuntimeError("Simulation router1 should of been setup")
+        if not sim.router2:
+            raise RuntimeError("Simulation router2 should of been setup")
+
+        self.output_config(sim)
+
+        r1_os_rib = sim.router1.run_ip(["--family", "inet", "route", "list"])
+        r2_os_rib = sim.router2.run_ip(["--family", "inet", "route", "list"])
+
+        print("OS(r1)[inet]:")
+        pprint.pprint(r1_os_rib)
+
+        print("OS(r2)[inet]:")
+        pprint.pprint(r2_os_rib)
 
         # Check kernel has the correct IPv4 RIB
         correct_result = [
             {"dev": "eth0", "dst": "10.0.0.0/24", "flags": [], "gateway": "192.168.0.2", "metric": 600, "protocol": "bird"},
             {"dev": "eth0", "dst": "192.168.0.0/24", "flags": [], "prefsrc": "192.168.0.1", "protocol": "kernel", "scope": "link"},
         ]
-        assert r1_os_rib["inet"] == correct_result, "R1 kernel IPv4 RIB does not match what it should be"
+        assert r1_os_rib == correct_result, "R1 kernel IPv4 RIB does not match what it should be"
 
         correct_result = [
             {"dev": "eth0", "dst": "192.168.0.0/24", "flags": [], "prefsrc": "192.168.0.1", "protocol": "kernel", "scope": "link"},
         ]
-        assert r2_os_rib["inet"] == correct_result, "R2 kernel IPv4 RIB does not match what it should be"
+        assert r2_os_rib == correct_result, "R2 kernel IPv4 RIB does not match what it should be"
+
+    def test_os_rib_inet6(self, sim: Simulation):
+        """Test OS rib inet6 tables."""
+
+        # Quick test to make sure sim.router1 and sim.router2 is defined
+        if not sim.router1:
+            raise RuntimeError("Simulation router1 should of been setup")
+        if not sim.router2:
+            raise RuntimeError("Simulation router2 should of been setup")
+
+        self.output_config(sim)
+
+        r1_os_rib = sim.router1.run_ip(["--family", "inet6", "route", "list"])
+        r2_os_rib = sim.router2.run_ip(["--family", "inet6", "route", "list"])
+
+        print("OS(r1)[inet6]:")
+        pprint.pprint(r1_os_rib)
+
+        print("OS(r2)[inet6]:")
+        pprint.pprint(r2_os_rib)
 
         # Check kernel has the correct IPv6 RIB
         correct_result = [
@@ -303,10 +416,10 @@ class TestBasicStatic:
             },
             {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
         ]
-        assert r1_os_rib["inet6"] == correct_result, "R1 Kernel IPv6 RIB does not match what it should be"
+        assert r1_os_rib == correct_result, "R1 Kernel IPv6 RIB does not match what it should be"
 
         correct_result = [
             {"dev": "eth0", "dst": "fc00::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
         ]
-        assert r2_os_rib["inet6"] == correct_result, "R2 Kernel IPv6 RIB does not match what it should be"
+        assert r2_os_rib == correct_result, "R2 Kernel IPv6 RIB does not match what it should be"
