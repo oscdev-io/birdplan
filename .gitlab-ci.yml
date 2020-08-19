@@ -1,0 +1,64 @@
+image: idmslinux/rolling
+
+include:
+  - template: 'Workflows/MergeRequest-Pipelines.gitlab-ci.yml'
+
+# Stages we need to progress through
+stages:
+  - test
+  - prepare_release
+  - release
+
+test_job:
+  stage: test
+  coverage: '/^TOTAL.+?(\d+\%)$/'
+  script:
+  # Create environment
+  - pacman -Syu --noconfirm
+  - pacman -S --noconfirm grep python
+  - pacman -S --noconfirm python-pytest-runner python-pytest-cov python-pytest-black python-pytest-flake8 python-pytest-pycodestyle python-pytest-pydocstyle python-pytest-pylint python-pytest-mypy
+  - pacman -S --noconfirm iproute2 bird exabgp
+  # Create Python environment
+  - pacman -S --noconfirm python-pip git
+  - pip install git+https://oscdev.io/software/birdclient.git
+  - pip install git+https://oscdev.io/software/nsnetsim.git
+  # Run tests
+  - python setup.py test
+  # Artifacts
+  artifacts:
+    expire_in: 1 day
+    paths:
+    - build/
+
+prepare_release:
+  stage: prepare_release
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+  - pacman -Syu --noconfirm
+  - pacman -S --noconfirm git
+  - mkdir build
+  # Work out commit range for changelog
+  - LAST_TAG=$(git tag --sort -version:refname | head -n2 | tail -n1)
+  - if [ -n "$LAST_TAG" ]; then COMMIT_RANGE="$LAST_TAG..$CI_COMMIT_TAG"; else COMMIT_RANGE=""; fi
+  # Output description file
+  - echo "Automatic release based on tag $CI_COMMIT_TAG" > build/description.txt
+  - git log --oneline --decorate --no-merges $COMMIT_RANGE >> build/description.txt
+  artifacts:
+    expire_in: 1 day
+    paths:
+    - build/
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - echo "Release"
+  release:
+     name: 'Release $CI_COMMIT_TAG'
+     description: 'Automatic release based on tag $CI_COMMIT_TAG'
+     tag_name: '$CI_COMMIT_TAG'
+     ref: '$CI_COMMIT_TAG'
+
