@@ -24,11 +24,6 @@ test_job:
   - pip install git+https://oscdev.io/software/nsnetsim.git
   # Run tests
   - python setup.py test
-  # Artifacts
-  artifacts:
-    expire_in: 1 day
-    paths:
-    - build/
 
 prepare_release:
   stage: prepare_release
