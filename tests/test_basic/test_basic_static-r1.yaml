@@ -1,0 +1,6 @@
+router_id: 0.0.0.1
+log_file: "@TMPDIR@/bird.log.r1"
+debug: True
+static:
+  - '10.0.0.0/24 via 192.168.0.2'
+  - 'fc10::/64 via fc00::2'
