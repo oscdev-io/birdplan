@@ -47,7 +47,7 @@ setup(
         "Topic:: System:: Networking",
     ],
     python_requires=">=3.8",
-    install_requires=["prompt_toolkit", "toml", "natsort", "jinja2", "requests"],
+    install_requires=["birdclient", "nsnetsim", "pyyaml"],
     packages=find_packages(),
     entry_points={"console_scripts": ["birdplan=birdplan.cmdline:run_birdplan"]},
 )
