@@ -88,7 +88,7 @@ class BGPQ3:
     @property
     def server(self):
         """Return the server we're using."""
-        return "{}:{}".format(self.host, self.port)
+        return f"{self.host}:{self.port}"
 
     @property
     def host(self):

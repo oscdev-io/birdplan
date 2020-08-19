@@ -144,7 +144,7 @@ class BirdPlan:
             try:
                 with open(output_filename, "w") as config_file:
                     config_file.write("\n".join(config_lines))
-            except OSError as err:
+            except OSError as err:  # pragma: no cover
                 raise BirdPlanError(f"Failed to open '{output_filename}' for writing: {err}") from None
 
         return "\n".join(config_lines)
