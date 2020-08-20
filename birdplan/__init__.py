@@ -40,12 +40,14 @@ class BirdPlan:
 
     _plan_file: Optional[str]
     _config: Dict[Any, Any]
+    _birdconf: Optional[BirdConfig]
 
     def __init__(self):
         """Initialize object."""
 
         self._plan_file = None
         self._config = {}
+        self._birdconf = None
 
     def load(self, plan_file: str, macros: Optional[Dict[str, str]] = None):
         """
@@ -88,56 +90,21 @@ class BirdPlan:
 
         """
 
-        birdconf = BirdConfig()
+        self._birdconf = BirdConfig()
 
         # Check configuration options are supported
         for config_item in self.config:
-            if config_item not in ["router_id", "log_file", "debug", "static", "export_kernel"]:
-                raise BirdPlanError("The config item '{config_Item}' is not supported")
+            if config_item not in ["router_id", "log_file", "debug", "static", "export_kernel", "rip"]:
+                raise BirdPlanError(f"The config item '{config_item}' is not supported")
 
-        # Check that a router ID was specified
-        if "router_id" not in self.config:
-            raise BirdPlanError("The 'router_id' attribute must be specified")
-        birdconf.router_id = self.config["router_id"]
+        # Configure sections
+        self._config_global()
+        self._config_static()
+        self._config_export_kernel()
+        self._config_rip()
 
-        # Check if we have a log_file specified to use
-        if "log_file" in self.config:
-            birdconf.log_file = self.config["log_file"]
-
-        # Check if we're in debugging mode or not
-        if "debug" in self.config:
-            birdconf.debug = self.config["debug"]
-
-        # Static routes
-        if "static" in self.config:
-            for route in self.config["static"]:
-                birdconf.static.add_route(route)
-
-        # Check if we're exporting routes from the master tables to the kernel tables
-        if "export_kernel" in self.config:
-            # Loop with export_kernel items
-            for export, export_config in self.config["export_kernel"].items():
-                # Static routes
-                if export == "static":
-                    birdconf.master.export_kernel_static = export_config
-                # Static device routes
-                elif export == "static_device":
-                    birdconf.master.export_kernel_static_device = export_config
-                # RIP routes
-                elif export == "rip":
-                    birdconf.master.export_kernel_rip = export_config
-                # OSPF routes
-                elif export == "ospf":
-                    birdconf.master.export_kernel_ospf = export_config
-                # BGP routes
-                elif export == "bgp":
-                    birdconf.master.export_kernel_bgp = export_config
-                # If we don't understand this 'accept' entry, throw an error
-                else:
-                    raise BirdPlanError(f"Configuration item '{export}' not understood in 'export_kernel'")
-
-        # Get the configuration
-        config_lines = birdconf.get_config()
+        # Generate the configuration
+        config_lines = self._birdconf.get_config()
 
         # If we have a filename, write out
         if output_filename:
@@ -148,6 +115,139 @@ class BirdPlan:
                 raise BirdPlanError(f"Failed to open '{output_filename}' for writing: {err}") from None
 
         return "\n".join(config_lines)
+
+    def _config_global(self):
+        """Configure global options."""
+
+        # Check that a router ID was specified
+        if "router_id" not in self.config:
+            raise BirdPlanError("The 'router_id' attribute must be specified")
+        self._birdconf.router_id = self.config["router_id"]
+
+        # Check if we have a log_file specified to use
+        if "log_file" in self.config:
+            self._birdconf.log_file = self.config["log_file"]
+
+        # Check if we're in debugging mode or not
+        if "debug" in self.config:
+            self._birdconf.debug = self.config["debug"]
+
+    def _config_static(self):
+        """Configure static section."""
+        # Static routes
+        if "static" in self.config:
+            for route in self.config["static"]:
+                self._birdconf.static.add_route(route)
+
+    def _config_export_kernel(self):
+        """Configure export_kernel section."""
+
+        # Check if we're exporting routes from the master tables to the kernel tables
+        if "export_kernel" in self.config:
+            # Loop with export_kernel items
+            for export, export_config in self.config["export_kernel"].items():
+                # Static routes
+                if export == "static":
+                    self._birdconf.master.export_kernel_static = export_config
+                # Static device routes
+                elif export == "static_device":
+                    self._birdconf.master.export_kernel_static_device = export_config
+                # RIP routes
+                elif export == "rip":
+                    self._birdconf.master.export_kernel_rip = export_config
+                # OSPF routes
+                elif export == "ospf":
+                    self._birdconf.master.export_kernel_ospf = export_config
+                # BGP routes
+                elif export == "bgp":
+                    self._birdconf.master.export_kernel_bgp = export_config
+                # If we don't understand this 'accept' entry, throw an error
+                else:
+                    raise BirdPlanError(f"Configuration item '{export}' not understood in 'export_kernel'")
+
+    def _config_rip(self):
+        """Configure rip section."""
+
+        # If we have no rip section, just return
+        if "rip" not in self.config:
+            return
+
+        # Check configuration options are supported
+        for config_item in self.config["rip"]:
+            if config_item not in ["accept", "redistribute", "interfaces"]:
+                raise BirdPlanError(f"The 'rip' config item '{config_item}' is not supported")
+
+        self._config_rip_accept()
+        self._config_rip_redistribute()
+        self._config_rip_interfaces()
+
+    def _config_rip_accept(self):
+        """Configure rip:accept section."""
+
+        # If we don't have an accept section, just return
+        if "accept" not in self.config["rip"]:
+            return
+
+        # Loop with accept items
+        for accept, accept_config in self.config["rip"]["accept"].items():
+            # Allow accept of the default route
+            if accept == "default":
+                self._birdconf.rip.accept_default = accept_config
+            # If we don't understand this 'accept' entry, throw an error
+            else:
+                raise BirdPlanError(f"Configuration item '{accept}' not understood in RIP accept")
+
+    def _config_rip_redistribute(self):
+        """Configure rip:redistribute section."""
+
+        # If we don't have a redistribute section just return
+        if "redistribute" not in self.config["rip"]:
+            return
+
+        # Loop with redistribution items
+        for redistribute, redistribute_config in self.config["rip"]["redistribute"].items():
+            # Add connected route redistribution
+            if redistribute == "connected":
+                self._birdconf.rip.redistribute_connected = redistribute_config
+            # Add static route redistribution
+            elif redistribute == "static":
+                self._birdconf.rip.redistribute_static = redistribute_config
+            # Add static device route redistribution
+            elif redistribute == "static_device":
+                self._birdconf.rip.redistribute_static_device = redistribute_config
+            # Add kernel route redistribution
+            elif redistribute == "kernel":
+                self._birdconf.rip.redistribute_kernel = redistribute_config
+            # Allow redistribution of the default route
+            elif redistribute == "default":
+                self._birdconf.rip.redistribute_default = redistribute_config
+            # Allow redistribution of RIP routes
+            elif redistribute == "rip":
+                self._birdconf.rip.redistribute_rip = redistribute_config
+            # If we don't understand this 'redistribute' entry, throw an error
+            else:
+                raise BirdPlanError(f"Configuration item '{redistribute}' not understood in RIP redistribute")
+
+    def _config_rip_interfaces(self):
+        """Configure rip:interfaces section."""
+
+        # If we don't have interfaces in our rip section, just return
+        if "interfaces" not in self.config["rip"]:
+            return
+
+        # Loop with each interface and its config
+        for interface_name, interface in self.config["rip"]["interfaces"].items():
+            # See if we have interface config
+            interface_config = []
+            # Loop with each config item in the peer
+            for config_item, config_value in interface.items():
+                if config_item in ("update-time", "metric"):
+                    interface_config.append({config_item: config_value})
+                # If we don't understand this 'redistribute' entry, throw an error
+                else:
+                    raise BirdPlanError(f"Configuration item '{config_item}' not understood in RIP area")
+            # Add interface
+            self._birdconf.rip.add_interface(interface_name, interface_config)
 
     @property
     def plan_file(self) -> Optional[str]:
