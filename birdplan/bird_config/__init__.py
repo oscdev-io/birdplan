@@ -1355,7 +1355,7 @@ class BirdConfigProtocolRIP(BirdConfigBase):
             # Loop with config items
             for config_item in interface:
                 # Loop with key-value pairs
-                for key, value in config_item.iteritems():
+                for key, value in config_item.items():
                     if (key == "update-time") and value:
                         interface_lines.append("\t\tupdate time %s;" % value)
                     else:
@@ -1544,7 +1544,7 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         config = self.interfaces[interface_name]
         # Work through supported configuration
         for item in interface_config:
-            for key, value in item.iteritems():
+            for key, value in item.items():
                 if key in ("metric", "update-time"):
                     config.append({key: value})
                 else:
@@ -1661,7 +1661,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
             # Loop with area config items
             for config_item in self.areas[area_name]:
                 # Loop with key-value pairs
-                for key, value in config_item.iteritems():
+                for key, value in config_item.items():
                     area_lines.append("\t\t%s %s;" % (key, value))
             # Loop with interfaces
             for interface_name in sorted(self.interfaces[area_name].keys()):
@@ -1670,7 +1670,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
                 # Loop with config items
                 for config_item in interface:
                     # Loop with key-value pairs
-                    for key, value in config_item.iteritems():
+                    for key, value in config_item.items():
                         if (key == "stub") and value:
                             area_lines.append("\t\t\t%s;" % key)
                         else:
@@ -1846,7 +1846,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         config = self.interfaces[area_name][interface_name]
         # Work through supported configuration
         for item in interface_config:
-            for key, value in item.iteritems():
+            for key, value in item.items():
                 if key == "hello":
                     config.append({key: value})
                 elif key == "wait":
@@ -2377,7 +2377,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
 
         # Work out what we're going to be redistributing
         if "redistribute" in self.peer_config:
-            for redistribute_type, redistribute_config in self.peer_config["redistribute"].iteritems():
+            for redistribute_type, redistribute_config in self.peer_config["redistribute"].items():
                 if redistribute_type not in ("default", "connected", "static", "static_device", "kernel", "originated"):
                     raise ValueError('The BGP redistribute type "%s" is not known' % redistribute_type)
                 self.redistribute[redistribute_type] = redistribute_config
@@ -2388,7 +2388,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         }
         # Work out what we're going to be accepting
         if "accept" in self.peer_config:
-            for accept_type, accept_config in self.peer_config["accept"].iteritems():
+            for accept_type, accept_config in self.peer_config["accept"].items():
                 if accept_type != "default":
                     raise ValueError('The BGP accept type "%s" is not known' % accept_type)
                 self._accept[accept_type] = accept_config
@@ -2396,7 +2396,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         # Check for filters we need to setup
         self._filter = {"prefixes": [], "asns": [], "as-set": []}
         if "filter" in self.peer_config:
-            for filter_type, filter_config in self.peer_config["filter"].iteritems():
+            for filter_type, filter_config in self.peer_config["filter"].items():
                 if filter_type not in ("prefixes", "asns", "as-set"):
                     raise ValueError('The BGP filter type "%s" is not known' % filter_type)
                 self._filter[filter_type] = filter_config
