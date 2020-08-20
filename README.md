@@ -72,7 +72,7 @@ bird:
 
 ## RIP Configuration
 
-The following pillar keys are supported under the `rip` key under the top level `bird` key.
+The following keys are supported under the `rip` key.
 
 ### interfaces
 
@@ -83,26 +83,31 @@ The following sub-properties are supported:
 `metric` - The metric value to add to the routes exported on this interface. The highest RIP route metric is 16, so be wary of
 this.
 
-`update-time` - How often we should be sending route updates.
+`update-time` - How often we should be sending updates.
 
 
 A configuration example for interfaces is below...
 ```yaml
-bird:
-  router_id: 0.0.0.2
-  rip:
-    interfaces:
-      'eth0': []
-      'eth1':
-        metric: 2
+router_id: 0.0.0.2
+rip:
+  interfaces:
+    'eth0': []
+    'eth1':
+      metric: 2
 ```
 
 ### accept
 
-The `accept` key contains a dictionary of routes we will accept.
+The `accept` key contains a dictionary of route types we will accept:
 
-`default` allows us to accept a default route from RIP.
+`default` - Allows us to accept a default route from RIP.
 
+```yaml
+router_id: 0.0.0.5
+rip:
+  accept:
+    default: True
+```
 
 ### redistribute
 
