@@ -1468,8 +1468,8 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         # Configure import filter to master table
         self._addline("filter f_rip_master%s_import {" % ipv)
         # Redistribute the default route
-        if not self.redistribute_default:
-            self._addline("\t# Import default route into RIP (redistribute_defeault)")
+        if self.redistribute_default:
+            self._addline("\t# Import default route into RIP (redistribute_default)")
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\taccept;")
             self._addline("\t}")
