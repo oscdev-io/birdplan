@@ -100,7 +100,7 @@ rip:
 
 The `accept` key contains a dictionary of route types we will accept:
 
-`default` - Allows us to accept a default route from RIP.
+`default` - Allows us to accept a default route from RIP. The default is `False`.
 
 ```yaml
 router_id: 0.0.0.5
@@ -120,7 +120,7 @@ like `eth*`.
 
 `static` routes are those setup in the static protocol.
 
-`static_device` routes are those setup in the static protocol which point to a device and not a gateway.
+`static_device` routes are those setup in the static protocol which point to a device and not a gateway. FIXME: NK: UNKNOWN WHERE THESE COME FROM
 
 `default` allows the redistribution of the default route, it must still come from somewhere, so this option alone is useless.
 
