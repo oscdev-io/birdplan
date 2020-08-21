@@ -1453,7 +1453,7 @@ class BirdConfigProtocolRIP(BirdConfigBase):
             self._addline("\t\treject;")
             self._addline("\t}")
         # Accept only RIP routes into the master table
-        self._addline("\t# Only export RIP routes o the master table")
+        self._addline("\t# Only export RIP routes to the master table")
         self._addline("\tif (source = RTS_RIP) then {")
         self._addline("\t\taccept;")
         self._addline("\t}")
@@ -1469,7 +1469,7 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         self._addline("filter f_rip_master%s_import {" % ipv)
         # Redistribute kernel routes
         if self.redistribute_kernel:
-            self._addline("\t# Import kernel routes into RIP (redistribute kernel)")
+            self._addline("\t# Import RTS_INHERIT routes (kernel routes) into RIP (redistribute_kernel)")
             self._addline("\tif (source = RTS_INHERIT) then {")
             self._addline("\t\taccept;")
             self._addline("\t}")
