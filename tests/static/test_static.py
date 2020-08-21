@@ -35,11 +35,13 @@ class TestStaticRouting:
         birdplan = BirdPlan()
         # Generate config files
         for router in ["r1", "r2"]:
+            conffile = f"{tmpdir}/bird.conf.{router}"
             logfile = f"{tmpdir}/bird.log.{router}"
             # Load yaml config
             birdplan.load(f"tests/static/{router}.yaml", {"@LOGFILE@": logfile})
             # Generate BIRD config
-            sim.add_report(f"CONFIG({router})", birdplan.generate(f"{tmpdir}/bird.conf.{router}"))
+            birdplan.generate(conffile)
+            sim.add_conffile(f"CONFFILE({router})", conffile)
             sim.add_logfile(f"LOGFILE({router})", logfile)
 
     def test_create_topology(self, sim, tmpdir):
