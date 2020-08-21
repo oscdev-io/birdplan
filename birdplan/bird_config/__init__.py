@@ -1448,11 +1448,8 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         self._addline("filter f_rip_master%s_export {" % ipv)
         # Check if we accept the default route, if not block it
         if not self.accept_default:
-            self._addline("\t# Do not export default route to master")
-            if ipv == 4:
-                self._addline("\tif (net = 0.0.0.0/0) then {")
-            elif ipv == 6:
-                self._addline("\tif (net = ::/0) then {")
+            self._addline("\t# Do not export default route to master (no accept:default)")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\treject;")
             self._addline("\t}")
         # Accept only RIP routes into the master table
