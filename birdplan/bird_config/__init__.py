@@ -1467,6 +1467,35 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         """RIP to master import filter setup."""
         # Configure import filter to master table
         self._addline("filter f_rip_master%s_import {" % ipv)
+        # Redistribute the default route
+        if not self.redistribute_default:
+            self._addline("\t# Import default route into RIP (redistribute_defeault)")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline("\t\taccept;")
+            self._addline("\t}")
+        else:
+            self._addline("\t# Deny import of default route into RIP (no redistribute_defeault)")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline("\t\treject;")
+            self._addline("\t}")
+        # Redistribute connected
+        if self.redistribute_connected:
+            self._addline("\t# Import RTS_DEVICE routes into RIP (redistribute_connected)")
+            self._addline("\tif (source = RTS_DEVICE) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
+        # Redistribute static device routes
+        if self.redistribute_static_device:
+            self._addline("\t# Import RTS_STATIC_DEVICE routes into RIP (redistribute_static_device)")
+            self._addline("\tif (source = RTS_STATIC_DEVICE) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
+        # Redistribute static routes
+        if self.redistribute_static:
+            self._addline("\t# Import RTS_STATIC routes into RIP (redistribute_static)")
+            self._addline("\tif (source = RTS_STATIC) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
         # Redistribute kernel routes
         if self.redistribute_kernel:
             self._addline("\t# Import RTS_INHERIT routes (kernel routes) into RIP (redistribute_kernel)")
@@ -1516,13 +1545,6 @@ class BirdConfigProtocolRIP(BirdConfigBase):
             self, table_from="rip", table_to="master", table_export_filtered=True, table_import_filtered=True
         )
         rip_master_pipe.configure()
-
-        # Configure pipe from RIP to the static routing table, if we need to export static routes
-        if self.redistribute_static:
-            rip_static_pipe = BirdConfigProtocolPipe(
-                self, table_from="rip", table_to="static", table_export="none", table_import="all"
-            )
-            rip_static_pipe.configure()
 
         # Check if we're redistributing connected routes, if we are, create the protocol and pipe
         if self.redistribute_connected:
