@@ -1392,6 +1392,11 @@ class BirdConfigProtocolRIP(BirdConfigBase):
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\taccept;")
             self._addline("\t}")
+        else:
+            self._addline("\t# Reject redistribution of the default route")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline("\t\treject;")
+            self._addline("\t}")
         # Redistribute connected
         if self.redistribute_connected:
             self._addline("\t# Redistribute connected")
