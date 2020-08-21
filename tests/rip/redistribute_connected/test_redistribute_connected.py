@@ -22,6 +22,7 @@
 
 import time
 import pytest
+from nsnetsim.exceptions import NsNetSimError
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.switch_node import SwitchNode
 from birdplan import BirdPlan
@@ -85,16 +86,17 @@ class TestRipRedistributeConnected:
         assert "router_id" in r2_status_output, "The status output should have 'router_id'"
         assert r2_status_output["router_id"] == "0.0.0.2", "The router ID should be '0.0.0.2'"
 
-    def test_bird_tables_rip4(self, sim, helpers):
-        """Test BIRD rip4 table."""
+    def test_bird_tables_direct4(self, sim, helpers):
+        """Test BIRD direct4_rip table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_rip4")
-        r2_table = sim.node("r2").birdc_show_route_table("t_rip4")
+        r1_table = sim.node("r1").birdc_show_route_table("t_direct4_rip")
+        # There is no direct4_rip table for r2
+        with pytest.raises(NsNetSimError, match=r".* CF_SYM_UNDEFINED, .*"):
+            sim.node("r2").birdc_show_route_table("t_direct4_rip")
 
-        sim.add_report_obj("BIRD(r1)[t_rip4]", r1_table)
-        sim.add_report_obj("BIRD(r2)[t_rip4]", r2_table)
+        sim.add_report_obj("BIRD(r1)[t_direct4_rip]", r1_table)
 
-        # Check rip4 BIRD tables
+        # Check direct4_rip BIRD table
         correct_result = {
             "192.168.10.0/24": [
                 {
@@ -107,34 +109,19 @@ class TestRipRedistributeConnected:
                 }
             ]
         }
-        assert r1_table == correct_result, "Result for R1 BIRD t_rip4 routing table does not match what it should be"
+        assert r1_table == correct_result, "Result for R1 BIRD t_direct4_rip routing table does not match what it should be"
 
-        correct_result = {
-            "192.168.10.0/24": [
-                {
-                    "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
-                    "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
-                    "pref": "120",
-                    "prefix_type": "unicast",
-                    "protocol": "rip4",
-                    "since": helpers.bird_since_field(),
-                    "type": ["RIP", "univ"],
-                }
-            ]
-        }
-        assert r2_table == correct_result, "Result for R2 BIRD t_rip4 routing table does not match what it should be"
+    def test_bird_tables_direct6(self, sim, helpers):
+        """Test BIRD direct6_rip table."""
 
-    def test_bird_tables_rip6(self, sim, helpers):
-        """Test BIRD rip4 table."""
+        r1_table = sim.node("r1").birdc_show_route_table("t_direct6_rip")
+        # There is no direct6_rip table for r2
+        with pytest.raises(NsNetSimError, match=r".* CF_SYM_UNDEFINED, .*"):
+            sim.node("r2").birdc_show_route_table("t_direct6_rip")
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_rip6")
-        r2_table = sim.node("r2").birdc_show_route_table("t_rip6")
+        sim.add_report_obj("BIRD(r1)[t_direct6_rip]", r1_table)
 
-        sim.add_report_obj("BIRD(r1)[t_rip6]", r1_table)
-        sim.add_report_obj("BIRD(r2)[t_rip6]", r2_table)
-
-        # Check rip6 BIRD tables
+        # Check direct6_rip BIRD table
         correct_result = {
             "fc10::/64": [
                 {
@@ -147,23 +134,7 @@ class TestRipRedistributeConnected:
                 }
             ]
         }
-        assert r1_table == correct_result, "Result for R1 BIRD t_rip6 routing table does not match what it should be"
-
-        correct_result = {
-            "fc10::/64": [
-                {
-                    "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
-                    "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
-                    "pref": "120",
-                    "prefix_type": "unicast",
-                    "protocol": "rip6",
-                    "since": helpers.bird_since_field(),
-                    "type": ["RIP", "univ"],
-                }
-            ]
-        }
-        assert r2_table == correct_result, "Result for R2 BIRD t_rip6 routing table does not match what it should be"
+        assert r1_table == correct_result, "Result for R1 BIRD t_direct6_rip routing table does not match what it should be"
 
     def test_bird_tables_static4(self, sim):
         """Test BIRD static4 table."""
@@ -250,6 +221,86 @@ class TestRipRedistributeConnected:
             ]
         }
         assert r2_table == correct_result, "Result for R2 BIRD master6 routing table does not match what it should be"
+
+    def test_bird_tables_rip4(self, sim, helpers):
+        """Test BIRD rip4 table."""
+
+        r1_table = sim.node("r1").birdc_show_route_table("t_rip4")
+        r2_table = sim.node("r2").birdc_show_route_table("t_rip4")
+
+        sim.add_report_obj("BIRD(r1)[t_rip4]", r1_table)
+        sim.add_report_obj("BIRD(r2)[t_rip4]", r2_table)
+
+        # Check rip4 BIRD tables
+        correct_result = {
+            "192.168.10.0/24": [
+                {
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": "240",
+                    "prefix_type": "unicast",
+                    "protocol": "direct4_rip",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ]
+        }
+        assert r1_table == correct_result, "Result for R1 BIRD t_rip4 routing table does not match what it should be"
+
+        correct_result = {
+            "192.168.10.0/24": [
+                {
+                    "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
+                    "metric1": "3",
+                    "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
+                    "pref": "120",
+                    "prefix_type": "unicast",
+                    "protocol": "rip4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["RIP", "univ"],
+                }
+            ]
+        }
+        assert r2_table == correct_result, "Result for R2 BIRD t_rip4 routing table does not match what it should be"
+
+    def test_bird_tables_rip6(self, sim, helpers):
+        """Test BIRD rip4 table."""
+
+        r1_table = sim.node("r1").birdc_show_route_table("t_rip6")
+        r2_table = sim.node("r2").birdc_show_route_table("t_rip6")
+
+        sim.add_report_obj("BIRD(r1)[t_rip6]", r1_table)
+        sim.add_report_obj("BIRD(r2)[t_rip6]", r2_table)
+
+        # Check rip6 BIRD tables
+        correct_result = {
+            "fc10::/64": [
+                {
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": "240",
+                    "prefix_type": "unicast",
+                    "protocol": "direct6_rip",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ]
+        }
+        assert r1_table == correct_result, "Result for R1 BIRD t_rip6 routing table does not match what it should be"
+
+        correct_result = {
+            "fc10::/64": [
+                {
+                    "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
+                    "metric1": "3",
+                    "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+                    "pref": "120",
+                    "prefix_type": "unicast",
+                    "protocol": "rip6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["RIP", "univ"],
+                }
+            ]
+        }
+        assert r2_table == correct_result, "Result for R2 BIRD t_rip6 routing table does not match what it should be"
 
     def test_bird_tables_kernel4(self, sim, helpers):
         """Test BIRD kernel4 table."""
