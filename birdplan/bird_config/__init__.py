@@ -1443,7 +1443,7 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         self._addline("filter f_rip_master%s_export {" % ipv)
         # Check if we accept the default route, if not block it
         if not self.accept_default:
-            self._addline("\t# Do not import default routes")
+            self._addline("\t# Do not export default route to master")
             if ipv == 4:
                 self._addline("\tif (net = 0.0.0.0/0) then {")
             elif ipv == 6:
@@ -1451,7 +1451,7 @@ class BirdConfigProtocolRIP(BirdConfigBase):
             self._addline("\t\treject;")
             self._addline("\t}")
         # Accept only RIP routes into the master table
-        self._addline("\t# Only import RIP routes into the master table")
+        self._addline("\t# Only export RIP routes o the master table")
         self._addline("\tif (source = RTS_RIP) then {")
         self._addline("\t\taccept;")
         self._addline("\t}")
@@ -1746,7 +1746,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         self._addline("filter f_ospf_master%s_export {" % ipv)
         # Check if we accept the default route, if not block it
         if not self.accept_default:
-            self._addline("\t# Do not import default routes")
+            self._addline("\t# Do not export default route to master")
             if ipv == 4:
                 self._addline("\tif (net = 0.0.0.0/0) then {")
             elif ipv == 6:
@@ -1754,7 +1754,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
             self._addline("\t\treject;")
             self._addline("\t}")
         # Accept only OSPF routes into the master table
-        self._addline("\t# Only import OSPF routes into the master table")
+        self._addline("\t# Only export OSPF routes to the master table")
         # NK: We cannot seem to filter out the device routes
         self._addline("\tif (source ~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2]) then {")
         self._addline("\t\taccept;")
