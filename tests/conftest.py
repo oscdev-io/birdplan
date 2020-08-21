@@ -20,7 +20,8 @@
 
 import os
 import re
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
+import pprint
 import pytest
 from nsnetsim.generic_node import GenericNode
 from nsnetsim.topology import Topology
@@ -86,29 +87,45 @@ def pytest_configure(config):
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     """Check if we failed, if we did set the parent _previousfailed."""
+
     # Yield so we can get the outcome from other hoooks
     outcome = yield
     report = outcome.get_result()
 
-    # Check for a failure
-    if report.when == "call" and report.failed:
+    # Make sure this is a call
+    if report.when == "call":
+        # Check if something failed
+        if report.failed:
+            # Check if we have fixtures...
+            if hasattr(item, "fixturenames"):
+                # If we do, check we have a "sim" fixture
+                if "sim" in item.fixturenames and item.config.getoption("verbose") > 0:
+                    # If we do, pull it out and add its report
+                    sim = item.funcargs["sim"]
+                    report.sections.extend(sim.report())
 
-        # Check if we have fixtures...
-        if hasattr(item, "fixturenames"):
-            # If we do, check we have a "sim" fixture
-            if "sim" in item.fixturenames and item.config.getoption("verbose") > 0:
-                # If we do, pull it out and add its report
+            # If this is an incremental test we need to add an attribute to indicate failure
+            if "incremental" in item.keywords:
+                if call.excinfo is not None:
+                    setattr(item.parent, "_previousfailed", item)
+
+        # If the test passed, clear the report data
+        else:
+            # Grab sim and clear the report
+            if hasattr(item, "fixturenames") and "sim" in item.fixturenames:
                 sim = item.funcargs["sim"]
-                report.sections.extend(sim.report())
-
-        # If this is an incremental test we need to add an attribute to indicate failure
-        if "incremental" in item.keywords:
-            if call.excinfo is not None:
-                setattr(item.parent, "_previousfailed", item)
+                sim.clear_report()
 
 
 def pytest_runtest_setup(item):
     """Check if the previous test failed, if so xfail the rest."""
+
+    # Clear reports before running test
+    if hasattr(item.parent, "fixturenames"):
+        if "sim" in item.parent.fixturenames:
+            sim = item.parent.funcargs["sim"]
+            sim.clear_report()
+
     previousfailed = getattr(item.parent, "_previousfailed", None)
     if previousfailed is not None:
         pytest.xfail(f"Previous test failed ({previousfailed.name})")
@@ -155,6 +172,18 @@ class Simulation:
         This info is output on test failure.
         """
         self._report[name] = info
+
+    def add_report_obj(self, name: str, obj: Any):
+        """
+        Add obj to the test report using pprint.
+
+        This info is output on test failure.
+        """
+        self._report[name] = pprint.pformat(obj)
+
+    def clear_report(self):
+        """Clear all reports we currently have."""
+        self._report = {}
 
     def add_logfile(self, name: str, filename: str):
         """

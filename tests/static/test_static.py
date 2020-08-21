@@ -20,7 +20,6 @@
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-import pprint
 import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.switch_node import SwitchNode
@@ -28,7 +27,7 @@ from birdplan import BirdPlan
 
 
 @pytest.mark.incremental
-class TestBasicStatic:
+class TestStaticRouting:
     """Basic set of tests for static routing."""
 
     def test_configure(self, sim, tmpdir):
@@ -38,7 +37,7 @@ class TestBasicStatic:
         for router in ["r1", "r2"]:
             logfile = f"{tmpdir}/bird.log.{router}"
             # Load yaml config
-            birdplan.load(f"tests/basic/static-{router}.yaml", {"@LOGFILE@": logfile})
+            birdplan.load(f"tests/static/{router}.yaml", {"@LOGFILE@": logfile})
             # Generate BIRD config
             sim.add_report(f"CONFIG({router})", birdplan.generate(f"{tmpdir}/bird.conf.{router}"))
             sim.add_logfile(f"LOGFILE({router})", logfile)
@@ -66,16 +65,13 @@ class TestBasicStatic:
         sim.run()
 
     def test_bird_status(self, sim):
-        """Grab data from the simulation."""
+        """Test BIRD status."""
 
         r1_status_output = sim.node("r1").birdc_show_status()
         r2_status_output = sim.node("r2").birdc_show_status()
 
-        print("STATUS(r1):")
-        pprint.pprint(r1_status_output)
-
-        print("STATUS(r2):")
-        pprint.pprint(r2_status_output)
+        sim.add_report_obj("STATUS(r1)", r1_status_output)
+        sim.add_report_obj("STATUS(r2)", r2_status_output)
 
         # Check BIRD router ID
         assert "router_id" in r1_status_output, "The status output should have 'router_id'"
@@ -85,15 +81,13 @@ class TestBasicStatic:
         assert r2_status_output["router_id"] == "0.0.0.1", "The router ID should be '0.0.0.1'"
 
     def test_bird_tables_static4(self, sim, helpers):
-        """Test BIRD static4 tables."""
+        """Test BIRD static4 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("t_static4")
         r2_table = sim.node("r2").birdc_show_route_table("t_static4")
 
-        print("BIRD(r1)[t_static4]:")
-        pprint.pprint(r1_table)
-        print("BIRD(r2)[t_static4]:")
-        pprint.pprint(r2_table)
+        sim.add_report_obj("BIRD(r1)[t_static4]", r1_table)
+        sim.add_report_obj("BIRD(r2)[t_static4]", r2_table)
 
         # Check static4 BIRD table
         correct_result = {
@@ -112,15 +106,13 @@ class TestBasicStatic:
         assert r2_table == correct_result, "Result for R2 BIRD t_static4 routing table does not match what it should be"
 
     def test_bird_tables_static6(self, sim, helpers):
-        """Test BIRD static6 tables."""
+        """Test BIRD static6 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("t_static6")
         r2_table = sim.node("r2").birdc_show_route_table("t_static6")
 
-        print("BIRD(r1)[t_static6]:")
-        pprint.pprint(r1_table)
-        print("BIRD(r2)[t_static6]:")
-        pprint.pprint(r2_table)
+        sim.add_report_obj("BIRD(r1)[t_static6]", r1_table)
+        sim.add_report_obj("BIRD(r2)[t_static6]", r2_table)
 
         # Check static6 BIRD table
         correct_result = {
@@ -139,15 +131,13 @@ class TestBasicStatic:
         assert r2_table == correct_result, "Result for R2 BIRD t_static6 routing table does not match what it should be"
 
     def test_bird_tables_master4(self, sim, helpers):
-        """Test BIRD master4 tables."""
+        """Test BIRD master4 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("master4")
         r2_table = sim.node("r2").birdc_show_route_table("master4")
 
-        print("BIRD(r1)[master4]:")
-        pprint.pprint(r1_table)
-        print("BIRD(r2)[master4]:")
-        pprint.pprint(r2_table)
+        sim.add_report_obj("BIRD(r1)[master4]", r1_table)
+        sim.add_report_obj("BIRD(r2)[master4]", r2_table)
 
         # Check master4 BIRD table
         correct_result = {
@@ -166,15 +156,13 @@ class TestBasicStatic:
         assert r2_table == correct_result, "Result for R2 BIRD master4 routing table does not match what it should be"
 
     def test_bird_tables_master6(self, sim, helpers):
-        """Test BIRD master6 tables."""
+        """Test BIRD master6 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("master6")
         r2_table = sim.node("r2").birdc_show_route_table("master6")
 
-        print("BIRD(r1)[master6]:")
-        pprint.pprint(r1_table)
-        print("BIRD(r2)[master6]:")
-        pprint.pprint(r2_table)
+        sim.add_report_obj("BIRD(r1)[master6]", r1_table)
+        sim.add_report_obj("BIRD(r2)[master6]", r2_table)
 
         # Check master6 BIRD table
         correct_result = {
@@ -193,15 +181,13 @@ class TestBasicStatic:
         assert r2_table == correct_result, "Result for R2 BIRD master6 routing table does not match what it should be"
 
     def test_bird_tables_kernel4(self, sim, helpers):
-        """Test BIRD kernel4 tables."""
+        """Test BIRD kernel4 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("t_kernel4")
         r2_table = sim.node("r2").birdc_show_route_table("t_kernel4")
 
-        print("BIRD(r1)[t_kernel4]:")
-        pprint.pprint(r1_table)
-        print("BIRD(r2)[t_kernel4]:")
-        pprint.pprint(r2_table)
+        sim.add_report_obj("BIRD(r1)[t_kernel_4]", r1_table)
+        sim.add_report_obj("BIRD(r2)[t_kernel_4]", r2_table)
 
         # Check kernel4 BIRD table
         correct_result = {
@@ -222,15 +208,13 @@ class TestBasicStatic:
         assert r2_table == correct_result, "Result for R2 BIRD t_kernel4 routing table does not match what it should be"
 
     def test_bird_tables_kernel6(self, sim, helpers):
-        """Test BIRD kernel6 tables."""
+        """Test BIRD kernel6 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("t_kernel6")
         r2_table = sim.node("r2").birdc_show_route_table("t_kernel6")
 
-        print("BIRD(r1)[t_kernel6]:")
-        pprint.pprint(r1_table)
-        print("BIRD(r2)[t_kernel6]:")
-        pprint.pprint(r2_table)
+        sim.add_report_obj("BIRD(r1)[t_kernel_6]", r1_table)
+        sim.add_report_obj("BIRD(r2)[t_kernel_6]", r2_table)
 
         # Check kernel6 BIRD table
         correct_result = {
@@ -251,16 +235,13 @@ class TestBasicStatic:
         assert r2_table == correct_result, "Result for R2 BIRD t_kernel6 routing table does not match what it should be"
 
     def test_os_rib_inet(self, sim):
-        """Test OS rib inet tables."""
+        """Test OS rib inet table."""
 
         r1_os_rib = sim.node("r1").run_ip(["--family", "inet", "route", "list"])
         r2_os_rib = sim.node("r2").run_ip(["--family", "inet", "route", "list"])
 
-        print("OS(r1)[inet]:")
-        pprint.pprint(r1_os_rib)
-
-        print("OS(r2)[inet]:")
-        pprint.pprint(r2_os_rib)
+        sim.add_report_obj("OS(r1)[inet]", r1_os_rib)
+        sim.add_report_obj("OS(r2)[inet]", r2_os_rib)
 
         # Check kernel has the correct IPv4 RIB
         correct_result = [
@@ -275,16 +256,13 @@ class TestBasicStatic:
         assert r2_os_rib == correct_result, "R2 kernel IPv4 RIB does not match what it should be"
 
     def test_os_rib_inet6(self, sim):
-        """Test OS rib inet6 tables."""
+        """Test OS rib inet6 table."""
 
         r1_os_rib = sim.node("r1").run_ip(["--family", "inet6", "route", "list"])
         r2_os_rib = sim.node("r2").run_ip(["--family", "inet6", "route", "list"])
 
-        print("OS(r1)[inet6]:")
-        pprint.pprint(r1_os_rib)
-
-        print("OS(r2)[inet6]:")
-        pprint.pprint(r2_os_rib)
+        sim.add_report_obj("OS(r1)[inet6]", r1_os_rib)
+        sim.add_report_obj("OS(r2)[inet6]", r2_os_rib)
 
         # Check kernel has the correct IPv6 RIB
         correct_result = [
