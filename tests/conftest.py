@@ -96,13 +96,17 @@ def pytest_runtest_makereport(item, call):
     if report.when == "call":
         # Check if something failed
         if report.failed:
-            # Check if we have fixtures...
-            if hasattr(item, "fixturenames"):
+            # Check if we a "sim" fixture
+            if hasattr(item, "fixturenames") and "sim" in item.fixturenames:
                 # If we do, check we have a "sim" fixture
-                if "sim" in item.fixturenames and item.config.getoption("verbose") > 0:
-                    # If we do, pull it out and add its report
-                    sim = item.funcargs["sim"]
-                    report.sections.extend(sim.report())
+                sim = item.funcargs["sim"]
+                report.sections.extend(sim.report())
+                # Check if we're adding log files
+                if item.config.getoption("verbose") > 1:
+                    report.sections.extend(sim.report_logs())
+                # Check if we're adding config files
+                if item.config.getoption("verbose") > 2:
+                    report.sections.extend(sim.report_configs())
 
             # If this is an incremental test we need to add an attribute to indicate failure
             if "incremental" in item.keywords:
