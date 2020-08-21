@@ -1077,6 +1077,7 @@ class BirdConfigProtocolStatic(BirdConfigBase):
         self._addline("protocol static static4 {")
         self._addline('\tdescription "Static protocol for IPv4";')
         self._addline("")
+        # FIXME - remove at some stage # pylint:disable=fixme
         self._addline("debug all;")
         self._addline("")
         self._addline("\tipv4 {")
