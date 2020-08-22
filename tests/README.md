@@ -6,6 +6,8 @@
 
 ## RIP
 
+[Redistribute Connected](rip/redistribute_connected/README.md)
+
 [Redistribute Kernel](rip/redistribute_kernel/README.md)
 
 [Redistribute Static](rip/redistribute_static/README.md)
