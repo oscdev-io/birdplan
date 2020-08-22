@@ -6,6 +6,8 @@
 
 ## RIP
 
+[No Export Kernel](rip/no_export_kernel/README.md)
+
 [Redistribute Connected](rip/redistribute_connected/README.md)
 
 [Redistribute Connected (with star)](rip/redistribute_connected_with_star/README.md)
