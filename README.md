@@ -129,16 +129,15 @@ like `eth*`.
 
 An example of this configuration can be found below...
 ```yaml
-bird:
-  router_id: 0.0.0.2
-  rip:
-    redistribute:
-      connected:
-        interfaces:
-          - eth9
-      kernel: True
-      static: True
-      static_device: True
+router_id: 0.0.0.2
+rip:
+  redistribute:
+    connected:
+      interfaces:
+        - eth9
+    kernel: True
+    static: True
+    static_device: True
 ```
 
 ## OSPF Configuration
