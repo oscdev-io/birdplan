@@ -22,4 +22,6 @@
 
 ## OSPF
 
+[Redistribute Kernel](ospf/redistribute_kernel/README.md)
+
 [Redistribute Static](ospf/redistribute_static/README.md)
