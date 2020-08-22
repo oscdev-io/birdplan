@@ -1781,9 +1781,27 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         """OSPF to master import filter setup."""
         # Configure import filter to master table
         self._addline("filter f_ospf_master%s_import {" % ipv)
-        # Redistribute master routes
+        # Redistribute the default route
+        if not self.redistribute_default:
+            self._addline("\t# Deny import of default route into OSPF (no redistribute_default)")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline("\t\treject;")
+            self._addline("\t}")
+        # Redistribute static device routes
+        if self.redistribute_static_device:
+            self._addline("\t# Import RTS_STATIC_DEVICE routes into OSPF (redistribute_static_device)")
+            self._addline("\tif (source = RTS_STATIC_DEVICE) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
+        # Redistribute static routes
+        if self.redistribute_static:
+            self._addline("\t# Import RTS_STATIC routes into OSPF (redistribute_static)")
+            self._addline("\tif (source = RTS_STATIC) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
+        # Redistribute kernel routes
         if self.redistribute_kernel:
-            self._addline("\t# Import kernel routes into OSPF (redistribute kernel)")
+            self._addline("\t# Import RTS_INHERIT routes (kernel routes) into OSPF (redistribute_kernel)")
             self._addline("\tif (source = RTS_INHERIT) then {")
             self._addline("\t\taccept;")
             self._addline("\t}")
@@ -1832,13 +1850,6 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
             self, table_from="ospf", table_to="master", table_export_filtered=True, table_import_filtered=True
         )
         ospf_master_pipe.configure()
-
-        # Configure pipe from OSPF to the static routing table, if we need to export static routes
-        if self.redistribute_static:
-            ospf_static_pipe = BirdConfigProtocolPipe(
-                self, table_from="ospf", table_to="static", table_export="none", table_import="all"
-            )
-            ospf_static_pipe.configure()
 
     def add_area(self, area_name, area_config=None):
         """Add area to OSPF."""
