@@ -28,7 +28,7 @@ from birdplan import BirdPlan
 
 
 @pytest.mark.incremental
-class TestRipRedistributeKernel:
+class TestRIPRedistributeKernel:
     """RIP test for redistributed kernel routes."""
 
     def test_configure(self, sim, tmpdir):

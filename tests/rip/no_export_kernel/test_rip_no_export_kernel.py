@@ -28,7 +28,7 @@ from birdplan import BirdPlan
 
 
 @pytest.mark.incremental
-class TestRipNoExportKernel:
+class TestRIPNoExportKernel:
     """RIP test for no exporting to kernel."""
 
     def test_configure(self, sim, tmpdir):

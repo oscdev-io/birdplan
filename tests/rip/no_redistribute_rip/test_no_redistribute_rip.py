@@ -28,7 +28,7 @@ from birdplan import BirdPlan
 
 
 @pytest.mark.incremental
-class TestRipNoRedistributeRip:
+class TestRIPNoRedistributeRip:
     """RIP test for non-redistribution of RIP routes."""
 
     def test_configure(self, sim, tmpdir):

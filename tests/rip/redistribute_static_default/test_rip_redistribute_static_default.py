@@ -28,7 +28,7 @@ from birdplan import BirdPlan
 
 
 @pytest.mark.incremental
-class TestRipRedistributeDefaultStatic:
+class TestRIPRedistributeDefaultStatic:
     """RIP test for redistributed default static routes."""
 
     def test_configure(self, sim, tmpdir):

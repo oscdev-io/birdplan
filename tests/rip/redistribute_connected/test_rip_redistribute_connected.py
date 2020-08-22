@@ -29,7 +29,7 @@ from birdplan import BirdPlan
 
 
 @pytest.mark.incremental
-class TestRipRedistributeConnected:
+class TestRIPRedistributeConnected:
     """RIP test for redistributed connected routes."""
 
     def test_configure(self, sim, tmpdir):
