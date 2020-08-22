@@ -16,12 +16,12 @@ class "Router: r1" {
 + fc00::1/64
 
   .. Interface: eth1 ..
-- 192.168.10.1/24
-+ fc10::1/64
+- 192.168.1.1/24
++ fc01::1/64
 
   .. BIRD static routes ..
-- 192.158.20.0/24 via 192.168.10.2 (eth1)
-+ fc20:/64 via fc10::2 (eth1)
+- 192.168.20.0/24 via 192.168.1.2 (eth1)
++ fc20:/64 via fc01::2 (eth1)
 }
 note top: Should export BIRD static routes on eth1 to r2
 

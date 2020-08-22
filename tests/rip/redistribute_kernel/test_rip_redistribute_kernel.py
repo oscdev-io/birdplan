@@ -54,7 +54,7 @@ class TestRipRedistributeKernel:
 
         print("Adding interfaces...")
         sim.node("r1").add_interface("eth0", mac="02:01:00:00:00:01", ips=["192.168.0.1/24", "fc00::1/64"])
-        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["192.168.10.1/24", "fc10::1/64"])
+        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["192.168.1.1/24", "fc01::1/64"])
         sim.node("r2").add_interface("eth0", mac="02:02:00:00:00:01", ips=["192.168.0.2/24", "fc00::2/64"])
 
         print("Adding switches...")
@@ -66,9 +66,10 @@ class TestRipRedistributeKernel:
         print("Simulate topology...")
         sim.run()
 
-        # Add kernel routes
-        sim.node("r1").run_ip(["route", "add", "192.168.20.0/24", "via", "192.168.10.2"])
-        sim.node("r1").run_ip(["route", "add", "fc20::/64", "via", "fc10::2"])
+        # Add gateway'd kernel routes
+        sim.node("r1").run_ip(["route", "add", "192.168.20.0/24", "via", "192.168.1.2"])
+        sim.node("r1").run_ip(["route", "add", "fc20::/64", "via", "fc01::2"])
+        # Add link kernel routes
         sim.node("r1").run_ip(["route", "add", "192.168.30.0/24", "dev", "eth1"])
         sim.node("r1").run_ip(["route", "add", "fc30::/64", "dev", "eth1"])
 
@@ -105,7 +106,7 @@ class TestRipRedistributeKernel:
             "192.168.20.0/24": [
                 {
                     "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
-                    "nexthops": [{"gateway": "192.168.10.2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
                     "pref": "10",
                     "prefix_type": "unicast",
                     "protocol": "kernel4",
@@ -169,7 +170,7 @@ class TestRipRedistributeKernel:
             "fc20::/64": [
                 {
                     "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
-                    "nexthops": [{"gateway": "fc10::2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
                     "pref": "10",
                     "prefix_type": "unicast",
                     "protocol": "kernel6",
@@ -261,7 +262,7 @@ class TestRipRedistributeKernel:
             "192.168.20.0/24": [
                 {
                     "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
-                    "nexthops": [{"gateway": "192.168.10.2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
                     "pref": "10",
                     "prefix_type": "unicast",
                     "protocol": "kernel4",
@@ -325,7 +326,7 @@ class TestRipRedistributeKernel:
             "fc20::/64": [
                 {
                     "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
-                    "nexthops": [{"gateway": "fc10::2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
                     "pref": "10",
                     "prefix_type": "unicast",
                     "protocol": "kernel6",
@@ -389,7 +390,7 @@ class TestRipRedistributeKernel:
             "192.168.20.0/24": [
                 {
                     "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
-                    "nexthops": [{"gateway": "192.168.10.2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
                     "pref": "10",
                     "prefix_type": "unicast",
                     "protocol": "kernel4",
@@ -453,7 +454,7 @@ class TestRipRedistributeKernel:
             "fc20::/64": [
                 {
                     "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
-                    "nexthops": [{"gateway": "fc10::2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
                     "pref": "10",
                     "prefix_type": "unicast",
                     "protocol": "kernel6",
@@ -515,15 +516,8 @@ class TestRipRedistributeKernel:
         # Check kernel has the correct IPv4 RIB
         correct_result = [
             {"dev": "eth0", "dst": "192.168.0.0/24", "flags": [], "prefsrc": "192.168.0.1", "protocol": "kernel", "scope": "link"},
-            {
-                "dev": "eth1",
-                "dst": "192.168.10.0/24",
-                "flags": [],
-                "prefsrc": "192.168.10.1",
-                "protocol": "kernel",
-                "scope": "link",
-            },
-            {"dev": "eth1", "dst": "192.168.20.0/24", "flags": [], "gateway": "192.168.10.2"},
+            {"dev": "eth1", "dst": "192.168.1.0/24", "flags": [], "prefsrc": "192.168.1.1", "protocol": "kernel", "scope": "link"},
+            {"dev": "eth1", "dst": "192.168.20.0/24", "flags": [], "gateway": "192.168.1.2"},
             {"dev": "eth1", "dst": "192.168.30.0/24", "flags": [], "scope": "link"},
         ]
         assert r1_os_rib == correct_result, "R1 kernel IPv4 RIB does not match what it should be"
@@ -547,8 +541,8 @@ class TestRipRedistributeKernel:
         # Check kernel has the correct IPv6 RIB
         correct_result = [
             {"dev": "eth0", "dst": "fc00::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-            {"dev": "eth1", "dst": "fc10::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-            {"dev": "eth1", "dst": "fc20::/64", "flags": [], "gateway": "fc10::2", "metric": 1024, "pref": "medium"},
+            {"dev": "eth1", "dst": "fc01::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+            {"dev": "eth1", "dst": "fc20::/64", "flags": [], "gateway": "fc01::2", "metric": 1024, "pref": "medium"},
             {"dev": "eth1", "dst": "fc30::/64", "flags": [], "metric": 1024, "pref": "medium"},
             {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
