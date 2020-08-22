@@ -20,7 +20,6 @@
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-import time
 import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.switch_node import SwitchNode
@@ -66,9 +65,6 @@ class TestRIPRedistributeStatic:
         print("Simulate topology...")
         sim.run()
 
-        # We need to wait at least 5 seconds for RIP To converge
-        time.sleep(7)
-
     def test_bird_status(self, sim):
         """Grab data from the simulation."""
 
@@ -88,7 +84,7 @@ class TestRIPRedistributeStatic:
     def test_bird_tables_static4(self, sim, helpers):
         """Test BIRD static4 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_static4")
+        r1_table = sim.node("r1").birdc_show_route_table("t_static4", expect_count=1)
         r2_table = sim.node("r2").birdc_show_route_table("t_static4")
 
         sim.add_report_obj("BIRD(r1)[t_static4]", r1_table)
@@ -115,7 +111,7 @@ class TestRIPRedistributeStatic:
     def test_bird_tables_static6(self, sim, helpers):
         """Test BIRD static6 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_static6")
+        r1_table = sim.node("r1").birdc_show_route_table("t_static6", expect_count=1)
         r2_table = sim.node("r2").birdc_show_route_table("t_static6")
 
         sim.add_report_obj("BIRD(r1)[t_static6]", r1_table)
@@ -142,8 +138,8 @@ class TestRIPRedistributeStatic:
     def test_bird_tables_master4(self, sim, helpers):
         """Test BIRD master4 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("master4")
-        r2_table = sim.node("r2").birdc_show_route_table("master4")
+        r1_table = sim.node("r1").birdc_show_route_table("master4", expect_count=1)
+        r2_table = sim.node("r2").birdc_show_route_table("master4", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[master4]", r1_table)
         sim.add_report_obj("BIRD(r2)[master4]", r2_table)
@@ -182,8 +178,8 @@ class TestRIPRedistributeStatic:
     def test_bird_tables_master6(self, sim, helpers):
         """Test BIRD master6 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("master6")
-        r2_table = sim.node("r2").birdc_show_route_table("master6")
+        r1_table = sim.node("r1").birdc_show_route_table("master6", expect_count=1)
+        r2_table = sim.node("r2").birdc_show_route_table("master6", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[master6]", r1_table)
         sim.add_report_obj("BIRD(r2)[master6]", r2_table)
@@ -222,8 +218,8 @@ class TestRIPRedistributeStatic:
     def test_bird_tables_rip4(self, sim, helpers):
         """Test BIRD rip4 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_rip4")
-        r2_table = sim.node("r2").birdc_show_route_table("t_rip4")
+        r1_table = sim.node("r1").birdc_show_route_table("t_rip4", expect_count=1)
+        r2_table = sim.node("r2").birdc_show_route_table("t_rip4", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[t_rip4]", r1_table)
         sim.add_report_obj("BIRD(r2)[t_rip4]", r2_table)
@@ -262,8 +258,8 @@ class TestRIPRedistributeStatic:
     def test_bird_tables_rip6(self, sim, helpers):
         """Test BIRD rip4 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_rip6")
-        r2_table = sim.node("r2").birdc_show_route_table("t_rip6")
+        r1_table = sim.node("r1").birdc_show_route_table("t_rip6", expect_count=1)
+        r2_table = sim.node("r2").birdc_show_route_table("t_rip6", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[t_rip6]", r1_table)
         sim.add_report_obj("BIRD(r2)[t_rip6]", r2_table)
@@ -302,8 +298,8 @@ class TestRIPRedistributeStatic:
     def test_bird_tables_kernel4(self, sim, helpers):
         """Test BIRD kernel4 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_kernel4")
-        r2_table = sim.node("r2").birdc_show_route_table("t_kernel4")
+        r1_table = sim.node("r1").birdc_show_route_table("t_kernel4", expect_count=1)
+        r2_table = sim.node("r2").birdc_show_route_table("t_kernel4", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[t_kernel_4]", r1_table)
         sim.add_report_obj("BIRD(r2)[t_kernel_4]", r2_table)
@@ -342,8 +338,8 @@ class TestRIPRedistributeStatic:
     def test_bird_tables_kernel6(self, sim, helpers):
         """Test BIRD kernel6 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_kernel6")
-        r2_table = sim.node("r2").birdc_show_route_table("t_kernel6")
+        r1_table = sim.node("r1").birdc_show_route_table("t_kernel6", expect_count=1)
+        r2_table = sim.node("r2").birdc_show_route_table("t_kernel6", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[t_kernel_6]", r1_table)
         sim.add_report_obj("BIRD(r2)[t_kernel_6]", r2_table)

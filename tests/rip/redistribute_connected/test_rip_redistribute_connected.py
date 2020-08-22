@@ -20,7 +20,6 @@
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-import time
 import pytest
 from nsnetsim.exceptions import NsNetSimError
 from nsnetsim.bird_router_node import BirdRouterNode
@@ -67,9 +66,6 @@ class TestRIPRedistributeConnected:
         print("Simulate topology...")
         sim.run()
 
-        # We need to wait at least 5 seconds for RIP To converge
-        time.sleep(7)
-
     def test_bird_status(self, sim):
         """Grab data from the simulation."""
 
@@ -89,7 +85,7 @@ class TestRIPRedistributeConnected:
     def test_bird_tables_direct4(self, sim, helpers):
         """Test BIRD direct4_rip table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_direct4_rip")
+        r1_table = sim.node("r1").birdc_show_route_table("t_direct4_rip", expect_count=1)
         # There is no direct4_rip table for r2
         with pytest.raises(NsNetSimError, match=r".* CF_SYM_UNDEFINED, .*"):
             sim.node("r2").birdc_show_route_table("t_direct4_rip")
@@ -114,7 +110,7 @@ class TestRIPRedistributeConnected:
     def test_bird_tables_direct6(self, sim, helpers):
         """Test BIRD direct6_rip table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_direct6_rip")
+        r1_table = sim.node("r1").birdc_show_route_table("t_direct6_rip", expect_count=1)
         # There is no direct6_rip table for r2
         with pytest.raises(NsNetSimError, match=r".* CF_SYM_UNDEFINED, .*"):
             sim.node("r2").birdc_show_route_table("t_direct6_rip")
@@ -168,7 +164,7 @@ class TestRIPRedistributeConnected:
         """Test BIRD master4 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("master4")
-        r2_table = sim.node("r2").birdc_show_route_table("master4")
+        r2_table = sim.node("r2").birdc_show_route_table("master4", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[master4]", r1_table)
         sim.add_report_obj("BIRD(r2)[master4]", r2_table)
@@ -197,7 +193,7 @@ class TestRIPRedistributeConnected:
         """Test BIRD master6 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("master6")
-        r2_table = sim.node("r2").birdc_show_route_table("master6")
+        r2_table = sim.node("r2").birdc_show_route_table("master6", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[master6]", r1_table)
         sim.add_report_obj("BIRD(r2)[master6]", r2_table)
@@ -225,8 +221,8 @@ class TestRIPRedistributeConnected:
     def test_bird_tables_rip4(self, sim, helpers):
         """Test BIRD rip4 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_rip4")
-        r2_table = sim.node("r2").birdc_show_route_table("t_rip4")
+        r1_table = sim.node("r1").birdc_show_route_table("t_rip4", expect_count=1)
+        r2_table = sim.node("r2").birdc_show_route_table("t_rip4", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[t_rip4]", r1_table)
         sim.add_report_obj("BIRD(r2)[t_rip4]", r2_table)
@@ -265,8 +261,8 @@ class TestRIPRedistributeConnected:
     def test_bird_tables_rip6(self, sim, helpers):
         """Test BIRD rip4 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_rip6")
-        r2_table = sim.node("r2").birdc_show_route_table("t_rip6")
+        r1_table = sim.node("r1").birdc_show_route_table("t_rip6", expect_count=1)
+        r2_table = sim.node("r2").birdc_show_route_table("t_rip6", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[t_rip6]", r1_table)
         sim.add_report_obj("BIRD(r2)[t_rip6]", r2_table)
@@ -306,7 +302,7 @@ class TestRIPRedistributeConnected:
         """Test BIRD kernel4 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("t_kernel4")
-        r2_table = sim.node("r2").birdc_show_route_table("t_kernel4")
+        r2_table = sim.node("r2").birdc_show_route_table("t_kernel4", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[t_kernel_4]", r1_table)
         sim.add_report_obj("BIRD(r2)[t_kernel_4]", r2_table)
@@ -335,7 +331,7 @@ class TestRIPRedistributeConnected:
         """Test BIRD kernel6 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("t_kernel6")
-        r2_table = sim.node("r2").birdc_show_route_table("t_kernel6")
+        r2_table = sim.node("r2").birdc_show_route_table("t_kernel6", expect_count=1)
 
         sim.add_report_obj("BIRD(r1)[t_kernel_6]", r1_table)
         sim.add_report_obj("BIRD(r2)[t_kernel_6]", r2_table)
