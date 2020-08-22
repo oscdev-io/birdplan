@@ -157,8 +157,8 @@ The `accept` key contains a dictionary of routes we will accept.
 
 The `redistribute` key contains a dictionary of the redistributable routes to be exported to OSPF.
 
-`connected` routes are kernel device routes for the interfaces. OSPF stub routes are used to add interfaces not part of the OSPF
-communication network. OSPF by default exports all connected routes as OSPF internal routes. So this option makes no sense.
+`connected` makes no sense to be used. OSPF stub routes are used to add interfaces not part of the OSPF
+communication network. OSPF by default exports all connected routes as OSPF internal routes.
 
 `kernel` routes are those statically added to the kernel.
 
@@ -171,17 +171,16 @@ communication network. OSPF by default exports all connected routes as OSPF inte
 
 An example of this configuration can be found below...
 ```yaml
-bird:
-  router_id: 0.0.0.2
-  ospf:
-    redistribute:
-      kernel: True
-      static: True
-      static_device: True
-    areas:
-      0:
-        interfaces:
-          'eth0': []
+router_id: 0.0.0.2
+ospf:
+  redistribute:
+    kernel: True
+    static: True
+    static_device: True
+  areas:
+    0:
+      interfaces:
+        'eth0': []
 ```
 
 ### areas
@@ -190,17 +189,22 @@ An OSPF area is defined using the `areas` key, which contains a dictionary of th
 
 Under the area ID is `interfaces`, which is a dictionary of interface matches, containing a list of supported options.
 
-Supported interface options are listed below.
+Supported interface options are listed below...
+
+* `hello` - Interval in seconds between sending of Hello messages, all routers on the same network must have the same value.
 
 * `stub` - When set to `True` will not communicate OSPF over this interface, but will add it to the automatically generated interface
 routes injected into the OSPF routing table.
 
+* `wait` - waits for the specified number of seconds between starting election and building adjacency. Default value is 4*hello.
+
+
 ```yaml
-  ospf:
-    areas:
-      0:
-        interfaces:
-          'eth0': []
-          'eth1':
-            - stub: True
+ospf:
+  areas:
+    0:
+      interfaces:
+        'eth0': []
+        'eth1':
+          stub: True
 ```
