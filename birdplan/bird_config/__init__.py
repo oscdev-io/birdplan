@@ -1388,12 +1388,7 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         """RIP export filter setup."""
         self._addline("filter f_rip_export%s {" % ipv)
         # Redistribute the default route
-        if self.redistribute_default:
-            self._addline("\t# Redistribute the default route")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
-            self._addline("\t\taccept;")
-            self._addline("\t}")
-        else:
+        if not self.redistribute_default:
             self._addline("\t# Reject redistribution of the default route")
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\treject;")
@@ -1469,13 +1464,8 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         # Configure import filter to master table
         self._addline("filter f_rip_master%s_import {" % ipv)
         # Redistribute the default route
-        if self.redistribute_default:
-            self._addline("\t# Import default route into RIP (redistribute_default)")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
-            self._addline("\t\taccept;")
-            self._addline("\t}")
-        else:
-            self._addline("\t# Deny import of default route into RIP (no redistribute_defeault)")
+        if not self.redistribute_default:
+            self._addline("\t# Deny import of default route into RIP (no redistribute_default)")
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\treject;")
             self._addline("\t}")
