@@ -94,7 +94,7 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config:
-            if config_item not in ["router_id", "log_file", "debug", "static", "export_kernel", "rip"]:
+            if config_item not in ["router_id", "log_file", "debug", "static", "export_kernel", "rip", "ospf"]:
                 raise BirdPlanError(f"The config item '{config_item}' is not supported")
 
         # Configure sections
@@ -102,6 +102,7 @@ class BirdPlan:
         self._config_static()
         self._config_export_kernel()
         self._config_rip()
+        self._config_ospf()
 
         # Generate the configuration
         config_lines = self._birdconf.get_config()
@@ -226,7 +227,7 @@ class BirdPlan:
                 self._birdconf.rip.redistribute_rip = redistribute_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
-                raise BirdPlanError(f"Configuration item '{redistribute}' not understood in RIP redistribute")
+                raise BirdPlanError(f"Configuration item '{redistribute}' not understood in rip:redistribute")
 
     def _config_rip_interfaces(self):
         """Configure rip:interfaces section."""
@@ -248,6 +249,100 @@ class BirdPlan:
                     raise BirdPlanError(f"Configuration item '{config_item}' not understood in RIP area")
             # Add interface
             self._birdconf.rip.add_interface(interface_name, interface_config)
+
+    def _config_ospf(self):
+        """Configure OSPF section."""
+
+        # If we have no ospf section, just return
+        if "ospf" not in self.config:
+            return
+
+        # Check configuration options are supported
+        for config_item in self.config["ospf"]:
+            if config_item not in ["accept", "redistribute", "areas"]:
+                raise BirdPlanError(f"The 'ospf' config item '{config_item}' is not supported")
+
+        self._config_ospf_accept()
+        self._config_ospf_redistribute()
+        self._config_ospf_areas()
+
+    def _config_ospf_accept(self):
+        """Configure ospf:accept section."""
+
+        # If we don't have an accept section, just return
+        if "accept" not in self.config["ospf"]:
+            return
+
+        # Loop with accept items
+        for accept, accept_config in self.config["ospf"]["accept"].items():
+            # Allow accept of the default route
+            if accept == "default":
+                self._birdconf.ospf.accept_default = accept_config
+            # If we don't understand this 'accept' entry, throw an error
+            else:
+                raise BirdPlanError(f"Configuration item '{accept}' not understood in ospf:accept")
+
+    def _config_ospf_redistribute(self):
+        """Configure ospf:redistribute section."""
+
+        # If we don't have a redistribute section just return
+        if "redistribute" not in self.config["ospf"]:
+            return
+
+        # Loop with redistribution items
+        for redistribute, redistribute_config in self.config["ospf"]["redistribute"].items():
+            # Add static route redistribution
+            if redistribute == "static":
+                self._birdconf.ospf.redistribute_static = redistribute_config
+            # Add static device route redistribution
+            elif redistribute == "static_device":
+                self._birdconf.ospf.redistribute_static_device = redistribute_config
+            # Add kernel route redistribution
+            elif redistribute == "kernel":
+                self._birdconf.ospf.redistribute_kernel = redistribute_config
+            # Allow redistribution of the default route
+            elif redistribute == "default":
+                self._birdconf.ospf.redistribute_default = redistribute_config
+            # If we don't understand this 'redistribute' entry, throw an error
+            else:
+                raise BirdPlanError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")
+
+    def _config_ospf_areas(self):
+        """Configure ospf:interfaces section."""
+
+        # If we don't have areas in our ospf section, just return
+        if "areas" not in self.config["ospf"]:
+            return
+
+        # Loop with each area and its config
+        for area_name, area in self.config["ospf"]["areas"].items():
+            # Make sure we have an interface for the area
+            if "interfaces" not in area:
+                raise BirdPlanError(f"OSPF area '{area_name}' must contain 'interfaces'")
+            # Loop with each config item
+            for config_item, config_value in area.items():
+                # Make sure this item is supported
+                if config_item not in ("config", "interfaces"):
+                    raise BirdPlanError(
+                        f"Configuration item '{config_item}' with value '{config_value}' not understood in ospf:areas"
+                    )
+            # See if we have area config
+            area_config = {}
+            if 'config' in area:
+                # Loop with each config item in the peer
+                for config_item, config_value in area['config'].iteritems():
+                    # No items supported atm
+                    if config_item in ('xxxxx', 'yyyy'):
+                        area_config[config_item] = config_value
+                    # If we don't understand this 'redistribute' entry, throw an error
+                    else:
+                        raise BirdPlanError("Configuration item '{config_item}' not understood in OSPF area")
+            # Add area
+            self._birdconf.ospf.add_area(area_name, area_config)
+            # Loop with interfaces in area
+            for interface_name, interface_config in area["interfaces"].items():
+                # Add interface to area
+                self._birdconf.ospf.add_interface(area_name, interface_name, interface_config)
 
     @property
     def plan_file(self) -> Optional[str]:
