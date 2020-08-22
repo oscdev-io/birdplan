@@ -328,11 +328,11 @@ class BirdPlan:
                     )
             # See if we have area config
             area_config = {}
-            if 'config' in area:
+            if "config" in area:
                 # Loop with each config item in the peer
-                for config_item, config_value in area['config'].iteritems():
+                for config_item, config_value in area["config"].iteritems():
                     # No items supported atm
-                    if config_item in ('xxxxx', 'yyyy'):
+                    if config_item in ("xxxxx", "yyyy"):
                         area_config[config_item] = config_value
                     # If we don't understand this 'redistribute' entry, throw an error
                     else:
