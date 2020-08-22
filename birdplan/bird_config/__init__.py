@@ -1868,20 +1868,17 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         # Grab the config so its easier to work with below
         config = self.interfaces[area_name][interface_name]
         # Work through supported configuration
-        for item in interface_config:
-            for key, value in item.items():
-                if key == "hello":
-                    config.append({key: value})
-                elif key == "wait":
-                    config.append({key: value})
-                elif key == "stub":
-                    if not value:
-                        RuntimeError('The OSPF default config for interface "%s" item "stub" is "false".' % interface_name)
-                    config.append({key: value})
-                else:
-                    raise RuntimeError(
-                        'The OSPF config for interface "%s" item "%s" hasnt been added to Salt yet' % (interface_name, key)
-                    )
+        for key, value in interface_config.items():
+            if key in ("hello", "wait"):
+                config.append({key: value})
+            elif key == "stub":
+                if not value:
+                    RuntimeError('The OSPF default config for interface "%s" item "stub" is "false".' % interface_name)
+                config.append({key: value})
+            else:
+                raise RuntimeError(
+                    'The OSPF config for interface "%s" item "%s" hasnt been added to Salt yet' % (interface_name, key)
+                )
 
     @property
     def accept_default(self):
