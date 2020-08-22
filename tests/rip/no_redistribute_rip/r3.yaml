@@ -1,0 +1,8 @@
+router_id: 0.0.0.3
+log_file: "@LOGFILE@"
+debug: True
+rip:
+  interfaces:
+    eth0:
+      update-time: 5
+      metric: 2
