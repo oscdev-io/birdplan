@@ -55,7 +55,7 @@ class TestRipRedistributeDefaultStatic:
 
         print("Adding interfaces...")
         sim.node("r1").add_interface("eth0", mac="02:01:00:00:00:01", ips=["192.168.0.1/24", "fc00::1/64"])
-        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["192.168.10.1/24", "fc10::1/64"])
+        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["192.168.1.1/24", "fc01::1/64"])
         sim.node("r2").add_interface("eth0", mac="02:02:00:00:00:01", ips=["192.168.0.2/24", "fc00::2/64"])
         sim.node("r3").add_interface("eth0", mac="02:03:00:00:00:01", ips=["192.168.0.3/24", "fc00::3/64"])
 
@@ -108,7 +108,7 @@ class TestRipRedistributeDefaultStatic:
         correct_result = {
             "0.0.0.0/0": [
                 {
-                    "nexthops": [{"gateway": "192.168.10.2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
                     "pref": "200",
                     "prefix_type": "unicast",
                     "protocol": "static4",
@@ -140,7 +140,7 @@ class TestRipRedistributeDefaultStatic:
         correct_result = {
             "::/0": [
                 {
-                    "nexthops": [{"gateway": "fc10::2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
                     "pref": "200",
                     "prefix_type": "unicast",
                     "protocol": "static6",
@@ -172,7 +172,7 @@ class TestRipRedistributeDefaultStatic:
         correct_result = {
             "0.0.0.0/0": [
                 {
-                    "nexthops": [{"gateway": "192.168.10.2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
                     "pref": "200",
                     "prefix_type": "unicast",
                     "protocol": "static4",
@@ -217,7 +217,7 @@ class TestRipRedistributeDefaultStatic:
         correct_result = {
             "::/0": [
                 {
-                    "nexthops": [{"gateway": "fc10::2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
                     "pref": "200",
                     "prefix_type": "unicast",
                     "protocol": "static6",
@@ -262,7 +262,7 @@ class TestRipRedistributeDefaultStatic:
         correct_result = {
             "0.0.0.0/0": [
                 {
-                    "nexthops": [{"gateway": "192.168.10.2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
                     "pref": "200",
                     "prefix_type": "unicast",
                     "protocol": "static4",
@@ -320,7 +320,7 @@ class TestRipRedistributeDefaultStatic:
         correct_result = {
             "::/0": [
                 {
-                    "nexthops": [{"gateway": "fc10::2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
                     "pref": "200",
                     "prefix_type": "unicast",
                     "protocol": "static6",
@@ -378,7 +378,7 @@ class TestRipRedistributeDefaultStatic:
         correct_result = {
             "0.0.0.0/0": [
                 {
-                    "nexthops": [{"gateway": "192.168.10.2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
                     "pref": "200",
                     "prefix_type": "unicast",
                     "protocol": "static4",
@@ -423,7 +423,7 @@ class TestRipRedistributeDefaultStatic:
         correct_result = {
             "::/0": [
                 {
-                    "nexthops": [{"gateway": "fc10::2", "interface": "eth1"}],
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
                     "pref": "200",
                     "prefix_type": "unicast",
                     "protocol": "static6",
@@ -466,16 +466,9 @@ class TestRipRedistributeDefaultStatic:
 
         # Check kernel has the correct IPv4 RIB
         correct_result = [
-            {"dev": "eth1", "dst": "default", "flags": [], "gateway": "192.168.10.2", "metric": 600, "protocol": "bird"},
+            {"dev": "eth1", "dst": "default", "flags": [], "gateway": "192.168.1.2", "metric": 600, "protocol": "bird"},
             {"dev": "eth0", "dst": "192.168.0.0/24", "flags": [], "prefsrc": "192.168.0.1", "protocol": "kernel", "scope": "link"},
-            {
-                "dev": "eth1",
-                "dst": "192.168.10.0/24",
-                "flags": [],
-                "prefsrc": "192.168.10.1",
-                "protocol": "kernel",
-                "scope": "link",
-            },
+            {"dev": "eth1", "dst": "192.168.1.0/24", "flags": [], "prefsrc": "192.168.1.1", "protocol": "kernel", "scope": "link"},
         ]
         assert r1_os_rib == correct_result, "R1 kernel IPv4 RIB does not match what it should be"
 
@@ -504,14 +497,14 @@ class TestRipRedistributeDefaultStatic:
         # Check kernel has the correct IPv6 RIB
         correct_result = [
             {"dev": "eth0", "dst": "fc00::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-            {"dev": "eth1", "dst": "fc10::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+            {"dev": "eth1", "dst": "fc01::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {
                 "dev": "eth1",
                 "dst": "default",
                 "flags": [],
-                "gateway": "fc10::2",
+                "gateway": "fc01::2",
                 "metric": 600,
                 "pref": "medium",
                 "protocol": "bird",
