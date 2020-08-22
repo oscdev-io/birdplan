@@ -1388,12 +1388,7 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         """RIP export filter setup."""
         self._addline("filter f_rip_export%s {" % ipv)
         # Redistribute the default route
-        if self.redistribute_default:
-            self._addline("\t# Redistribute the default route")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
-            self._addline("\t\taccept;")
-            self._addline("\t}")
-        else:
+        if not self.redistribute_default:
             self._addline("\t# Reject redistribution of the default route")
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\treject;")
@@ -1469,13 +1464,8 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         # Configure import filter to master table
         self._addline("filter f_rip_master%s_import {" % ipv)
         # Redistribute the default route
-        if self.redistribute_default:
-            self._addline("\t# Import default route into RIP (redistribute_default)")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
-            self._addline("\t\taccept;")
-            self._addline("\t}")
-        else:
-            self._addline("\t# Deny import of default route into RIP (no redistribute_defeault)")
+        if not self.redistribute_default:
+            self._addline("\t# Deny import of default route into RIP (no redistribute_default)")
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\treject;")
             self._addline("\t}")
@@ -1727,10 +1717,10 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
 
         self._addline("filter f_ospf_export%s {" % ipv)
         # Redistribute the default route
-        if self.redistribute_default:
-            self._addline("\t# Redistribute the default route")
+        if not self.redistribute_default:
+            self._addline("\t# Reject redistribution of the default route")
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
-            self._addline("\t\taccept;")
+            self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute static routes
         if self.redistribute_static:
@@ -1771,11 +1761,8 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         self._addline("filter f_ospf_master%s_export {" % ipv)
         # Check if we accept the default route, if not block it
         if not self.accept_default:
-            self._addline("\t# Do not export default route to master")
-            if ipv == 4:
-                self._addline("\tif (net = 0.0.0.0/0) then {")
-            elif ipv == 6:
-                self._addline("\tif (net = ::/0) then {")
+            self._addline("\t# Do not export default route to master (no accept:default)")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\treject;")
             self._addline("\t}")
         # Accept only OSPF routes into the master table
@@ -1794,9 +1781,27 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         """OSPF to master import filter setup."""
         # Configure import filter to master table
         self._addline("filter f_ospf_master%s_import {" % ipv)
-        # Redistribute master routes
+        # Redistribute the default route
+        if not self.redistribute_default:
+            self._addline("\t# Deny import of default route into OSPF (no redistribute_default)")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline("\t\treject;")
+            self._addline("\t}")
+        # Redistribute static device routes
+        if self.redistribute_static_device:
+            self._addline("\t# Import RTS_STATIC_DEVICE routes into OSPF (redistribute_static_device)")
+            self._addline("\tif (source = RTS_STATIC_DEVICE) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
+        # Redistribute static routes
+        if self.redistribute_static:
+            self._addline("\t# Import RTS_STATIC routes into OSPF (redistribute_static)")
+            self._addline("\tif (source = RTS_STATIC) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
+        # Redistribute kernel routes
         if self.redistribute_kernel:
-            self._addline("\t# Import kernel routes into OSPF (redistribute kernel)")
+            self._addline("\t# Import RTS_INHERIT routes (kernel routes) into OSPF (redistribute_kernel)")
             self._addline("\tif (source = RTS_INHERIT) then {")
             self._addline("\t\taccept;")
             self._addline("\t}")
@@ -1846,13 +1851,6 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         )
         ospf_master_pipe.configure()
 
-        # Configure pipe from OSPF to the static routing table, if we need to export static routes
-        if self.redistribute_static:
-            ospf_static_pipe = BirdConfigProtocolPipe(
-                self, table_from="ospf", table_to="static", table_export="none", table_import="all"
-            )
-            ospf_static_pipe.configure()
-
     def add_area(self, area_name, area_config=None):
         """Add area to OSPF."""
         # Make sure the area exists
@@ -1870,20 +1868,17 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         # Grab the config so its easier to work with below
         config = self.interfaces[area_name][interface_name]
         # Work through supported configuration
-        for item in interface_config:
-            for key, value in item.items():
-                if key == "hello":
-                    config.append({key: value})
-                elif key == "wait":
-                    config.append({key: value})
-                elif key == "stub":
-                    if not value:
-                        RuntimeError('The OSPF default config for interface "%s" item "stub" is "false".' % interface_name)
-                    config.append({key: value})
-                else:
-                    raise RuntimeError(
-                        'The OSPF config for interface "%s" item "%s" hasnt been added to Salt yet' % (interface_name, key)
-                    )
+        for key, value in interface_config.items():
+            if key in ("hello", "wait"):
+                config.append({key: value})
+            elif key == "stub":
+                if not value:
+                    RuntimeError('The OSPF default config for interface "%s" item "stub" is "false".' % interface_name)
+                config.append({key: value})
+            else:
+                raise RuntimeError(
+                    'The OSPF config for interface "%s" item "%s" hasnt been added to Salt yet' % (interface_name, key)
+                )
 
     @property
     def accept_default(self):
