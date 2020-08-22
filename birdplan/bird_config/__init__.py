@@ -1717,10 +1717,10 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
 
         self._addline("filter f_ospf_export%s {" % ipv)
         # Redistribute the default route
-        if self.redistribute_default:
-            self._addline("\t# Redistribute the default route")
+        if not self.redistribute_default:
+            self._addline("\t# Reject redistribution of the default route")
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
-            self._addline("\t\taccept;")
+            self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute static routes
         if self.redistribute_static:
