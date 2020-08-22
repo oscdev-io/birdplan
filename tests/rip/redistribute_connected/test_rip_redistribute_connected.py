@@ -55,7 +55,7 @@ class TestRipRedistributeConnected:
 
         print("Adding interfaces...")
         sim.node("r1").add_interface("eth0", mac="02:01:00:00:00:01", ips=["192.168.0.1/24", "fc00::1/64"])
-        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["192.168.10.1/24", "fc10::1/64"])
+        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["192.168.1.1/24", "fc01::1/64"])
         sim.node("r2").add_interface("eth0", mac="02:02:00:00:00:01", ips=["192.168.0.2/24", "fc00::2/64"])
 
         print("Adding switches...")
@@ -98,7 +98,7 @@ class TestRipRedistributeConnected:
 
         # Check direct4_rip BIRD table
         correct_result = {
-            "192.168.10.0/24": [
+            "192.168.1.0/24": [
                 {
                     "nexthops": [{"interface": "eth1"}],
                     "pref": "240",
@@ -123,7 +123,7 @@ class TestRipRedistributeConnected:
 
         # Check direct6_rip BIRD table
         correct_result = {
-            "fc10::/64": [
+            "fc01::/64": [
                 {
                     "nexthops": [{"interface": "eth1"}],
                     "pref": "240",
@@ -178,7 +178,7 @@ class TestRipRedistributeConnected:
         assert r1_table == correct_result, "Result for R1 BIRD master4 routing table does not match what it should be"
 
         correct_result = {
-            "192.168.10.0/24": [
+            "192.168.1.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
                     "metric1": "3",
@@ -207,7 +207,7 @@ class TestRipRedistributeConnected:
         assert r1_table == correct_result, "Result for R1 BIRD master6 routing table does not match what it should be"
 
         correct_result = {
-            "fc10::/64": [
+            "fc01::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
                     "metric1": "3",
@@ -233,7 +233,7 @@ class TestRipRedistributeConnected:
 
         # Check rip4 BIRD tables
         correct_result = {
-            "192.168.10.0/24": [
+            "192.168.1.0/24": [
                 {
                     "nexthops": [{"interface": "eth1"}],
                     "pref": "240",
@@ -247,7 +247,7 @@ class TestRipRedistributeConnected:
         assert r1_table == correct_result, "Result for R1 BIRD t_rip4 routing table does not match what it should be"
 
         correct_result = {
-            "192.168.10.0/24": [
+            "192.168.1.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
                     "metric1": "3",
@@ -273,7 +273,7 @@ class TestRipRedistributeConnected:
 
         # Check rip6 BIRD tables
         correct_result = {
-            "fc10::/64": [
+            "fc01::/64": [
                 {
                     "nexthops": [{"interface": "eth1"}],
                     "pref": "240",
@@ -287,7 +287,7 @@ class TestRipRedistributeConnected:
         assert r1_table == correct_result, "Result for R1 BIRD t_rip6 routing table does not match what it should be"
 
         correct_result = {
-            "fc10::/64": [
+            "fc01::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
                     "metric1": "3",
@@ -316,7 +316,7 @@ class TestRipRedistributeConnected:
         assert r1_table == correct_result, "Result for R1 BIRD t_kernel4 routing table does not match what it should be"
 
         correct_result = {
-            "192.168.10.0/24": [
+            "192.168.1.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
                     "metric1": "3",
@@ -345,7 +345,7 @@ class TestRipRedistributeConnected:
         assert r1_table == correct_result, "Result for R1 BIRD t_kernel6 routing table does not match what it should be"
 
         correct_result = {
-            "fc10::/64": [
+            "fc01::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
                     "metric1": "3",
@@ -372,20 +372,13 @@ class TestRipRedistributeConnected:
         # Check kernel has the correct IPv4 RIB
         correct_result = [
             {"dev": "eth0", "dst": "192.168.0.0/24", "flags": [], "prefsrc": "192.168.0.1", "protocol": "kernel", "scope": "link"},
-            {
-                "dev": "eth1",
-                "dst": "192.168.10.0/24",
-                "flags": [],
-                "prefsrc": "192.168.10.1",
-                "protocol": "kernel",
-                "scope": "link",
-            },
+            {"dev": "eth1", "dst": "192.168.1.0/24", "flags": [], "prefsrc": "192.168.1.1", "protocol": "kernel", "scope": "link"},
         ]
         assert r1_os_rib == correct_result, "R1 kernel IPv4 RIB does not match what it should be"
 
         correct_result = [
             {"dev": "eth0", "dst": "192.168.0.0/24", "flags": [], "prefsrc": "192.168.0.2", "protocol": "kernel", "scope": "link"},
-            {"dev": "eth0", "dst": "192.168.10.0/24", "flags": [], "gateway": "192.168.0.1", "metric": 600, "protocol": "bird"},
+            {"dev": "eth0", "dst": "192.168.1.0/24", "flags": [], "gateway": "192.168.0.1", "metric": 600, "protocol": "bird"},
         ]
         assert r2_os_rib == correct_result, "R2 kernel IPv4 RIB does not match what it should be"
 
@@ -401,7 +394,7 @@ class TestRipRedistributeConnected:
         # Check kernel has the correct IPv6 RIB
         correct_result = [
             {"dev": "eth0", "dst": "fc00::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-            {"dev": "eth1", "dst": "fc10::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+            {"dev": "eth1", "dst": "fc01::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
         ]
@@ -411,7 +404,7 @@ class TestRipRedistributeConnected:
             {"dev": "eth0", "dst": "fc00::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {
                 "dev": "eth0",
-                "dst": "fc10::/64",
+                "dst": "fc01::/64",
                 "flags": [],
                 "gateway": "fe80::1:ff:fe00:1",
                 "metric": 600,
