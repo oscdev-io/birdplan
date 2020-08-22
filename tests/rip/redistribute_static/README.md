@@ -7,6 +7,7 @@ Router r1 should be exporting the BIRD static routes on r1 interface eth1 to r2,
 @startuml
 hide circle
 title Test redistribute statics on r1 (eth1) to r2
+left to right direction
 
 
 class "Router: r1" {
@@ -22,7 +23,7 @@ class "Router: r1" {
 - 192.158.20.0/24 via 192.168.10.2 (eth1)
 + fc20:/64 via fc10::2 (eth1)
 }
-note right: Should export BIRD static routes on eth1 to r2
+note top: Should export BIRD static routes on eth1 to r2
 
 
 class "Router: r2" {
@@ -30,7 +31,7 @@ class "Router: r2" {
 - 192.168.0.2/24
 + fc00::2/64
 }
-note right: Should get BIRD static routes from r1 eth1
+note top: Should get BIRD static routes from r1 eth1
 
 
 class "Switch: s1" {}

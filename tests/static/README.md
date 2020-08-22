@@ -7,7 +7,7 @@ Router r1 should install static routes into OS RIB. Router r2 should not install
 @startuml
 hide circle
 title Test basic static routing
-
+left to right direction
 
 class "Router: r1" {
   .. Interface: eth0 ..
@@ -18,7 +18,7 @@ class "Router: r1" {
 - 10.0.0.0/24 via 192.168.0.2 (eth0)
 + fc10::/64 via fc00::2 (eth0)
 }
-note left: Should install BIRD static routes into OS RIB
+note top: Should install BIRD static routes into OS RIB
 
 
 class "Router: r2" {
@@ -30,7 +30,7 @@ class "Router: r2" {
 - 10.0.0.0/24 via 192.168.0.2 (eth0)
 + fc10::/64 via fc00::2 (eth0)
 }
-note right: Should not install BIRD static routes into OS RIB
+note top: Should not install BIRD static routes into OS RIB
 
 
 class "Switch: s1" {}
