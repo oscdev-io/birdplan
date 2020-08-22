@@ -16,31 +16,34 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""RIP test for redistributed static routes."""
+"""RIP test for redistributed connected routes."""
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
 import time
 import pytest
+from nsnetsim.exceptions import NsNetSimError
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.switch_node import SwitchNode
 from birdplan import BirdPlan
 
 
 @pytest.mark.incremental
-class TestRipRedistributeStatic:
-    """RIP test for redistributed static routes."""
+class TestRipRedistributeConnected:
+    """RIP test for redistributed connected routes."""
 
     def test_configure(self, sim, tmpdir):
         """Create our configuration files."""
         birdplan = BirdPlan()
         # Generate config files
         for router in ["r1", "r2"]:
+            conffile = f"{tmpdir}/bird.conf.{router}"
             logfile = f"{tmpdir}/bird.log.{router}"
             # Load yaml config
-            birdplan.load(f"tests/rip/redistribute_static/{router}.yaml", {"@LOGFILE@": logfile})
+            birdplan.load(f"tests/rip/redistribute_connected/{router}.yaml", {"@LOGFILE@": logfile})
             # Generate BIRD config
-            sim.add_report(f"CONFIG({router})", birdplan.generate(f"{tmpdir}/bird.conf.{router}"))
+            birdplan.generate(conffile)
+            sim.add_conffile(f"CONFFILE({router})", conffile)
             sim.add_logfile(f"LOGFILE({router})", logfile)
 
     def test_create_topology(self, sim, tmpdir):
@@ -52,7 +55,7 @@ class TestRipRedistributeStatic:
 
         print("Adding interfaces...")
         sim.node("r1").add_interface("eth0", mac="02:01:00:00:00:01", ips=["192.168.0.1/24", "fc00::1/64"])
-        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["192.168.10.1/24", "fc10::1/64"])
+        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["192.168.1.1/24", "fc01::1/64"])
         sim.node("r2").add_interface("eth0", mac="02:02:00:00:00:01", ips=["192.168.0.2/24", "fc00::2/64"])
 
         print("Adding switches...")
@@ -83,6 +86,142 @@ class TestRipRedistributeStatic:
         assert "router_id" in r2_status_output, "The status output should have 'router_id'"
         assert r2_status_output["router_id"] == "0.0.0.2", "The router ID should be '0.0.0.2'"
 
+    def test_bird_tables_direct4(self, sim, helpers):
+        """Test BIRD direct4_rip table."""
+
+        r1_table = sim.node("r1").birdc_show_route_table("t_direct4_rip")
+        # There is no direct4_rip table for r2
+        with pytest.raises(NsNetSimError, match=r".* CF_SYM_UNDEFINED, .*"):
+            sim.node("r2").birdc_show_route_table("t_direct4_rip")
+
+        sim.add_report_obj("BIRD(r1)[t_direct4_rip]", r1_table)
+
+        # Check direct4_rip BIRD table
+        correct_result = {
+            "192.168.1.0/24": [
+                {
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": "240",
+                    "prefix_type": "unicast",
+                    "protocol": "direct4_rip",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ]
+        }
+        assert r1_table == correct_result, "Result for R1 BIRD t_direct4_rip routing table does not match what it should be"
+
+    def test_bird_tables_direct6(self, sim, helpers):
+        """Test BIRD direct6_rip table."""
+
+        r1_table = sim.node("r1").birdc_show_route_table("t_direct6_rip")
+        # There is no direct6_rip table for r2
+        with pytest.raises(NsNetSimError, match=r".* CF_SYM_UNDEFINED, .*"):
+            sim.node("r2").birdc_show_route_table("t_direct6_rip")
+
+        sim.add_report_obj("BIRD(r1)[t_direct6_rip]", r1_table)
+
+        # Check direct6_rip BIRD table
+        correct_result = {
+            "fc01::/64": [
+                {
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": "240",
+                    "prefix_type": "unicast",
+                    "protocol": "direct6_rip",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ]
+        }
+        assert r1_table == correct_result, "Result for R1 BIRD t_direct6_rip routing table does not match what it should be"
+
+    def test_bird_tables_static4(self, sim):
+        """Test BIRD static4 table."""
+
+        r1_table = sim.node("r1").birdc_show_route_table("t_static4")
+        r2_table = sim.node("r2").birdc_show_route_table("t_static4")
+
+        sim.add_report_obj("BIRD(r1)[t_static4]", r1_table)
+        sim.add_report_obj("BIRD(r2)[t_static4]", r2_table)
+
+        # Check static4 BIRD table
+        correct_result = {}
+        assert r1_table == correct_result, "Result for R1 BIRD t_static4 routing table does not match what it should be"
+        assert r2_table == correct_result, "Result for R2 BIRD t_static4 routing table does not match what it should be"
+
+    def test_bird_tables_static6(self, sim):
+        """Test BIRD static6 table."""
+
+        r1_table = sim.node("r1").birdc_show_route_table("t_static6")
+        r2_table = sim.node("r2").birdc_show_route_table("t_static6")
+
+        sim.add_report_obj("BIRD(r1)[t_static6]", r1_table)
+        sim.add_report_obj("BIRD(r2)[t_static6]", r2_table)
+
+        # Check static6 BIRD table
+        correct_result = {}
+        assert r1_table == correct_result, "Result for R1 BIRD t_static6 routing table does not match what it should be"
+        assert r2_table == correct_result, "Result for R2 BIRD t_static6 routing table does not match what it should be"
+
+    def test_bird_tables_master4(self, sim, helpers):
+        """Test BIRD master4 table."""
+
+        r1_table = sim.node("r1").birdc_show_route_table("master4")
+        r2_table = sim.node("r2").birdc_show_route_table("master4")
+
+        sim.add_report_obj("BIRD(r1)[master4]", r1_table)
+        sim.add_report_obj("BIRD(r2)[master4]", r2_table)
+
+        # Check master4 BIRD table
+        correct_result = {}
+        assert r1_table == correct_result, "Result for R1 BIRD master4 routing table does not match what it should be"
+
+        correct_result = {
+            "192.168.1.0/24": [
+                {
+                    "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
+                    "metric1": "3",
+                    "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
+                    "pref": "120",
+                    "prefix_type": "unicast",
+                    "protocol": "rip4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["RIP", "univ"],
+                }
+            ]
+        }
+        assert r2_table == correct_result, "Result for R2 BIRD master4 routing table does not match what it should be"
+
+    def test_bird_tables_master6(self, sim, helpers):
+        """Test BIRD master6 table."""
+
+        r1_table = sim.node("r1").birdc_show_route_table("master6")
+        r2_table = sim.node("r2").birdc_show_route_table("master6")
+
+        sim.add_report_obj("BIRD(r1)[master6]", r1_table)
+        sim.add_report_obj("BIRD(r2)[master6]", r2_table)
+
+        # Check master6 BIRD table
+        correct_result = {}
+        assert r1_table == correct_result, "Result for R1 BIRD master6 routing table does not match what it should be"
+
+        correct_result = {
+            "fc01::/64": [
+                {
+                    "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
+                    "metric1": "3",
+                    "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+                    "pref": "120",
+                    "prefix_type": "unicast",
+                    "protocol": "rip6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["RIP", "univ"],
+                }
+            ]
+        }
+        assert r2_table == correct_result, "Result for R2 BIRD master6 routing table does not match what it should be"
+
     def test_bird_tables_rip4(self, sim, helpers):
         """Test BIRD rip4 table."""
 
@@ -94,21 +233,21 @@ class TestRipRedistributeStatic:
 
         # Check rip4 BIRD tables
         correct_result = {
-            "192.168.20.0/24": [
+            "192.168.1.0/24": [
                 {
-                    "nexthops": [{"gateway": "192.168.10.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": "240",
                     "prefix_type": "unicast",
-                    "protocol": "static4",
+                    "protocol": "direct4_rip",
                     "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
+                    "type": ["device", "univ"],
                 }
             ]
         }
         assert r1_table == correct_result, "Result for R1 BIRD t_rip4 routing table does not match what it should be"
 
         correct_result = {
-            "192.168.20.0/24": [
+            "192.168.1.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
                     "metric1": "3",
@@ -134,21 +273,21 @@ class TestRipRedistributeStatic:
 
         # Check rip6 BIRD tables
         correct_result = {
-            "fc20::/64": [
+            "fc01::/64": [
                 {
-                    "nexthops": [{"gateway": "fc10::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": "240",
                     "prefix_type": "unicast",
-                    "protocol": "static6",
+                    "protocol": "direct6_rip",
                     "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
+                    "type": ["device", "univ"],
                 }
             ]
         }
         assert r1_table == correct_result, "Result for R1 BIRD t_rip6 routing table does not match what it should be"
 
         correct_result = {
-            "fc20::/64": [
+            "fc01::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
                     "metric1": "3",
@@ -163,140 +302,6 @@ class TestRipRedistributeStatic:
         }
         assert r2_table == correct_result, "Result for R2 BIRD t_rip6 routing table does not match what it should be"
 
-    def test_bird_tables_static4(self, sim, helpers):
-        """Test BIRD static4 table."""
-
-        r1_table = sim.node("r1").birdc_show_route_table("t_static4")
-        r2_table = sim.node("r2").birdc_show_route_table("t_static4")
-
-        sim.add_report_obj("BIRD(r1)[t_static4]", r1_table)
-        sim.add_report_obj("BIRD(r2)[t_static4]", r2_table)
-
-        # Check static4 BIRD table
-        correct_result = {
-            "192.168.20.0/24": [
-                {
-                    "nexthops": [{"gateway": "192.168.10.2", "interface": "eth1"}],
-                    "pref": "200",
-                    "prefix_type": "unicast",
-                    "protocol": "static4",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
-        assert r1_table == correct_result, "Result for R1 BIRD t_static4 routing table does not match what it should be"
-
-        correct_result = {}
-        assert r2_table == correct_result, "Result for R2 BIRD t_static4 routing table does not match what it should be"
-
-    def test_bird_tables_static6(self, sim, helpers):
-        """Test BIRD static6 table."""
-
-        r1_table = sim.node("r1").birdc_show_route_table("t_static6")
-        r2_table = sim.node("r2").birdc_show_route_table("t_static6")
-
-        sim.add_report_obj("BIRD(r1)[t_static6]", r1_table)
-        sim.add_report_obj("BIRD(r2)[t_static6]", r2_table)
-
-        # Check static6 BIRD table
-        correct_result = {
-            "fc20::/64": [
-                {
-                    "nexthops": [{"gateway": "fc10::2", "interface": "eth1"}],
-                    "pref": "200",
-                    "prefix_type": "unicast",
-                    "protocol": "static6",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
-        assert r1_table == correct_result, "Result for R1 BIRD t_static6 routing table does not match what it should be"
-
-        correct_result = {}
-        assert r2_table == correct_result, "Result for R2 BIRD t_static6 routing table does not match what it should be"
-
-    def test_bird_tables_master4(self, sim, helpers):
-        """Test BIRD master4 table."""
-
-        r1_table = sim.node("r1").birdc_show_route_table("master4")
-        r2_table = sim.node("r2").birdc_show_route_table("master4")
-
-        sim.add_report_obj("BIRD(r1)[master4]", r1_table)
-        sim.add_report_obj("BIRD(r2)[master4]", r2_table)
-
-        # Check master4 BIRD table
-        correct_result = {
-            "192.168.20.0/24": [
-                {
-                    "nexthops": [{"gateway": "192.168.10.2", "interface": "eth1"}],
-                    "pref": "200",
-                    "prefix_type": "unicast",
-                    "protocol": "static4",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
-        assert r1_table == correct_result, "Result for R1 BIRD master4 routing table does not match what it should be"
-
-        correct_result = {
-            "192.168.20.0/24": [
-                {
-                    "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
-                    "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
-                    "pref": "120",
-                    "prefix_type": "unicast",
-                    "protocol": "rip4",
-                    "since": helpers.bird_since_field(),
-                    "type": ["RIP", "univ"],
-                }
-            ]
-        }
-        assert r2_table == correct_result, "Result for R2 BIRD master4 routing table does not match what it should be"
-
-    def test_bird_tables_master6(self, sim, helpers):
-        """Test BIRD master6 table."""
-
-        r1_table = sim.node("r1").birdc_show_route_table("master6")
-        r2_table = sim.node("r2").birdc_show_route_table("master6")
-
-        sim.add_report_obj("BIRD(r1)[master6]", r1_table)
-        sim.add_report_obj("BIRD(r2)[master6]", r2_table)
-
-        # Check master6 BIRD table
-        correct_result = {
-            "fc20::/64": [
-                {
-                    "nexthops": [{"gateway": "fc10::2", "interface": "eth1"}],
-                    "pref": "200",
-                    "prefix_type": "unicast",
-                    "protocol": "static6",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
-        assert r1_table == correct_result, "Result for R1 BIRD master6 routing table does not match what it should be"
-
-        correct_result = {
-            "fc20::/64": [
-                {
-                    "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
-                    "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
-                    "pref": "120",
-                    "prefix_type": "unicast",
-                    "protocol": "rip6",
-                    "since": helpers.bird_since_field(),
-                    "type": ["RIP", "univ"],
-                }
-            ]
-        }
-        assert r2_table == correct_result, "Result for R2 BIRD master6 routing table does not match what it should be"
-
     def test_bird_tables_kernel4(self, sim, helpers):
         """Test BIRD kernel4 table."""
 
@@ -307,22 +312,11 @@ class TestRipRedistributeStatic:
         sim.add_report_obj("BIRD(r2)[t_kernel_4]", r2_table)
 
         # Check kernel4 BIRD table
-        correct_result = {
-            "192.168.20.0/24": [
-                {
-                    "nexthops": [{"gateway": "192.168.10.2", "interface": "eth1"}],
-                    "pref": "200",
-                    "prefix_type": "unicast",
-                    "protocol": "static4",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
+        correct_result = {}
         assert r1_table == correct_result, "Result for R1 BIRD t_kernel4 routing table does not match what it should be"
 
         correct_result = {
-            "192.168.20.0/24": [
+            "192.168.1.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
                     "metric1": "3",
@@ -347,22 +341,11 @@ class TestRipRedistributeStatic:
         sim.add_report_obj("BIRD(r2)[t_kernel_6]", r2_table)
 
         # Check kernel6 BIRD table
-        correct_result = {
-            "fc20::/64": [
-                {
-                    "nexthops": [{"gateway": "fc10::2", "interface": "eth1"}],
-                    "pref": "200",
-                    "prefix_type": "unicast",
-                    "protocol": "static6",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
+        correct_result = {}
         assert r1_table == correct_result, "Result for R1 BIRD t_kernel6 routing table does not match what it should be"
 
         correct_result = {
-            "fc20::/64": [
+            "fc01::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
                     "metric1": "3",
@@ -389,21 +372,13 @@ class TestRipRedistributeStatic:
         # Check kernel has the correct IPv4 RIB
         correct_result = [
             {"dev": "eth0", "dst": "192.168.0.0/24", "flags": [], "prefsrc": "192.168.0.1", "protocol": "kernel", "scope": "link"},
-            {
-                "dev": "eth1",
-                "dst": "192.168.10.0/24",
-                "flags": [],
-                "prefsrc": "192.168.10.1",
-                "protocol": "kernel",
-                "scope": "link",
-            },
-            {"dev": "eth1", "dst": "192.168.20.0/24", "flags": [], "gateway": "192.168.10.2", "metric": 600, "protocol": "bird"},
+            {"dev": "eth1", "dst": "192.168.1.0/24", "flags": [], "prefsrc": "192.168.1.1", "protocol": "kernel", "scope": "link"},
         ]
         assert r1_os_rib == correct_result, "R1 kernel IPv4 RIB does not match what it should be"
 
         correct_result = [
             {"dev": "eth0", "dst": "192.168.0.0/24", "flags": [], "prefsrc": "192.168.0.2", "protocol": "kernel", "scope": "link"},
-            {"dev": "eth0", "dst": "192.168.20.0/24", "flags": [], "gateway": "192.168.0.1", "metric": 600, "protocol": "bird"},
+            {"dev": "eth0", "dst": "192.168.1.0/24", "flags": [], "gateway": "192.168.0.1", "metric": 600, "protocol": "bird"},
         ]
         assert r2_os_rib == correct_result, "R2 kernel IPv4 RIB does not match what it should be"
 
@@ -419,16 +394,7 @@ class TestRipRedistributeStatic:
         # Check kernel has the correct IPv6 RIB
         correct_result = [
             {"dev": "eth0", "dst": "fc00::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-            {"dev": "eth1", "dst": "fc10::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-            {
-                "dev": "eth1",
-                "dst": "fc20::/64",
-                "flags": [],
-                "gateway": "fc10::2",
-                "metric": 600,
-                "pref": "medium",
-                "protocol": "bird",
-            },
+            {"dev": "eth1", "dst": "fc01::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
         ]
@@ -438,7 +404,7 @@ class TestRipRedistributeStatic:
             {"dev": "eth0", "dst": "fc00::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {
                 "dev": "eth0",
-                "dst": "fc20::/64",
+                "dst": "fc01::/64",
                 "flags": [],
                 "gateway": "fe80::1:ff:fe00:1",
                 "metric": 600,

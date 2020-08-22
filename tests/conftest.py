@@ -96,13 +96,17 @@ def pytest_runtest_makereport(item, call):
     if report.when == "call":
         # Check if something failed
         if report.failed:
-            # Check if we have fixtures...
-            if hasattr(item, "fixturenames"):
+            # Check if we a "sim" fixture
+            if hasattr(item, "fixturenames") and "sim" in item.fixturenames:
                 # If we do, check we have a "sim" fixture
-                if "sim" in item.fixturenames and item.config.getoption("verbose") > 0:
-                    # If we do, pull it out and add its report
-                    sim = item.funcargs["sim"]
-                    report.sections.extend(sim.report())
+                sim = item.funcargs["sim"]
+                report.sections.extend(sim.report())
+                # Check if we're adding log files
+                if item.config.getoption("verbose") > 1:
+                    report.sections.extend(sim.report_logs())
+                # Check if we're adding config files
+                if item.config.getoption("verbose") > 2:
+                    report.sections.extend(sim.report_configs())
 
             # If this is an incremental test we need to add an attribute to indicate failure
             if "incremental" in item.keywords:
@@ -140,12 +144,14 @@ class Simulation:
     """Simulation class, storing the topology and nodes."""
 
     _report: Dict[str, str]
+    _conffiles: Dict[str, str]
     _logfiles: Dict[str, str]
     _topology: Topology
 
     def __init__(self):
         """Initialize object."""
         self._report = {}
+        self._conffiles = {}
         self._logfiles = {}
         self._topology = Topology()
 
@@ -185,16 +191,24 @@ class Simulation:
         """Clear all reports we currently have."""
         self._report = {}
 
+    def add_conffile(self, name: str, filename: str):
+        """
+        Add a configuration file to our reports.
+
+        The configuration files are read and displayed on test failure.
+        """
+        self._conffiles[name] = filename
+
     def add_logfile(self, name: str, filename: str):
         """
-        Add a logfile.
+        Add a log file to our reports.
 
-        The logfiles are read and displayed on test failure.
+        The log files are read and displayed on test failure.
         """
         self._logfiles[name] = filename
 
     def report(self) -> List[Tuple[str, str]]:
-        """Build a report, containing desc, info pairs."""
+        """Build a report for the current test."""
 
         items = []
 
@@ -202,7 +216,14 @@ class Simulation:
         for name, info in self._report.items():
             items.append((name, info))
 
-        # Loop with logfiles to add
+        return items
+
+    def report_logs(self) -> List[Tuple[str, str]]:
+        """Build a report, containing our log file contents."""
+
+        items = []
+
+        # Loop with log files to add
         for name, filename in self._logfiles.items():
             # If the file does not exist, just output a message
             if not os.path.exists(filename):
@@ -211,6 +232,29 @@ class Simulation:
             # If it does exist add its contents to our items
             with open(filename, "r") as logfile:
                 contents = logfile.read()
+            items.append((name, contents))
+
+        return items
+
+    def report_configs(self) -> List[Tuple[str, str]]:
+        """Build a report, containing our config file contents."""
+
+        items = []
+
+        # Loop with configuration files to add
+        for name, filename in self._conffiles.items():
+            # If the file does not exist, just output a message
+            if not os.path.exists(filename):
+                items.append((name, "-- NOT CREATED --"))
+                continue
+            # If it does exist loop with each line, number it and add
+            contents = ""
+            with open(filename, "r") as conffile:
+                lineno = 1
+                for line in conffile.readlines():
+                    contents += f"{lineno}: {line}"
+                    lineno += 1
+            # Add report
             items.append((name, contents))
 
         return items

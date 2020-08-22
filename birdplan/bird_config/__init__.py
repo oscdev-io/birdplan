@@ -1077,6 +1077,7 @@ class BirdConfigProtocolStatic(BirdConfigBase):
         self._addline("protocol static static4 {")
         self._addline('\tdescription "Static protocol for IPv4";')
         self._addline("")
+        # FIXME - remove at some stage # pylint:disable=fixme
         self._addline("debug all;")
         self._addline("")
         self._addline("\tipv4 {")
@@ -1392,6 +1393,11 @@ class BirdConfigProtocolRIP(BirdConfigBase):
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\taccept;")
             self._addline("\t}")
+        else:
+            self._addline("\t# Reject redistribution of the default route")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline("\t\treject;")
+            self._addline("\t}")
         # Redistribute connected
         if self.redistribute_connected:
             self._addline("\t# Redistribute connected")
@@ -1443,15 +1449,12 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         self._addline("filter f_rip_master%s_export {" % ipv)
         # Check if we accept the default route, if not block it
         if not self.accept_default:
-            self._addline("\t# Do not import default routes")
-            if ipv == 4:
-                self._addline("\tif (net = 0.0.0.0/0) then {")
-            elif ipv == 6:
-                self._addline("\tif (net = ::/0) then {")
+            self._addline("\t# Do not export default route to master (no accept:default)")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\treject;")
             self._addline("\t}")
         # Accept only RIP routes into the master table
-        self._addline("\t# Only import RIP routes into the master table")
+        self._addline("\t# Only export RIP routes to the master table")
         self._addline("\tif (source = RTS_RIP) then {")
         self._addline("\t\taccept;")
         self._addline("\t}")
@@ -1465,9 +1468,38 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         """RIP to master import filter setup."""
         # Configure import filter to master table
         self._addline("filter f_rip_master%s_import {" % ipv)
+        # Redistribute the default route
+        if self.redistribute_default:
+            self._addline("\t# Import default route into RIP (redistribute_default)")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline("\t\taccept;")
+            self._addline("\t}")
+        else:
+            self._addline("\t# Deny import of default route into RIP (no redistribute_defeault)")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline("\t\treject;")
+            self._addline("\t}")
+        # Redistribute connected
+        if self.redistribute_connected:
+            self._addline("\t# Import RTS_DEVICE routes into RIP (redistribute_connected)")
+            self._addline("\tif (source = RTS_DEVICE) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
+        # Redistribute static device routes
+        if self.redistribute_static_device:
+            self._addline("\t# Import RTS_STATIC_DEVICE routes into RIP (redistribute_static_device)")
+            self._addline("\tif (source = RTS_STATIC_DEVICE) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
+        # Redistribute static routes
+        if self.redistribute_static:
+            self._addline("\t# Import RTS_STATIC routes into RIP (redistribute_static)")
+            self._addline("\tif (source = RTS_STATIC) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
         # Redistribute kernel routes
         if self.redistribute_kernel:
-            self._addline("\t# Import kernel routes into RIP (redistribute kernel)")
+            self._addline("\t# Import RTS_INHERIT routes (kernel routes) into RIP (redistribute_kernel)")
             self._addline("\tif (source = RTS_INHERIT) then {")
             self._addline("\t\taccept;")
             self._addline("\t}")
@@ -1514,13 +1546,6 @@ class BirdConfigProtocolRIP(BirdConfigBase):
             self, table_from="rip", table_to="master", table_export_filtered=True, table_import_filtered=True
         )
         rip_master_pipe.configure()
-
-        # Configure pipe from RIP to the static routing table, if we need to export static routes
-        if self.redistribute_static:
-            rip_static_pipe = BirdConfigProtocolPipe(
-                self, table_from="rip", table_to="static", table_export="none", table_import="all"
-            )
-            rip_static_pipe.configure()
 
         # Check if we're redistributing connected routes, if we are, create the protocol and pipe
         if self.redistribute_connected:
@@ -1746,7 +1771,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         self._addline("filter f_ospf_master%s_export {" % ipv)
         # Check if we accept the default route, if not block it
         if not self.accept_default:
-            self._addline("\t# Do not import default routes")
+            self._addline("\t# Do not export default route to master")
             if ipv == 4:
                 self._addline("\tif (net = 0.0.0.0/0) then {")
             elif ipv == 6:
@@ -1754,7 +1779,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
             self._addline("\t\treject;")
             self._addline("\t}")
         # Accept only OSPF routes into the master table
-        self._addline("\t# Only import OSPF routes into the master table")
+        self._addline("\t# Only export OSPF routes to the master table")
         # NK: We cannot seem to filter out the device routes
         self._addline("\tif (source ~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2]) then {")
         self._addline("\t\taccept;")
