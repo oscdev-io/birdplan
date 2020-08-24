@@ -480,7 +480,7 @@ class TestOSPFStubInterface:
         assert r2_table == correct_result, "Result for R2 BIRD t_ospf4 routing table does not match what it should be"
 
     def test_bird_tables_ospf6(self, sim, helpers):
-        """Test BIRD ospf4 table."""
+        """Test BIRD ospf6 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("t_ospf6", expect_count=2)
         r2_table = sim.node("r2").birdc_show_route_table("t_ospf6", expect_count=2)
