@@ -1,0 +1,16 @@
+router_id: 0.0.0.1
+log_file: "@LOGFILE@"
+debug: True
+static:
+  - '0.0.0.0/0 via 192.168.1.2'
+  - '::/0 via fc01::2'
+ospf:
+  redistribute:
+    default: True
+    static: True
+  areas:
+    0:
+      interfaces:
+        'eth0':
+          hello: 1
+          wait: 2
