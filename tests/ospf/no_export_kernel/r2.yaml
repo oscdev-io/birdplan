@@ -1,0 +1,12 @@
+router_id: 0.0.0.2
+log_file: "@LOGFILE@"
+debug: True
+export_kernel:
+  ospf: False
+ospf:
+  areas:
+    0:
+      interfaces:
+        'eth0':
+          hello: 1
+          wait: 2

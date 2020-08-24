@@ -676,9 +676,9 @@ class TestOSPFRedistributeDefaultStatic:
     def test_bird_tables_kernel6(self, sim, helpers):
         """Test BIRD kernel6 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("t_kernel6", expect_count=1)
-        r2_table = sim.node("r2").birdc_show_route_table("t_kernel6")
-        r3_table = sim.node("r3").birdc_show_route_table("t_kernel6", expect_count=1)
+        r1_table = sim.node("r1").birdc_show_route_table("t_kernel6", expect_count=2)
+        r2_table = sim.node("r2").birdc_show_route_table("t_kernel6", expect_count=1)
+        r3_table = sim.node("r3").birdc_show_route_table("t_kernel6", expect_count=2)
 
         sim.add_report_obj("BIRD(r1)[t_kernel_6]", r1_table)
         sim.add_report_obj("BIRD(r2)[t_kernel_6]", r2_table)

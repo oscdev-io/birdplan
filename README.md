@@ -120,8 +120,6 @@ like `eth*`.
 
 `static` routes are those setup in the static protocol.
 
-`static_device` routes are those setup in the static protocol which point to a device and not a gateway. FIXME: NK: UNKNOWN WHERE THESE COME FROM
-
 `default` allows the redistribution of the default route, it must still come from somewhere, so this option alone is useless.
 
 `rip` allows the disabling of redistributing of the RIP routes we receive. By default we redistribute RIP routes.
@@ -163,8 +161,6 @@ communication network. OSPF by default exports all connected routes as OSPF inte
 `kernel` routes are those statically added to the kernel.
 
 `static` routes are those setup in the static protocol.
-
-`static_device` routes are those setup in the static protocol which point to a device and not a gateway. FIXME: NK: UNKNOWN WHERE THESE COME FROM
 
 `default` allows the redistribution of the default route, it must still come from somewhere, so this option alone is useless.
 
