@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""OSPF test for redistributed connected routes."""
+"""OSPF test for redistributed connected routes using a star."""
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
@@ -28,8 +28,8 @@ from birdplan import BirdPlan
 
 
 @pytest.mark.incremental
-class TestOSPFRedistributeConnected:
-    """OSPF test for redistributed connected routes."""
+class TestOSPFRedistributeConnectedWithStar:
+    """OSPF test for redistributed connected routes using a star."""
 
     def test_configure(self, sim, tmpdir):
         """Create our configuration files."""
@@ -39,7 +39,7 @@ class TestOSPFRedistributeConnected:
             conffile = f"{tmpdir}/bird.conf.{router}"
             logfile = f"{tmpdir}/bird.log.{router}"
             # Load yaml config
-            birdplan.load(f"tests/ospf/redistribute_connected/{router}.yaml", {"@LOGFILE@": logfile})
+            birdplan.load(f"tests/ospf/redistribute_connected_with_star/{router}.yaml", {"@LOGFILE@": logfile})
             # Generate BIRD config
             birdplan.generate(conffile)
             sim.add_conffile(f"CONFFILE({router})", conffile)
@@ -54,7 +54,7 @@ class TestOSPFRedistributeConnected:
 
         print("Adding interfaces...")
         sim.node("r1").add_interface("eth0", mac="02:01:00:00:00:01", ips=["192.168.0.1/24", "fc00::1/64"])
-        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["192.168.1.1/24", "fc01::1/64"])
+        sim.node("r1").add_interface("eth10", mac="02:01:00:00:00:02", ips=["192.168.1.1/24", "fc01::1/64"])
         sim.node("r2").add_interface("eth0", mac="02:02:00:00:00:01", ips=["192.168.0.2/24", "fc00::2/64"])
 
         print("Adding switches...")
@@ -96,7 +96,7 @@ class TestOSPFRedistributeConnected:
         correct_result = {
             "192.168.1.0/24": [
                 {
-                    "nexthops": [{"interface": "eth1"}],
+                    "nexthops": [{"interface": "eth10"}],
                     "pref": "240",
                     "prefix_type": "unicast",
                     "protocol": "direct4_ospf",
@@ -121,7 +121,7 @@ class TestOSPFRedistributeConnected:
         correct_result = {
             "fc01::/64": [
                 {
-                    "nexthops": [{"interface": "eth1"}],
+                    "nexthops": [{"interface": "eth10"}],
                     "pref": "240",
                     "prefix_type": "unicast",
                     "protocol": "direct6_ospf",
@@ -319,7 +319,7 @@ class TestOSPFRedistributeConnected:
             ],
             "192.168.1.0/24": [
                 {
-                    "nexthops": [{"interface": "eth1"}],
+                    "nexthops": [{"interface": "eth10"}],
                     "pref": "240",
                     "prefix_type": "unicast",
                     "protocol": "direct4_ospf",
@@ -395,7 +395,7 @@ class TestOSPFRedistributeConnected:
             ],
             "fc01::/64": [
                 {
-                    "nexthops": [{"interface": "eth1"}],
+                    "nexthops": [{"interface": "eth10"}],
                     "pref": "240",
                     "prefix_type": "unicast",
                     "protocol": "direct6_ospf",
@@ -589,7 +589,7 @@ class TestOSPFRedistributeConnected:
         correct_result = [
             {"dev": "eth0", "dst": "192.168.0.0/24", "flags": [], "prefsrc": "192.168.0.1", "protocol": "kernel", "scope": "link"},
             {"dev": "eth0", "dst": "192.168.0.0/24", "flags": [], "metric": 600, "protocol": "bird", "scope": "link"},
-            {"dev": "eth1", "dst": "192.168.1.0/24", "flags": [], "prefsrc": "192.168.1.1", "protocol": "kernel", "scope": "link"},
+            {"dev": "eth10", "dst": "192.168.1.0/24", "flags": [], "prefsrc": "192.168.1.1", "protocol": "kernel", "scope": "link"},
         ]
         assert r1_os_rib == correct_result, "R1 kernel IPv4 RIB does not match what it should be"
 
@@ -613,9 +613,9 @@ class TestOSPFRedistributeConnected:
         correct_result = [
             {"dev": "eth0", "dst": "fc00::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth0", "dst": "fc00::/64", "flags": [], "metric": 600, "pref": "medium", "protocol": "bird"},
-            {"dev": "eth1", "dst": "fc01::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+            {"dev": "eth10", "dst": "fc01::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-            {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+            {"dev": "eth10", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
         ]
         assert r1_os_rib == correct_result, "R1 Kernel IPv6 RIB does not match what it should be"
 

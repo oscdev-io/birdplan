@@ -30,6 +30,8 @@
 
 [Redistribute Connected](ospf/redistribute_connected/README.md)
 
+[Redistribute Connected (with star)](ospf/redistribute_connected_with_star/README.md)
+
 [Redistribute Kernel](ospf/redistribute_kernel/README.md)
 
 [Redistribute Static](ospf/redistribute_static/README.md)
