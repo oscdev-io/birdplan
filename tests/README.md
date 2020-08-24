@@ -28,6 +28,8 @@
 
 [No Export Kernel](ospf/no_export_kernel/README.md)
 
+[Redistribute Connected](ospf/redistribute_connected/README.md)
+
 [Redistribute Kernel](ospf/redistribute_kernel/README.md)
 
 [Redistribute Static](ospf/redistribute_static/README.md)
