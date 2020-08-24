@@ -20,7 +20,6 @@
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-import time
 import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.switch_node import SwitchNode
@@ -65,9 +64,6 @@ class TestRIPRedistributeOnlyDefault:
         # Simulate our topology
         print("Simulate topology...")
         sim.run()
-
-        # We need to wait at least 5 seconds for RIP To converge
-        time.sleep(7)
 
     def test_bird_status(self, sim):
         """Grab data from the simulation."""
