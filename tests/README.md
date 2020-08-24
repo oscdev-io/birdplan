@@ -34,6 +34,8 @@
 
 [Redistribute Kernel](ospf/redistribute_kernel/README.md)
 
+[Redistribute Only Default](ospf/redistribute_only_default/README.md)
+
 [Redistribute Static](ospf/redistribute_static/README.md)
 
 [Redistribute Static Default](ospf/redistribute_static_default/README.md)
