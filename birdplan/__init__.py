@@ -288,6 +288,9 @@ class BirdPlan:
             # Add static route redistribution
             if redistribute == "static":
                 self._birdconf.ospf.redistribute_static = redistribute_config
+            # Add connected route redistribution
+            elif redistribute == "connected":
+                self._birdconf.ospf.redistribute_connected = redistribute_config
             # Add kernel route redistribution
             elif redistribute == "kernel":
                 self._birdconf.ospf.redistribute_kernel = redistribute_config

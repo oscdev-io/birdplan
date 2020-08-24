@@ -152,8 +152,8 @@ The `accept` key contains a dictionary of routes we will accept.
 
 The `redistribute` key contains a dictionary of the redistributable routes to be exported to OSPF.
 
-`connected` makes no sense to be used. OSPF stub routes are used to add interfaces not part of the OSPF
-communication network. OSPF by default exports all connected routes as OSPF internal routes.
+`connected` routes are kernel device routes for the interfaces listed. A list of interfaces must be provided. This can be a pattern
+like `eth*`.
 
 `kernel` routes are those statically added to the kernel.
 
@@ -169,6 +169,9 @@ ospf:
   redistribute:
     kernel: True
     static: True
+    connected:
+      interfaces:
+        - eth9
   areas:
     0:
       interfaces:
