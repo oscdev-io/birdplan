@@ -862,7 +862,6 @@ class BirdConfigMaster(BirdConfigBase):
         # Are we going to export routes to the kernel
         self._export_kernel = {
             "static": True,
-            "static_device": True,
             "rip": True,
             "ospf": True,
             "bgp": True,
@@ -909,12 +908,6 @@ class BirdConfigMaster(BirdConfigBase):
             self._addline("\t\taccept;")
             self._addline("\t}")
 
-        if self.export_kernel_static_device:
-            self._addline("\t# Export static device routes to kernel")
-            self._addline("\tif (source = RTS_STATIC_DEVICE) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
-
         if self.export_kernel_rip:
             self._addline("\t# Export RIP routes to kernel")
             self._addline("\tif (source = RTS_RIP) then {")
@@ -947,16 +940,6 @@ class BirdConfigMaster(BirdConfigBase):
     def export_kernel_static(self, value):
         """Set if we're exporting static routes to kernel."""
         self._export_kernel["static"] = value
-
-    @property
-    def export_kernel_static_device(self):
-        """Return if we're exporting static_device to kernel."""
-        return self._export_kernel["static_device"]
-
-    @export_kernel_static_device.setter
-    def export_kernel_static_device(self, value):
-        """Set if we're exporting static_device routes to kernel."""
-        self._export_kernel["static_device"] = value
 
     @property
     def export_kernel_rip(self):
@@ -1339,7 +1322,6 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         self._rip_redistribute = {
             "connected": {},
             "static": False,
-            "static_device": False,
             "kernel": False,
             "default": False,
             "rip": True,
@@ -1397,12 +1379,6 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         if self.redistribute_connected:
             self._addline("\t# Redistribute connected")
             self._addline("\tif (source = RTS_DEVICE) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
-        # Redistribute static device routes
-        if self.redistribute_static_device:
-            self._addline("\t# Redistribute static device routes")
-            self._addline("\tif (source = RTS_STATIC_DEVICE) then {")
             self._addline("\t\taccept;")
             self._addline("\t}")
         # Redistribute static routes
@@ -1473,12 +1449,6 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         if self.redistribute_connected:
             self._addline("\t# Import RTS_DEVICE routes into RIP (redistribute_connected)")
             self._addline("\tif (source = RTS_DEVICE) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
-        # Redistribute static device routes
-        if self.redistribute_static_device:
-            self._addline("\t# Import RTS_STATIC_DEVICE routes into RIP (redistribute_static_device)")
-            self._addline("\tif (source = RTS_STATIC_DEVICE) then {")
             self._addline("\t\taccept;")
             self._addline("\t}")
         # Redistribute static routes
@@ -1598,16 +1568,6 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         self._rip_redistribute["static"] = value
 
     @property
-    def redistribute_static_device(self):
-        """Return if we redistribute static device routes."""
-        return self._rip_redistribute["static_device"]
-
-    @redistribute_static_device.setter
-    def redistribute_static_device(self, value):
-        """Set redistribute static device routes."""
-        self._rip_redistribute["static_device"] = value
-
-    @property
     def redistribute_kernel(self):
         """Return if we redistribute kernel routes."""
         return self._rip_redistribute["kernel"]
@@ -1662,7 +1622,6 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         # OSPF route redistribution
         self._ospf_redistribute = {
             "static": False,
-            "static_device": False,
             "kernel": False,
             "default": False,
         }
@@ -1728,12 +1687,6 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
             self._addline("\tif (source = RTS_STATIC) then {")
             self._addline("\t\taccept;")
             self._addline("\t}")
-        # Redistribute static device routes
-        if self.redistribute_static_device:
-            self._addline("\t# Redistribute static device routes")
-            self._addline("\tif (source = RTS_STATIC_DEVICE) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
         # Redistribute kernel routes
         if self.redistribute_kernel:
             self._addline("\t# Redistribute kernel routes")
@@ -1786,12 +1739,6 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
             self._addline("\t# Deny import of default route into OSPF (no redistribute_default)")
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\treject;")
-            self._addline("\t}")
-        # Redistribute static device routes
-        if self.redistribute_static_device:
-            self._addline("\t# Import RTS_STATIC_DEVICE routes into OSPF (redistribute_static_device)")
-            self._addline("\tif (source = RTS_STATIC_DEVICE) then {")
-            self._addline("\t\taccept;")
             self._addline("\t}")
         # Redistribute static routes
         if self.redistribute_static:
@@ -1899,16 +1846,6 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
     def redistribute_static(self, value):
         """Set if we redistribute static routes."""
         self._ospf_redistribute["static"] = value
-
-    @property
-    def redistribute_static_device(self):
-        """Return if we redistribute static device routes."""
-        return self._ospf_redistribute["static_device"]
-
-    @redistribute_static_device.setter
-    def redistribute_static_device(self, value):
-        """Set if we redistribute static device routes."""
-        self._ospf_redistribute["static_device"] = value
 
     @property
     def redistribute_kernel(self):
@@ -2357,7 +2294,6 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             "connected": False,
             "kernel": False,
             "static": False,
-            "static_device": False,
             "originated": False,
             "bgp": False,
             "bgp_own": False,
@@ -2398,7 +2334,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         # Work out what we're going to be redistributing
         if "redistribute" in self.peer_config:
             for redistribute_type, redistribute_config in self.peer_config["redistribute"].items():
-                if redistribute_type not in ("default", "connected", "static", "static_device", "kernel", "originated"):
+                if redistribute_type not in ("default", "connected", "static", "kernel", "originated"):
                     raise ValueError('The BGP redistribute type "%s" is not known' % redistribute_type)
                 self.redistribute[redistribute_type] = redistribute_config
 
@@ -2571,7 +2507,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         self._addline("\taccept_route = 0;")
 
         # Check that we have static routes imported first
-        if (self.redistribute["static"] or self.redistribute["static_device"]) and (not self.parent.import_static):
+        if self.redistribute["static"] and not self.parent.import_static:
             raise RuntimeError("BGP needs static routes to be imported before they can be redistributed to a peer")
 
         # Do not redistribute the default route, no matter where we get it from
@@ -2636,17 +2572,6 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
                 debug=True,
             )
             self._add_redistribute_properties(self.redistribute["static"])
-            self._addline("\t\taccept_route = 1;")
-            self._addline("\t}")
-        # Redistribute static device routes
-        if self.redistribute["static_device"]:
-            self._addline("\t# Redistribute static device routes")
-            self._addline("\tif (source = RTS_STATIC_DEVICE) then {")
-            self._addline(
-                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on RTS_STATIC_DEVICE";' % (self.peer_table, ipv),
-                debug=True,
-            )
-            self._add_redistribute_properties(self.redistribute["static_device"])
             self._addline("\t\taccept_route = 1;")
             self._addline("\t}")
         # Redistribute kernel routes
