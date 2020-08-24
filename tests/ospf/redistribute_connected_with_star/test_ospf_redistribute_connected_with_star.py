@@ -293,7 +293,7 @@ class TestOSPFRedistributeConnectedWithStar:
         assert r2_table == correct_result, "Result for R2 BIRD master6 routing table does not match what it should be"
 
     def test_bird_tables_ospf4(self, sim, helpers):
-        """Test BIRD rip4 table."""
+        """Test BIRD ospf4 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("t_ospf4", expect_count=2)
         r2_table = sim.node("r2").birdc_show_route_table("t_ospf4", expect_count=2)
@@ -301,7 +301,7 @@ class TestOSPFRedistributeConnectedWithStar:
         sim.add_report_obj("BIRD(r1)[t_ospf4]", r1_table)
         sim.add_report_obj("BIRD(r2)[t_ospf4]", r2_table)
 
-        # Check rip4 BIRD tables
+        # Check ospf4 BIRD tables
         correct_result = {
             "192.168.0.0/24": [
                 {
@@ -369,7 +369,7 @@ class TestOSPFRedistributeConnectedWithStar:
         assert r2_table == correct_result, "Result for R2 BIRD t_ospf4 routing table does not match what it should be"
 
     def test_bird_tables_ospf6(self, sim, helpers):
-        """Test BIRD rip6 table."""
+        """Test BIRD ospf6 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("t_ospf6", expect_count=2)
         r2_table = sim.node("r2").birdc_show_route_table("t_ospf6", expect_count=2)
@@ -377,7 +377,7 @@ class TestOSPFRedistributeConnectedWithStar:
         sim.add_report_obj("BIRD(r1)[t_ospf6]", r1_table)
         sim.add_report_obj("BIRD(r2)[t_ospf6]", r2_table)
 
-        # Check rip6 BIRD tables
+        # Check ospf6 BIRD tables
         correct_result = {
             "fc00::/64": [
                 {
