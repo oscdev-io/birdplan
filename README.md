@@ -36,8 +36,6 @@ The `export_kernel` key contains a dictionary of the routes to be exported to th
 
 `static` routes are those setup in the static protocol.
 
-`static_device` routes are those setup in the static protocol which point to a device and not a gateway. FIXME: NK: UNKNOWN WHERE THESE COME FROM
-
 `rip` routes from the RIP protocol.
 
 `ospf` routes from the OSPF protocol.
@@ -135,7 +133,6 @@ rip:
         - eth9
     kernel: True
     static: True
-    static_device: True
 ```
 
 ## OSPF Configuration
@@ -155,8 +152,8 @@ The `accept` key contains a dictionary of routes we will accept.
 
 The `redistribute` key contains a dictionary of the redistributable routes to be exported to OSPF.
 
-`connected` makes no sense to be used. OSPF stub routes are used to add interfaces not part of the OSPF
-communication network. OSPF by default exports all connected routes as OSPF internal routes.
+`connected` routes are kernel device routes for the interfaces listed. A list of interfaces must be provided. This can be a pattern
+like `eth*`.
 
 `kernel` routes are those statically added to the kernel.
 
@@ -172,7 +169,9 @@ ospf:
   redistribute:
     kernel: True
     static: True
-    static_device: True
+    connected:
+      interfaces:
+        - eth9
   areas:
     0:
       interfaces:

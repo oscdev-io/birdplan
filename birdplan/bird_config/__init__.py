@@ -1621,6 +1621,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
 
         # OSPF route redistribution
         self._ospf_redistribute = {
+            "connected": {},
             "static": False,
             "kernel": False,
             "default": False,
@@ -1681,6 +1682,12 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\treject;")
             self._addline("\t}")
+        # Redistribute connected
+        if self.redistribute_connected:
+            self._addline("\t# Redistribute connected")
+            self._addline("\tif (source = RTS_DEVICE) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
         # Redistribute static routes
         if self.redistribute_static:
             self._addline("\t# Redistribute static routes")
@@ -1740,6 +1747,12 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
             self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\treject;")
             self._addline("\t}")
+        # Redistribute connected
+        if self.redistribute_connected:
+            self._addline("\t# Import RTS_DEVICE routes into OSPF (redistribute_connected)")
+            self._addline("\tif (source = RTS_DEVICE) then {")
+            self._addline("\t\taccept;")
+            self._addline("\t}")
         # Redistribute static routes
         if self.redistribute_static:
             self._addline("\t# Import RTS_STATIC routes into OSPF (redistribute_static)")
@@ -1798,6 +1811,25 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         )
         ospf_master_pipe.configure()
 
+        # Check if we're redistributing connected routes, if we are, create the protocol and pipe
+        if self.redistribute_connected:
+            if "interfaces" not in self.redistribute_connected:
+                raise RuntimeError('OSPF redistribute connected requires a list in item "interfaces" to match interface names')
+            # Add direct protocol for redistribution of connected routes
+            ospf_direct_protocol = BirdConfigProtocolDirect(self, name="ospf", interfaces=self.redistribute_connected["interfaces"])
+            ospf_direct_protocol.configure()
+            # Add pipe
+            ospf_direct_pipe = BirdConfigProtocolPipe(
+                self,
+                name="ospf",
+                descospftion="ospf",
+                table_from="ospf",
+                table_to="direct",
+                table_export="none",
+                table_import="all",
+            )
+            ospf_direct_pipe.configure()
+
     def add_area(self, area_name, area_config=None):
         """Add area to OSPF."""
         # Make sure the area exists
@@ -1836,6 +1868,16 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
     def accept_default(self, value):
         """Set if we accept the default route if we get it via OSPF."""
         self._ospf_accept["default"] = value
+
+    @property
+    def redistribute_connected(self):
+        """Return if we redistribute connected routes."""
+        return self._ospf_redistribute["connected"]
+
+    @redistribute_connected.setter
+    def redistribute_connected(self, value):
+        """Set redistribute connected routes."""
+        self._ospf_redistribute["connected"] = value
 
     @property
     def redistribute_static(self):
