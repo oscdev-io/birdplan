@@ -163,7 +163,7 @@ class TestOSPFRedistributeConnected:
     def test_bird_tables_master4(self, sim, helpers):
         """Test BIRD master4 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("master4", expect_count=1)
+        r1_table = sim.node("r1").birdc_show_route_table("master4", expect_count=1, expect_content="'OSPF.router_id': '0.0.0.2'")
         r2_table = sim.node("r2").birdc_show_route_table("master4", expect_count=2)
 
         sim.add_report_obj("BIRD(r1)[master4]", r1_table)
@@ -173,14 +173,14 @@ class TestOSPFRedistributeConnected:
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.1"},
+                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
                     "metric1": "10",
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
                     "pref": "150",
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
-                    "router_id": "0.0.0.1",
+                    "router_id": "0.0.0.2",
                     "since": helpers.bird_since_field(),
                     "type": ["OSPF", "univ"],
                 }
@@ -229,7 +229,7 @@ class TestOSPFRedistributeConnected:
     def test_bird_tables_master6(self, sim, helpers):
         """Test BIRD master6 table."""
 
-        r1_table = sim.node("r1").birdc_show_route_table("master6", expect_count=1)
+        r1_table = sim.node("r1").birdc_show_route_table("master6", expect_count=1, expect_content="'OSPF.router_id': '0.0.0.2'")
         r2_table = sim.node("r2").birdc_show_route_table("master6", expect_count=2)
 
         sim.add_report_obj("BIRD(r1)[master6]", r1_table)
