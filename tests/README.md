@@ -16,6 +16,8 @@
 
 [Redistribute Kernel](rip/redistribute_kernel/README.md)
 
+[Redistribute Only Default](rip/redistribute_only_default/README.md)
+
 [Redistribute Static](rip/redistribute_static/README.md)
 
 [Redistribute Static Default](rip/redistribute_static_default/README.md)
