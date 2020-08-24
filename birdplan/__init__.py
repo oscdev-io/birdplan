@@ -150,9 +150,6 @@ class BirdPlan:
                 # Static routes
                 if export == "static":
                     self._birdconf.master.export_kernel_static = export_config
-                # Static device routes
-                elif export == "static_device":
-                    self._birdconf.master.export_kernel_static_device = export_config
                 # RIP routes
                 elif export == "rip":
                     self._birdconf.master.export_kernel_rip = export_config
@@ -213,9 +210,6 @@ class BirdPlan:
             # Add static route redistribution
             elif redistribute == "static":
                 self._birdconf.rip.redistribute_static = redistribute_config
-            # Add static device route redistribution
-            elif redistribute == "static_device":
-                self._birdconf.rip.redistribute_static_device = redistribute_config
             # Add kernel route redistribution
             elif redistribute == "kernel":
                 self._birdconf.rip.redistribute_kernel = redistribute_config
@@ -294,9 +288,6 @@ class BirdPlan:
             # Add static route redistribution
             if redistribute == "static":
                 self._birdconf.ospf.redistribute_static = redistribute_config
-            # Add static device route redistribution
-            elif redistribute == "static_device":
-                self._birdconf.ospf.redistribute_static_device = redistribute_config
             # Add kernel route redistribution
             elif redistribute == "kernel":
                 self._birdconf.ospf.redistribute_kernel = redistribute_config

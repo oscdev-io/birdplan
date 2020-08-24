@@ -36,8 +36,6 @@ The `export_kernel` key contains a dictionary of the routes to be exported to th
 
 `static` routes are those setup in the static protocol.
 
-`static_device` routes are those setup in the static protocol which point to a device and not a gateway. FIXME: NK: UNKNOWN WHERE THESE COME FROM
-
 `rip` routes from the RIP protocol.
 
 `ospf` routes from the OSPF protocol.
@@ -135,7 +133,6 @@ rip:
         - eth9
     kernel: True
     static: True
-    static_device: True
 ```
 
 ## OSPF Configuration
@@ -172,7 +169,6 @@ ospf:
   redistribute:
     kernel: True
     static: True
-    static_device: True
   areas:
     0:
       interfaces:
