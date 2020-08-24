@@ -40,4 +40,6 @@
 
 [Redistribute Static Default](ospf/redistribute_static_default/README.md)
 
+[Redistribute Static Without Default](ospf/redistribute_static_without_default/README.md)
+
 [Stub Interface](ospf/stub_interface/README.md)
