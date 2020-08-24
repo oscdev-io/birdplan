@@ -25,3 +25,5 @@
 [Redistribute Kernel](ospf/redistribute_kernel/README.md)
 
 [Redistribute Static](ospf/redistribute_static/README.md)
+
+[Stub Interface](ospf/stub_interface/README.md)
