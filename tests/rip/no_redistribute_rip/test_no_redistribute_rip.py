@@ -292,7 +292,7 @@ class TestRIPNoRedistributeRip:
         assert r3_table == correct_result, "Result for R3 BIRD t_rip4 routing table does not match what it should be"
 
     def test_bird_tables_rip6(self, sim, helpers):
-        """Test BIRD rip4 table."""
+        """Test BIRD rip6 table."""
 
         r1_table = sim.node("r1").birdc_show_route_table("t_rip6", expect_count=1)
         r2_table = sim.node("r2").birdc_show_route_table("t_rip6", expect_count=1)
