@@ -22,6 +22,8 @@
 
 [Redistribute Static Default](rip/redistribute_static_default/README.md)
 
+[Redistribute Static Without Default](rip/redistribute_static_without_default/README.md)
+
 ## OSPF
 
 [Redistribute Kernel](ospf/redistribute_kernel/README.md)
