@@ -440,15 +440,15 @@ class BirdPlan:
             # Import connected routes into the main BGP table
             if import_type == "connected":
                 self._birdconf.bgp.import_connected = import_config
-            # Import static routes into the main BGP table
-            elif import_type == "static":
-                self._birdconf.bgp.import_static = import_config
             # Import kernel routes into the main BGP table
             elif import_type == "kernel":
                 self._birdconf.bgp.import_kernel = import_config
+            # Import static routes into the main BGP table
+            elif import_type == "static":
+                self._birdconf.bgp.import_static = import_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
-                raise BirdPlanError("Configuration item '{import_type}' not understood in bgp:import")
+                raise BirdPlanError(f"Configuration item '{import_type}' not understood in bgp:import")
 
     def _config_bgp_peers(self):
         """Configure bgp:peers section."""
