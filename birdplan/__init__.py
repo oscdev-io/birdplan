@@ -545,7 +545,7 @@ class BirdPlan:
         if peer["type"] not in (
             "customer",
             "peer",
-            "upstream",
+            "transit",
             "rrclient",
             "rrserver",
             "rrserver-rrserver",

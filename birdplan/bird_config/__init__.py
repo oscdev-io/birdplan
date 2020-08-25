@@ -2346,9 +2346,9 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         # If this is a rrserver, send our entire BGP table
         if self.peer_type in ("rrclient", "rrserver", "rrserver-rrserver"):
             self.redistribute["bgp"] = True
-        # If this is an upstream, peer, customer, routecollector or routeserver, we need to redistribute our own routes and
+        # If this is an transit, peer, customer, routecollector or routeserver, we need to redistribute our own routes and
         # customer routes
-        if self.peer_type in ("customer", "routecollector", "routeserver", "peer", "upstream"):
+        if self.peer_type in ("customer", "routecollector", "routeserver", "peer", "transit"):
             self.redistribute["bgp_own"] = True
             self.redistribute["bgp_customer"] = True
         # If this is an customer, we need to redistribute peer and transit routes too
@@ -2749,8 +2749,8 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
 
         # Check if we're accepting the route...
         self._addline("\tif (accept_route > 0) then {")
-        # Do large community prepending if the peer is a customer, peer, routeserver or upstream
-        if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "upstream"):
+        # Do large community prepending if the peer is a customer, peer, routeserver or transit
+        if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
             # Check if we are adding a large community to outgoing routes
             if "outgoing-large-communities" in self.peer_config:
                 for large_community in sorted(self.peer_config["outgoing-large-communities"]):
@@ -2848,8 +2848,8 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         elif self.peer_type == "rrserver-rrserver":
             if not self._accept["default"]:
                 type_lines.append("\t\tbgp_filter_default_v%s();" % ipv)
-        # Upstreams
-        elif self.peer_type == "upstream":
+        # Transit providers
+        elif self.peer_type == "transit":
             type_lines.append("\t\tbgp_lc_remove_all();")
             type_lines.append("\t\tbgp_import_transit(%s, %s);" % (self.peer_asn, self.cost))
             if not self._accept["default"]:
