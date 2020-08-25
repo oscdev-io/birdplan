@@ -310,7 +310,7 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("define BGP_LC_FUNCTION_LOCATION_UN = 2;")
         self._addline("define BGP_LC_FUNCTION_RELATION = 3;")
         self._addline("define BGP_LC_FUNCTION_NOEXPORT = 4;")
-        self._addline("define BGP_LC_FUNCTION_PREPEND_ONE = 61;")
+        self._addline("define BGP_LC_FUNCTION_PREPEND_ONE = 6;")
         self._addline("define BGP_LC_FUNCTION_PREPEND_TWO = 62;")
         self._addline("define BGP_LC_FUNCTION_PREPEND_THREE = 63;")
         self._addline("define BGP_LC_FUNCTION_FILTERED = 1101;")
