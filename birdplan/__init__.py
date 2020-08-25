@@ -94,7 +94,7 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config:
-            if config_item not in ["router_id", "log_file", "debug", "static", "export_kernel", "rip", "ospf"]:
+            if config_item not in ["router_id", "log_file", "debug", "static", "export_kernel", "bgp", "rip", "ospf"]:
                 raise BirdPlanError(f"The config item '{config_item}' is not supported")
 
         # Configure sections
@@ -103,6 +103,7 @@ class BirdPlan:
         self._config_export_kernel()
         self._config_rip()
         self._config_ospf()
+        self._config_bgp()
 
         # Generate the configuration
         config_lines = self._birdconf.get_config()
@@ -337,6 +338,243 @@ class BirdPlan:
             for interface_name, interface_config in area["interfaces"].items():
                 # Add interface to area
                 self._birdconf.ospf.add_interface(area_name, interface_name, interface_config)
+
+    def _config_bgp(self):
+        """Configure bgp section."""
+
+        # If we have no rip section, just return
+        if "bgp" not in self.config:
+            return
+
+        # Set our ASN
+        if "asn" not in self.config["bgp"]:
+            raise BirdPlanError('BGP configuration must have an "asn" item defined')
+        self._birdconf.bgp.set_asn(self.config["bgp"]["asn"])
+
+        # Check configuration options are supported
+        for config_item in self.config["bgp"]:
+            if config_item not in [
+                # Globals
+                "asn",
+                "prefix_maxlen4_import",
+                "prefix_maxlen4_export",
+                "prefix_minlen4_import",
+                "prefix_minlen4_export",
+                "prefix_maxlen6_import",
+                "prefix_maxlen6_export",
+                "prefix_minlen6_import",
+                "prefix_minlen6_export",
+                # Origination
+                "originate",
+                "accept",
+                "import",
+                "rr_cluster_id",
+                "peers",
+            ]:
+                raise BirdPlanError(f"The 'bgp' config item '{config_item}' is not supported")
+
+        self._config_bgp_accept()
+        self._config_bgp_globals()
+        self._config_bgp_originate()
+
+        self._config_bgp_import()
+        self._config_bgp_peers()
+
+    def _config_bgp_accept(self):
+        """Configure bgp:accept section."""
+
+        # If we don't have an accept section, just return
+        if "accept" not in self.config["bgp"]:
+            return
+
+        # Loop with accept items
+        for accept, accept_config in self.config["bgp"]["accept"].items():
+            # Allow accept of the default route
+            if accept == "default":
+                self._birdconf.bgp.accept_default = accept_config
+            # If we don't understand this 'accept' entry, throw an error
+            else:
+                raise BirdPlanError(f"Configuration item '{accept}' not understood in bgp:accept")
+
+    def _config_bgp_globals(self):
+        """Configure bgp globals."""
+
+        # Setup prefix lengths
+        for item in [
+            "prefix_maxlen4_import",
+            "prefix_maxlen4_export",
+            "prefix_minlen4_import",
+            "prefix_minlen4_export",
+            "prefix_maxlen6_import",
+            "prefix_maxlen6_export",
+            "prefix_minlen6_import",
+            "prefix_minlen6_export",
+        ]:
+            if item in self.config["bgp"]:
+                setattr(self._birdconf.bgp, item, self.config["bgp"][item])
+
+        # Set our route reflector cluster id
+        if "rr_cluster_id" in self.config["bgp"]:
+            self._birdconf.bgp.rr_cluster_id = self.config["bgp"]["rr_cluster_id"]
+
+    def _config_bgp_originate(self):
+        """Configure bgp:originate section."""
+
+        # If we don't have an accept section, just return
+        if "originate" not in self.config["bgp"]:
+            return
+
+        # Add origination routes
+        for route in self.config["bgp"]["originate"]:
+            self._birdconf.bgp.add_originate_route(route)
+
+    def _config_bgp_import(self):
+        """Configure bgp:import section."""
+
+        # If we don't have the option then just return
+        if "import" not in self.config["bgp"]:
+            return
+
+        # Loop with redistribution items
+        for import_type, import_config in self.config["bgp"]["import"].items():
+            # Import connected routes into the main BGP table
+            if import_type == "connected":
+                self._birdconf.bgp.import_connected = import_config
+            # Import static routes into the main BGP table
+            elif import_type == "static":
+                self._birdconf.bgp.import_static = import_config
+            # Import kernel routes into the main BGP table
+            elif import_type == "kernel":
+                self._birdconf.bgp.import_kernel = import_config
+            # If we don't understand this 'redistribute' entry, throw an error
+            else:
+                raise BirdPlanError("Configuration item '{import_type}' not understood in bgp:import")
+
+    def _config_bgp_peers(self):
+        """Configure bgp:peers section."""
+
+        if "peers" not in self.config["bgp"]:
+            return
+
+        # Loop with peer ASN and config
+        for peer_name, peer_config in self.config["bgp"]["peers"].items():
+            self._config_bgp_peers_peer(peer_name, peer_config)
+
+    def _config_bgp_peers_peer(self, peer_name: str, peer_config: Dict[str, Any]):  # pylint: disable=too-many-branches # noqa: C901
+        """Configure bgp:peers single peer."""
+
+        # Start with no peer config
+        peer = {}
+
+        # Loop with each config item in the peer
+        for config_item, config_value in peer_config.items():
+            if config_item in (
+                "asn",
+                "description",
+                "type",
+                "neighbor4",
+                "neighbor6",
+                "neighbor4",
+                "neighbor6",
+                "source_address4",
+                "source_address6",
+                "connect_retry_time",
+                "connect_delay_time",
+                "error_wait_time",
+                "multihop",
+                "password",
+                "prefix_limit_ipv4",
+                "prefix_limit_ipv6",
+                "accept_default",
+                "quarantine",
+                "incoming-large-communities",
+                "outgoing-large-communities",
+                "cost",
+            ):
+                peer[config_item] = config_value
+            # Work out redistribution
+            elif config_item == "redistribute":
+                peer["redistribute"] = {}
+                # Loop with redistribution items
+                for redistribute_type, redistribute_config in config_value.items():
+                    if redistribute_type in (
+                        "default",
+                        "connected",
+                        "static",
+                        "static_device",
+                        "kernel",
+                        "originated",
+                        "bgp",
+                        "bgp_own",
+                        "bgp_customer",
+                        "bgp_peering",
+                        "bgp_transit",
+                    ):
+                        peer["redistribute"][redistribute_type] = redistribute_config
+                    # If we don't understand this 'redistribute' entry, throw an error
+                    else:
+                        raise BirdPlanError(
+                            f"Configuration item '{redistribute_type}' not understood in bgp:peers:{peer_name} redistribute"
+                        )
+            # Work out acceptance of routes
+            elif config_item == "accept":
+                peer["accept"] = {}
+                # Loop with acceptance items
+                for accept, accept_config in config_value.items():
+                    if accept in ["default"]:
+                        peer["accept"][accept] = accept_config
+                    # If we don't understand this 'accept' entry, throw an error
+                    else:
+                        raise BirdPlanError(f"Configuration item '{accept}' not understood in bgp:peers:{peer_name}:accept")
+            # Work out filters
+            elif config_item == "filter":
+                peer["filter"] = {}
+                # Loop with filterance items
+                for filter_type, filter_config in config_value.iteritems():
+                    if filter_type in ("prefixes", "asns", "as-set"):
+                        peer["filter"][filter_type] = filter_config
+                    # If we don't understand this 'filter' entry, throw an error
+                    else:
+                        raise BirdPlanError(f"Configuration item '{filter_type}' not understood in bgp:peers:{peer_name}:filter")
+            else:
+                raise BirdPlanError(f"Configuration item '{config_item}' not understood in bgp:peers:{peer_name}")
+
+        # Check items we need
+        for required_item in ["asn", "description", "type"]:
+            if required_item not in peer:
+                raise BirdPlanError(f"Configuration item '{required_item}' missing in bgp:peers:{peer_name}")
+
+        # Check the peer type is valid
+        if peer["type"] not in (
+            "customer",
+            "peer",
+            "upstream",
+            "rrclient",
+            "rrserver",
+            "rrserver-rrserver",
+            "routecollector",
+            "routeserver",
+        ):
+            raise BirdPlanError(f"Configuration item 'type' is invalid for bgp:peers:{peer_name}")
+
+        # Check that if we have a peer type of rrclient, that we have rr_cluster_id too...
+        if (peer["type"] == "rrclient") and ("rr_cluster_id" not in self.config["bgp"]):
+            raise BirdPlanError("Configuration item 'bgp:rr_cluster_id' missing when having 'rrclient' peers")
+        # If we are a customer type, we must have filters defined
+        if (peer["type"] == "customer") and ("filter" not in peer):
+            raise BirdPlanError(f"Configuration items 'bgp:peers:{peer_name}' missing 'filter' when type is 'customer'")
+        # We must have a neighbor4 or neighbor6
+        if ("neighbor4" not in peer) and ("neighbor6" not in peer):
+            raise BirdPlanError(f"Configuration item 'bgp:peers:{peer_name}' missing 'neighbor4' or 'neighbor6' config")
+        # We must have a source_address4 for neighbor4
+        if ("neighbor4" in peer) and ("source_address4" not in peer):
+            raise BirdPlanError(f"Configuration item 'bgp:peers:{peer_name}' must have a 'source_address4'")
+        # We must have a source_address6 for neighbor6
+        if ("neighbor6" in peer) and ("source_address6" not in peer):
+            raise BirdPlanError(f"Configuration item 'bgp:peers:{peer_name}' must have a 'source_address6'")
+
+        # Make sure we have items we need
+        self._birdconf.bgp.add_peer(peer_name, peer)  # type: ignore
 
     @property
     def plan_file(self) -> Optional[str]:

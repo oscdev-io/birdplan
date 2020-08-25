@@ -299,7 +299,7 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("# Preferences")
         self._addline("define BGP_PREF_OWN = 950;")  # -20 = Originate, -10 = static, -5 = kernel
         self._addline("define BGP_PREF_CUSTOMER = 750;")
-        self._addline("define BGP_PREF_PEER = 450;")
+        self._addline("define BGP_PREF_PEER = 470;")
         self._addline("define BGP_PREF_ROUTESERVER = 450;")
         self._addline("define BGP_PREF_TRANSIT = 150;")
         self._addline("")
