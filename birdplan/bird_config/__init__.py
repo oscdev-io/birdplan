@@ -305,6 +305,9 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("")
 
         self._addline("# Large community functions")
+        # NK: IMPORTANT IF YOU CHANGE THE BELOW, UPDATE BGP_LC_STRIP
+        self._addline("define BGP_LC_FUNCTION_LOCATION_ISO = 1;")
+        self._addline("define BGP_LC_FUNCTION_LOCATION_UN = 2;")
         self._addline("define BGP_LC_FUNCTION_RELATION = 3;")
         self._addline("define BGP_LC_FUNCTION_NOEXPORT = 4;")
         self._addline("define BGP_LC_FUNCTION_PREPEND_ONE = 61;")
@@ -391,6 +394,16 @@ class BirdConfigConstants(BirdConfigBase):
 
         self._addline("# Clear internal large communities")
         self._addline("function bgp_lc_remove_internal() {")
+        self._addline("\t# Remove location ISO")
+        self._addline("\tif (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_LOCATION_ISO, *)]) then {")
+        self._addline('\t\tprint "[bgp_lc_remove_internal] Removing location ISO communities from ", net;', debug=True)
+        self._addline("\t\tbgp_large_community.delete([(BGP_ASN, BGP_LC_FUNCTION_LOCATION_ISO, *)]);")
+        self._addline("\t}")
+        self._addline("\t# Remove location UN")
+        self._addline("\tif (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_LOCATION_UN, *)]) then {")
+        self._addline('\t\tprint "[bgp_lc_remove_internal] Removing location UN communities from ", net;', debug=True)
+        self._addline("\t\tbgp_large_community.delete([(BGP_ASN, BGP_LC_FUNCTION_LOCATION_UN, *)]);")
+        self._addline("\t}")
         self._addline("\t# Remove relations")
         self._addline("\tif (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_RELATION, *)]) then {")
         self._addline('\t\tprint "[bgp_lc_remove_internal] Removing relation communities from ", net;', debug=True)
