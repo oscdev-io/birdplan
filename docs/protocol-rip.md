@@ -2,7 +2,7 @@
 
 The following options are supported under `rip`.
 
-## interfaces
+# interfaces
 
 The `interfaces` key contains a dictionary of the interfaces to use for RIP.
 
@@ -24,7 +24,7 @@ rip:
       metric: 2
 ```
 
-## accept
+# accept
 
 The `accept` key contains a dictionary of route types we will accept:
 
@@ -37,7 +37,7 @@ rip:
     default: True
 ```
 
-## redistribute
+# redistribute
 
 Tests: connected, connected_with_star, kernel, static, default, rip
 
