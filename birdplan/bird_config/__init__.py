@@ -311,6 +311,10 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("define BGP_LC_FUNCTION_PREPEND_TWO = 62;")
         self._addline("define BGP_LC_FUNCTION_PREPEND_THREE = 63;")
         self._addline("define BGP_LC_FUNCTION_FILTERED = 1101;")
+        # NK: IMPORTANT IF THE ABOVE CHANGES UPDATE THE BELOW
+        self._addline(
+            "define BGP_LC_STRIP = [ (BGP_ASN, 5, *), (BGP_ASN, 7..61, *), (BGP_ASN, 64..1100, *), (BGP_ASN, 1102..65535) ];"
+        )
         self._addline("")
 
         self._addline("# Large community noexport")
@@ -396,6 +400,11 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("\tif (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_FILTERED, *)]) then {")
         self._addline('\t\tprint "[bgp_lc_remove_internal] Removing filtered communities from ", net;', debug=True)
         self._addline("\t\tbgp_large_community.delete([(BGP_ASN, BGP_LC_FUNCTION_FILTERED, *)]);")
+        self._addline("\t}")
+        self._addline("\t# Remove stripped communities")
+        self._addline("\tif (bgp_large_community ~ BGP_LC_STRIP) then {")
+        self._addline('\t\tprint "[bgp_lc_remove_internal] Removing stripped communities from ", net;', debug=True)
+        self._addline("\t\tbgp_large_community.delete(BGP_LC_STRIP);")
         self._addline("\t}")
         self._addline("}")
         self._addline("")
