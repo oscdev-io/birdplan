@@ -2360,18 +2360,18 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         # For routecollector and routeservers we filter, not block
         if self.peer_type in ("customer", "peer"):
             if self.has_ipv4:
-                if "prefix_limit_ipv4" not in self.peer_config:
-                    self.peer_config["prefix_limit_ipv4"] = "peeringdb"
+                if "prefix_limit4" not in self.peer_config:
+                    self.peer_config["prefix_limit4"] = "peeringdb"
             if self.has_ipv6:
-                if "prefix_limit_ipv6" not in self.peer_config:
-                    self.peer_config["prefix_limit_ipv6"] = "peeringdb"
+                if "prefix_limit6" not in self.peer_config:
+                    self.peer_config["prefix_limit6"] = "peeringdb"
         # Work out the prefix limits...
         if self.has_ipv4:
-            if ("prefix_limit_ipv4" in self.peer_config) and (self.peer_config["prefix_limit_ipv4"] == "peeringdb"):
-                self.peer_config["prefix_limit_ipv4"] = self.peeringdb["info_prefixes4"]
+            if ("prefix_limit4" in self.peer_config) and (self.peer_config["prefix_limit4"] == "peeringdb"):
+                self.peer_config["prefix_limit4"] = self.peeringdb["info_prefixes4"]
         if self.has_ipv6:
-            if ("prefix_limit_ipv6" in self.peer_config) and (self.peer_config["prefix_limit_ipv6"] == "peeringdb"):
-                self.peer_config["prefix_limit_ipv6"] = self.peeringdb["info_prefixes6"]
+            if ("prefix_limit6" in self.peer_config) and (self.peer_config["prefix_limit6"] == "peeringdb"):
+                self.peer_config["prefix_limit6"] = self.peeringdb["info_prefixes6"]
 
         # Work out what we're going to be redistributing
         if "redistribute" in self.peer_config:
@@ -2945,7 +2945,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         self._addline("\t\timport table;")
         self._addline("\t\texport table;")
         # Setup prefix limit
-        prefix_limit_name = "prefix_limit_ipv%s" % ipv
+        prefix_limit_name = "prefix_limit%s" % ipv
         if prefix_limit_name in self.peer_config and (self.peer_config[prefix_limit_name] is not None):
             self._addline("\t\timport limit %s;" % self.peer_config[prefix_limit_name])
         # Setup filters
