@@ -305,12 +305,19 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("")
 
         self._addline("# Large community functions")
+        # NK: IMPORTANT IF YOU CHANGE THE BELOW, UPDATE BGP_LC_STRIP
+        self._addline("define BGP_LC_FUNCTION_LOCATION_ISO = 1;")
+        self._addline("define BGP_LC_FUNCTION_LOCATION_UN = 2;")
         self._addline("define BGP_LC_FUNCTION_RELATION = 3;")
         self._addline("define BGP_LC_FUNCTION_NOEXPORT = 4;")
-        self._addline("define BGP_LC_FUNCTION_PREPEND_ONE = 61;")
+        self._addline("define BGP_LC_FUNCTION_PREPEND_ONE = 6;")
         self._addline("define BGP_LC_FUNCTION_PREPEND_TWO = 62;")
         self._addline("define BGP_LC_FUNCTION_PREPEND_THREE = 63;")
         self._addline("define BGP_LC_FUNCTION_FILTERED = 1101;")
+        # NK: IMPORTANT IF THE ABOVE CHANGES UPDATE THE BELOW
+        self._addline(
+            "define BGP_LC_STRIP = [ (BGP_ASN, 5, *), (BGP_ASN, 7..61, *), (BGP_ASN, 64..1100, *), (BGP_ASN, 1102..65535) ];"
+        )
         self._addline("")
 
         self._addline("# Large community noexport")
@@ -387,6 +394,16 @@ class BirdConfigConstants(BirdConfigBase):
 
         self._addline("# Clear internal large communities")
         self._addline("function bgp_lc_remove_internal() {")
+        self._addline("\t# Remove location ISO")
+        self._addline("\tif (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_LOCATION_ISO, *)]) then {")
+        self._addline('\t\tprint "[bgp_lc_remove_internal] Removing location ISO communities from ", net;', debug=True)
+        self._addline("\t\tbgp_large_community.delete([(BGP_ASN, BGP_LC_FUNCTION_LOCATION_ISO, *)]);")
+        self._addline("\t}")
+        self._addline("\t# Remove location UN")
+        self._addline("\tif (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_LOCATION_UN, *)]) then {")
+        self._addline('\t\tprint "[bgp_lc_remove_internal] Removing location UN communities from ", net;', debug=True)
+        self._addline("\t\tbgp_large_community.delete([(BGP_ASN, BGP_LC_FUNCTION_LOCATION_UN, *)]);")
+        self._addline("\t}")
         self._addline("\t# Remove relations")
         self._addline("\tif (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_RELATION, *)]) then {")
         self._addline('\t\tprint "[bgp_lc_remove_internal] Removing relation communities from ", net;', debug=True)
@@ -396,6 +413,11 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("\tif (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_FILTERED, *)]) then {")
         self._addline('\t\tprint "[bgp_lc_remove_internal] Removing filtered communities from ", net;', debug=True)
         self._addline("\t\tbgp_large_community.delete([(BGP_ASN, BGP_LC_FUNCTION_FILTERED, *)]);")
+        self._addline("\t}")
+        self._addline("\t# Remove stripped communities")
+        self._addline("\tif (bgp_large_community ~ BGP_LC_STRIP) then {")
+        self._addline('\t\tprint "[bgp_lc_remove_internal] Removing stripped communities from ", net;', debug=True)
+        self._addline("\t\tbgp_large_community.delete(BGP_LC_STRIP);")
         self._addline("\t}")
         self._addline("}")
         self._addline("")
@@ -2013,7 +2035,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
         self._addline("};")
         self._addline("")
 
-        # Configure BGP origination route pipe to the kernel
+        # Configure BGP origination route pipe to the bgp table
         originate_pipe = BirdConfigProtocolPipe(
             self, table_from="bgp_originate", table_to="bgp", table_export="all", table_import="none"
         )
@@ -2346,9 +2368,9 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         # If this is a rrserver, send our entire BGP table
         if self.peer_type in ("rrclient", "rrserver", "rrserver-rrserver"):
             self.redistribute["bgp"] = True
-        # If this is an upstream, peer, customer, routecollector or routeserver, we need to redistribute our own routes and
+        # If this is an transit, peer, customer, routecollector or routeserver, we need to redistribute our own routes and
         # customer routes
-        if self.peer_type in ("customer", "routecollector", "routeserver", "peer", "upstream"):
+        if self.peer_type in ("customer", "routecollector", "routeserver", "peer", "transit"):
             self.redistribute["bgp_own"] = True
             self.redistribute["bgp_customer"] = True
         # If this is an customer, we need to redistribute peer and transit routes too
@@ -2360,18 +2382,18 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         # For routecollector and routeservers we filter, not block
         if self.peer_type in ("customer", "peer"):
             if self.has_ipv4:
-                if "prefix_limit_ipv4" not in self.peer_config:
-                    self.peer_config["prefix_limit_ipv4"] = "peeringdb"
+                if "prefix_limit4" not in self.peer_config:
+                    self.peer_config["prefix_limit4"] = "peeringdb"
             if self.has_ipv6:
-                if "prefix_limit_ipv6" not in self.peer_config:
-                    self.peer_config["prefix_limit_ipv6"] = "peeringdb"
+                if "prefix_limit6" not in self.peer_config:
+                    self.peer_config["prefix_limit6"] = "peeringdb"
         # Work out the prefix limits...
         if self.has_ipv4:
-            if ("prefix_limit_ipv4" in self.peer_config) and (self.peer_config["prefix_limit_ipv4"] == "peeringdb"):
-                self.peer_config["prefix_limit_ipv4"] = self.peeringdb["info_prefixes4"]
+            if ("prefix_limit4" in self.peer_config) and (self.peer_config["prefix_limit4"] == "peeringdb"):
+                self.peer_config["prefix_limit4"] = self.peeringdb["info_prefixes4"]
         if self.has_ipv6:
-            if ("prefix_limit_ipv6" in self.peer_config) and (self.peer_config["prefix_limit_ipv6"] == "peeringdb"):
-                self.peer_config["prefix_limit_ipv6"] = self.peeringdb["info_prefixes6"]
+            if ("prefix_limit6" in self.peer_config) and (self.peer_config["prefix_limit6"] == "peeringdb"):
+                self.peer_config["prefix_limit6"] = self.peeringdb["info_prefixes6"]
 
         # Work out what we're going to be redistributing
         if "redistribute" in self.peer_config:
@@ -2596,48 +2618,91 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
 
         # Redistribute connected
         if self.redistribute["connected"]:
-            self._addline("\t# Redistribute connected")
+            self._addline("\t# Redistribute connected routes")
             self._addline("\tif (source = RTS_DEVICE) then {")
             self._addline(
-                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on RTS_DEVICE";' % (self.peer_table, ipv),
+                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on RTS_DEVICE (redistribute connected)";'
+                % (self.peer_table, ipv),
                 debug=True,
             )
             self._add_redistribute_properties(self.redistribute["connected"])
             self._addline("\t\taccept_route = 1;")
             self._addline("\t}")
+        else:
+            self._addline("\t# Do not redistribute connected routes")
+            self._addline("\tif (source = RTS_DEVICE) then {")
+            self._addline(
+                '\t\tprint "[f_%s_bgp%s_import] Rejecting ", net, " due to match on RTS_DEVICE (no redistribute connected)";'
+                % (self.peer_table, ipv),
+                debug=True,
+            )
+            self._addline("\t\treject;")
+            self._addline("\t}")
         # Redistribute static routes
         if self.redistribute["static"]:
             self._addline("\t# Redistribute static routes")
-            self._addline("\tif (source = RTS_STATIC) then {")
+            self._addline('\tif (proto = "static%s") then {' % ipv)
             self._addline(
-                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on RTS_STATIC";' % (self.peer_table, ipv),
+                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on proto static%s (redistribute static)";'
+                % (self.peer_table, ipv, ipv),
                 debug=True,
             )
             self._add_redistribute_properties(self.redistribute["static"])
             self._addline("\t\taccept_route = 1;")
+            self._addline("\t}")
+        else:
+            self._addline("\t# Do not redistribute static routes")
+            self._addline('\tif (proto = "static%s") then {' % ipv)
+            self._addline(
+                '\t\tprint "[f_%s_bgp%s_import] Rejecting ", net, " due to match on proto static%s (no redistribute static)";'
+                % (self.peer_table, ipv, ipv),
+                debug=True,
+            )
+            self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute kernel routes
         if self.redistribute["kernel"]:
             self._addline("\t# Redistribute kernel routes")
             self._addline("\tif (source = RTS_INHERIT) then {")
             self._addline(
-                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on RTS_INHERIT";' % (self.peer_table, ipv),
+                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on RTS_INHERIT (redistribute kernel)";'
+                % (self.peer_table, ipv),
                 debug=True,
             )
             self._add_redistribute_properties(self.redistribute["kernel"])
             self._addline("\t\taccept_route = 1;")
+            self._addline("\t}")
+        else:
+            self._addline("\t# Do not redistribute kernel routes")
+            self._addline("\tif (source = RTS_INHERIT) then {")
+            self._addline(
+                '\t\tprint "[f_%s_bgp%s_import] Rejecting ", net, " due to match on RTS_INHERIT (no redistribute kernel)";'
+                % (self.peer_table, ipv),
+                debug=True,
+            )
+            self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute originated routes
         if self.redistribute["originated"]:
             self._addline("\t# Redistribute originated routes")
             self._addline('\tif (proto = "bgp_originate%s") then {' % ipv)
             self._addline(
-                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on bgp_originate%s";'
-                % (self.peer_table, ipv, ipv),
+                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on proto bgp_originate%s'
+                ' (redistribute originated)";' % (self.peer_table, ipv, ipv),
                 debug=True,
             )
             self._add_redistribute_properties(self.redistribute["originated"])
             self._addline("\t\taccept_route = 1;")
+            self._addline("\t}")
+        else:
+            self._addline("\t# Do not redistribute originated routes")
+            self._addline('\tif (proto = "bgp_originate%s") then {' % ipv)
+            self._addline(
+                '\t\tprint "[f_%s_bgp%s_import] Rejecting ", net, " due to match on proto bgp_originate%s'
+                ' (no redistribute originated)";' % (self.peer_table, ipv, ipv),
+                debug=True,
+            )
+            self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute BGP routes
         if self.redistribute["bgp"]:
@@ -2749,8 +2814,8 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
 
         # Check if we're accepting the route...
         self._addline("\tif (accept_route > 0) then {")
-        # Do large community prepending if the peer is a customer, peer, routeserver or upstream
-        if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "upstream"):
+        # Do large community prepending if the peer is a customer, peer, routeserver or transit
+        if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
             # Check if we are adding a large community to outgoing routes
             if "outgoing-large-communities" in self.peer_config:
                 for large_community in sorted(self.peer_config["outgoing-large-communities"]):
@@ -2848,8 +2913,8 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         elif self.peer_type == "rrserver-rrserver":
             if not self._accept["default"]:
                 type_lines.append("\t\tbgp_filter_default_v%s();" % ipv)
-        # Upstreams
-        elif self.peer_type == "upstream":
+        # Transit providers
+        elif self.peer_type == "transit":
             type_lines.append("\t\tbgp_lc_remove_all();")
             type_lines.append("\t\tbgp_import_transit(%s, %s);" % (self.peer_asn, self.cost))
             if not self._accept["default"]:
@@ -2945,7 +3010,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         self._addline("\t\timport table;")
         self._addline("\t\texport table;")
         # Setup prefix limit
-        prefix_limit_name = "prefix_limit_ipv%s" % ipv
+        prefix_limit_name = "prefix_limit%s" % ipv
         if prefix_limit_name in self.peer_config and (self.peer_config[prefix_limit_name] is not None):
             self._addline("\t\timport limit %s;" % self.peer_config[prefix_limit_name])
         # Setup filters

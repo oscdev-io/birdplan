@@ -2,7 +2,7 @@
 
 Below are configuration options that do not apply to any specific protocol.
 
-## router_id
+# router_id
 
 This is the BIRD router ID, the main IP of the system is normally used.
 
@@ -10,7 +10,7 @@ This is the BIRD router ID, the main IP of the system is normally used.
 router_id: 0.0.0.2
 ```
 
-## log_file
+# log_file
 
 Set the log filename to use instead of systemd journal.
 
@@ -18,7 +18,7 @@ Set the log filename to use instead of systemd journal.
 log_file: /var/log/bird.log
 ```
 
-## debug
+# debug
 
 Set BIRD into debug mode.
 
@@ -26,7 +26,7 @@ Set BIRD into debug mode.
 debug: True
 ```
 
-## export_kernel
+# export_kernel
 
 The `export_kernel` key contains a dictionary of the routes to be exported to the kernel RIB. All items default to `True`.
 

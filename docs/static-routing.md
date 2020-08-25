@@ -2,7 +2,7 @@
 
 The following keys are supported under `static`.
 
-## static
+# static
 
 The `static` key contains a list of routes to be added in the static routing table.
 

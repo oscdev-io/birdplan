@@ -2,6 +2,8 @@
 
 # Local Preferences
 
+Peer costs are minus'd from the below preference values.
+
 | Constant | Preference | Description |
 | --- | --- | --- |
 | BGP_PREF_OWN | 950 | Originated routes (originated = -20, static = -10, direct = -10, kernel = -5) |
@@ -31,14 +33,39 @@ These are globals which can be overridden in configuration.
 Large communities are in the form of (OWN_ASN, FUNCTION, XXX) and are described below.
 
 ## Functions
+
+
 | Function Number | Description |
 | --- | --- |
-| 3 | Relation |
-| 4 | No Export |
-| 61 | Prepend one |
-| 62 | Prepend two |
-| 63 | Prepend three |
+| 1 | Route learned [^lc-function-1] in (https://www.iso.org/iso-3166-country-codes.html) - ISO 3166-1 numeric country identifier |
+| 2 | Route learned [^lc-function-2] in (https://unstats.un.org/unsd/methodology/m49/) - UN M.49 Region |
+| 3 | Relation [^lc-function-3] |
+| 4 | ASN-based selective NOEXPORT [^lc-function-4] |
+| 5 | TODO: Location-based selective NOEXPORT [^lc-function-5] |
+| 6 | ASN-Based Selective AS_PATH Prepending (one) [^lc-function-6] |
+| 62 | ENHANCED: ASN-Based Selective AS_PATH Prepending (two) [^lc-function-6] |
+| 63 | ENHANCED: ASN-Based Selective AS_PATH Prepending (three) [^lc-function-6] |
+| 7 | TODO: Location-Based Selective AS_PATH Prepending (one) [^lc-function-7] |
+| 71 | TODO ENHANCED: Location-Based Selective AS_PATH Prepending (one) [^lc-function-7] |
+| 72 | TODO ENHANCED: Location-Based Selective AS_PATH Prepending (one) [^lc-function-7] |
+| 8 | TODO ENHANCED: Manipulation of the LOCAL_PREF Attribute (set to 1, 2, 3) [^lc-function-8] |
 | 1101 | Filtered |
+
+[^lc-function-1]: Route learned in ISO-3166-1 country. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 3.1.1 pg. 6
+
+[^lc-function-2]: Route learned in UN M.49 region. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 3.1.2 pg. 6
+
+[^lc-function-3]: Relation. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 3.2 pg 7.
+
+[^lc-function-4]: ASN-based selective NOEXPORT. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 4.1.1 pg 8.
+
+[^lc-function-5]: Location-based selective NOEXPORT. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 4.1.2 pg 8.
+
+[^lc-function-6]: ASN-Based Selective AS_PATH Prepending. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 4.2.1 pg 9.
+
+[^lc-function-7]: Location-Based Selective AS_PATH Prepending. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 4.2.2 pg 10.
+
+[^lc-function-8]: Manipulation of the LOCAL_PREF Attribute. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 4.3 pg 10/11.
 
 ## Relation Communities
 
@@ -46,7 +73,7 @@ Internally set, not allowable from any BGP peer type.
 
 | Community | Description |
 | --- | --- |
-| (OWN_ASN, 3, 1) | Originated |
+| (OWN_ASN, 3, 1) | Originated (OWN) |
 | (OWN_ASN, 3, 2) | Customer |
 | (OWN_ASN, 3, 3) | Peer |
 | (OWN_ASN, 3, 4) | Transit |
@@ -69,7 +96,7 @@ Allowable internally and by `customer`.
 
 | Community | Description |
 | --- | --- |
-| (OWN_ASN, 61, PEER_ASN) | Prepend 1x to PEER_ASN |
+| (OWN_ASN, 6, PEER_ASN) | Prepend 1x to PEER_ASN |
 | (OWN_ASN, 62, PEER_ASN) | Prepend 2x to PEER_ASN |
 | (OWN_ASN, 63, PEER_ASN) | Prepend 3x to PEER_ASN |
 

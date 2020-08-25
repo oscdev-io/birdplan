@@ -4,7 +4,7 @@ The following options are supported under `ospf`.
 
 OSPF v3 is used for both IPv4 and IPv6.
 
-## accept
+# accept
 
 The `accept` key contains a dictionary of routes we will accept.
 
@@ -22,7 +22,7 @@ ospf:
         'eth0': []
 ```
 
-### redistribute
+## redistribute
 
 Tests: connected, kernel, static, default
 
@@ -54,7 +54,7 @@ ospf:
         'eth0': []
 ```
 
-### areas
+## areas
 
 Tests: hello, stub, wait
 
