@@ -10,6 +10,8 @@
 
 [Redistribute Originated](bgp/redistribute_originated/README.md)
 
+[Redistribute Static](bgp/redistribute_static/README.md)
+
 
 # RIP
 
