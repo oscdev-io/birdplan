@@ -2035,7 +2035,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
         self._addline("};")
         self._addline("")
 
-        # Configure BGP origination route pipe to the kernel
+        # Configure BGP origination route pipe to the bgp table
         originate_pipe = BirdConfigProtocolPipe(
             self, table_from="bgp_originate", table_to="bgp", table_export="all", table_import="none"
         )
