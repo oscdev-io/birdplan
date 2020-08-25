@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGP basic feature test."""
+"""BGP test for redistribution of originated routes."""
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
@@ -27,8 +27,8 @@ from birdplan import BirdPlan
 
 
 @pytest.mark.incremental
-class TestBGPBasic:
-    """BGP test for basic feature set."""
+class TestBGPRedistributeOriginated:
+    """BGP test for redistribution of originated routes."""
 
     def test_configure(self, sim, tmpdir):
         """Create our configuration files."""
@@ -38,7 +38,7 @@ class TestBGPBasic:
             conffile = f"{tmpdir}/bird.conf.{router}"
             logfile = f"{tmpdir}/bird.log.{router}"
             # Load yaml config
-            birdplan.load(f"tests/bgp/basic/{router}.yaml", {"@LOGFILE@": logfile})
+            birdplan.load(f"tests/bgp/redistribute_originated/{router}.yaml", {"@LOGFILE@": logfile})
             # Generate BIRD config
             birdplan.generate(conffile)
             sim.add_conffile(f"CONFFILE({router})", conffile)
