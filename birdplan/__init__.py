@@ -474,8 +474,6 @@ class BirdPlan:
                 "type",
                 "neighbor4",
                 "neighbor6",
-                "neighbor4",
-                "neighbor6",
                 "source_address4",
                 "source_address6",
                 "connect_retry_time",
