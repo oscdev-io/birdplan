@@ -1,10 +1,19 @@
 # Test Cases
 
-## Basic
+
+# Basic
 
 [Static Routing](static/README.md)
 
-## RIP
+
+# BGP
+
+[Redistribute Originated](bgp/redistribute_originated/README.md)
+
+[Redistribute Static](bgp/redistribute_static/README.md)
+
+
+# RIP
 
 [No Export Kernel](rip/no_export_kernel/README.md)
 
@@ -24,7 +33,8 @@
 
 [Redistribute Static Without Default](rip/redistribute_static_without_default/README.md)
 
-## OSPF
+
+# OSPF
 
 [No Export Kernel](ospf/no_export_kernel/README.md)
 

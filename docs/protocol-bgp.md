@@ -16,6 +16,33 @@ bgp:
   asn: 65000
 ```
 
+# import
+
+The `import` key contains a dictionary of the routes to import into the main BGP table.
+
+* `connected` routes are kernel device routes for the interfaces listed. A list of interfaces must be provided. This can be a pattern
+like `eth*`.
+
+* `kernel` routes are those statically added to the kernel.
+
+* `static` routes are those setup in the static protocol.
+
+
+One can specify the ASN as per below...
+```yaml
+router_id: 0.0.0.1
+
+bgp:
+  asn: 65000
+  import:
+    connected:
+      interfaces:
+        - eth9
+        - ppp*
+    static: True
+```
+
+
 # originate
 
 Origination of BGP prefixes, generally we set these to `blackhole` to avoid TTL loops.
