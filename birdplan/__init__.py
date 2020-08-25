@@ -499,7 +499,6 @@ class BirdPlan:
                         "default",
                         "connected",
                         "static",
-                        "static_device",
                         "kernel",
                         "originated",
                         "bgp",
