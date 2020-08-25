@@ -2618,48 +2618,91 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
 
         # Redistribute connected
         if self.redistribute["connected"]:
-            self._addline("\t# Redistribute connected")
+            self._addline("\t# Redistribute connected routes")
             self._addline("\tif (source = RTS_DEVICE) then {")
             self._addline(
-                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on RTS_DEVICE";' % (self.peer_table, ipv),
+                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on RTS_DEVICE (redistribute connected)";'
+                % (self.peer_table, ipv),
                 debug=True,
             )
             self._add_redistribute_properties(self.redistribute["connected"])
             self._addline("\t\taccept_route = 1;")
             self._addline("\t}")
+        else:
+            self._addline("\t# Do not redistribute connected routes")
+            self._addline("\tif (source = RTS_DEVICE) then {")
+            self._addline(
+                '\t\tprint "[f_%s_bgp%s_import] Rejecting ", net, " due to match on RTS_DEVICE (no redistribute connected)";'
+                % (self.peer_table, ipv),
+                debug=True,
+            )
+            self._addline("\t\treject;")
+            self._addline("\t}")
         # Redistribute static routes
         if self.redistribute["static"]:
             self._addline("\t# Redistribute static routes")
-            self._addline("\tif (source = RTS_STATIC) then {")
+            self._addline('\tif (proto = "static%s") then {' % ipv)
             self._addline(
-                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on RTS_STATIC";' % (self.peer_table, ipv),
+                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on proto static%s (redistribute static)";'
+                % (self.peer_table, ipv, ipv),
                 debug=True,
             )
             self._add_redistribute_properties(self.redistribute["static"])
             self._addline("\t\taccept_route = 1;")
+            self._addline("\t}")
+        else:
+            self._addline("\t# Do not redistribute static routes")
+            self._addline('\tif (proto = "static%s") then {' % ipv)
+            self._addline(
+                '\t\tprint "[f_%s_bgp%s_import] Rejecting ", net, " due to match on proto static%s (no redistribute static)";'
+                % (self.peer_table, ipv, ipv),
+                debug=True,
+            )
+            self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute kernel routes
         if self.redistribute["kernel"]:
             self._addline("\t# Redistribute kernel routes")
             self._addline("\tif (source = RTS_INHERIT) then {")
             self._addline(
-                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on RTS_INHERIT";' % (self.peer_table, ipv),
+                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on RTS_INHERIT (redistribute kernel)";'
+                % (self.peer_table, ipv),
                 debug=True,
             )
             self._add_redistribute_properties(self.redistribute["kernel"])
             self._addline("\t\taccept_route = 1;")
+            self._addline("\t}")
+        else:
+            self._addline("\t# Do not redistribute kernel routes")
+            self._addline("\tif (source = RTS_INHERIT) then {")
+            self._addline(
+                '\t\tprint "[f_%s_bgp%s_import] Rejecting ", net, " due to match on RTS_INHERIT (no redistribute kernel)";'
+                % (self.peer_table, ipv),
+                debug=True,
+            )
+            self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute originated routes
         if self.redistribute["originated"]:
             self._addline("\t# Redistribute originated routes")
             self._addline('\tif (proto = "bgp_originate%s") then {' % ipv)
             self._addline(
-                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on bgp_originate%s";'
-                % (self.peer_table, ipv, ipv),
+                '\t\tprint "[f_%s_bgp%s_import] Accepting ", net, " due to match on proto bgp_originate%s'
+                ' (redistribute originated)";' % (self.peer_table, ipv, ipv),
                 debug=True,
             )
             self._add_redistribute_properties(self.redistribute["originated"])
             self._addline("\t\taccept_route = 1;")
+            self._addline("\t}")
+        else:
+            self._addline("\t# Do not redistribute originated routes")
+            self._addline('\tif (proto = "bgp_originate%s") then {' % ipv)
+            self._addline(
+                '\t\tprint "[f_%s_bgp%s_import] Rejecting ", net, " due to match on proto bgp_originate%s'
+                ' (no redistribute originated)";' % (self.peer_table, ipv, ipv),
+                debug=True,
+            )
+            self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute BGP routes
         if self.redistribute["bgp"]:
