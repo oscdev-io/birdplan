@@ -1,6 +1,6 @@
 # RIP redistribution of BIRD static routes without default
 
-Router r1 should not be exporting the BIRD static default route on r1 interface eth1 to r2.
+Router r1 should not be exporting the BIRD static default route on r1 interface eth1 to r2 as redistribute default defaults to False.
 
 
 ```plantuml
