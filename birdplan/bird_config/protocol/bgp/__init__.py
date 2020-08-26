@@ -131,12 +131,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
         # Check if we accept the default route, if not block it
         if not self.accept_default:
             self._addline("\t# Do not export default routes to the master")
-
-            if ipv == 4:
-                self._addline("\tif (net = 0.0.0.0/0) then {")
-            elif ipv == 6:
-                self._addline("\tif (net = ::/0) then {")
-
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
             self._addline("\t\treject;")
             self._addline("\t}")
         # Else accept
