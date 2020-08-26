@@ -284,14 +284,6 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         if self.redistribute["static"] and not self.parent.import_static:
             raise RuntimeError("BGP needs static routes to be imported before they can be redistributed to a peer")
 
-        # Do not redistribute the default route, no matter where we get it from
-        if not self.redistribute["default"]:
-            self._addline("\t# Reject the default route as we are not redistributing it")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
-            self._addline('\t\tprint "[f_%s_bgp%s_import] Rejecting default route ", net, " export";' % (self.peer_table, ipv))
-            self._addline("\t\treject;")
-            self._addline("\t}")
-
         # Override exports if this is a customer peer and we don't export to customers
         if self.peer_type == "customer":
             self._addline("\t# Check for large community to prevent export to customers")
@@ -414,6 +406,25 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             )
             self._addline("\t\treject;")
             self._addline("\t}")
+
+        # Do not redistribute the default route, no matter where we get it from
+        if not self.redistribute["default"]:
+            self._addline("\t# Reject the default route as we are not redistributing it")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline('\t\tprint "[f_%s_bgp%s_import] Rejecting default route ", net, " export";' % (self.peer_table, ipv))
+            self._addline("\t\treject;")
+            self._addline("\t}")
+        else:
+            self._addline("\t# Accept the default route as we're redistributing, but only if, its been accepted above")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s && accept_route > 0) then {" % ipv)
+            self._addline(
+                '\t\tprint "[f_%s_bgp%s_import] Accepting default route ", net, " due to match on accept_route>0'
+                ' (redistribute default)";' % (self.peer_table, ipv),
+                debug=True,
+            )
+            self._addline("\t\taccept;")
+            self._addline("\t}")
+
         # Redistribute BGP routes
         if self.redistribute["bgp"]:
             self._addline("\t# Redistribute BGP routes (which is everything in our table)")
@@ -628,9 +639,15 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             type_lines.append("\t\tbgp_lc_remove_all();")
             type_lines.append("\t\tbgp_import_transit(%s, %s);" % (self.peer_asn, self.cost))
             if self.accept["default"]:
+                type_lines.append("\t\t# Bypass bogon and size filters for the default route")
+                type_lines.append("\t\tif (net != DEFAULT_ROUTE_V%s) then {" % ipv)
+                type_lines.append("\t\t\tbgp_filter_bogons_v%s();" % ipv)
+                type_lines.append("\t\t\tbgp_filter_size_v%s();" % ipv)
+                type_lines.append("\t\t}")
+            else:
                 type_lines.append("\t\tbgp_filter_default_v%s();" % ipv)
-            type_lines.append("\t\tbgp_filter_bogons_v%s();" % ipv)
-            type_lines.append("\t\tbgp_filter_size_v%s();" % ipv)
+                type_lines.append("\t\tbgp_filter_bogons_v%s();" % ipv)
+                type_lines.append("\t\tbgp_filter_size_v%s();" % ipv)
             type_lines.append("\t\tbgp_filter_asn_short();")
             type_lines.append("\t\tbgp_filter_asn_invalid(%s);" % self.peer_asn)
         else:
