@@ -26,7 +26,7 @@ rip:
 
 # accept
 
-The `accept` key contains a dictionary of route types we will accept:
+The `accept` key contains a dictionary of route types we will accept.  Namely...
 
 * `default` - Allows us to accept a default route from RIP. The default is `False`.
 
