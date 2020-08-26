@@ -863,7 +863,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
 
     @property
     def redistribute(self):
-        """Return our restribute structure."""
+        """Return our redistribute structure."""
         return self._redistribute
 
     def configure(self):
