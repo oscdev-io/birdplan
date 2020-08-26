@@ -325,7 +325,7 @@ class BirdPlan:
             area_config = {}
             if "config" in area:
                 # Loop with each config item in the peer
-                for config_item, config_value in area["config"].iteritems():
+                for config_item, config_value in area["config"].items():
                     # No items supported atm
                     if config_item in ("xxxxx", "yyyy"):
                         area_config[config_item] = config_value
@@ -526,8 +526,8 @@ class BirdPlan:
             elif config_item == "filter":
                 peer["filter"] = {}
                 # Loop with filterance items
-                for filter_type, filter_config in config_value.iteritems():
-                    if filter_type in ("prefixes", "asns", "as-set"):
+                for filter_type, filter_config in config_value.items():
+                    if filter_type in ["prefixes", "asns", "as-set"]:
                         peer["filter"][filter_type] = filter_config
                     # If we don't understand this 'filter' entry, throw an error
                     else:
