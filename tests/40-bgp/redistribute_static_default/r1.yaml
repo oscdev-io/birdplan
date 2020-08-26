@@ -21,10 +21,13 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
-      type: peer
+      type: customer
       redistribute:
         default: True
         static: True
+      filter:
+        asns:
+          - 65001
     r3:
       asn: 65002
       description: BGP session to r3
@@ -35,7 +38,10 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
-      type: peer
+      type: customer
       redistribute:
         default: True
         static: True
+      filter:
+        asns:
+          - 65002

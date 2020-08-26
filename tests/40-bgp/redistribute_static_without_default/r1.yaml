@@ -21,6 +21,9 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
-      type: peer
+      type: customer
       redistribute:
         static: True
+      filter:
+        asns:
+          - 65001
