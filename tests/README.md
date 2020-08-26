@@ -52,6 +52,8 @@
 
 [Redistribute Originated](40-bgp/redistribute_originated/README.md)
 
+[Redistribute Only Default](40-bgp/redistribute_only_default/README.md)
+
 [Redistribute Static](40-bgp/redistribute_static/README.md)
 
 [Redistribute Static Default](40-bgp/redistribute_static_default/README.md)

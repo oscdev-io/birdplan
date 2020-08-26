@@ -24,24 +24,6 @@ bgp:
       type: customer
       redistribute:
         default: True
-        static: True
       filter:
         asns:
           - 65001
-    r3:
-      asn: 65002
-      description: BGP session to r3
-      source_address4: 100.64.0.1
-      source_address6: fc00:100::1
-      neighbor4: 100.64.0.3
-      neighbor6: fc00:100::3
-      connect_delay_time: 2
-      connect_retry_time: 2
-      error_wait_time: 2,5
-      type: customer
-      redistribute:
-        default: True
-        static: True
-      filter:
-        asns:
-          - 65002

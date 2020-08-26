@@ -217,6 +217,33 @@ bgp:
 ```
 
 
+## filters
+
+Filtering of routes received from a peer. Options available are below...
+
+* `prefixes` will filter on a list of allowed prefixes
+* `asns` will filter on a list of allowed ASN's
+* `as-sets` will filter on a list of as-sets, resolving them at the same time.
+
+An example is however below...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      filters:
+        as-set: AS-EXAMPLE
+        asns:
+          - 65009
+        prefixes:
+          - "100.141.0.0/24"
+          - "fc00:141::/64"
+...
+```
+
 
 ## incoming-large-communities
 
