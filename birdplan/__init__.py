@@ -75,7 +75,7 @@ class BirdPlan:
 
         try:
             self.config = yaml.safe_load(raw_config)
-        except ImportError as err:
+        except ImportError as err:  # pragma: no cover
             raise BirdPlanError(f" Failed to import plan file '{plan_file}': {err}") from None
 
     def generate(self, output_filename: Optional[str] = None) -> str:
