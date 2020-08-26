@@ -7,8 +7,9 @@ Birdplan is a configuration tool for the BIRD Internet Routing Daemon.
 * [Configuration](docs/configuration.md)
 * Protocol Configuration
     * [Static Routing](docs/static-routing.md)
-    * [OSPF Configuration](docs/protocol-ospf.md)
     * [RIP Configuration](docs/protocol-rip.md)
+    * [OSPF Configuration](docs/protocol-ospf.md)
+    * [BGP Configuration](docs/protocol-bgp.md)
 * Appendix
     * [Route Transversal](docs/route-transversal.md)
     * [Test Cases](tests/README.md)

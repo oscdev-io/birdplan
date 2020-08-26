@@ -123,7 +123,7 @@ class "OS: RIB" {
 "Table: bgp_direct" -> "Table: bgp"
 "Table: bgp_XXX_peer" <-down-> "Table: bgp"
 
-"Table: kernel" <-down- "Table: master"
+"Table: kernel" <-up-> "Table: master"
 "OS: RIB" <-up-> "Table: kernel"
 
 
