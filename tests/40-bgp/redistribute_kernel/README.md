@@ -25,6 +25,9 @@ class "Router: r1" {
 + fc00:101::/48 via fc01::2 (eth1)
 - 100.103.0.0/24 dev eth1
 + fc00:103::/64 dev eth1
+
+  .. BGP ..
+* AS65000
 }
 note top: Should export kernel routes on eth1 to r2
 
@@ -43,6 +46,9 @@ class "Router: r2" {
 + fc00:102::/48 via fc02::2 (eth1)
 - 100.104.0.0/24 dev eth1
 + fc00:104::/64 dev eth1
+
+  .. BGP ..
+* AS65001
 }
 note top: Should get kernel routes from r1 eth1, \n should not export own kernel routes to r1
 

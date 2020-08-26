@@ -18,6 +18,9 @@ class "Router: r1" {
   .. BGP Originated ..
 - 100.101.0.0/24 (blackhole)
 + fc00:101::/48 (blackhole)
+
+  .. BGP ..
+* AS65000
 }
 note top: Should export originated routes to r2
 
@@ -30,6 +33,9 @@ class "Router: r2" {
   .. BGP Originated (no redistribute)..
 - 100.102.0.0/24 (blackhole)
 + fc00:102::/48 (blackhole)
+
+  .. BGP ..
+* AS65001
 }
 note top: Should not export originated routes to r1
 
