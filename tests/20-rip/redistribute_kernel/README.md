@@ -23,7 +23,7 @@ class "Router: r1" {
 - 192.168.20.0/24 via 192.168.1.2 (eth1)
 + fc20:/64 via fc01::2 (eth1)
 - 192.168.30.0/24 dev eth1
-- fc30::/64 dev eth1
++ fc30::/64 dev eth1
 }
 note top: Should export kernel routes to r2
 
