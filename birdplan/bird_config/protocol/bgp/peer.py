@@ -408,13 +408,11 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             self._addline("\t}")
 
         # Do not redistribute the default route, no matter where we get it from
-        if not self.redistribute["default"]:
-            self._addline("\t# Reject the default route as we are not redistributing it")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
-            self._addline('\t\tprint "[f_%s_bgp%s_import] Rejecting default route ", net, " export";' % (self.peer_table, ipv))
-            self._addline("\t\treject;")
-            self._addline("\t}")
-        else:
+        if self.redistribute["default"]:
+            # Make sure this is an allowed peer type for the default route to be exported
+            if self.peer_type not in ["customer", "rrclient", "rrserver", "rrserver-rrserver"]:
+                raise RuntimeError(f"Having 'redistribute[default]' as True for a '{self.peer_type}'' makes no sense")
+            # Proceed with exporting...
             self._addline("\t# Accept the default route as we're redistributing, but only if, its been accepted above")
             self._addline("\tif (net = DEFAULT_ROUTE_V%s && accept_route > 0) then {" % ipv)
             self._addline(
@@ -423,7 +421,13 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
                 debug=True,
             )
             self._addline("\t\taccept;")
-            self._addline("\t}")
+        # Else explicitly reject it
+        else:
+            self._addline("\t# Reject the default route as we are not redistributing it")
+            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline('\t\tprint "[f_%s_bgp%s_import] Rejecting default route ", net, " export";' % (self.peer_table, ipv))
+            self._addline("\t\treject;")
+        self._addline("\t}")
 
         # Redistribute BGP routes
         if self.redistribute["bgp"]:
