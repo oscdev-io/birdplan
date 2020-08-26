@@ -54,4 +54,6 @@
 
 [Redistribute Static](40-bgp/redistribute_static/README.md)
 
+[Redistribute Static Default](40-bgp/redistribute_static_default/README.md)
+
 [Redistribute Kernel](40-bgp/redistribute_kernel/README.md)
