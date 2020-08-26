@@ -26,7 +26,7 @@ from nsnetsim.switch_node import SwitchNode
 from basetests import BirdPlanBaseTestCase
 
 
-class TestBGPRedistributeStaticWithoutDefault(BirdPlanBaseTestCase):
+class TestBGPRedistributeOnlyDefault(BirdPlanBaseTestCase):
     """BGP test for redistributed static routes without default."""
 
     test_dir = os.path.dirname(__file__)
