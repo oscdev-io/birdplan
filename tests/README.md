@@ -52,6 +52,8 @@
 
 [Redistribute Connected](40-bgp/redistribute_connected/README.md)
 
+[Redistribute Connected (with star)](40-bgp/redistribute_connected_with_star/README.md)
+
 [Redistribute Originated](40-bgp/redistribute_originated/README.md)
 
 [Redistribute Only Default](40-bgp/redistribute_only_default/README.md)
