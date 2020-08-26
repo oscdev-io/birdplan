@@ -3,53 +3,54 @@
 
 # Basic
 
-[Static Routing](static/README.md)
-
-
-# BGP
-
-[Redistribute Originated](bgp/redistribute_originated/README.md)
-
-[Redistribute Static](bgp/redistribute_static/README.md)
+[Static Routing](10-basic/static/README.md)
 
 
 # RIP
 
-[No Export Kernel](rip/no_export_kernel/README.md)
+[No Export Kernel](20-rip/no_export_kernel/README.md)
 
-[No Redistribute RIP](rip/no_redistribute_rip/README.md)
+[No Redistribute RIP](20-rip/no_redistribute_20-rip/README.md)
 
-[Redistribute Connected](rip/redistribute_connected/README.md)
+[Redistribute Connected](20-rip/redistribute_connected/README.md)
 
-[Redistribute Connected (with star)](rip/redistribute_connected_with_star/README.md)
+[Redistribute Connected (with star)](20-rip/redistribute_connected_with_star/README.md)
 
-[Redistribute Kernel](rip/redistribute_kernel/README.md)
+[Redistribute Kernel](20-rip/redistribute_kernel/README.md)
 
-[Redistribute Only Default](rip/redistribute_only_default/README.md)
+[Redistribute Only Default](20-rip/redistribute_only_default/README.md)
 
-[Redistribute Static](rip/redistribute_static/README.md)
+[Redistribute Static](20-rip/redistribute_static/README.md)
 
-[Redistribute Static Default](rip/redistribute_static_default/README.md)
+[Redistribute Static Default](20-rip/redistribute_static_default/README.md)
 
-[Redistribute Static Without Default](rip/redistribute_static_without_default/README.md)
+[Redistribute Static Without Default](20-rip/redistribute_static_without_default/README.md)
 
 
 # OSPF
 
-[No Export Kernel](ospf/no_export_kernel/README.md)
+[No Export Kernel](30-rip/no_export_kernel/README.md)
 
-[Redistribute Connected](ospf/redistribute_connected/README.md)
+[Redistribute Connected](30-rip/redistribute_connected/README.md)
 
-[Redistribute Connected (with star)](ospf/redistribute_connected_with_star/README.md)
+[Redistribute Connected (with star)](30-rip/redistribute_connected_with_star/README.md)
 
-[Redistribute Kernel](ospf/redistribute_kernel/README.md)
+[Redistribute Kernel](30-rip/redistribute_kernel/README.md)
 
-[Redistribute Only Default](ospf/redistribute_only_default/README.md)
+[Redistribute Only Default](30-rip/redistribute_only_default/README.md)
 
-[Redistribute Static](ospf/redistribute_static/README.md)
+[Redistribute Static](30-rip/redistribute_static/README.md)
 
-[Redistribute Static Default](ospf/redistribute_static_default/README.md)
+[Redistribute Static Default](30-rip/redistribute_static_default/README.md)
 
-[Redistribute Static Without Default](ospf/redistribute_static_without_default/README.md)
+[Redistribute Static Without Default](30-rip/redistribute_static_without_default/README.md)
 
-[Stub Interface](ospf/stub_interface/README.md)
+[Stub Interface](30-rip/stub_interface/README.md)
+
+
+# BGP
+
+[Redistribute Originated](40-bgp/redistribute_originated/README.md)
+
+[Redistribute Static](40-bgp/redistribute_static/README.md)
+
