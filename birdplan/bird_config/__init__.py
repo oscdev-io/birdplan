@@ -2571,6 +2571,14 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         self._addline("\taccept_route = 0;")
 
         # Check that we have static routes imported first
+        if self.redistribute["connected"] and not self.parent.import_connected:
+            raise RuntimeError("BGP needs connected routes to be imported before they can be redistributed to a peer")
+
+        # Check that we have static routes imported first
+        if self.redistribute["kernel"] and not self.parent.import_kernel:
+            raise RuntimeError("BGP needs kernel routes to be imported before they can be redistributed to a peer")
+
+        # Check that we have static routes imported first
         if self.redistribute["static"] and not self.parent.import_static:
             raise RuntimeError("BGP needs static routes to be imported before they can be redistributed to a peer")
 
