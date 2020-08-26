@@ -127,6 +127,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
         """BGP to master filter."""
 
         # Configure export filter to master
+        self._addline("# Export filter FROM BGP table TO master table")
         self._addline("filter f_bgp_master%s_export {" % ipv)
         # Check if we accept the default route, if not block it
         if not self.accept_default:
@@ -141,6 +142,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
 
     def _bgp_to_master_import_filter(self, ipv):
         # Configure import filter to master
+        self._addline("# Import filter FROM master table TO BGP table")
         self._addline("filter f_bgp_master%s_import" % ipv)
         self._addline("{")
         # Redistribute kernel routes
