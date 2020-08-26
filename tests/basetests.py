@@ -60,6 +60,6 @@ class BirdPlanBaseTestCase:
         # Grab the route table
         route_table = sim.node(node).birdc_show_route_table(route_table_name, **kwargs)
         # Add report
-        sim.add_report_obj("BIRD({node})[{route_table_name}]", route_table)
+        sim.add_report_obj(f"BIRD({node})[{route_table_name}]", route_table)
         # Return route table
         return route_table
