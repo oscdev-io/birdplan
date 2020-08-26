@@ -483,7 +483,6 @@ class BirdPlan:
                 "password",
                 "prefix_limit4",
                 "prefix_limit6",
-                "accept_default",
                 "quarantine",
                 "incoming-large-communities",
                 "outgoing-large-communities",

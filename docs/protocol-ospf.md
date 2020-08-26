@@ -6,9 +6,9 @@ OSPF v3 is used for both IPv4 and IPv6.
 
 # accept
 
-The `accept` key contains a dictionary of routes we will accept.
+The `accept` key contains a dictionary of routes we will accept. Namely...
 
-* `default` allows us to accept a default route from OSPF.
+* `default` - Allows us to accept a default route from OSPF. The default is `False`.
 
 Below is a configuration example...
 ```yaml

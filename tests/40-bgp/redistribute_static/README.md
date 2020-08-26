@@ -23,6 +23,9 @@ class "Router: r1" {
   .. BIRD static routes ..
 - 100.101.0.0/24 via 192.168.1.2 (eth1)
 + fc00:101::/48 via fc01::2 (eth1)
+
+  .. BGP ..
+* AS65000
 }
 note top: Should export BIRD static routes on eth1 to r2
 
@@ -39,6 +42,9 @@ class "Router: r2" {
   .. BIRD static routes ..
 - 100.102.0.0/24 via 192.168.2.2 (eth1)
 + fc00:102::/48 via fc02::2 (eth1)
+
+  .. BGP ..
+* AS65001
 }
 note top: Should get BIRD static routes from r1 eth1, \n should not export own static routes to r1
 

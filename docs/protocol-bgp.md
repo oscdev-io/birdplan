@@ -4,6 +4,27 @@ Below are configuration options that apply to the BGP protocol.
 
 Remember to set the `router_id`, see [Configuration](configuration.md).
 
+
+
+# accept
+
+The `accept` key contains a dictionary of routes we will accept into the master table from our BGP table. Namely...
+
+* `default` - Allows us to accept a default route from BGP. The default is `False`.
+
+Below is a configuration example...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      accept:
+        default: True
+...
+```
+
 # asn
 
 Our BGP ASN. This is mandatory.
@@ -79,11 +100,13 @@ bgp:
 ```
 
 
-## accept_default
+## accept
 
-Accept a default route from the peer. By default we explicitly block default routes.
+The `accept` key contains a dictionary of routes we will accept. Namely...
 
-An example is below...
+* `default` - Allows us to accept a default route from the BGP peer. The default is `False`.
+
+Below is a configuration example...
 ```yaml
 ...
 
@@ -91,7 +114,8 @@ bgp:
   peers:
     peer1:
       asn: 65000
-      accept_default: True
+      accept:
+        default: True
 ...
 ```
 

@@ -529,13 +529,13 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("\t# Validate route before export")
         self._addline("\tif prefix_is_longer(BGP_PREFIX_MAXLEN4_EXPORT) then {")
         self._addline(
-            '\t\tprint "[bgp_can_export_v4] Not exporting due to prefix lengh > BGP_PREFIX_MAXLEN4_EXPORT for ", net;', debug=True
+            '\t\tprint "[bgp_can_export_v4] Not exporting due to prefix length > BGP_PREFIX_MAXLEN4_EXPORT for ", net;', debug=True
         )
         self._addline("\t\treturn false;")
         self._addline("\t}")
         self._addline("\tif prefix_is_shorter(BGP_PREFIX_MINLEN4_EXPORT) then {")
         self._addline(
-            '\t\tprint "[bgp_can_export_v4] Not exporting due to prefix lengh < BGP_PREFIX_MINLEN4_EXPORT for ", net;', debug=True
+            '\t\tprint "[bgp_can_export_v4] Not exporting due to prefix length < BGP_PREFIX_MINLEN4_EXPORT for ", net;', debug=True
         )
         self._addline("\t\treturn false;")
         self._addline("\t}")
@@ -561,13 +561,13 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("\t# Validate route before export")
         self._addline("\tif prefix_is_longer(BGP_PREFIX_MAXLEN6_EXPORT) then {")
         self._addline(
-            '\t\tprint "[bgp_can_export_v6] Not exporting due to prefix lengh > BGP_PREFIX_MAXLEN6_EXPORT for ", net;', debug=True
+            '\t\tprint "[bgp_can_export_v6] Not exporting due to prefix length > BGP_PREFIX_MAXLEN6_EXPORT for ", net;', debug=True
         )
         self._addline("\t\treturn false;")
         self._addline("\t}")
         self._addline("\tif prefix_is_shorter(BGP_PREFIX_MINLEN6_EXPORT) then {")
         self._addline(
-            '\t\tprint "[bgp_can_export_v6] Not exporting due to prefix lengh < BGP_PREFIX_MINLEN6_EXPORT for ", net;', debug=True
+            '\t\tprint "[bgp_can_export_v6] Not exporting due to prefix length < BGP_PREFIX_MINLEN6_EXPORT for ", net;', debug=True
         )
         self._addline("\t\treturn false;")
         self._addline("\t}")
