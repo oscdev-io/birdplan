@@ -23,6 +23,7 @@ from ..pipe import BirdConfigProtocolPipe
 from ...base import BirdConfigBase
 from ... import util
 from ....bgpq3 import BGPQ3
+from ....exceptions import BirdPlanError
 
 
 class BirdConfigProtocolBGPPeer(BirdConfigBase):
@@ -101,7 +102,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         if "redistribute" in self.peer_config:
             for redistribute_type, redistribute_config in self.peer_config["redistribute"].items():
                 if redistribute_type not in ("default", "connected", "static", "kernel", "originated"):
-                    raise ValueError('The BGP redistribute type "%s" is not known' % redistribute_type)
+                    raise BirdPlanError(f"The BGP redistribute type '{redistribute_type}' is not known")
                 self.redistribute[redistribute_type] = redistribute_config
 
         # Default to accepting nothing
@@ -112,7 +113,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         if "accept" in self.peer_config:
             for accept_type, accept_config in self.peer_config["accept"].items():
                 if accept_type != "default":
-                    raise ValueError('The BGP accept type "%s" is not known' % accept_type)
+                    raise BirdPlanError(f"The BGP accept type '{accept_type}' is not known")
                 self.accept[accept_type] = accept_config
 
         # Check for filters we need to setup
@@ -120,7 +121,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         if "filter" in self.peer_config:
             for filter_type, filter_config in self.peer_config["filter"].items():
                 if filter_type not in ("prefixes", "asns", "as-set"):
-                    raise ValueError('The BGP filter type "%s" is not known' % filter_type)
+                    raise BirdPlanError("The BGP filter type '{filter_type}' is not known")
                 self._filter[filter_type] = filter_config
 
         # Check if we're quarantined
@@ -274,15 +275,15 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
 
         # Check that we have static routes imported first
         if self.redistribute["connected"] and not self.parent.import_connected:
-            raise RuntimeError("BGP needs connected routes to be imported before they can be redistributed to a peer")
+            raise BirdPlanError("BGP needs connected routes to be imported before they can be redistributed to a peer")
 
         # Check that we have static routes imported first
         if self.redistribute["kernel"] and not self.parent.import_kernel:
-            raise RuntimeError("BGP needs kernel routes to be imported before they can be redistributed to a peer")
+            raise BirdPlanError("BGP needs kernel routes to be imported before they can be redistributed to a peer")
 
         # Check that we have static routes imported first
         if self.redistribute["static"] and not self.parent.import_static:
-            raise RuntimeError("BGP needs static routes to be imported before they can be redistributed to a peer")
+            raise BirdPlanError("BGP needs static routes to be imported before they can be redistributed to a peer")
 
         # Override exports if this is a customer peer and we don't export to customers
         if self.peer_type == "customer":
@@ -411,7 +412,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         if self.redistribute["default"]:
             # Make sure this is an allowed peer type for the default route to be exported
             if self.peer_type not in ["customer", "rrclient", "rrserver", "rrserver-rrserver"]:
-                raise RuntimeError(f"Having 'redistribute[default]' as True for a '{self.peer_type}'' makes no sense")
+                raise BirdPlanError(f"Having 'redistribute[default]' as True for a '{self.peer_type}' makes no sense")
             # Proceed with exporting...
             self._addline("\t# Accept the default route as we're redistributing, but only if, its been accepted above")
             self._addline("\tif (net = DEFAULT_ROUTE_V%s && accept_route > 0) then {" % ipv)
@@ -590,7 +591,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             type_lines.append("\t\tbgp_lc_remove_internal();")
             type_lines.append("\t\tbgp_import_customer(%s, %s);" % (self.peer_asn, self.cost))
             if self.accept["default"]:
-                raise RuntimeError('Having "accept[default]" as True for a "customer" makes no sense')
+                raise BirdPlanError("Having 'accept[default]' as True for a 'customer' makes no sense")
             type_lines.append("\t\tbgp_filter_default_v%s();" % ipv)
             type_lines.append("\t\tbgp_filter_bogons_v%s();" % ipv)
             type_lines.append("\t\tbgp_filter_size_v%s();" % ipv)
@@ -602,7 +603,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             type_lines.append("\t\tbgp_lc_remove_all();")
             type_lines.append("\t\tbgp_import_peer(%s, %s);" % (self.peer_asn, self.cost))
             if self.accept["default"]:
-                raise RuntimeError('Having "accept[default]" as True for a "peer" makes no sense')
+                raise BirdPlanError("Having 'accept[default]' as True for a 'peer' makes no sense")
             type_lines.append("\t\tbgp_filter_default_v%s();" % ipv)
             type_lines.append("\t\tbgp_filter_bogons_v%s();" % ipv)
             type_lines.append("\t\tbgp_filter_size_v%s();" % ipv)
@@ -613,14 +614,14 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         elif self.peer_type == "routecollector":
             type_lines.append("\t\tbgp_lc_remove_all();")
             if self.accept["default"]:
-                raise RuntimeError('Having "accept[default]" as True for a "routecollector" makes no sense')
+                raise BirdPlanError("Having 'accept[default]' as True for a 'routecollector' makes no sense")
             type_lines.append("\t\tbgp_filter_routecollector();")
         # Routeserver
         elif self.peer_type == "routeserver":
             type_lines.append("\t\tbgp_lc_remove_all();")
             type_lines.append("\t\tbgp_import_routeserver(%s, %s);" % (self.peer_asn, self.cost))
             if self.accept["default"]:
-                raise RuntimeError('Having "accept[default]" as True for a "routeserver" makes no sense')
+                raise BirdPlanError("Having 'accept[default]' as True for a 'routeserver' makes no sense")
             type_lines.append("\t\tbgp_filter_default_v%s();" % ipv)
             type_lines.append("\t\tbgp_filter_bogons_v%s();" % ipv)
             type_lines.append("\t\tbgp_filter_size_v%s();" % ipv)
@@ -655,7 +656,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             type_lines.append("\t\tbgp_filter_asn_short();")
             type_lines.append("\t\tbgp_filter_asn_invalid(%s);" % self.peer_asn)
         else:
-            raise RuntimeError('The BGP peer type "%s" is not supported' % self.peer_type)
+            raise BirdPlanError(f"The BGP peer type '{self.peer_type}' is not supported")
 
         # Check if we're filtering allowed ASNs
         if self.filter_asns:
@@ -719,7 +720,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         if self.peer_type == "rrclient":
             # First of all check if we have a route reflector cluster ID, we need one to have a rrclient
             if not self.parent.rr_cluster_id:
-                raise RuntimeError('BGP route reflectors require a "cluster_id set" if they have "rrclient" peers')
+                raise BirdPlanError("BGP route reflectors require a 'cluster_id' set if they have 'rrclient' peers")
             # Set this peer as a route reflector client
             self._addline("\trr client;")
             self._addline("\trr cluster id %s;" % self.parent.rr_cluster_id)
@@ -728,7 +729,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         if self.peer_type == "rrserver-rrserver":
             # First of all check if we have a route reflector cluster ID, we need one to have a rrserver-rrserver peer
             if not self.parent.rr_cluster_id:
-                raise RuntimeError('BGP route reflectors require a "cluster_id" if they have "rrserver-rrserver" peers')
+                raise BirdPlanError("BGP route reflectors require a 'cluster_id' if they have 'rrserver-rrserver' peers")
             # Set this peer as a route reflector client
             self._addline("\trr client;")
             self._addline("\trr cluster id %s;" % self.parent.rr_cluster_id)

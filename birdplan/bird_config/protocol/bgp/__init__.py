@@ -22,6 +22,7 @@ from ...base import BirdConfigBase
 from ..pipe import BirdConfigProtocolPipe
 from ..direct import BirdConfigProtocolDirect
 from .peer import BirdConfigProtocolBGPPeer
+from ....exceptions import BirdPlanError
 
 
 class BirdConfigProtocolBGP(BirdConfigBase):
@@ -60,7 +61,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
             elif ":" in prefix:
                 routes_ipv6.append("%s %s" % (prefix, info))
             else:
-                raise RuntimeError('The BGP originate route "%s" is odd' % prefix)
+                raise BirdPlanError(f"The BGP originate route '{prefix}' is odd")
 
         self._addline("# BGP Origination")
         self._addline("ipv4 table t_bgp_originate4;")
