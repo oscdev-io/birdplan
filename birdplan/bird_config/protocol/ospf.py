@@ -21,6 +21,7 @@
 from ..base import BirdConfigBase
 from .direct import BirdConfigProtocolDirect
 from .pipe import BirdConfigProtocolPipe
+from ...exceptions import BirdPlanError
 
 
 class BirdConfigProtocolOSPF(BirdConfigBase):
@@ -52,24 +53,24 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
 
         area_lines = []
         for area_name in self.interfaces:
-            area_lines.append("\tarea %s {" % area_name)
+            area_lines.append(f"\tarea {area_name} {{")
             # Loop with area config items
             for config_item in self.areas[area_name]:
                 # Loop with key-value pairs
                 for key, value in config_item.items():
-                    area_lines.append("\t\t%s %s;" % (key, value))
+                    area_lines.append(f"\t\t{key} {value};")
             # Loop with interfaces
             for interface_name in sorted(self.interfaces[area_name].keys()):
                 interface = self.interfaces[area_name][interface_name]
-                area_lines.append('\t\tinterface "%s" {' % interface_name)
+                area_lines.append(f'\t\tinterface "{interface_name}" {{')
                 # Loop with config items
                 for config_item in interface:
                     # Loop with key-value pairs
                     for key, value in config_item.items():
                         if (key == "stub") and value:
-                            area_lines.append("\t\t\t%s;" % key)
+                            area_lines.append(f"\t\t\t{key};")
                         else:
-                            area_lines.append("\t\t\t%s %s;" % (key, value))
+                            area_lines.append(f"\t\t\t{key} {value};")
                 area_lines.append("\t\t};")
             # End off area
             area_lines.append("\t};")
@@ -77,14 +78,14 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         return area_lines
 
     def _setup_protocol(self, ipv):
-        self._addline("protocol ospf v3 ospf%s {" % ipv)
-        self._addline('\tdescription "OSPF protocol for IPv%s";' % ipv)
+        self._addline(f"protocol ospf v3 ospf{ipv} {{")
+        self._addline(f'\tdescription "OSPF protocol for IPv{ipv}";')
         self._addline("")
-        self._addline("\tipv%s {" % ipv)
-        self._addline("\t\ttable t_ospf%s;" % ipv)
+        self._addline(f"\tipv{ipv} {{")
+        self._addline(f"\t\ttable t_ospf{ipv};")
         self._addline("")
-        self._addline("\t\texport filter f_ospf_export%s;" % ipv)
-        self._addline("\t\timport filter f_ospf_import%s;" % ipv)
+        self._addline(f"\t\texport filter f_ospf_export{ipv};")
+        self._addline(f"\t\timport filter f_ospf_import{ipv};")
         self._addline("")
         self._addline("\t};")
         self._addline("")
@@ -95,11 +96,11 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
     def _ospf_export_filter(self, ipv):
         """OSPF export filter setup."""
 
-        self._addline("filter f_ospf_export%s {" % ipv)
+        self._addline(f"filter f_ospf_export{ipv} {{")
         # Redistribute the default route
         if not self.redistribute_default:
             self._addline("\t# Reject redistribution of the default route")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute connected
@@ -128,7 +129,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
     def _ospf_import_filter(self, ipv):
         """OSPF import filter setup."""
         # Configure import4 filter
-        self._addline("filter f_ospf_import%s {" % ipv)
+        self._addline(f"filter f_ospf_import{ipv} {{")
         # Accept all inbound routes into the t_ospf4 table
         self._addline("\t# Import all OSPF routes by default")
         self._addline("\taccept;")
@@ -138,11 +139,11 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
     def _ospf_to_master_export_filter(self, ipv):
         """OSPF to master export filter setup."""
         # Configure export filter to master table
-        self._addline("filter f_ospf_master%s_export {" % ipv)
+        self._addline(f"filter f_ospf_master{ipv}_export {{")
         # Check if we accept the default route, if not block it
         if not self.accept_default:
             self._addline("\t# Do not export default route to master (no accept:default)")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self._addline("\t\treject;")
             self._addline("\t}")
         # Accept only OSPF routes into the master table
@@ -160,11 +161,11 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
     def _ospf_to_master_import_filter(self, ipv):
         """OSPF to master import filter setup."""
         # Configure import filter to master table
-        self._addline("filter f_ospf_master%s_import {" % ipv)
+        self._addline(f"filter f_ospf_master{ipv}_import {{")
         # Redistribute the default route
         if not self.redistribute_default:
             self._addline("\t# Deny import of default route into OSPF (no redistribute_default)")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute connected
@@ -234,7 +235,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         # Check if we're redistributing connected routes, if we are, create the protocol and pipe
         if self.redistribute_connected:
             if "interfaces" not in self.redistribute_connected:
-                raise RuntimeError('OSPF redistribute connected requires a list in item "interfaces" to match interface names')
+                raise BirdPlanError("OSPF redistribute connected requires a list in item 'interfaces' to match interface names")
             # Add direct protocol for redistribution of connected routes
             ospf_direct_protocol = BirdConfigProtocolDirect(self, name="ospf", interfaces=self.redistribute_connected["interfaces"])
             ospf_direct_protocol.configure()
@@ -272,12 +273,10 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
                 config.append({key: value})
             elif key == "stub":
                 if not value:
-                    RuntimeError('The OSPF default config for interface "%s" item "stub" is "false".' % interface_name)
+                    BirdPlanError(f"The OSPF default config for interface '{interface_name}' item 'stub' is 'false'")
                 config.append({key: value})
             else:
-                raise RuntimeError(
-                    'The OSPF config for interface "%s" item "%s" hasnt been added to Salt yet' % (interface_name, key)
-                )
+                raise BirdPlanError(f"The OSPF config for interface '{interface_name}' item '{key}' hasnt been added to Salt yet")
 
     @property
     def accept_default(self):

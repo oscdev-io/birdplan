@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd /root/birdplan
+echo "PYTHONPATH: $PYTHONPATH"
+echo "RUNNING: python setup.py test --addopt \"-v $*\""
+
+export PYTHONPATH
+
+python setup.py test --addopt "-v $*"

@@ -58,7 +58,7 @@ class BirdConfigMaster(BirdConfigBase):
     def _master_to_kernel_import_filter(self, ipv):
         """Master to kernel import filter setup."""
         # Configure import filter to master table
-        self._addline("filter f_master_kernel%s_import {" % ipv)
+        self._addline(f"filter f_master_kernel{ipv}_import {{")
         self._addline("\t# Accept all routes from the kernel, always")
         self._addline("\tif (source = RTS_INHERIT) then {")
         self._addline("\t\taccept;")
@@ -70,7 +70,7 @@ class BirdConfigMaster(BirdConfigBase):
     def _master_to_kernel_export_filter(self, ipv):
         """Master to kernel export filter setup."""
         # Configure export filter to master table
-        self._addline("filter f_master_kernel%s_export {" % ipv)
+        self._addline(f"filter f_master_kernel{ipv}_export {{")
 
         if self.export_kernel_static:
             self._addline("\t# Export static routes to kernel")

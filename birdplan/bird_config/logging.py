@@ -30,7 +30,7 @@ class BirdConfigLogging(BirdConfigBase):
         # Grab logfile if we have one
         log_file = self.parent.log_file
         if log_file:
-            self._addline('log "%s" all;' % log_file)
+            self._addline(f'log "{log_file}" all;')
         else:
             self._addline("log stderr all;")
         # Check if we're in debug mode

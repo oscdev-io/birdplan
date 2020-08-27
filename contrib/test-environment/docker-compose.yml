@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  birdplan:
+    # We need a privileged container as we need to create network interfaces and namespaces
+    privileged: true
+    # Build the container from this directory
+    build:
+      context: .
+    # Set the paths for python so we don't download from pypi
+    environment:
+      PYTHONPATH: /root/birdplan:/root/python-nsnetsim:/root/python-birdclient
+    # This may need some modification, we map birdplan, nsnetsim and birdclient to /root in the container
+    volumes:
+      - ../..:/root/birdplan
+      - ../../../python-nsnetsim:/root/python-nsnetsim
+      - ../../../python-birdclient:/root/python-birdclient

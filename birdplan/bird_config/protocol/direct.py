@@ -30,7 +30,7 @@ class BirdConfigProtocolDirect(BirdConfigBase):
 
         # Add a suffix if we have a name
         if name:
-            self._name_suffix = "_%s" % name
+            self._name_suffix = f"_{name}"
         else:
             self._name_suffix = ""
 
@@ -49,25 +49,28 @@ class BirdConfigProtocolDirect(BirdConfigBase):
             # Create list of quoted interfaces
             interface_list = []
             for interface in self.interfaces:
-                interface_list.append('"%s"' % interface)
+                interface_list.append(f'"{interface}"')
             # Drop in a comma between them
             interface_str = ", ".join(interface_list)
             interface_lines.append("")
-            interface_lines.append("\tinterface %s;" % interface_str)
+            interface_lines.append(f"\tinterface {interface_str};")
 
-        self._addline("ipv4 table t_direct4%s;" % self.name_suffix)
-        self._addline("ipv6 table t_direct6%s;" % self.name_suffix)
+        self._addline(f"ipv4 table t_direct4{self.name_suffix};")
+        self._addline(f"ipv6 table t_direct6{self.name_suffix};")
         self._addline("")
 
         self._setup_protocol(4, interface_lines)
         self._setup_protocol(6, interface_lines)
 
     def _setup_protocol(self, ipv, lines):
-        self._addline("protocol direct direct%s%s {" % (ipv, self.name_suffix))
+
+        protocol_name = f"direct{ipv}{self.name_suffix}"
+
+        self._addline(f"protocol direct {protocol_name} {{")
         self._addline('\tdescription "Direct protocol for IPv%s";' % ipv)
         self._addline("")
         self._addline("\tipv%s {" % ipv)
-        self._addline("\t\ttable t_direct%s%s;" % (ipv, self.name_suffix))
+        self._addline(f"\t\ttable t_{protocol_name};")
         self._addline("")
         self._addline("\t\texport none;")
         self._addline("\t\timport all;")
