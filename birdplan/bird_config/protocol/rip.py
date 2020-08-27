@@ -21,6 +21,7 @@
 from ..base import BirdConfigBase
 from .direct import BirdConfigProtocolDirect
 from .pipe import BirdConfigProtocolPipe
+from ...exceptions import BirdPlanError
 
 
 class BirdConfigProtocolRIP(BirdConfigBase):
@@ -54,15 +55,15 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         # Loop with interfaces
         for interface_name in sorted(self.interfaces.keys()):
             interface = self.interfaces[interface_name]
-            interface_lines.append('\tinterface "%s" {' % interface_name)
+            interface_lines.append(f'\tinterface "{interface_name}" {{')
             # Loop with config items
             for config_item in interface:
                 # Loop with key-value pairs
                 for key, value in config_item.items():
                     if (key == "update-time") and value:
-                        interface_lines.append("\t\tupdate time %s;" % value)
+                        interface_lines.append(f"\t\tupdate time {value};")
                     else:
-                        interface_lines.append("\t\t%s %s;" % (key, value))
+                        interface_lines.append(f"\t\t{key} {value};")
             interface_lines.append("\t};")
 
         return interface_lines
@@ -70,16 +71,16 @@ class BirdConfigProtocolRIP(BirdConfigBase):
     def _setup_protocol(self, ipv):
         """Set up RIP protocol."""
         if ipv == 4:
-            self._addline("protocol rip rip%s {" % ipv)
+            self._addline(f"protocol rip rip{ipv} {{")
         elif ipv == 6:
-            self._addline("protocol rip ng rip%s {" % ipv)
-        self._addline('\tdescription "RIP protocol for IPv%s";' % ipv)
+            self._addline(f"protocol rip ng rip{ipv} {{")
+        self._addline(f'\tdescription "RIP protocol for IPv{ipv}";')
         self._addline("")
-        self._addline("\tipv%s {" % ipv)
-        self._addline("\t\ttable t_rip%s;" % ipv)
+        self._addline(f"\tipv{ipv} {{")
+        self._addline(f"\t\ttable t_rip{ipv};")
         self._addline("")
-        self._addline("\t\texport filter f_rip_export%s;" % ipv)
-        self._addline("\t\timport filter f_rip_import%s;" % ipv)
+        self._addline(f"\t\texport filter f_rip_export{ipv};")
+        self._addline(f"\t\timport filter f_rip_import{ipv};")
         self._addline("")
         self._addline("\t};")
         self._addline("")
@@ -88,11 +89,11 @@ class BirdConfigProtocolRIP(BirdConfigBase):
 
     def _rip_export_filter(self, ipv):
         """RIP export filter setup."""
-        self._addline("filter f_rip_export%s {" % ipv)
+        self._addline(f"filter f_rip_export{ipv} {{")
         # Redistribute the default route
         if not self.redistribute_default:
             self._addline("\t# Reject redistribution of the default route")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute connected
@@ -127,7 +128,7 @@ class BirdConfigProtocolRIP(BirdConfigBase):
     def _rip_import_filter(self, ipv):
         """RIP import filter setup."""
         # Configure import filter
-        self._addline("filter f_rip_import%s {" % ipv)
+        self._addline(f"filter f_rip_import{ipv} {{")
         # Accept all inbound routes into the table
         self._addline("\t# Import all RIP routes by default")
         self._addline("\taccept;")
@@ -137,11 +138,11 @@ class BirdConfigProtocolRIP(BirdConfigBase):
     def _rip_to_master_export_filter(self, ipv):
         """RIP to master export filter setup."""
         # Configure export filter to master4
-        self._addline("filter f_rip_master%s_export {" % ipv)
+        self._addline(f"filter f_rip_master{ipv}_export {{")
         # Check if we accept the default route, if not block it
         if not self.accept_default:
             self._addline("\t# Do not export default route to master (no accept:default)")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self._addline("\t\treject;")
             self._addline("\t}")
         # Accept only RIP routes into the master table
@@ -158,11 +159,11 @@ class BirdConfigProtocolRIP(BirdConfigBase):
     def _rip_to_master_import_filter(self, ipv):
         """RIP to master import filter setup."""
         # Configure import filter to master table
-        self._addline("filter f_rip_master%s_import {" % ipv)
+        self._addline(f"filter f_rip_master{ipv}_import {{")
         # Redistribute the default route
         if not self.redistribute_default:
             self._addline("\t# Deny import of default route into RIP (no redistribute_default)")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self._addline("\t\treject;")
             self._addline("\t}")
         # Redistribute connected
@@ -230,7 +231,7 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         # Check if we're redistributing connected routes, if we are, create the protocol and pipe
         if self.redistribute_connected:
             if "interfaces" not in self.redistribute_connected:
-                raise RuntimeError('RIP redistribute connected requires a list in item "interfaces" to match interface names')
+                raise BirdPlanError("RIP redistribute connected requires a list in item 'interfaces' to match interface names")
             # Add direct protocol for redistribution of connected routes
             rip_direct_protocol = BirdConfigProtocolDirect(self, name="rip", interfaces=self.redistribute_connected["interfaces"])
             rip_direct_protocol.configure()
@@ -253,9 +254,7 @@ class BirdConfigProtocolRIP(BirdConfigBase):
                 if key in ("metric", "update-time"):
                     config.append({key: value})
                 else:
-                    raise RuntimeError(
-                        'The RIP config for interface "%s" item "%s" hasnt been added to Salt yet' % (interface_name, key)
-                    )
+                    raise BirdPlanError(f"The RIP config for interface '{interface_name}' item '{key}' hasnt been added")
 
     @property
     def accept_default(self):

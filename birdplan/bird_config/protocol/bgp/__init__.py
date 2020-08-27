@@ -98,7 +98,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
             self._addline("")
             # Output the routes
             for route in routes_ipv4:
-                self._addline("\troute %s;" % route)
+                self._addline(f"\troute {route};")
         self._addline("};")
         self._addline("")
         self._addline("protocol static bgp_originate6 {")
@@ -114,7 +114,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
             self._addline("")
             # Output the routes
             for route in routes_ipv6:
-                self._addline("\troute %s;" % route)
+                self._addline(f"\troute {route};")
         self._addline("};")
         self._addline("")
 
@@ -129,11 +129,11 @@ class BirdConfigProtocolBGP(BirdConfigBase):
 
         # Configure export filter to master
         self._addline("# Export filter FROM BGP table TO master table")
-        self._addline("filter f_bgp_master%s_export {" % ipv)
+        self._addline(f"filter f_bgp_master{ipv}_export {{")
         # Check if we accept the default route, if not block it
         if not self.accept_default:
             self._addline("\t# Do not export default routes to the master")
-            self._addline("\tif (net = DEFAULT_ROUTE_V%s) then {" % ipv)
+            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self._addline("\t\treject;")
             self._addline("\t}")
         # Else accept
@@ -144,7 +144,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
     def _bgp_to_master_import_filter(self, ipv):
         # Configure import filter to master
         self._addline("# Import filter FROM master table TO BGP table")
-        self._addline("filter f_bgp_master%s_import" % ipv)
+        self._addline(f"filter f_bgp_master{ipv}_import")
         self._addline("{")
         # Redistribute kernel routes
         if self.import_kernel:
@@ -167,8 +167,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
 
     def _bgp_to_direct_import_filter(self, ipv):
         # Configure import filter to direct
-        self._addline("filter f_bgp_direct%s_import" % ipv)
-        self._addline("{")
+        self._addline(f"filter f_bgp_direct{ipv}_import {{")
         self._addline("\t# Origination import")
         self._addline("\tbgp_import_own(10);")
         self._addline("\taccept;")
@@ -216,7 +215,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
         # Check if we're importing connected routes, if we are, create the protocol and pipe
         if self.import_connected:
             if "interfaces" not in self.import_connected:
-                raise RuntimeError('BGP import connected requires a list in item "interfaces" to match interface names')
+                raise BirdPlanError("BGP import connected requires a list in item 'interfaces' to match interface names")
             # Add direct protocol for redistribution of connected routes
             bgp_direct_protocol = BirdConfigProtocolDirect(self, name="bgp", interfaces=self.import_connected["interfaces"])
             bgp_direct_protocol.configure()

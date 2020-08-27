@@ -160,18 +160,18 @@ class BirdConfigConstants(BirdConfigBase):
         self._addtitle("BGP Constants")
 
         self._addline("# Our BGP ASN")
-        self._addline("define BGP_ASN = %s;" % self.bgp_asn)
+        self._addline(f"define BGP_ASN = {self.bgp_asn};")
         self._addline("")
 
         self._addline("# Prefix sizes we will be using")
-        self._addline("define BGP_PREFIX_MAXLEN4_IMPORT = %s;" % self.bgp_prefix_maxlen4_import)
-        self._addline("define BGP_PREFIX_MAXLEN4_EXPORT = %s;" % self.bgp_prefix_maxlen4_export)
-        self._addline("define BGP_PREFIX_MINLEN4_IMPORT = %s;" % self.bgp_prefix_minlen4_import)
-        self._addline("define BGP_PREFIX_MINLEN4_EXPORT = %s;" % self.bgp_prefix_minlen4_export)
-        self._addline("define BGP_PREFIX_MAXLEN6_IMPORT = %s;" % self.bgp_prefix_maxlen6_import)
-        self._addline("define BGP_PREFIX_MAXLEN6_EXPORT = %s;" % self.bgp_prefix_maxlen6_export)
-        self._addline("define BGP_PREFIX_MINLEN6_IMPORT = %s;" % self.bgp_prefix_minlen6_import)
-        self._addline("define BGP_PREFIX_MINLEN6_EXPORT = %s;" % self.bgp_prefix_minlen6_export)
+        self._addline(f"define BGP_PREFIX_MAXLEN4_IMPORT = {self.bgp_prefix_maxlen4_import};")
+        self._addline(f"define BGP_PREFIX_MAXLEN4_EXPORT = {self.bgp_prefix_maxlen4_export};")
+        self._addline(f"define BGP_PREFIX_MINLEN4_IMPORT = {self.bgp_prefix_minlen4_import};")
+        self._addline(f"define BGP_PREFIX_MINLEN4_EXPORT = {self.bgp_prefix_minlen4_export};")
+        self._addline(f"define BGP_PREFIX_MAXLEN6_IMPORT = {self.bgp_prefix_maxlen6_import};")
+        self._addline(f"define BGP_PREFIX_MAXLEN6_EXPORT = {self.bgp_prefix_maxlen6_export};")
+        self._addline(f"define BGP_PREFIX_MINLEN6_IMPORT = {self.bgp_prefix_minlen6_import};")
+        self._addline(f"define BGP_PREFIX_MINLEN6_EXPORT = {self.bgp_prefix_minlen6_export};")
 
         self._addline("# Preferences")
         self._addline("define BGP_PREF_OWN = 950;")  # -20 = Originate, -10 = static, -5 = kernel

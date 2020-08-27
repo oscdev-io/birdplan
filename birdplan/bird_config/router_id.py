@@ -27,5 +27,5 @@ class BirdConfigRouterID(BirdConfigBase):
     def configure(self):
         """Configure routing id."""
         self._addtitle("Router ID")
-        self._addline("router id %s;" % self.parent.router_id)
+        self._addline(f"router id {self.parent.router_id};")
         self._addline("")

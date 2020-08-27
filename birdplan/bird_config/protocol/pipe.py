@@ -30,7 +30,7 @@ class BirdConfigProtocolPipe(BirdConfigBase):  # pylint: disable=too-many-instan
 
         # Add a suffix if we have a name
         if name:
-            self._name_suffix = "_%s" % name
+            self._name_suffix = f"_{name}"
         else:
             self._name_suffix = ""
 
@@ -43,65 +43,36 @@ class BirdConfigProtocolPipe(BirdConfigBase):  # pylint: disable=too-many-instan
         self._table_import_filtered = kwargs.get("table_import_filtered", False)
 
         # Are we excluding anything?
-        self._has_ipv4 = kwargs.get("has_ipv4", True)
-        self._has_ipv6 = kwargs.get("has_ipv6", True)
+        self._ipversions = []
+        if kwargs.get("has_ipv4", True):
+            self._ipversions.append(4)
+        if kwargs.get("has_ipv6", True):
+            self._ipversions.append(6)
 
     def configure(self):
         """Create a pipe protocol."""
 
-        if self.has_ipv4:
-            self._addline("protocol pipe p_%s4_to_%s4%s {" % (self.table_from, self.table_to, self.name_suffix))
-            self._addline('\tdescription "Pipe from %s4 to %s4%s";' % (self.t_table_from, self.t_table_to, self.name_suffix))
+        for ipv in self._ipversions:
+            self._addline(f"protocol pipe p_{self.table_from}{ipv}_to_{self.table_to}{ipv}{self.name_suffix} {{")
+            self._addline(f'\tdescription "Pipe from {self.t_table_from}{ipv} to {self.t_table_to}{ipv}{self.name_suffix}";')
             self._addline("")
-            self._addline("\ttable %s4;" % self.t_table_from)
-            self._addline("\tpeer table %s4%s;" % (self.t_table_to, self.name_suffix))
-            self._addline("")
-            # Check if we're doing export filtering
-            if self.table_export_filtered:
-                self._addline("\texport filter f_%s_%s4_export;" % (self.table_from, self.table_to))
-            # If not add per normal
-            else:
-                self._addline("\texport %s;" % self.table_export)
-            # Check if we're doing import filtering
-            if self.table_import_filtered:
-                self._addline("\timport filter f_%s_%s4_import;" % (self.table_from, self.table_to))
-            # If not add per normal
-            else:
-                self._addline("\timport %s;" % self.table_import)
-            self._addline("};")
-            self._addline("")
-
-        if self.has_ipv6:
-            self._addline("protocol pipe p_%s6_to_%s6%s {" % (self.table_from, self.table_to, self.name_suffix))
-            self._addline('\tdescription "Pipe from %s6 to %s6%s";' % (self.t_table_from, self.t_table_to, self.name_suffix))
-            self._addline("")
-            self._addline("\ttable %s6;" % self.t_table_from)
-            self._addline("\tpeer table %s6%s;" % (self.t_table_to, self.name_suffix))
+            self._addline(f"\ttable {self.t_table_from}{ipv};")
+            self._addline(f"\tpeer table {self.t_table_to}{ipv}{self.name_suffix};")
             self._addline("")
             # Check if we're doing export filtering
             if self.table_export_filtered:
-                self._addline("\texport filter f_%s_%s6_export;" % (self.table_from, self.table_to))
+                self._addline(f"\texport filter f_{self.table_from}_{self.table_to}{ipv}_export;")
             # If not add per normal
             else:
-                self._addline("\texport %s;" % self.table_export)
+                self._addline(f"\texport {self.table_export};")
             # Check if we're doing import filtering
             if self.table_import_filtered:
-                self._addline("\timport filter f_%s_%s6_import;" % (self.table_from, self.table_to))
+                self._addline(f"\timport filter f_{self.table_from}_{self.table_to}{ipv}_import;")
             # If not add per normal
             else:
-                self._addline("\timport %s;" % self.table_import)
+                self._addline(f"\timport {self.table_import};")
             self._addline("};")
             self._addline("")
-
-    @property
-    def has_ipv4(self):
-        """Return if we have IPv4."""
-        return self._has_ipv4
-
-    @property
-    def has_ipv6(self):
-        """Return if we have IPv6."""
-        return self._has_ipv6
 
     @property
     def name_suffix(self):
@@ -113,14 +84,14 @@ class BirdConfigProtocolPipe(BirdConfigBase):  # pylint: disable=too-many-instan
         """Return table_from, some tables don't have t_ prefixes."""
         if self._table_from == "master":
             return self._table_from
-        return "t_%s" % self._table_from
+        return f"t_{self._table_from}"
 
     @property
     def t_table_to(self):
         """Return table_to, some tables don't have t_ prefixes."""
         if self._table_to == "master":
             return self._table_to
-        return "t_%s" % self._table_to
+        return f"t_{self._table_to}"
 
     @property
     def table_from(self):

@@ -20,6 +20,7 @@
 
 from ..base import BirdConfigBase
 from .pipe import BirdConfigProtocolPipe
+from ...exceptions import BirdPlanError
 
 
 class BirdConfigProtocolStatic(BirdConfigBase):
@@ -45,11 +46,11 @@ class BirdConfigProtocolStatic(BirdConfigBase):
         for prefix in sorted(self.static_routes.keys()):
             info = self.static_routes[prefix]
             if "." in prefix:
-                routes_ipv4.append("%s %s" % (prefix, info))
+                routes_ipv4.append(f"{prefix} {info}")
             elif ":" in prefix:
-                routes_ipv6.append("%s %s" % (prefix, info))
+                routes_ipv6.append(f"{prefix} {info}")
             else:
-                raise RuntimeError('The static route "%s" is odd' % prefix)
+                raise BirdPlanError(f"The static route '{prefix}' is odd")
 
         self._addtitle("Static Protocol")
 
@@ -72,7 +73,7 @@ class BirdConfigProtocolStatic(BirdConfigBase):
             self._addline("")
             # Output the routes
             for route in routes_ipv4:
-                self._addline("\troute %s;" % route)
+                self._addline(f"\troute {route};")
         self._addline("};")
         self._addline("")
         self._addline("protocol static static6 {")
@@ -88,7 +89,7 @@ class BirdConfigProtocolStatic(BirdConfigBase):
             self._addline("")
             # Output the routes
             for route in routes_ipv6:
-                self._addline("\troute %s;" % route)
+                self._addline(f"\troute {route};")
         self._addline("};")
         self._addline("")
 
