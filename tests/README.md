@@ -50,6 +50,8 @@
 
 # BGP
 
+[No Export Kernel](40-bgp/no_export_kernel/README.md)
+
 [Redistribute Connected](40-bgp/redistribute_connected/README.md)
 
 [Redistribute Connected (with star)](40-bgp/redistribute_connected_with_star/README.md)
