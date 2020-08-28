@@ -540,8 +540,15 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         self._addline("# Export filter TO the BGP peer from the peer BGP table")
         self._addline(f"filter {filter_name}")
         self._addline("{")
-        self._addline("\t# We accept all routes going to the peer that are in the peer BGP table")
-        self._addline(f'\tif (proto != "{protocol_name}") then accept;')
+        # Check if we're quarantined, if we are reject routes to the peer
+        if self.quarantined:
+            self._addline("\t# Peer is quarantined so reject exporting of routes")
+            self._addline(f'\tprint "[{filter_name}] Rejecting ", net, " to peer (quarantined)";', debug=True)
+            self._addline("\treject;")
+        # If we're not quarantined, then export routes
+        else:
+            self._addline("\t# We accept all routes going to the peer that are in the peer BGP table")
+            self._addline(f'\tif (proto != "{protocol_name}") then accept;')
         self._addline("};")
 
     def _peer_import_filter(self, ipv):
@@ -883,8 +890,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         self._setup_peer_prefixes()
 
         # BGP peer to main table
-        if not self.quarantined:
-            self._setup_peer_to_bgp_filters()
+        self._setup_peer_to_bgp_filters()
 
         # BGP peer filters
         self._setup_peer_filters()
@@ -893,17 +899,16 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         self._setup_peer_protocols()
 
         # Configure pipe from the BGP peer table to the main BGP table
-        if not self.quarantined:
-            bgp_peer_pipe = BirdConfigProtocolPipe(
-                self,
-                table_from=self.peer_table,
-                table_to="bgp",
-                table_export_filtered=True,
-                table_import_filtered=True,
-                has_ipv4=self.has_ipv4,
-                has_ipv6=self.has_ipv6,
-            )
-            bgp_peer_pipe.configure()
+        bgp_peer_pipe = BirdConfigProtocolPipe(
+            self,
+            table_from=self.peer_table,
+            table_to="bgp",
+            table_export_filtered=True,
+            table_import_filtered=True,
+            has_ipv4=self.has_ipv4,
+            has_ipv6=self.has_ipv6,
+        )
+        bgp_peer_pipe.configure()
 
         # End of peer
         self._addline("")
