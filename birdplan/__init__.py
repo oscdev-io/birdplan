@@ -40,14 +40,14 @@ class BirdPlan:
 
     _plan_file: Optional[str]
     _config: Dict[Any, Any]
-    _birdconf: Optional[BirdConfig]
+    _birdconf: BirdConfig
 
     def __init__(self):
         """Initialize object."""
 
         self._plan_file = None
         self._config = {}
-        self._birdconf = None
+        self._birdconf = BirdConfig()
 
     def load(self, plan_file: str, macros: Optional[Dict[str, str]] = None):
         """
@@ -89,8 +89,6 @@ class BirdPlan:
             configuration.
 
         """
-
-        self._birdconf = BirdConfig()
 
         # Check configuration options are supported
         for config_item in self.config:
