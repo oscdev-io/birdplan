@@ -223,7 +223,7 @@ Filtering of routes received from a peer. Options available are below...
 
 * `prefixes` will filter on a list of allowed prefixes
 * `asns` will filter on a list of allowed ASN's
-* `as-sets` will filter on a list of as-sets, resolving them at the same time.
+* `as_sets` will filter on a list of as-sets, resolving them at the same time.
 
 An example is however below...
 ```yaml
@@ -424,6 +424,9 @@ Types of routes to redistribute to the peer, valid options are detailed below...
 * `static` will redistribute static routes in our global static configuration. Defaults to `False`.
 * `kernel` will redistribute kernel routes. Defaults to `False`.
 * `originated` will redistribute originated routes. Defaults to `False`.
+
+In addition to setting these as a boolean value, one can also add the following items to a dictionary...
+* `redistribute-large-communities` will add additional large communities when exporting routes of this type
 
 Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
 
