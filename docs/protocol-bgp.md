@@ -425,6 +425,9 @@ Types of routes to redistribute to the peer, valid options are detailed below...
 * `kernel` will redistribute kernel routes. Defaults to `False`.
 * `originated` will redistribute originated routes. Defaults to `False`.
 
+In addition to setting these as a boolean value, one can also add the following items to a dictionary...
+* `redistribute-large-communities` will add additional large communities when exporting routes of this type
+
 Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
 
 * `bgp` will redistribute BGP routes. Automatically set to `True` for peer types of `rrclient`, `rrserver` and `rrserver-rrserver`.
