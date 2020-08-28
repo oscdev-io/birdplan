@@ -48,9 +48,6 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
     _multihop: Optional[str]
     _password: Optional[str]
 
-    _prefix_list_name: str
-    _asn_list_name: str
-
     _cost: int
 
     _incoming_large_communities: List[str]
@@ -128,11 +125,6 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             self._multihop = peer_config["multihop"]
         if "password" in peer_config:
             self._password = peer_config["password"]
-
-        # Work out our prefix list name
-        self._prefix_list_name = f"bgp_AS{self.asn}_{self.name}_prefixes"
-        # Work out our ASN list name
-        self._asn_list_name = f"bgp_AS{self.asn}_{self.name}_asns"
 
         self._cost = 0
         if "cost" in peer_config:
@@ -304,6 +296,10 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         """Return the IP versioned BGP import filter name."""
         return f"f_bgp{ipv}_AS{self.asn}_{self.name}_peer_bgp{ipv}_import"
 
+    def prefix_list_name(self, ipv: int) -> str:
+        """Return our prefix list name."""
+        return f"bgp{ipv}_AS{self.asn}_{self.name}_prefixes"
+
     def _setup_peer_tables(self):
         """Peering routing table setup."""
         if self.has_ipv4:
@@ -368,7 +364,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
 
         # Output prefix definitions
         for ipv in ["4", "6"]:
-            self._addline(f"define {self.prefix_list_name}{ipv} = [")
+            self._addline(f"define {self.prefix_list_name(ipv)} = [")
             prefix_list = prefix_lists[ipv]
             prefix_list_irr = irr_prefixes[f"ipv{ipv}"]
             prefixes = []
@@ -820,7 +816,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         # Check if we're filtering allowed prefixes
         if self.filter_prefixes:
             type_lines.append("\t\t# Filter on the allowed prefixes")
-            type_lines.append(f"\t\tbgp_filter_prefixes_v{ipv}({self.prefix_list_name}{ipv});")
+            type_lines.append(f"\t\tbgp_filter_prefixes_v{ipv}({self.prefix_list_name(ipv)});")
 
         # Quarantine mode...
         if self.quarantined:
@@ -1007,16 +1003,6 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
         return self._password
 
     @property
-    def prefix_list_name(self):
-        """Return our prefix list name."""
-        return self._prefix_list_name
-
-    @property
-    def asn_list_name(self):
-        """Return our ASN list name."""
-        return self._asn_list_name
-
-    @property
     def cost(self) -> int:
         """Return our prefix cost."""
         return self._cost
@@ -1130,6 +1116,11 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
     #
     # Helper properties
     #
+
+    @property
+    def asn_list_name(self) -> str:
+        """Return our ASN list name."""
+        return f"bgp_AS{self.asn}_{self.name}_asns"
 
     @property
     def has_asn_filter(self):

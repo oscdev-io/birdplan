@@ -38,7 +38,7 @@ class BirdConfigProtocolKernel(BirdConfigBase):
 
         self._addline("")
 
-    def _configure_protocol_kernel(self, ipv):
+    def _configure_protocol_kernel(self, ipv: int):
         """Protocol configuration."""
         self._addline("")
         self._addline(f"protocol kernel kernel{ipv} {{")
