@@ -52,71 +52,43 @@ class BirdConfigProtocolBGP(BirdConfigBase):
 
     def _configure_originate(self):
         # Work out static v4 and v6 routes
-        routes_ipv4 = []
-        routes_ipv6 = []
+        routes = {"4": [], "6": []}
         for prefix in sorted(self._bgp_originate_routes.keys()):
             info = self._bgp_originate_routes[prefix]
             if "." in prefix:
-                routes_ipv4.append("%s %s" % (prefix, info))
+                routes["4"].append("%s %s" % (prefix, info))
             elif ":" in prefix:
-                routes_ipv6.append("%s %s" % (prefix, info))
+                routes["6"].append("%s %s" % (prefix, info))
             else:
                 raise BirdPlanError(f"The BGP originate route '{prefix}' is odd")
-
-        self._addline("# BGP Origination")
-        self._addline("ipv4 table t_bgp_originate4;")
-        self._addline("ipv6 table t_bgp_originate6;")
-        self._addline("")
-
-        #
-        # Setup BGP Origination
-        #
-
-        self._addline("filter f_bgp_originate4_import {")
-        self._addline("\t# Origination import")
-        self._addline("\tbgp_import_own(20);")
-        self._addline("\taccept;")
-        self._addline("};")
-        self._addline("")
-        self._addline("filter f_bgp_originate6_import {")
-        self._addline("\t# Origination import")
-        self._addline("\tbgp_import_own(20);")
-        self._addline("\taccept;")
-        self._addline("};")
-        self._addline("")
-
-        self._addline("protocol static bgp_originate4 {")
-        self._addline('\tdescription "BGP route origination for IPv4";')
-        self._addline("")
-        self._addline("\tipv4 {")
-        self._addline("\t\ttable t_bgp_originate4;")
-        self._addline("\t\texport none;")
-        self._addline("\t\timport filter f_bgp_originate4_import;")
-        self._addline("\t};")
-        # If we have IPv4 routes
-        if routes_ipv4:
+        # Loop with IPv4 and IPv6
+        for ipv in ["4", "6"]:
+            self._addline(f"# BGP Origination for IPv{ipv}")
+            self._addline(f"ipv{ipv} table t_bgp_originate{ipv};")
             self._addline("")
-            # Output the routes
-            for route in routes_ipv4:
-                self._addline(f"\troute {route};")
-        self._addline("};")
-        self._addline("")
-        self._addline("protocol static bgp_originate6 {")
-        self._addline('\tdescription "BGP route origination for IPv6";')
-        self._addline("")
-        self._addline("\tipv6 {")
-        self._addline("\t\ttable t_bgp_originate6;")
-        self._addline("\t\texport none;")
-        self._addline("\t\timport filter f_bgp_originate6_import;")
-        self._addline("\t};")
-        # If we have IPv6 routes
-        if routes_ipv6:
+
+            self._addline(f"filter f_bgp_originate{ipv}_import {{")
+            self._addline("\t# Origination import")
+            self._addline("\tbgp_import_own(20);")
+            self._addline("\taccept;")
+            self._addline("};")
+
+            self._addline(f"protocol static bgp_originate{ipv} {{")
+            self._addline(f'\tdescription "BGP route origination for IPv{ipv}";')
             self._addline("")
-            # Output the routes
-            for route in routes_ipv6:
-                self._addline(f"\troute {route};")
-        self._addline("};")
-        self._addline("")
+            self._addline(f"\tipv{ipv} {{")
+            self._addline(f"\t\ttable t_bgp_originate{ipv};")
+            self._addline("\t\texport none;")
+            self._addline(f"\t\timport filter f_bgp_originate{ipv}_import;")
+            self._addline("\t};")
+            # If we have IPv4 routes
+            if routes[ipv]:
+                self._addline("")
+                # Output the routes
+                for route in routes[ipv]:
+                    self._addline(f"\troute {route};")
+            self._addline("};")
+            self._addline("")
 
         # Configure BGP origination route pipe to the bgp table
         originate_pipe = BirdConfigProtocolPipe(
@@ -129,7 +101,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
 
         # Configure export filter to master
         self._addline("# Export filter FROM BGP table TO master table")
-        self._addline(f"filter f_bgp_master{ipv}_export {{")
+        self._addline(f"filter f_bgp{ipv}_master{ipv}_export {{")
         # Check if we accept the default route, if not block it
         if not self.accept_default:
             self._addline("\t# Do not export default routes to the master")
@@ -144,7 +116,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
     def _bgp_to_master_import_filter(self, ipv):
         # Configure import filter to master
         self._addline("# Import filter FROM master table TO BGP table")
-        self._addline(f"filter f_bgp_master{ipv}_import")
+        self._addline(f"filter f_bgp{ipv}_master{ipv}_import")
         self._addline("{")
         # Redistribute kernel routes
         if self.import_kernel:
@@ -167,7 +139,7 @@ class BirdConfigProtocolBGP(BirdConfigBase):
 
     def _bgp_to_direct_import_filter(self, ipv):
         # Configure import filter to direct
-        self._addline(f"filter f_bgp_direct{ipv}_import {{")
+        self._addline(f"filter f_bgp{ipv}_direct{ipv}_import {{")
         self._addline("\t# Origination import")
         self._addline("\tbgp_import_own(10);")
         self._addline("\taccept;")

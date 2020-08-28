@@ -139,7 +139,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
     def _ospf_to_master_export_filter(self, ipv):
         """OSPF to master export filter setup."""
         # Configure export filter to master table
-        self._addline(f"filter f_ospf_master{ipv}_export {{")
+        self._addline(f"filter f_ospf{ipv}_master{ipv}_export {{")
         # Check if we accept the default route, if not block it
         if not self.accept_default:
             self._addline("\t# Do not export default route to master (no accept:default)")
@@ -161,7 +161,7 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
     def _ospf_to_master_import_filter(self, ipv):
         """OSPF to master import filter setup."""
         # Configure import filter to master table
-        self._addline(f"filter f_ospf_master{ipv}_import {{")
+        self._addline(f"filter f_ospf{ipv}_master{ipv}_import {{")
         # Redistribute the default route
         if not self.redistribute_default:
             self._addline("\t# Deny import of default route into OSPF (no redistribute_default)")
