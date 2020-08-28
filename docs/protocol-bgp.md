@@ -223,7 +223,7 @@ Filtering of routes received from a peer. Options available are below...
 
 * `prefixes` will filter on a list of allowed prefixes
 * `asns` will filter on a list of allowed ASN's
-* `as-sets` will filter on a list of as-sets, resolving them at the same time.
+* `as_sets` will filter on a list of as-sets, resolving them at the same time.
 
 An example is however below...
 ```yaml
