@@ -23,11 +23,13 @@ import os
 import pprint
 from nsnetsim.generic_node import GenericNode
 from nsnetsim.topology import Topology
+from birdplan import BirdPlan  # pylint: disable=import-error
 
 
 class Simulation:
     """Simulation class, storing the topology and nodes."""
 
+    _configs: Dict[str, BirdPlan]
     _report: Dict[str, str]
     _conffiles: Dict[str, str]
     _logfiles: Dict[str, str]
@@ -35,10 +37,19 @@ class Simulation:
 
     def __init__(self):
         """Initialize object."""
+        self._configs = {}
         self._report = {}
         self._conffiles = {}
         self._logfiles = {}
         self._topology = Topology()
+
+    def config(self, name: str) -> BirdPlan:
+        """Return a node by name."""
+        return self._configs[name]
+
+    def add_config(self, name: str, config: BirdPlan):
+        """Add a config."""
+        self._configs[name] = config
 
     def node(self, name: str) -> GenericNode:
         """Return a node by name."""

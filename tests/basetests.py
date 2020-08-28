@@ -18,13 +18,13 @@
 
 """Base test classes for our tests."""
 
-# pylint: disable=import-error,too-few-public-methods
+# pylint: disable=too-few-public-methods
 
 from typing import Any, List, Optional
 import pytest
 from nsnetsim.generic_node import GenericNode
 from simulation import Simulation
-from birdplan import BirdPlan
+from birdplan import BirdPlan  # pylint: disable=import-error
 
 
 #
@@ -42,18 +42,20 @@ class BirdPlanBaseTestCase:
 
     def _test_configure(self, sim, tmpdir):
         """Create our configuration files."""
-        # Lets start configuring...
-        birdplan = BirdPlan()
         # Generate config files
         for router in self.routers:
             bird_conffile = f"{tmpdir}/bird.conf.{router}"
             bird_logfile = f"{tmpdir}/bird.log.{router}"
+            # Lets start configuring...
+            birdplan = BirdPlan()
             # Load yaml config
             birdplan.load(f"{self.test_dir}/{router}.yaml", {"@LOGFILE@": bird_logfile})
             # Generate BIRD config
             birdplan.generate(bird_conffile)
             sim.add_conffile(f"CONFFILE({router})", bird_conffile)
             sim.add_logfile(f"LOGFILE({router})", bird_logfile)
+            # Add the birdplan configuration object to the simulation
+            sim.add_config(router, birdplan)
 
     def _bird_route_table(self, sim: Simulation, node: GenericNode, route_table_name: str, **kwargs) -> Any:
         """Routing table retrieval helper."""
@@ -63,3 +65,15 @@ class BirdPlanBaseTestCase:
         sim.add_report_obj(f"BIRD({node})[{route_table_name}]", route_table)
         # Return route table
         return route_table
+
+    def _bird_bgp_peer_table(self, sim: Simulation, name: str, peer_name: str, ipv: int) -> str:
+        """Get a bird BGP peer table name."""
+        # Grab BirdConfig object for this router name
+        birdconf = sim.config(name).birdconf
+
+        # Work-around for mypy error saying its undefined...
+        if not birdconf:
+            raise RuntimeError("It should not happen that birdconf.bgp is not set")
+
+        # Grab BGP peer BGP table name
+        return birdconf.bgp.peer(peer_name).bgp_table_name(ipv)

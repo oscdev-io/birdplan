@@ -108,7 +108,7 @@ class BirdConfig(BirdConfigBase):  # pylint: disable=too-many-instance-attribute
         if self.ospf.areas:
             self.ospf.configure()
 
-        if self.bgp.peers:
+        if self.bgp.peers_config:
             self.bgp.configure()
 
         return self.config_lines

@@ -18,6 +18,7 @@
 
 """BIRD BGP protocol configuration."""
 
+from typing import Dict
 from ...base import BirdConfigBase
 from ..pipe import BirdConfigProtocolPipe
 from ..direct import BirdConfigProtocolDirect
@@ -34,7 +35,8 @@ class BirdConfigProtocolBGP(BirdConfigBase):
 
         # BGP
         self._bgp_asn = None
-        self._bgp_peers = {}
+        self._peers = {}
+        self._peers_config = {}
         # Route reflector cluster ID
         self._bgp_rr_cluster_id = None
         # Routes originated from BGP
@@ -205,9 +207,11 @@ class BirdConfigProtocolBGP(BirdConfigBase):
             bgp_direct_pipe.configure()
 
         # Loop with BGP peers and configure them
-        for peer_name in sorted(self._bgp_peers.keys()):
-            peer = BirdConfigProtocolBGPPeer(self, peer_name=peer_name, peer_config=self._bgp_peers[peer_name])
+        for peer_name, peer_config in sorted(self.peers_config.items()):
+            peer = BirdConfigProtocolBGPPeer(self, peer_name=peer_name, peer_config=peer_config)
             peer.configure()
+            # Add to our list of peer objects
+            self.peers[peer_name] = peer
 
     def set_asn(self, asn):
         """Set our ASN."""
@@ -225,8 +229,12 @@ class BirdConfigProtocolBGP(BirdConfigBase):
 
     def add_peer(self, peer_name, peer_config=None):
         """Add peer to BGP."""
-        if peer_name not in self._bgp_peers:
-            self._bgp_peers[peer_name] = peer_config
+        if peer_name not in self.peers_config:
+            self.peers_config[peer_name] = peer_config
+
+    def peer(self, name: str) -> BirdConfigProtocolBGPPeer:
+        """Return a BGP peer configuration object."""
+        return self.peers[name]
 
     # PREFIX_MAXLEN4
 
@@ -359,9 +367,14 @@ class BirdConfigProtocolBGP(BirdConfigBase):
         self._bgp_import["kernel"] = value
 
     @property
-    def peers(self):
+    def peers(self) -> Dict[str, BirdConfigProtocolBGPPeer]:
         """Return BGP peers."""
-        return self._bgp_peers
+        return self._peers
+
+    @property
+    def peers_config(self) -> Dict[str, Dict]:
+        """Return BGP peers configuration."""
+        return self._peers_config
 
     @property
     def rr_cluster_id(self):

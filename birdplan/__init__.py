@@ -586,3 +586,8 @@ class BirdPlan:
     def config(self, config: Dict[Any, Any]):
         """Set our configuration."""
         self._config = config
+
+    @property
+    def birdconf(self) -> Optional[BirdConfig]:
+        """Return the BirdConfig object."""
+        return self._birdconf
