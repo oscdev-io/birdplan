@@ -67,3 +67,7 @@
 [Redistribute Static Without Default](40-bgp/redistribute_static_without_default/README.md)
 
 [Redistribute Kernel](40-bgp/redistribute_kernel/README.md)
+
+## Features
+
+[Quarantine](40-bgp/features/quarantine/README.md)
