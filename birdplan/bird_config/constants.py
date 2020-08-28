@@ -44,9 +44,6 @@ class BirdConfigConstants(BirdConfigBase):
             "prefix_minlen6_import": 16,
             "prefix_minlen6_export": 16,
         }
-        if self.root and self.root.test_mode:
-            self._bgp["prefix_maxlen6_import"] = 64
-            self._bgp["prefix_maxlen6_export"] = 64
 
     def _configure_defaults(self):
         """Configure default routes."""
@@ -61,10 +58,10 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("define BOGONS_V4 = [")
         self._addline("\t0.0.0.0/31-, # Match anything which has a shorter default route prefix")
         self._addline("\t10.0.0.0/8+, # Private range")
-        if self.is_test_mode():
-            self._addline("\t100.64.0.0/10+, # Carrier NAT range")
-        else:
+        if self.test_mode:
             self._addline("\t# Excluding 100.64.0.0/10+ Carrier NAT range: EXCLUDED DUE TO TESTING")
+        else:
+            self._addline("\t100.64.0.0/10+, # Carrier NAT range")
         self._addline("\t127.0.0.0/8+, # Local loopback")
         self._addline("\t169.254.0.0/16+, # Link-local")
         self._addline("\t172.16.0.0/12+, # Private range")
@@ -101,10 +98,10 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("\t2002:0a00::/24+, # Invalid 6to4 packets (IPv4 private 10.0.0.0/8 network)")
         self._addline("\t2002:ac10::/28+, # Invalid 6to4 packets (IPv4 private 172.16.0.0/12 network)")
         self._addline("\t2002:c0a8::/32+, # Invalid 6to4 packets (IPv4 private 192.168.0.0/16 network)")
-        if self.is_test_mode():
-            self._addline("\tfc00::/7+, # Unicast Unique Local Addresses (ULA) - RFC 4193")
-        else:
+        if self.test_mode:
             self._addline("\t# Excluding fc00::/7+ Unicast Unique Local Addresses (ULA) - RFC 4193: EXCLUDED DUE TO TESTING")
+        else:
+            self._addline("\tfc00::/7+, # Unicast Unique Local Addresses (ULA) - RFC 4193")
         self._addline("\tfe80::/10+, # Link-local Unicast")
         self._addline("\tfec0::/10+, # Site-local Unicast - deprecated by RFC 3879 (replaced by ULA)")
         self._addline("\tff00::/8+ # Multicast")
@@ -168,8 +165,13 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline(f"define BGP_PREFIX_MAXLEN4_EXPORT = {self.bgp_prefix_maxlen4_export};")
         self._addline(f"define BGP_PREFIX_MINLEN4_IMPORT = {self.bgp_prefix_minlen4_import};")
         self._addline(f"define BGP_PREFIX_MINLEN4_EXPORT = {self.bgp_prefix_minlen4_export};")
-        self._addline(f"define BGP_PREFIX_MAXLEN6_IMPORT = {self.bgp_prefix_maxlen6_import};")
-        self._addline(f"define BGP_PREFIX_MAXLEN6_EXPORT = {self.bgp_prefix_maxlen6_export};")
+        # If we're in test mode, allow smaller prefixes
+        if self.test_mode:
+            self._addline("define BGP_PREFIX_MAXLEN6_IMPORT = 64;")
+            self._addline("define BGP_PREFIX_MAXLEN6_EXPORT = 64;")
+        else:
+            self._addline(f"define BGP_PREFIX_MAXLEN6_IMPORT = {self.bgp_prefix_maxlen6_import};")
+            self._addline(f"define BGP_PREFIX_MAXLEN6_EXPORT = {self.bgp_prefix_maxlen6_export};")
         self._addline(f"define BGP_PREFIX_MINLEN6_IMPORT = {self.bgp_prefix_minlen6_import};")
         self._addline(f"define BGP_PREFIX_MINLEN6_EXPORT = {self.bgp_prefix_minlen6_export};")
 

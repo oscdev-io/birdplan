@@ -77,11 +77,12 @@ class BirdConfigBase:
         self._addline("#")
         self._addline("")
 
-    def is_test_mode(self) -> bool:
-        """Return if we're in test mode or not."""
-        if self.root and self.root.test_mode:
-            return True
-        return False
+    @property
+    def test_mode(self) -> bool:
+        """Quick and easy test_mode check."""
+        if not self.root:
+            raise RuntimeError("self.root should never be a negative test result")
+        return self.root.test_mode
 
     @property
     def root(self) -> Optional["BirdConfig"]:

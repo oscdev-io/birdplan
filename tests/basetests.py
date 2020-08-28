@@ -48,6 +48,8 @@ class BirdPlanBaseTestCase:
             bird_logfile = f"{tmpdir}/bird.log.{router}"
             # Lets start configuring...
             birdplan = BirdPlan()
+            # Set test mode
+            birdplan.birdconf.test_mode = True
             # Load yaml config
             birdplan.load(f"{self.test_dir}/{router}.yaml", {"@LOGFILE@": bird_logfile})
             # Generate BIRD config

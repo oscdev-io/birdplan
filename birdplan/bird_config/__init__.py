@@ -39,6 +39,7 @@ class BirdConfig(BirdConfigBase):  # pylint: disable=too-many-instance-attribute
     _router_id: str
     _log_file: Optional[str]
     _debug: bool
+    _test_mode: bool
 
     _constants: BirdConfigConstants
     _master: BirdConfigMaster
