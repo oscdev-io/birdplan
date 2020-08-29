@@ -56,7 +56,7 @@ class BGPFilteringBogonASNBase(BGPFilteringBase):
 
 
 class TestBGPFilteringBogonASNCustomer(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'customer' peer type."""
+    """Test filtering of bogon ASNs for the 'customer' peer type."""
 
     # BIRD configuration
     peer_type = "customer"
@@ -66,7 +66,7 @@ class TestBGPFilteringBogonASNCustomer(BGPFilteringBogonASNBase):
 """
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'customer' peer type."""
+        """Test filtering of bogon ASNs for the 'customer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -129,13 +129,13 @@ class TestBGPFilteringBogonASNCustomer(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNPeer(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'peer' peer type."""
+    """Test filtering of bogon ASNs for the 'peer' peer type."""
 
     # BIRD configuration
     peer_type = "peer"
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'peer' peer type."""
+        """Test filtering of bogon ASNs for the 'peer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -198,13 +198,13 @@ class TestBGPFilteringBogonASNPeer(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNTransit(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'transit' peer type."""
+    """Test filtering of bogon ASNs for the 'transit' peer type."""
 
     # BIRD configuration
     peer_type = "transit"
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'transit' peer type."""
+        """Test filtering of bogon ASNs for the 'transit' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -267,7 +267,7 @@ class TestBGPFilteringBogonASNTransit(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNRrclient(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'rrclient' peer type."""
+    """Test filtering of bogon ASNs for the 'rrclient' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -277,7 +277,7 @@ class TestBGPFilteringBogonASNRrclient(BGPFilteringBogonASNBase):
 """
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'rrclient' peer type."""
+        """Test filtering of bogon ASNs for the 'rrclient' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -387,7 +387,7 @@ class TestBGPFilteringBogonASNRrclient(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNRrserver(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'rrserver' peer type."""
+    """Test filtering of bogon ASNs for the 'rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -397,7 +397,7 @@ class TestBGPFilteringBogonASNRrserver(BGPFilteringBogonASNBase):
 """
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'rrserver' peer type."""
+        """Test filtering of bogon ASNs for the 'rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -507,7 +507,7 @@ class TestBGPFilteringBogonASNRrserver(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNRrserverRrserver(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'rrserver-rrserver' peer type."""
+    """Test filtering of bogon ASNs for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -517,7 +517,7 @@ class TestBGPFilteringBogonASNRrserverRrserver(BGPFilteringBogonASNBase):
 """
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'rrserver-rrserver' peer type."""
+        """Test filtering of bogon ASNs for the 'rrserver-rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -627,13 +627,13 @@ class TestBGPFilteringBogonASNRrserverRrserver(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNRoutecollector(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'routecollector' peer type."""
+    """Test filtering of bogon ASNs for the 'routecollector' peer type."""
 
     # BIRD configuration
     peer_type = "routecollector"
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'routecollector' peer type."""
+        """Test filtering of bogon ASNs for the 'routecollector' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -696,13 +696,13 @@ class TestBGPFilteringBogonASNRoutecollector(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNRouteserver(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'routeserver' peer type."""
+    """Test filtering of bogon ASNs for the 'routeserver' peer type."""
 
     # BIRD configuration
     peer_type = "routeserver"
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'routeserver' peer type."""
+        """Test filtering of bogon ASNs for the 'routeserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
