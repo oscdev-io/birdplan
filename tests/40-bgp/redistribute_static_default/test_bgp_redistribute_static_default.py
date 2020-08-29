@@ -127,7 +127,7 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
             "0.0.0.0/0": [
                 {
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -155,7 +155,7 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
             "::/0": [
                 {
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -188,9 +188,9 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
         correct_result = {
             "0.0.0.0/0": [
                 {
-                    "attributes": {"BGP.large_community": [("65000", "3", "1")], "BGP.local_pref": "940"},
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -205,9 +205,9 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
         correct_result = {
             "0.0.0.0/0": [
                 {
-                    "attributes": {"BGP.large_community": [("65000", "3", "1")], "BGP.local_pref": "940"},
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -224,16 +224,16 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65000",
                     "attributes": {
-                        "BGP.as_path": "65000",
-                        "BGP.large_community": [("65000", "3", "1"), ("65001", "3", "3"), ("65001", "1101", "12")],
-                        "BGP.local_pref": "470",
+                        "BGP.as_path": [65000],
+                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3), (65001, 1101, 12)],
+                        "BGP.local_pref": 470,
                         "BGP.next_hop": "100.64.0.1",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65000_r1",
                     "since": helpers.bird_since_field(),
@@ -248,16 +248,16 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65000",
                     "attributes": {
-                        "BGP.as_path": "65000",
-                        "BGP.large_community": [("65000", "3", "1"), ("65002", "3", "4")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65000],
+                        "BGP.large_community": [(65000, 3, 1), (65002, 3, 4)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "100.64.0.1",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65000_r1",
                     "since": helpers.bird_since_field(),
@@ -284,9 +284,9 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
         correct_result = {
             "::/0": [
                 {
-                    "attributes": {"BGP.large_community": [("65000", "3", "1")], "BGP.local_pref": "940"},
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -301,9 +301,9 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
         correct_result = {
             "::/0": [
                 {
-                    "attributes": {"BGP.large_community": [("65000", "3", "1")], "BGP.local_pref": "940"},
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -320,16 +320,16 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65000",
                     "attributes": {
-                        "BGP.as_path": "65000",
-                        "BGP.large_community": [("65000", "3", "1"), ("65001", "3", "3"), ("65001", "1101", "12")],
-                        "BGP.local_pref": "470",
+                        "BGP.as_path": [65000],
+                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3), (65001, 1101, 12)],
+                        "BGP.local_pref": 470,
                         "BGP.next_hop": "fc00:100::1 fe80::1:ff:fe00:1",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::1", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65000_r1",
                     "since": helpers.bird_since_field(),
@@ -344,16 +344,16 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65000",
                     "attributes": {
-                        "BGP.as_path": "65000",
-                        "BGP.large_community": [("65000", "3", "1"), ("65002", "3", "4")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65000],
+                        "BGP.large_community": [(65000, 3, 1), (65002, 3, 4)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "fc00:100::1 fe80::1:ff:fe00:1",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::1", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65000_r1",
                     "since": helpers.bird_since_field(),
@@ -374,9 +374,9 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
         correct_result = {
             "0.0.0.0/0": [
                 {
-                    "attributes": {"BGP.large_community": [("65000", "3", "1")], "BGP.local_pref": "940"},
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -394,16 +394,16 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65000",
                     "attributes": {
-                        "BGP.as_path": "65000",
-                        "BGP.large_community": [("65000", "3", "1"), ("65002", "3", "4")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65000],
+                        "BGP.large_community": [(65000, 3, 1), (65002, 3, 4)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "100.64.0.1",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65000_r1",
                     "since": helpers.bird_since_field(),
@@ -424,9 +424,9 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
         correct_result = {
             "::/0": [
                 {
-                    "attributes": {"BGP.large_community": [("65000", "3", "1")], "BGP.local_pref": "940"},
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -444,16 +444,16 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65000",
                     "attributes": {
-                        "BGP.as_path": "65000",
-                        "BGP.large_community": [("65000", "3", "1"), ("65002", "3", "4")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65000],
+                        "BGP.large_community": [(65000, 3, 1), (65002, 3, 4)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "fc00:100::1 fe80::1:ff:fe00:1",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::1", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65000_r1",
                     "since": helpers.bird_since_field(),
@@ -475,7 +475,7 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
             "0.0.0.0/0": [
                 {
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -493,16 +493,16 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65000",
                     "attributes": {
-                        "BGP.as_path": "65000",
-                        "BGP.large_community": [("65000", "3", "1"), ("65002", "3", "4")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65000],
+                        "BGP.large_community": [(65000, 3, 1), (65002, 3, 4)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "100.64.0.1",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65000_r1",
                     "since": helpers.bird_since_field(),
@@ -524,7 +524,7 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
             "::/0": [
                 {
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -542,16 +542,16 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65000",
                     "attributes": {
-                        "BGP.as_path": "65000",
-                        "BGP.large_community": [("65000", "3", "1"), ("65002", "3", "4")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65000],
+                        "BGP.large_community": [(65000, 3, 1), (65002, 3, 4)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "fc00:100::1 fe80::1:ff:fe00:1",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::1", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65000_r1",
                     "since": helpers.bird_since_field(),
@@ -573,7 +573,7 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
             "0.0.0.0/0": [
                 {
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -591,16 +591,16 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65000",
                     "attributes": {
-                        "BGP.as_path": "65000",
-                        "BGP.large_community": [("65000", "3", "1"), ("65002", "3", "4")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65000],
+                        "BGP.large_community": [(65000, 3, 1), (65002, 3, 4)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "100.64.0.1",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65000_r1",
                     "since": helpers.bird_since_field(),
@@ -622,7 +622,7 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
             "::/0": [
                 {
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -640,16 +640,16 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65000",
                     "attributes": {
-                        "BGP.as_path": "65000",
-                        "BGP.large_community": [("65000", "3", "1"), ("65002", "3", "4")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65000],
+                        "BGP.large_community": [(65000, 3, 1), (65002, 3, 4)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "fc00:100::1 fe80::1:ff:fe00:1",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::1", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65000_r1",
                     "since": helpers.bird_since_field(),

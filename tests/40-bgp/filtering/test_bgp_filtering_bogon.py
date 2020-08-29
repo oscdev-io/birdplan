@@ -76,16 +76,16 @@ class TestBGPFilteringBogonCustomer(BGPFilteringBogonBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": "65001",
-                        "BGP.large_community": [("65000", "3", "2"), ("65000", "1101", "3")],
-                        "BGP.local_pref": "750",
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 3)],
+                        "BGP.local_pref": 750,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -101,16 +101,16 @@ class TestBGPFilteringBogonCustomer(BGPFilteringBogonBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": "65001",
-                        "BGP.large_community": [("65000", "3", "2"), ("65000", "1101", "3")],
-                        "BGP.local_pref": "750",
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 3)],
+                        "BGP.local_pref": 750,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -145,16 +145,16 @@ class TestBGPFilteringBogonPeer(BGPFilteringBogonBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": "65001",
-                        "BGP.large_community": [("65000", "3", "3"), ("65000", "1101", "3")],
-                        "BGP.local_pref": "470",
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 3)],
+                        "BGP.local_pref": 470,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -170,16 +170,16 @@ class TestBGPFilteringBogonPeer(BGPFilteringBogonBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": "65001",
-                        "BGP.large_community": [("65000", "3", "3"), ("65000", "1101", "3")],
-                        "BGP.local_pref": "470",
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 3)],
+                        "BGP.local_pref": 470,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -214,16 +214,16 @@ class TestBGPFilteringBogonTransit(BGPFilteringBogonBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": "65001",
-                        "BGP.large_community": [("65000", "3", "4"), ("65000", "1101", "3")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 3)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -239,16 +239,16 @@ class TestBGPFilteringBogonTransit(BGPFilteringBogonBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": "65001",
-                        "BGP.large_community": [("65000", "3", "4"), ("65000", "1101", "3")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 3)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -285,11 +285,11 @@ class TestBGPFilteringBogonRrclient(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -303,11 +303,11 @@ class TestBGPFilteringBogonRrclient(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -325,11 +325,11 @@ class TestBGPFilteringBogonRrclient(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -343,11 +343,11 @@ class TestBGPFilteringBogonRrclient(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -381,11 +381,11 @@ class TestBGPFilteringBogonRrserver(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -399,11 +399,11 @@ class TestBGPFilteringBogonRrserver(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -421,11 +421,11 @@ class TestBGPFilteringBogonRrserver(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -439,11 +439,11 @@ class TestBGPFilteringBogonRrserver(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -477,11 +477,11 @@ class TestBGPFilteringBogonRrserverRrserver(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -495,11 +495,11 @@ class TestBGPFilteringBogonRrserverRrserver(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -517,11 +517,11 @@ class TestBGPFilteringBogonRrserverRrserver(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -535,11 +535,11 @@ class TestBGPFilteringBogonRrserverRrserver(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": "", "BGP.local_pref": "100", "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -571,16 +571,16 @@ class TestBGPFilteringBogonRoutecollector(BGPFilteringBogonBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": "65001",
-                        "BGP.large_community": [("65000", "1101", "17")],
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65000, 1101, 17)],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -596,16 +596,16 @@ class TestBGPFilteringBogonRoutecollector(BGPFilteringBogonBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": "65001",
-                        "BGP.large_community": [("65000", "1101", "17")],
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65000, 1101, 17)],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -640,16 +640,16 @@ class TestBGPFilteringBogonRouteserver(BGPFilteringBogonBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": "65001",
-                        "BGP.large_community": [("65000", "3", "5"), ("65000", "1101", "3")],
-                        "BGP.local_pref": "450",
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 3)],
+                        "BGP.local_pref": 450,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -665,16 +665,16 @@ class TestBGPFilteringBogonRouteserver(BGPFilteringBogonBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": "65001",
-                        "BGP.large_community": [("65000", "3", "5"), ("65000", "1101", "3")],
-                        "BGP.local_pref": "450",
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 3)],
+                        "BGP.local_pref": 450,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65001_e1",
                     "since": helpers.bird_since_field(),

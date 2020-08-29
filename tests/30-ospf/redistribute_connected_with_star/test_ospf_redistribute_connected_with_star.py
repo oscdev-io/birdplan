@@ -88,7 +88,7 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "192.168.1.0/24": [
                 {
                     "nexthops": [{"interface": "eth10"}],
-                    "pref": "240",
+                    "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct4_ospf",
                     "since": helpers.bird_since_field(),
@@ -111,7 +111,7 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "fc01::/64": [
                 {
                     "nexthops": [{"interface": "eth10"}],
-                    "pref": "240",
+                    "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct6_ospf",
                     "since": helpers.bird_since_field(),
@@ -153,11 +153,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.2",
@@ -171,11 +171,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.2",
@@ -186,16 +186,16 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "192.168.1.0/24": [
                 {
                     "attributes": {
-                        "OSPF.metric1": "10",
-                        "OSPF.metric2": "10000",
+                        "OSPF.metric1": 10,
+                        "OSPF.metric2": 10000,
                         "OSPF.router_id": "0.0.0.1",
                         "OSPF.tag": "0x00000000",
                     },
-                    "metric1": "10",
-                    "metric2": "10000",
+                    "metric1": 10,
+                    "metric2": 10000,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
                     "ospf_type": "E2",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.1",
@@ -216,11 +216,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -234,11 +234,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -249,16 +249,16 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "fc01::/64": [
                 {
                     "attributes": {
-                        "OSPF.metric1": "10",
-                        "OSPF.metric2": "10000",
+                        "OSPF.metric1": 10,
+                        "OSPF.metric2": 10000,
                         "OSPF.router_id": "0.0.0.1",
                         "OSPF.tag": "0x00000000",
                     },
-                    "metric1": "10",
-                    "metric2": "10000",
+                    "metric1": 10,
+                    "metric2": 10000,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
                     "ospf_type": "E2",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.1",
@@ -279,11 +279,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.2",
@@ -294,7 +294,7 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "192.168.1.0/24": [
                 {
                     "nexthops": [{"interface": "eth10"}],
-                    "pref": "240",
+                    "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct4_ospf",
                     "since": helpers.bird_since_field(),
@@ -307,11 +307,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.2",
@@ -322,16 +322,16 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "192.168.1.0/24": [
                 {
                     "attributes": {
-                        "OSPF.metric1": "10",
-                        "OSPF.metric2": "10000",
+                        "OSPF.metric1": 10,
+                        "OSPF.metric2": 10000,
                         "OSPF.router_id": "0.0.0.1",
                         "OSPF.tag": "0x00000000",
                     },
-                    "metric1": "10",
-                    "metric2": "10000",
+                    "metric1": 10,
+                    "metric2": 10000,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
                     "ospf_type": "E2",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.1",
@@ -352,11 +352,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -367,7 +367,7 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "fc01::/64": [
                 {
                     "nexthops": [{"interface": "eth10"}],
-                    "pref": "240",
+                    "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct6_ospf",
                     "since": helpers.bird_since_field(),
@@ -380,11 +380,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -395,16 +395,16 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "fc01::/64": [
                 {
                     "attributes": {
-                        "OSPF.metric1": "10",
-                        "OSPF.metric2": "10000",
+                        "OSPF.metric1": 10,
+                        "OSPF.metric2": 10000,
                         "OSPF.router_id": "0.0.0.1",
                         "OSPF.tag": "0x00000000",
                     },
-                    "metric1": "10",
-                    "metric2": "10000",
+                    "metric1": 10,
+                    "metric2": 10000,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
                     "ospf_type": "E2",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.1",
@@ -425,11 +425,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.2",
@@ -443,11 +443,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.2",
@@ -458,16 +458,16 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "192.168.1.0/24": [
                 {
                     "attributes": {
-                        "OSPF.metric1": "10",
-                        "OSPF.metric2": "10000",
+                        "OSPF.metric1": 10,
+                        "OSPF.metric2": 10000,
                         "OSPF.router_id": "0.0.0.1",
                         "OSPF.tag": "0x00000000",
                     },
-                    "metric1": "10",
-                    "metric2": "10000",
+                    "metric1": 10,
+                    "metric2": 10000,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
                     "ospf_type": "E2",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.1",
@@ -488,11 +488,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -506,11 +506,11 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -521,16 +521,16 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "fc01::/64": [
                 {
                     "attributes": {
-                        "OSPF.metric1": "10",
-                        "OSPF.metric2": "10000",
+                        "OSPF.metric1": 10,
+                        "OSPF.metric2": 10000,
                         "OSPF.router_id": "0.0.0.1",
                         "OSPF.tag": "0x00000000",
                     },
-                    "metric1": "10",
-                    "metric2": "10000",
+                    "metric1": 10,
+                    "metric2": 10000,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
                     "ospf_type": "E2",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.1",
