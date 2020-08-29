@@ -88,3 +88,13 @@ class BirdPlanBaseTestCase:
 
         # Grab BGP peer BGP table name
         return birdconf.bgp.peer(peer_name).bgp_table_name(ipv)
+
+    def _exabgpcli(self, sim: Simulation, name: str, args: List[str], report_title: str = "") -> List[str]:
+        """Run the ExaBGP cli."""
+        # Grab the route table
+        output = sim.node(name).exabgpcli(args)
+        # Add report
+        sim.add_report_obj(f"EXABGP({name})[command{report_title}]", args)
+        sim.add_report_obj(f"EXABGP({name})[output{report_title}]", output)
+        # Return route table
+        return output
