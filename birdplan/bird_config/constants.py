@@ -495,6 +495,15 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("}")
         self._addline("")
 
+        self._addline("# Filter long AS paths")
+        self._addline("function bgp_filter_asn_long() {")
+        self._addline("\tif (bgp_path.len > 100) then {")
+        self._addline('\t\tprint "[bgp_filter_asn_long] Adding BGP_LC_FILTERED_AS_PATH_TOO_LONG to ", net;', debug=True)
+        self._addline("\t\tbgp_large_community.add(BGP_LC_FILTERED_AS_PATH_TOO_LONG);")
+        self._addline("\t}")
+        self._addline("}")
+        self._addline("")
+
         self._addline("# Filter short AS paths")
         self._addline("function bgp_filter_asn_short() {")
         self._addline("\tif (bgp_path.len < 1) then {")

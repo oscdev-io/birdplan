@@ -745,6 +745,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             type_lines.append(f"\t\tbgp_filter_default_v{ipv}();")
             type_lines.append(f"\t\tbgp_filter_bogons_v{ipv}();")
             type_lines.append(f"\t\tbgp_filter_size_v{ipv}();")
+            type_lines.append("\t\tbgp_filter_asn_long();")
             type_lines.append("\t\tbgp_filter_asn_short();")
             type_lines.append(f"\t\tbgp_filter_asn_invalid({self.asn});")
             type_lines.append("\t\tbgp_filter_asn_transit();")
@@ -757,6 +758,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             type_lines.append(f"\t\tbgp_filter_default_v{ipv}();")
             type_lines.append(f"\t\tbgp_filter_bogons_v{ipv}();")
             type_lines.append(f"\t\tbgp_filter_size_v{ipv}();")
+            type_lines.append("\t\tbgp_filter_asn_long();")
             type_lines.append("\t\tbgp_filter_asn_short();")
             type_lines.append(f"\t\tbgp_filter_asn_invalid({self.asn});")
             type_lines.append("\t\tbgp_filter_asn_transit();")
@@ -775,6 +777,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             type_lines.append(f"\t\tbgp_filter_default_v{ipv}();")
             type_lines.append(f"\t\tbgp_filter_bogons_v{ipv}();")
             type_lines.append(f"\t\tbgp_filter_size_v{ipv}();")
+            type_lines.append("\t\tbgp_filter_asn_long();")
             type_lines.append("\t\tbgp_filter_asn_short();")
             type_lines.append("\t\tbgp_filter_asn_transit();")
         # Route reflector client
@@ -803,6 +806,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
                 type_lines.append(f"\t\tbgp_filter_default_v{ipv}();")
                 type_lines.append(f"\t\tbgp_filter_bogons_v{ipv}();")
                 type_lines.append(f"\t\tbgp_filter_size_v{ipv}();")
+            type_lines.append("\t\tbgp_filter_asn_long();")
             type_lines.append("\t\tbgp_filter_asn_short();")
             type_lines.append(f"\t\tbgp_filter_asn_invalid({self.asn});")
         else:
