@@ -217,7 +217,7 @@ bgp:
 ```
 
 
-## filters
+## filter
 
 Filtering of routes received from a peer. Options available are below...
 
@@ -234,7 +234,7 @@ bgp:
     peer1:
       asn: 65000
       description: Some peer
-      filters:
+      filter:
         as-set: AS-EXAMPLE
         asns:
           - 65009
