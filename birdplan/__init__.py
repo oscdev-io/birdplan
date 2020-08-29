@@ -586,6 +586,6 @@ class BirdPlan:
         self._config = config
 
     @property
-    def birdconf(self) -> Optional[BirdConfig]:
+    def birdconf(self) -> BirdConfig:
         """Return the BirdConfig object."""
         return self._birdconf
