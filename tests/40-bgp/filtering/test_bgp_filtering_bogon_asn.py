@@ -56,7 +56,7 @@ class BGPFilteringBogonASNBase(BGPFilteringBase):
 
 
 class TestBGPFilteringBogonASNCustomer(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'customer' peer type."""
+    """Test filtering of bogon ASNs for the 'customer' peer type."""
 
     # BIRD configuration
     peer_type = "customer"
@@ -66,7 +66,7 @@ class TestBGPFilteringBogonASNCustomer(BGPFilteringBogonASNBase):
 """
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'customer' peer type."""
+        """Test filtering of bogon ASNs for the 'customer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -80,16 +80,16 @@ class TestBGPFilteringBogonASNCustomer(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.large_community": [("65000", "3", "2"), ("65000", "1101", "4")],
-                        "BGP.local_pref": "750",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 4)],
+                        "BGP.local_pref": 750,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -105,16 +105,16 @@ class TestBGPFilteringBogonASNCustomer(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.large_community": [("65000", "3", "2"), ("65000", "1101", "4")],
-                        "BGP.local_pref": "750",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 4)],
+                        "BGP.local_pref": 750,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -129,13 +129,13 @@ class TestBGPFilteringBogonASNCustomer(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNPeer(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'peer' peer type."""
+    """Test filtering of bogon ASNs for the 'peer' peer type."""
 
     # BIRD configuration
     peer_type = "peer"
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'peer' peer type."""
+        """Test filtering of bogon ASNs for the 'peer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -149,16 +149,16 @@ class TestBGPFilteringBogonASNPeer(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.large_community": [("65000", "3", "3"), ("65000", "1101", "4")],
-                        "BGP.local_pref": "470",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 4)],
+                        "BGP.local_pref": 470,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -174,16 +174,16 @@ class TestBGPFilteringBogonASNPeer(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.large_community": [("65000", "3", "3"), ("65000", "1101", "4")],
-                        "BGP.local_pref": "470",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 4)],
+                        "BGP.local_pref": 470,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -198,13 +198,13 @@ class TestBGPFilteringBogonASNPeer(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNTransit(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'transit' peer type."""
+    """Test filtering of bogon ASNs for the 'transit' peer type."""
 
     # BIRD configuration
     peer_type = "transit"
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'transit' peer type."""
+        """Test filtering of bogon ASNs for the 'transit' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -218,16 +218,16 @@ class TestBGPFilteringBogonASNTransit(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.large_community": [("65000", "3", "4"), ("65000", "1101", "4")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 4)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -243,16 +243,16 @@ class TestBGPFilteringBogonASNTransit(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.large_community": [("65000", "3", "4"), ("65000", "1101", "4")],
-                        "BGP.local_pref": "150",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 4)],
+                        "BGP.local_pref": 150,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -267,7 +267,7 @@ class TestBGPFilteringBogonASNTransit(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNRrclient(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'rrclient' peer type."""
+    """Test filtering of bogon ASNs for the 'rrclient' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -277,7 +277,7 @@ class TestBGPFilteringBogonASNRrclient(BGPFilteringBogonASNBase):
 """
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'rrclient' peer type."""
+        """Test filtering of bogon ASNs for the 'rrclient' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -291,15 +291,15 @@ class TestBGPFilteringBogonASNRrclient(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -315,15 +315,15 @@ class TestBGPFilteringBogonASNRrclient(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -343,15 +343,15 @@ class TestBGPFilteringBogonASNRrclient(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -367,15 +367,15 @@ class TestBGPFilteringBogonASNRrclient(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -387,7 +387,7 @@ class TestBGPFilteringBogonASNRrclient(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNRrserver(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'rrserver' peer type."""
+    """Test filtering of bogon ASNs for the 'rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -397,7 +397,7 @@ class TestBGPFilteringBogonASNRrserver(BGPFilteringBogonASNBase):
 """
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'rrserver' peer type."""
+        """Test filtering of bogon ASNs for the 'rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -411,15 +411,15 @@ class TestBGPFilteringBogonASNRrserver(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -435,15 +435,15 @@ class TestBGPFilteringBogonASNRrserver(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -463,15 +463,15 @@ class TestBGPFilteringBogonASNRrserver(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -487,15 +487,15 @@ class TestBGPFilteringBogonASNRrserver(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -507,7 +507,7 @@ class TestBGPFilteringBogonASNRrserver(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNRrserverRrserver(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'rrserver-rrserver' peer type."""
+    """Test filtering of bogon ASNs for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -517,7 +517,7 @@ class TestBGPFilteringBogonASNRrserverRrserver(BGPFilteringBogonASNBase):
 """
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'rrserver-rrserver' peer type."""
+        """Test filtering of bogon ASNs for the 'rrserver-rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -531,15 +531,15 @@ class TestBGPFilteringBogonASNRrserverRrserver(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -555,15 +555,15 @@ class TestBGPFilteringBogonASNRrserverRrserver(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -583,15 +583,15 @@ class TestBGPFilteringBogonASNRrserverRrserver(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -607,15 +607,15 @@ class TestBGPFilteringBogonASNRrserverRrserver(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unreachable",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
@@ -627,13 +627,13 @@ class TestBGPFilteringBogonASNRrserverRrserver(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNRoutecollector(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'routecollector' peer type."""
+    """Test filtering of bogon ASNs for the 'routecollector' peer type."""
 
     # BIRD configuration
     peer_type = "routecollector"
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'routecollector' peer type."""
+        """Test filtering of bogon ASNs for the 'routecollector' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -647,16 +647,16 @@ class TestBGPFilteringBogonASNRoutecollector(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.large_community": [("65000", "1101", "17")],
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.large_community": [(65000, 1101, 17)],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -672,16 +672,16 @@ class TestBGPFilteringBogonASNRoutecollector(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.large_community": [("65000", "1101", "17")],
-                        "BGP.local_pref": "100",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.large_community": [(65000, 1101, 17)],
+                        "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -696,13 +696,13 @@ class TestBGPFilteringBogonASNRoutecollector(BGPFilteringBogonASNBase):
 
 
 class TestBGPFilteringBogonASNRouteserver(BGPFilteringBogonASNBase):
-    """Test filtering of bogon ASNss for the 'routeserver' peer type."""
+    """Test filtering of bogon ASNs for the 'routeserver' peer type."""
 
     # BIRD configuration
     peer_type = "routeserver"
 
     def test_bogon_asn_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogon ASNss for the 'routeserver' peer type."""
+        """Test filtering of bogon ASNs for the 'routeserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -716,16 +716,16 @@ class TestBGPFilteringBogonASNRouteserver(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.large_community": [("65000", "3", "5"), ("65000", "1101", "4")],
-                        "BGP.local_pref": "450",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 4)],
+                        "BGP.local_pref": 450,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp4_AS65001_e1",
                     "since": helpers.bird_since_field(),
@@ -741,16 +741,16 @@ class TestBGPFilteringBogonASNRouteserver(BGPFilteringBogonASNBase):
                 {
                     "asn": "AS23456",
                     "attributes": {
-                        "BGP.as_path": "65001 23456",
-                        "BGP.large_community": [("65000", "3", "5"), ("65000", "1101", "4")],
-                        "BGP.local_pref": "450",
+                        "BGP.as_path": [65001, 23456],
+                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 4)],
+                        "BGP.local_pref": 450,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
                     "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-                    "pref": "100",
+                    "pref": 100,
                     "prefix_type": "unicast",
                     "protocol": "bgp6_AS65001_e1",
                     "since": helpers.bird_since_field(),

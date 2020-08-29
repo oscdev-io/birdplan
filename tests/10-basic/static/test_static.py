@@ -85,7 +85,7 @@ class TestStaticRouting(BirdPlanBaseTestCase):
             "10.0.0.0/24": [
                 {
                     "nexthops": [{"gateway": "192.168.0.2", "interface": "eth0"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -107,7 +107,7 @@ class TestStaticRouting(BirdPlanBaseTestCase):
             "fc10::/64": [
                 {
                     "nexthops": [{"gateway": "fc00::2", "interface": "eth0"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -129,7 +129,7 @@ class TestStaticRouting(BirdPlanBaseTestCase):
             "10.0.0.0/24": [
                 {
                     "nexthops": [{"gateway": "192.168.0.2", "interface": "eth0"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -151,7 +151,7 @@ class TestStaticRouting(BirdPlanBaseTestCase):
             "fc10::/64": [
                 {
                     "nexthops": [{"gateway": "fc00::2", "interface": "eth0"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -173,7 +173,7 @@ class TestStaticRouting(BirdPlanBaseTestCase):
             "10.0.0.0/24": [
                 {
                     "nexthops": [{"gateway": "192.168.0.2", "interface": "eth0"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -197,7 +197,7 @@ class TestStaticRouting(BirdPlanBaseTestCase):
             "fc10::/64": [
                 {
                     "nexthops": [{"gateway": "fc00::2", "interface": "eth0"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),

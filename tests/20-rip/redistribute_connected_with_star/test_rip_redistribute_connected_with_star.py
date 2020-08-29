@@ -88,7 +88,7 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "192.168.1.0/24": [
                 {
                     "nexthops": [{"interface": "eth10"}],
-                    "pref": "240",
+                    "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct4_rip",
                     "since": helpers.bird_since_field(),
@@ -111,7 +111,7 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "fc01::/64": [
                 {
                     "nexthops": [{"interface": "eth10"}],
-                    "pref": "240",
+                    "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct6_rip",
                     "since": helpers.bird_since_field(),
@@ -157,9 +157,9 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "192.168.1.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip4",
                     "since": helpers.bird_since_field(),
@@ -183,9 +183,9 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "fc01::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip6",
                     "since": helpers.bird_since_field(),
@@ -206,7 +206,7 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "192.168.1.0/24": [
                 {
                     "nexthops": [{"interface": "eth10"}],
-                    "pref": "240",
+                    "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct4_rip",
                     "since": helpers.bird_since_field(),
@@ -220,9 +220,9 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "192.168.1.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip4",
                     "since": helpers.bird_since_field(),
@@ -243,7 +243,7 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "fc01::/64": [
                 {
                     "nexthops": [{"interface": "eth10"}],
-                    "pref": "240",
+                    "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct6_rip",
                     "since": helpers.bird_since_field(),
@@ -257,9 +257,9 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "fc01::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip6",
                     "since": helpers.bird_since_field(),
@@ -283,9 +283,9 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "192.168.1.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip4",
                     "since": helpers.bird_since_field(),
@@ -309,9 +309,9 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             "fc01::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip6",
                     "since": helpers.bird_since_field(),

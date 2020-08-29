@@ -84,7 +84,7 @@ class TestRIPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "0.0.0.0/0": [
                 {
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -108,7 +108,7 @@ class TestRIPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "::/0": [
                 {
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -132,7 +132,7 @@ class TestRIPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "0.0.0.0/0": [
                 {
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -156,7 +156,7 @@ class TestRIPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "::/0": [
                 {
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -206,7 +206,7 @@ class TestRIPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "0.0.0.0/0": [
                 {
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -230,7 +230,7 @@ class TestRIPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "::/0": [
                 {
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),

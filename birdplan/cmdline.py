@@ -43,7 +43,11 @@ def get_argparser() -> argparse.ArgumentParser:
 def add_arguments(arg_group: argparse.ArgumentParser):
     """Add arguments."""
     arg_group.add_argument(
-        "--generate", nargs=1, metavar="PLAN_FILE", required=True, help="Plan file to process",
+        "--generate",
+        nargs=1,
+        metavar="PLAN_FILE",
+        required=True,
+        help="Plan file to process",
     )
 
 

@@ -4,6 +4,7 @@ debug: True
 
 bgp:
   asn: 65000
+@GLOBAL_CONFIG@
   peers:
     e1:
       asn: @PEER_ASN@

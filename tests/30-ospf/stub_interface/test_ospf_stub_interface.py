@@ -83,11 +83,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.1",
@@ -97,11 +97,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "192.168.1.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth1"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.1",
@@ -115,11 +115,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.2",
@@ -129,11 +129,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "192.168.1.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "20", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "20",
+                    "attributes": {"OSPF.metric1": 20, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 20,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.1",
@@ -154,11 +154,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -168,11 +168,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "fc01::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth1"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.1",
@@ -186,11 +186,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -200,11 +200,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "fc01::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "20", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "20",
+                    "attributes": {"OSPF.metric1": 20, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 20,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.1",
@@ -247,11 +247,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.2",
@@ -261,11 +261,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "192.168.1.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth1"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.1",
@@ -279,11 +279,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.2",
@@ -293,11 +293,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "192.168.1.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "20", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "20",
+                    "attributes": {"OSPF.metric1": 20, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 20,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.1",
@@ -318,11 +318,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -332,11 +332,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "fc01::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth1"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.1",
@@ -350,11 +350,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -364,11 +364,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "fc01::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "20", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "20",
+                    "attributes": {"OSPF.metric1": 20, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 20,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.1",
@@ -389,11 +389,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.2",
@@ -403,11 +403,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "192.168.1.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth1"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.1",
@@ -421,11 +421,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.2",
@@ -435,11 +435,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "192.168.1.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": "20", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "20",
+                    "attributes": {"OSPF.metric1": 20, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 20,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
                     "router_id": "0.0.0.1",
@@ -460,11 +460,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -474,11 +474,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "fc01::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth1"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.1",
@@ -492,11 +492,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "10", "OSPF.router_id": "0.0.0.2"},
-                    "metric1": "10",
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.2",
@@ -506,11 +506,11 @@ class TestOSPFStubInterface(BirdPlanBaseTestCase):
             ],
             "fc01::/64": [
                 {
-                    "attributes": {"OSPF.metric1": "20", "OSPF.router_id": "0.0.0.1"},
-                    "metric1": "20",
+                    "attributes": {"OSPF.metric1": 20, "OSPF.router_id": "0.0.0.1"},
+                    "metric1": 20,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
                     "ospf_type": "I",
-                    "pref": "150",
+                    "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf6",
                     "router_id": "0.0.0.1",

@@ -9,7 +9,8 @@ Tests done include:
     * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
   * Bogon ASN filtering
     * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
-
+  * AS path too long filtering
+    * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
 ```plantuml
 @startuml
 hide circle

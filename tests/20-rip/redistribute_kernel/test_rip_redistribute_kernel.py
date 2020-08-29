@@ -92,7 +92,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel4",
                     "since": helpers.bird_since_field(),
@@ -103,7 +103,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "0", "Kernel.scope": "253", "Kernel.source": "3"},
                     "nexthops": [{"interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel4",
                     "since": helpers.bird_since_field(),
@@ -117,9 +117,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "192.168.20.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip4",
                     "since": helpers.bird_since_field(),
@@ -129,9 +129,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "192.168.30.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip4",
                     "since": helpers.bird_since_field(),
@@ -153,7 +153,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel6",
                     "since": helpers.bird_since_field(),
@@ -164,7 +164,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
                     "nexthops": [{"interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel6",
                     "since": helpers.bird_since_field(),
@@ -178,9 +178,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "fc20::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip6",
                     "since": helpers.bird_since_field(),
@@ -190,9 +190,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "fc30::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip6",
                     "since": helpers.bird_since_field(),
@@ -236,7 +236,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel4",
                     "since": helpers.bird_since_field(),
@@ -247,7 +247,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "0", "Kernel.scope": "253", "Kernel.source": "3"},
                     "nexthops": [{"interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel4",
                     "since": helpers.bird_since_field(),
@@ -261,9 +261,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "192.168.20.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip4",
                     "since": helpers.bird_since_field(),
@@ -273,9 +273,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "192.168.30.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip4",
                     "since": helpers.bird_since_field(),
@@ -297,7 +297,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel6",
                     "since": helpers.bird_since_field(),
@@ -308,7 +308,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
                     "nexthops": [{"interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel6",
                     "since": helpers.bird_since_field(),
@@ -322,9 +322,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "fc20::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip6",
                     "since": helpers.bird_since_field(),
@@ -334,9 +334,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "fc30::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip6",
                     "since": helpers.bird_since_field(),
@@ -358,7 +358,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel4",
                     "since": helpers.bird_since_field(),
@@ -369,7 +369,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "0", "Kernel.scope": "253", "Kernel.source": "3"},
                     "nexthops": [{"interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel4",
                     "since": helpers.bird_since_field(),
@@ -383,9 +383,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "192.168.20.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip4",
                     "since": helpers.bird_since_field(),
@@ -395,9 +395,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "192.168.30.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "192.168.0.1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip4",
                     "since": helpers.bird_since_field(),
@@ -419,7 +419,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel6",
                     "since": helpers.bird_since_field(),
@@ -430,7 +430,7 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
                 {
                     "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
                     "nexthops": [{"interface": "eth1"}],
-                    "pref": "10",
+                    "pref": 10,
                     "prefix_type": "unicast",
                     "protocol": "kernel6",
                     "since": helpers.bird_since_field(),
@@ -444,9 +444,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "fc20::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip6",
                     "since": helpers.bird_since_field(),
@@ -456,9 +456,9 @@ class TestRIPRedistributeKernel(BirdPlanBaseTestCase):
             "fc30::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
-                    "metric1": "3",
+                    "metric1": 3,
                     "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
-                    "pref": "120",
+                    "pref": 120,
                     "prefix_type": "unicast",
                     "protocol": "rip6",
                     "since": helpers.bird_since_field(),

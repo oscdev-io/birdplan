@@ -110,7 +110,7 @@ class TestBGPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "0.0.0.0/0": [
                 {
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -134,7 +134,7 @@ class TestBGPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "::/0": [
                 {
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -193,9 +193,9 @@ class TestBGPRedistributeOnlyDefault(BirdPlanBaseTestCase):
         correct_result = {
             "0.0.0.0/0": [
                 {
-                    "attributes": {"BGP.large_community": [("65000", "3", "1")], "BGP.local_pref": "940"},
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -218,9 +218,9 @@ class TestBGPRedistributeOnlyDefault(BirdPlanBaseTestCase):
         correct_result = {
             "::/0": [
                 {
-                    "attributes": {"BGP.large_community": [("65000", "3", "1")], "BGP.local_pref": "940"},
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -244,7 +244,7 @@ class TestBGPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "0.0.0.0/0": [
                 {
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -268,7 +268,7 @@ class TestBGPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "::/0": [
                 {
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),
@@ -292,7 +292,7 @@ class TestBGPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "0.0.0.0/0": [
                 {
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static4",
                     "since": helpers.bird_since_field(),
@@ -316,7 +316,7 @@ class TestBGPRedistributeOnlyDefault(BirdPlanBaseTestCase):
             "::/0": [
                 {
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": "200",
+                    "pref": 200,
                     "prefix_type": "unicast",
                     "protocol": "static6",
                     "since": helpers.bird_since_field(),

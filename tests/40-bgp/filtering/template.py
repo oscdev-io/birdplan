@@ -36,6 +36,7 @@ class BGPFilteringBase(BirdPlanBaseTestCase):
     # BIRD configuration
     peer_asn = "65001"
     peer_type = ""
+    global_config = ""
     extra_config = ""
 
     def _setup(self, sim, tmpdir):
@@ -43,7 +44,14 @@ class BGPFilteringBase(BirdPlanBaseTestCase):
 
         # Configure our simulator
         self._test_configure(
-            sim, tmpdir, {"@PEER_ASN@": self.peer_asn, "@PEER_TYPE@": self.peer_type, "@EXTRA_CONFIG@": self.extra_config}
+            sim,
+            tmpdir,
+            {
+                "@PEER_ASN@": self.peer_asn,
+                "@PEER_TYPE@": self.peer_type,
+                "@GLOBAL_CONFIG@": self.global_config,
+                "@EXTRA_CONFIG@": self.extra_config,
+            },
         )
 
         print("Adding routers...")
