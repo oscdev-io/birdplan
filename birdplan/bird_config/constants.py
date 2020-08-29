@@ -54,59 +54,67 @@ class BirdConfigConstants(BirdConfigBase):
 
     def _configure_bogons_ipv4(self):
         """Configure IPv4 bogons."""
-        self._addline("# Ref https://tools.ietf.org/html/rfc6890")
+        self._addline("# As per http://bgpfilterguide.nlnog.net/guides/bogon_prefixes/")
         self._addline("define BOGONS_V4 = [")
-        self._addline("\t0.0.0.0/31-, # Match anything which has a shorter default route prefix")
-        self._addline("\t10.0.0.0/8+, # Private range")
+        self._addline("\t0.0.0.0/8+, # RFC 1122 'this' network")
+        self._addline("\t10.0.0.0/8+, # RFC 1918 private space")
         if self.test_mode:
-            self._addline("\t# Excluding 100.64.0.0/10+ Carrier NAT range: EXCLUDED DUE TO TESTING")
+            self._addline("\t# EXCLUDING DUE TO TESTING: 100.64.0.0/10+, # RFC 6598 Carrier grade nat space")
         else:
-            self._addline("\t100.64.0.0/10+, # Carrier NAT range")
-        self._addline("\t127.0.0.0/8+, # Local loopback")
-        self._addline("\t169.254.0.0/16+, # Link-local")
-        self._addline("\t172.16.0.0/12+, # Private range")
-        self._addline("\t192.0.0.0/24+, # Reserved for IANA")
-        self._addline("\t192.0.2.0/24+, # Reserved for TEST-NET-1")
-        self._addline("\t192.168.0.0/16+, # Private range")
-        self._addline("\t198.18.0.0/15+, # Benchmarking range")
-        self._addline("\t198.51.100.0/24+, # Reserved for TEST-NET-2")
-        self._addline("\t203.0.113.0/24+, # Reserved for TEST-NET-3")
-        self._addline("\t224.0.0.0/4+, # Multicast reserved")
-        self._addline("\t240.0.0.0/4+ # Reserved host group addresses")
+            self._addline("\t100.64.0.0/10+, # RFC 6598 Carrier grade nat space")
+        self._addline("\t127.0.0.0/8+, # RFC 1122 localhost")
+        self._addline("\t169.254.0.0/16+, # RFC 3927 link local")
+        self._addline("\t172.16.0.0/12+, # RFC 1918 private space")
+        self._addline("\t192.0.2.0/24+, # RFC 5737 TEST-NET-1")
+        self._addline("\t192.88.99.0/24+, # RFC 7526 6to4 anycast relay")
+        self._addline("\t192.168.0.0/16+, # RFC 1918 private space")
+        self._addline("\t198.18.0.0/15+, # RFC 2544 benchmarking")
+        self._addline("\t198.51.100.0/24+, # RFC 5737 TEST-NET-2")
+        self._addline("\t203.0.113.0/24+, # RFC 5737 TEST-NET-3")
+        self._addline("\t224.0.0.0/4+, # multicast")
+        self._addline("\t240.0.0.0/4+ # reserved")
         self._addline("];")
         self._addline("")
 
     def _configure_bogons_ipv6(self):
         """Configure IPv6 bogons."""
+        self._addline("# As per http://bgpfilterguide.nlnog.net/guides/bogon_prefixes/")
         self._addline("define BOGONS_V6 = [")
-        self._addline("\t::/96, # IPv4-compatible IPv6 address - deprecated by RFC4291")
-        self._addline("\t::/128, # Unspecified address")
-        self._addline("\t::1/128, # Local host loopback address")
-        self._addline("\t::ffff:0.0.0.0/96+, # IPv4-mapped addresses")
-        self._addline("\t::224.0.0.0/100+, # Compatible address (IPv4 format)")
-        self._addline("\t::127.0.0.0/104+, # Compatible address (IPv4 format)")
-        self._addline("\t::0.0.0.0/104+, # Compatible address (IPv4 format)")
-        self._addline("\t::255.0.0.0/104+, # Compatible address (IPv4 format)")
-        self._addline("\t0000::/8+, # Pool used for unspecified, loopback and embedded IPv4 addresses")
-        self._addline("\t0200::/7+, # OSI NSAP-mapped prefix set (RFC4548) - deprecated by RFC4048")
-        self._addline("\t3ffe::/16+, # Former 6bone, now decommissioned")
-        self._addline("\t2001:db8::/32+, # Reserved by IANA for special purposes and documentation")
-        self._addline("\t2002:e000::/20+, # Invalid 6to4 packets (IPv4 multicast)")
-        self._addline("\t2002:7f00::/24+, # Invalid 6to4 packets (IPv4 loopback)")
-        self._addline("\t2002:0000::/24+, # Invalid 6to4 packets (IPv4 default)")
-        self._addline("\t2002:ff00::/24+, # Invalid 6to4 packets")
-        self._addline("\t2002:0a00::/24+, # Invalid 6to4 packets (IPv4 private 10.0.0.0/8 network)")
-        self._addline("\t2002:ac10::/28+, # Invalid 6to4 packets (IPv4 private 172.16.0.0/12 network)")
-        self._addline("\t2002:c0a8::/32+, # Invalid 6to4 packets (IPv4 private 192.168.0.0/16 network)")
+        self._addline("\t::/8+, # RFC 4291 IPv4-compatible, loopback, et al")
+        self._addline("\t0100::/64+, # RFC 6666 Discard-Only")
+        self._addline("\t2001:2::/48+, # RFC 5180 BMWG")
+        self._addline("\t2001:10::/28+, # RFC 4843 ORCHID")
+        self._addline("\t2001:db8::/32+, # RFC 3849 documentation")
+        self._addline("\t2002::/16+, # RFC 7526 6to4 anycast relay")
+        self._addline("\t3ffe::/16+, # RFC 3701 old 6bone")
         if self.test_mode:
-            self._addline("\t# Excluding fc00::/7+ Unicast Unique Local Addresses (ULA) - RFC 4193: EXCLUDED DUE TO TESTING")
+            self._addline("\t# EXCLUDING DUE TO TESTING: fc00::/7+, # RFC 4193 unique local unicast")
         else:
-            self._addline("\tfc00::/7+, # Unicast Unique Local Addresses (ULA) - RFC 4193")
-        self._addline("\tfe80::/10+, # Link-local Unicast")
-        self._addline("\tfec0::/10+, # Site-local Unicast - deprecated by RFC 3879 (replaced by ULA)")
-        self._addline("\tff00::/8+ # Multicast")
+            self._addline("\tfc00::/7+, # RFC 4193 unique local unicast")
+        self._addline("\tfe80::/10+, # RFC 4291 link local unicast")
+        self._addline("\tfec0::/10+, # RFC 3879 old site local unicast")
+        self._addline("\tff00::/8+ # RFC 4291 multicast")
         self._addline("];")
         self._addline("")
+
+    def _configure_bogons_asn(self):
+        """Configure ASN bogons."""
+
+        self._addline("# Ref http://bgpfilterguide.nlnog.net/guides/bogon_asns/")
+        self._addline("define BOGON_ASNS = [")
+        self._addline("\t0, # RFC 7607")
+        self._addline("\t23456, # RFC 4893 AS_TRANS")
+        self._addline("\t64496..64511, # RFC 5398 and documentation/example ASNs")
+        if self.test_mode:
+            self._addline("\t# EXCLUDING DUE TO TESTING: 64512..65534, # RFC 6996 Private ASNs")
+        else:
+            self._addline("\t64512..65534, # RFC 6996 Private ASNs")
+        self._addline("\t65535, # RFC 7300 Last 16 bit ASN")
+        self._addline("\t65536..65551, # RFC 5398 and documentation/example ASNs")
+        self._addline("\t65552..131071, # RFC IANA reserved ASNs")
+        self._addline("\t4200000000..4294967294, # RFC 6996 Private ASNs")
+        self._addline("\t4294967295 # RFC 7300 Last 32 bit ASN")
+        self._addline("];")
 
     def _configure_functions(self):
         """Configure functions."""
@@ -596,6 +604,7 @@ class BirdConfigConstants(BirdConfigBase):
         # Check if we're adding bogons constants
         if self.need_bogons or self.need_functions:
             self._addline("")
+            self._configure_bogons_asn()
             self._configure_bogons_ipv4()
             self._configure_bogons_ipv6()
         # Check if we're adding functions
