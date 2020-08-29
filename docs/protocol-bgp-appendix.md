@@ -115,7 +115,7 @@ Internally set, not allowable from any BGP peer type.
 | (OWN_ASN, 1101, 7) | First AS not peer AS |
 | (OWN_ASN, 1101, 8) | Next hop not peer IP |
 | (OWN_ASN, 1101, 9) | Prefix filtered |
-| (OWN_ASN, 1101, 10) | Origin AS filtered |
+| (OWN_ASN, 1101, 10) | Origin AS filtered (not in filter list) |
 | (OWN_ASN, 1101, 12) | Default route not allowed |
 | (OWN_ASN, 1101, 13) | RPKI unknown |
 | (OWN_ASN, 1101, 14) | RPKI invalid |

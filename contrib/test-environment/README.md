@@ -8,6 +8,14 @@ somewhere/python-nsnetsim
 somewhere/python-birdclient
 ```
 
+Which can be created using...
+```
+cd somewhere
+git clone https://oscdev.io/software/birdplan.git
+git clone https://oscdev.io/software/nsnetsim.git python-nsnetsim
+git clone https://oscdev.io/software/birdclient.git python-birdclient
+```
+
 From there you can `cd` into `somewhere/birdplan/contrib/test-environment`.
 
 # Running all tests
