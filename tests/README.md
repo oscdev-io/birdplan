@@ -70,4 +70,6 @@
 
 ## Features
 
+[Filtering](40-bgp/features/filtering/README.md)
+
 [Quarantine](40-bgp/features/quarantine/README.md)

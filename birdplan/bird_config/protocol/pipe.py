@@ -53,55 +53,82 @@ class BirdConfigProtocolPipe(BirdConfigBase):  # pylint: disable=too-many-instan
         """Create a pipe protocol."""
 
         for ipv in self._ipversions:
-            self._addline(f"protocol pipe p_{self.table_from}{ipv}_to_{self.table_to}{ipv}{self.name_suffix} {{")
-            self._addline(f'\tdescription "Pipe from {self.t_table_from}{ipv} to {self.t_table_to}{ipv}{self.name_suffix}";')
+            self._addline(f"protocol pipe p_{self.table_from(ipv)}_to_{self.table_to(ipv)}{self.name_suffix} {{")
+            self._addline(f'  description "Pipe from {self.t_table_from(ipv)} to {self.t_table_to(ipv)}{self.name_suffix}";')
             self._addline("")
-            self._addline(f"\ttable {self.t_table_from}{ipv};")
-            self._addline(f"\tpeer table {self.t_table_to}{ipv}{self.name_suffix};")
+            self._addline(f"  table {self.t_table_from(ipv)};")
+            self._addline(f"  peer table {self.t_table_to(ipv)}{self.name_suffix};")
             self._addline("")
+
             # Check if we're doing export filtering
             if self.table_export_filtered:
-                self._addline(f"\texport filter f_{self.table_from}_{self.table_to}{ipv}_export;")
+                self._addline(f"  export filter f_{self.table_from(ipv)}_{self.table_to(ipv)}_export;")
             # If not add per normal
             else:
-                self._addline(f"\texport {self.table_export};")
+                self._addline(f"  export {self.table_export};")
+
             # Check if we're doing import filtering
             if self.table_import_filtered:
-                self._addline(f"\timport filter f_{self.table_from}_{self.table_to}{ipv}_import;")
+                self._addline(f"  import filter f_{self.table_from(ipv)}_{self.table_to(ipv)}_import;")
             # If not add per normal
             else:
-                self._addline(f"\timport {self.table_import};")
+                self._addline(f"  import {self.table_import};")
+
             self._addline("};")
             self._addline("")
+
+    def table_from(self, ipv: int) -> str:
+        """Return table_from with IP version included."""
+
+        # If the table is callable, call it and get the name
+        if callable(self._table_from):
+            table_from = self._table_from(ipv)
+        # Else just use it as a string
+        else:
+            table_from = f"{self._table_from}{ipv}"
+
+        # If it starts with t_, we need to remove t_ for now
+        if table_from.startswith("t_"):
+            table_from = table_from[2:]
+
+        return table_from
+
+    def table_to(self, ipv: int) -> str:
+        """Return table_to with IP version included."""
+
+        # If the table is callable, call it and get the name
+        if callable(self._table_to):
+            table_to = self._table_to(ipv)
+        # Else just use it as a string
+        else:
+            table_to = f"{self._table_to}{ipv}"
+
+        # If it starts with t_, we need to remove t_ for now
+        if table_to.startswith("t_"):
+            table_to = table_to[2:]
+
+        return table_to
+
+    def t_table_from(self, ipv):
+        """Return table_from, some tables don't have t_ prefixes."""
+        table_name = self.table_from(ipv)
+        # If it is not a master table, add t_
+        if not table_name.startswith("master"):
+            table_name = "t_" + table_name
+        return table_name
+
+    def t_table_to(self, ipv):
+        """Return table_to, some tables don't have t_ prefixes."""
+        table_name = self.table_to(ipv)
+        # If it is not a master table, add t_
+        if not table_name.startswith("master"):
+            table_name = "t_" + table_name
+        return table_name
 
     @property
     def name_suffix(self):
         """Return our name suffix."""
         return self._name_suffix
-
-    @property
-    def t_table_from(self):
-        """Return table_from, some tables don't have t_ prefixes."""
-        if self._table_from == "master":
-            return self._table_from
-        return f"t_{self._table_from}"
-
-    @property
-    def t_table_to(self):
-        """Return table_to, some tables don't have t_ prefixes."""
-        if self._table_to == "master":
-            return self._table_to
-        return f"t_{self._table_to}"
-
-    @property
-    def table_from(self):
-        """Return table_from, raw."""
-        return self._table_from
-
-    @property
-    def table_to(self):
-        """Return table_to, raw."""
-        return self._table_to
 
     @property
     def table_export(self):

@@ -58,38 +58,38 @@ class BirdConfigProtocolStatic(BirdConfigBase):
         self._addline("ipv6 table t_static6;")
         self._addline("")
         self._addline("protocol static static4 {")
-        self._addline('\tdescription "Static protocol for IPv4";')
+        self._addline('  description "Static protocol for IPv4";')
         self._addline("")
         # FIXME - remove at some stage # pylint:disable=fixme
         self._addline("debug all;")
         self._addline("")
-        self._addline("\tipv4 {")
-        self._addline("\t\ttable t_static4;")
-        self._addline("\t\texport none;")
-        self._addline("\t\timport all;")
-        self._addline("\t};")
+        self._addline("  ipv4 {")
+        self._addline("    table t_static4;")
+        self._addline("    export none;")
+        self._addline("    import all;")
+        self._addline("  };")
         # If we have IPv4 routes
         if routes_ipv4:
             self._addline("")
             # Output the routes
             for route in routes_ipv4:
-                self._addline(f"\troute {route};")
+                self._addline(f"  route {route};")
         self._addline("};")
         self._addline("")
         self._addline("protocol static static6 {")
-        self._addline('\tdescription "Static protocol for IPv6";')
+        self._addline('  description "Static protocol for IPv6";')
         self._addline("")
-        self._addline("\tipv6 {")
-        self._addline("\t\ttable t_static6;")
-        self._addline("\t\texport none;")
-        self._addline("\t\timport all;")
-        self._addline("\t};")
+        self._addline("  ipv6 {")
+        self._addline("    table t_static6;")
+        self._addline("    export none;")
+        self._addline("    import all;")
+        self._addline("  };")
         # If we have IPv6 routes
         if routes_ipv6:
             self._addline("")
             # Output the routes
             for route in routes_ipv6:
-                self._addline(f"\troute {route};")
+                self._addline(f"  route {route};")
         self._addline("};")
         self._addline("")
 

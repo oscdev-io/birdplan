@@ -55,16 +55,16 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         # Loop with interfaces
         for interface_name in sorted(self.interfaces.keys()):
             interface = self.interfaces[interface_name]
-            interface_lines.append(f'\tinterface "{interface_name}" {{')
+            interface_lines.append(f'  interface "{interface_name}" {{')
             # Loop with config items
             for config_item in interface:
                 # Loop with key-value pairs
                 for key, value in config_item.items():
                     if (key == "update-time") and value:
-                        interface_lines.append(f"\t\tupdate time {value};")
+                        interface_lines.append(f"    update time {value};")
                     else:
-                        interface_lines.append(f"\t\t{key} {value};")
-            interface_lines.append("\t};")
+                        interface_lines.append(f"    {key} {value};")
+            interface_lines.append("  };")
 
         return interface_lines
 
@@ -74,15 +74,15 @@ class BirdConfigProtocolRIP(BirdConfigBase):
             self._addline(f"protocol rip rip{ipv} {{")
         elif ipv == 6:
             self._addline(f"protocol rip ng rip{ipv} {{")
-        self._addline(f'\tdescription "RIP protocol for IPv{ipv}";')
+        self._addline(f'  description "RIP protocol for IPv{ipv}";')
         self._addline("")
-        self._addline(f"\tipv{ipv} {{")
-        self._addline(f"\t\ttable t_rip{ipv};")
+        self._addline(f"  ipv{ipv} {{")
+        self._addline(f"    table t_rip{ipv};")
         self._addline("")
-        self._addline(f"\t\texport filter f_rip_export{ipv};")
-        self._addline(f"\t\timport filter f_rip_import{ipv};")
+        self._addline(f"    export filter f_rip_export{ipv};")
+        self._addline(f"    import filter f_rip_import{ipv};")
         self._addline("")
-        self._addline("\t};")
+        self._addline("  };")
         self._addline("")
         self._addlines(self._interface_config())
         self._addline("};")
@@ -92,36 +92,36 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         self._addline(f"filter f_rip_export{ipv} {{")
         # Redistribute the default route
         if not self.redistribute_default:
-            self._addline("\t# Reject redistribution of the default route")
-            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self._addline("\t\treject;")
-            self._addline("\t}")
+            self._addline("  # Reject redistribution of the default route")
+            self._addline(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
+            self._addline("    reject;")
+            self._addline("  }")
         # Redistribute connected
         if self.redistribute_connected:
-            self._addline("\t# Redistribute connected")
-            self._addline("\tif (source = RTS_DEVICE) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Redistribute connected")
+            self._addline("  if (source = RTS_DEVICE) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Redistribute static routes
         if self.redistribute_static:
-            self._addline("\t# Redistribute static routes")
-            self._addline("\tif (source = RTS_STATIC) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Redistribute static routes")
+            self._addline("  if (source = RTS_STATIC) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Redistribute kernel routes
         if self.redistribute_kernel:
-            self._addline("\t# Redistribute kernel routes")
-            self._addline("\tif (source = RTS_INHERIT) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Redistribute kernel routes")
+            self._addline("  if (source = RTS_INHERIT) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Redistribute RIP routes
         if self.redistribute_rip:
-            self._addline("\t# Redistribute RIP routes")
-            self._addline("\tif (source = RTS_RIP) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Redistribute RIP routes")
+            self._addline("  if (source = RTS_RIP) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Else reject
-        self._addline("\treject;")
+        self._addline("  reject;")
         self._addline("};")
         self._addline("")
 
@@ -130,62 +130,62 @@ class BirdConfigProtocolRIP(BirdConfigBase):
         # Configure import filter
         self._addline(f"filter f_rip_import{ipv} {{")
         # Accept all inbound routes into the table
-        self._addline("\t# Import all RIP routes by default")
-        self._addline("\taccept;")
+        self._addline("  # Import all RIP routes by default")
+        self._addline("  accept;")
         self._addline("};")
         self._addline("")
 
     def _rip_to_master_export_filter(self, ipv):
         """RIP to master export filter setup."""
         # Configure export filter to master4
-        self._addline(f"filter f_rip_master{ipv}_export {{")
+        self._addline(f"filter f_rip{ipv}_master{ipv}_export {{")
         # Check if we accept the default route, if not block it
         if not self.accept_default:
-            self._addline("\t# Do not export default route to master (no accept:default)")
-            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self._addline("\t\treject;")
-            self._addline("\t}")
+            self._addline("  # Do not export default route to master (no accept:default)")
+            self._addline(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
+            self._addline("    reject;")
+            self._addline("  }")
         # Accept only RIP routes into the master table
-        self._addline("\t# Only export RIP routes to the master table")
-        self._addline("\tif (source = RTS_RIP) then {")
-        self._addline("\t\taccept;")
-        self._addline("\t}")
+        self._addline("  # Only export RIP routes to the master table")
+        self._addline("  if (source = RTS_RIP) then {")
+        self._addline("    accept;")
+        self._addline("  }")
         # Default to reject
-        self._addline("\t# Reject everything else;")
-        self._addline("\treject;")
+        self._addline("  # Reject everything else;")
+        self._addline("  reject;")
         self._addline("};")
         self._addline("")
 
     def _rip_to_master_import_filter(self, ipv):
         """RIP to master import filter setup."""
         # Configure import filter to master table
-        self._addline(f"filter f_rip_master{ipv}_import {{")
+        self._addline(f"filter f_rip{ipv}_master{ipv}_import {{")
         # Redistribute the default route
         if not self.redistribute_default:
-            self._addline("\t# Deny import of default route into RIP (no redistribute_default)")
-            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self._addline("\t\treject;")
-            self._addline("\t}")
+            self._addline("  # Deny import of default route into RIP (no redistribute_default)")
+            self._addline(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
+            self._addline("    reject;")
+            self._addline("  }")
         # Redistribute connected
         if self.redistribute_connected:
-            self._addline("\t# Import RTS_DEVICE routes into RIP (redistribute_connected)")
-            self._addline("\tif (source = RTS_DEVICE) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Import RTS_DEVICE routes into RIP (redistribute_connected)")
+            self._addline("  if (source = RTS_DEVICE) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Redistribute static routes
         if self.redistribute_static:
-            self._addline("\t# Import RTS_STATIC routes into RIP (redistribute_static)")
-            self._addline("\tif (source = RTS_STATIC) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Import RTS_STATIC routes into RIP (redistribute_static)")
+            self._addline("  if (source = RTS_STATIC) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Redistribute kernel routes
         if self.redistribute_kernel:
-            self._addline("\t# Import RTS_INHERIT routes (kernel routes) into RIP (redistribute_kernel)")
-            self._addline("\tif (source = RTS_INHERIT) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Import RTS_INHERIT routes (kernel routes) into RIP (redistribute_kernel)")
+            self._addline("  if (source = RTS_INHERIT) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Else accept
-        self._addline("\treject;")
+        self._addline("  reject;")
         self._addline("};")
         self._addline("")
 

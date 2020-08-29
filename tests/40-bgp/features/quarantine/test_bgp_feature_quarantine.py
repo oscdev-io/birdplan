@@ -34,7 +34,7 @@ class TestBGPFeatureQuarantine(BirdPlanBaseTestCase):
 
     def test_configure(self, sim, tmpdir):
         """Create our configuration files."""
-        super()._test_configure(sim, tmpdir)
+        self._test_configure(sim, tmpdir)
 
     def test_create_topology(self, sim, tmpdir):
         """Test topology creation."""
@@ -173,8 +173,11 @@ class TestBGPFeatureQuarantine(BirdPlanBaseTestCase):
     def test_bird_tables_bgp_peer4(self, sim, helpers):
         """Test BIRD bgp peer4 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "t_bgp_AS65001_r2_peer4", expect_count=2)
-        r2_table = self._bird_route_table(sim, "r2", "t_bgp_AS65000_r1_peer4", expect_count=1)
+        r1r2_bgp_table = self._bird_bgp_peer_table(sim, "r1", "r2", 4)
+        r2r1_bgp_table = self._bird_bgp_peer_table(sim, "r2", "r1", 4)
+
+        r1_table = self._bird_route_table(sim, "r1", r1r2_bgp_table, expect_count=2)
+        r2_table = self._bird_route_table(sim, "r2", r2r1_bgp_table, expect_count=1)
 
         # Check bgp peer4 BIRD table
         correct_result = {
@@ -204,15 +207,13 @@ class TestBGPFeatureQuarantine(BirdPlanBaseTestCase):
                     "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
                     "pref": "100",
                     "prefix_type": "unicast",
-                    "protocol": "bgp_AS65001_r2_peer4",
+                    "protocol": "bgp4_AS65001_r2",
                     "since": helpers.bird_since_field(),
                     "type": ["BGP", "univ"],
                 }
             ],
         }
-        assert (
-            r1_table == correct_result
-        ), "Result for R1 BIRD t_bgp_AS65001_r2_peer4 routing table does not match what it should be"
+        assert r1_table == correct_result, f"Result for R1 BIRD {r1r2_bgp_table} routing table does not match what it should be"
 
         correct_result = {
             "100.102.0.0/24": [
@@ -227,15 +228,16 @@ class TestBGPFeatureQuarantine(BirdPlanBaseTestCase):
                 }
             ]
         }
-        assert (
-            r2_table == correct_result
-        ), "Result for R2 BIRD t_bgp_AS65000_r1_peer4 routing table does not match what it should be"
+        assert r2_table == correct_result, f"Result for R2 BIRD {r2r1_bgp_table} routing table does not match what it should be"
 
     def test_bird_tables_bgp_peer6(self, sim, helpers):
         """Test BIRD bgp peer6 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "t_bgp_AS65001_r2_peer6", expect_count=2)
-        r2_table = self._bird_route_table(sim, "r2", "t_bgp_AS65000_r1_peer6", expect_count=1)
+        r1r2_bgp_table = self._bird_bgp_peer_table(sim, "r1", "r2", 6)
+        r2r1_bgp_table = self._bird_bgp_peer_table(sim, "r2", "r1", 6)
+
+        r1_table = self._bird_route_table(sim, "r1", r1r2_bgp_table, expect_count=2)
+        r2_table = self._bird_route_table(sim, "r2", r2r1_bgp_table, expect_count=1)
 
         # Check originate6 BIRD table
         correct_result = {
@@ -265,15 +267,13 @@ class TestBGPFeatureQuarantine(BirdPlanBaseTestCase):
                     "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
                     "pref": "100",
                     "prefix_type": "unicast",
-                    "protocol": "bgp_AS65001_r2_peer6",
+                    "protocol": "bgp6_AS65001_r2",
                     "since": helpers.bird_since_field(),
                     "type": ["BGP", "univ"],
                 }
             ],
         }
-        assert (
-            r1_table == correct_result
-        ), "Result for R1 BIRD t_bgp_AS65001_r2_peer6 routing table does not match what it should be"
+        assert r1_table == correct_result, f"Result for R1 BIRD {r1r2_bgp_table} routing table does not match what it should be"
 
         correct_result = {
             "fc00:102::/48": [
@@ -288,9 +288,7 @@ class TestBGPFeatureQuarantine(BirdPlanBaseTestCase):
                 }
             ]
         }
-        assert (
-            r2_table == correct_result
-        ), "Result for R2 BIRD t_bgp_AS65000_r1_peer6 routing table does not match what it should be"
+        assert r2_table == correct_result, f"Result for R2 BIRD {r2r1_bgp_table} routing table does not match what it should be"
 
     def test_bird_tables_bgp4(self, sim, helpers):
         """Test BIRD t_bgp4 table."""
