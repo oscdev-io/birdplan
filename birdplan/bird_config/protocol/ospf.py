@@ -53,41 +53,41 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
 
         area_lines = []
         for area_name in self.interfaces:
-            area_lines.append(f"\tarea {area_name} {{")
+            area_lines.append(f"  area {area_name} {{")
             # Loop with area config items
             for config_item in self.areas[area_name]:
                 # Loop with key-value pairs
                 for key, value in config_item.items():
-                    area_lines.append(f"\t\t{key} {value};")
+                    area_lines.append(f"    {key} {value};")
             # Loop with interfaces
             for interface_name in sorted(self.interfaces[area_name].keys()):
                 interface = self.interfaces[area_name][interface_name]
-                area_lines.append(f'\t\tinterface "{interface_name}" {{')
+                area_lines.append(f'    interface "{interface_name}" {{')
                 # Loop with config items
                 for config_item in interface:
                     # Loop with key-value pairs
                     for key, value in config_item.items():
                         if (key == "stub") and value:
-                            area_lines.append(f"\t\t\t{key};")
+                            area_lines.append(f"      {key};")
                         else:
-                            area_lines.append(f"\t\t\t{key} {value};")
-                area_lines.append("\t\t};")
+                            area_lines.append(f"      {key} {value};")
+                area_lines.append("    };")
             # End off area
-            area_lines.append("\t};")
+            area_lines.append("  };")
 
         return area_lines
 
     def _setup_protocol(self, ipv):
         self._addline(f"protocol ospf v3 ospf{ipv} {{")
-        self._addline(f'\tdescription "OSPF protocol for IPv{ipv}";')
+        self._addline(f'  description "OSPF protocol for IPv{ipv}";')
         self._addline("")
-        self._addline(f"\tipv{ipv} {{")
-        self._addline(f"\t\ttable t_ospf{ipv};")
+        self._addline(f"  ipv{ipv} {{")
+        self._addline(f"    table t_ospf{ipv};")
         self._addline("")
-        self._addline(f"\t\texport filter f_ospf_export{ipv};")
-        self._addline(f"\t\timport filter f_ospf_import{ipv};")
+        self._addline(f"    export filter f_ospf_export{ipv};")
+        self._addline(f"    import filter f_ospf_import{ipv};")
         self._addline("")
-        self._addline("\t};")
+        self._addline("  };")
         self._addline("")
         self._addlines(self._area_config())
         self._addline("};")
@@ -99,30 +99,30 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         self._addline(f"filter f_ospf_export{ipv} {{")
         # Redistribute the default route
         if not self.redistribute_default:
-            self._addline("\t# Reject redistribution of the default route")
-            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self._addline("\t\treject;")
-            self._addline("\t}")
+            self._addline("  # Reject redistribution of the default route")
+            self._addline(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
+            self._addline("    reject;")
+            self._addline("  }")
         # Redistribute connected
         if self.redistribute_connected:
-            self._addline("\t# Redistribute connected")
-            self._addline("\tif (source = RTS_DEVICE) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Redistribute connected")
+            self._addline("  if (source = RTS_DEVICE) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Redistribute static routes
         if self.redistribute_static:
-            self._addline("\t# Redistribute static routes")
-            self._addline("\tif (source = RTS_STATIC) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Redistribute static routes")
+            self._addline("  if (source = RTS_STATIC) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Redistribute kernel routes
         if self.redistribute_kernel:
-            self._addline("\t# Redistribute kernel routes")
-            self._addline("\tif (source = RTS_INHERIT) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Redistribute kernel routes")
+            self._addline("  if (source = RTS_INHERIT) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Else reject
-        self._addline("\treject;")
+        self._addline("  reject;")
         self._addline("};")
         self._addline("")
 
@@ -131,8 +131,8 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         # Configure import4 filter
         self._addline(f"filter f_ospf_import{ipv} {{")
         # Accept all inbound routes into the t_ospf4 table
-        self._addline("\t# Import all OSPF routes by default")
-        self._addline("\taccept;")
+        self._addline("  # Import all OSPF routes by default")
+        self._addline("  accept;")
         self._addline("};")
         self._addline("")
 
@@ -142,19 +142,19 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         self._addline(f"filter f_ospf{ipv}_master{ipv}_export {{")
         # Check if we accept the default route, if not block it
         if not self.accept_default:
-            self._addline("\t# Do not export default route to master (no accept:default)")
-            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self._addline("\t\treject;")
-            self._addline("\t}")
+            self._addline("  # Do not export default route to master (no accept:default)")
+            self._addline(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
+            self._addline("    reject;")
+            self._addline("  }")
         # Accept only OSPF routes into the master table
-        self._addline("\t# Only export OSPF routes to the master table")
+        self._addline("  # Only export OSPF routes to the master table")
         # NK: We cannot seem to filter out the device routes
-        self._addline("\tif (source ~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2]) then {")
-        self._addline("\t\taccept;")
-        self._addline("\t}")
+        self._addline("  if (source ~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2]) then {")
+        self._addline("    accept;")
+        self._addline("  }")
         # Default to reject
-        self._addline("\t# Reject everything else;")
-        self._addline("\treject;")
+        self._addline("  # Reject everything else;")
+        self._addline("  reject;")
         self._addline("};")
         self._addline("")
 
@@ -164,30 +164,30 @@ class BirdConfigProtocolOSPF(BirdConfigBase):
         self._addline(f"filter f_ospf{ipv}_master{ipv}_import {{")
         # Redistribute the default route
         if not self.redistribute_default:
-            self._addline("\t# Deny import of default route into OSPF (no redistribute_default)")
-            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self._addline("\t\treject;")
-            self._addline("\t}")
+            self._addline("  # Deny import of default route into OSPF (no redistribute_default)")
+            self._addline(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
+            self._addline("    reject;")
+            self._addline("  }")
         # Redistribute connected
         if self.redistribute_connected:
-            self._addline("\t# Import RTS_DEVICE routes into OSPF (redistribute_connected)")
-            self._addline("\tif (source = RTS_DEVICE) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Import RTS_DEVICE routes into OSPF (redistribute_connected)")
+            self._addline("  if (source = RTS_DEVICE) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Redistribute static routes
         if self.redistribute_static:
-            self._addline("\t# Import RTS_STATIC routes into OSPF (redistribute_static)")
-            self._addline("\tif (source = RTS_STATIC) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Import RTS_STATIC routes into OSPF (redistribute_static)")
+            self._addline("  if (source = RTS_STATIC) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Redistribute kernel routes
         if self.redistribute_kernel:
-            self._addline("\t# Import RTS_INHERIT routes (kernel routes) into OSPF (redistribute_kernel)")
-            self._addline("\tif (source = RTS_INHERIT) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Import RTS_INHERIT routes (kernel routes) into OSPF (redistribute_kernel)")
+            self._addline("  if (source = RTS_INHERIT) then {")
+            self._addline("    accept;")
+            self._addline("  }")
         # Else accept
-        self._addline("\treject;")
+        self._addline("  reject;")
         self._addline("};")
         self._addline("")
 

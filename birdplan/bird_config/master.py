@@ -59,11 +59,11 @@ class BirdConfigMaster(BirdConfigBase):
         """Master to kernel import filter setup."""
         # Configure import filter to master table
         self._addline(f"filter f_master{ipv}_kernel{ipv}_import {{")
-        self._addline("\t# Accept all routes from the kernel, always")
-        self._addline("\tif (source = RTS_INHERIT) then {")
-        self._addline("\t\taccept;")
-        self._addline("\t}")
-        self._addline("\treject;")
+        self._addline("  # Accept all routes from the kernel, always")
+        self._addline("  if (source = RTS_INHERIT) then {")
+        self._addline("    accept;")
+        self._addline("  }")
+        self._addline("  reject;")
         self._addline("};")
         self._addline("")
 
@@ -73,31 +73,31 @@ class BirdConfigMaster(BirdConfigBase):
         self._addline(f"filter f_master{ipv}_kernel{ipv}_export {{")
 
         if self.export_kernel_static:
-            self._addline("\t# Export static routes to kernel")
-            self._addline("\tif (source = RTS_STATIC) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Export static routes to kernel")
+            self._addline("  if (source = RTS_STATIC) then {")
+            self._addline("    accept;")
+            self._addline("  }")
 
         if self.export_kernel_rip:
-            self._addline("\t# Export RIP routes to kernel")
-            self._addline("\tif (source = RTS_RIP) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Export RIP routes to kernel")
+            self._addline("  if (source = RTS_RIP) then {")
+            self._addline("    accept;")
+            self._addline("  }")
 
         if self.export_kernel_ospf:
-            self._addline("\t# Export OSPF routes to kernel")
+            self._addline("  # Export OSPF routes to kernel")
             # NK: We cannot seem to filter out the device routes
-            self._addline("\tif (source ~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2]) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  if (source ~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2]) then {")
+            self._addline("    accept;")
+            self._addline("  }")
 
         if self.export_kernel_bgp:
-            self._addline("\t# Export BGP routes to kernel")
-            self._addline("\tif (source = RTS_BGP) then {")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Export BGP routes to kernel")
+            self._addline("  if (source = RTS_BGP) then {")
+            self._addline("    accept;")
+            self._addline("  }")
 
-        self._addline("\treject;")
+        self._addline("  reject;")
         self._addline("};")
         self._addline("")
 

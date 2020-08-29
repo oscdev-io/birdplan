@@ -28,8 +28,8 @@ class BirdConfigProtocolDevice(BirdConfigBase):
         """Configure the device protocol."""
         self._addtitle("Device Protocol")
         self._addline("protocol device {")
-        self._addline('\tdescription "Device protocol";')
+        self._addline('  description "Device protocol";')
         self._addline("")
-        self._addline("\tscan time 10;")
+        self._addline("  scan time 10;")
         self._addline("};")
         self._addline("")

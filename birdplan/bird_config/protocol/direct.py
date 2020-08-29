@@ -53,7 +53,7 @@ class BirdConfigProtocolDirect(BirdConfigBase):
             # Drop in a comma between them
             interface_str = ", ".join(interface_list)
             interface_lines.append("")
-            interface_lines.append(f"\tinterface {interface_str};")
+            interface_lines.append(f"  interface {interface_str};")
 
         self._addline(f"ipv4 table t_direct4{self.name_suffix};")
         self._addline(f"ipv6 table t_direct6{self.name_suffix};")
@@ -67,14 +67,14 @@ class BirdConfigProtocolDirect(BirdConfigBase):
         protocol_name = f"direct{ipv}{self.name_suffix}"
 
         self._addline(f"protocol direct {protocol_name} {{")
-        self._addline('\tdescription "Direct protocol for IPv%s";' % ipv)
+        self._addline('  description "Direct protocol for IPv%s";' % ipv)
         self._addline("")
-        self._addline("\tipv%s {" % ipv)
-        self._addline(f"\t\ttable t_{protocol_name};")
+        self._addline("  ipv%s {" % ipv)
+        self._addline(f"    table t_{protocol_name};")
         self._addline("")
-        self._addline("\t\texport none;")
-        self._addline("\t\timport all;")
-        self._addline("\t};")
+        self._addline("    export none;")
+        self._addline("    import all;")
+        self._addline("  };")
         self._addlines(lines)
         self._addline("};")
         self._addline("")

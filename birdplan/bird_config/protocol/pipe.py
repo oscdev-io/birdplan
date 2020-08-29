@@ -54,25 +54,25 @@ class BirdConfigProtocolPipe(BirdConfigBase):  # pylint: disable=too-many-instan
 
         for ipv in self._ipversions:
             self._addline(f"protocol pipe p_{self.table_from(ipv)}_to_{self.table_to(ipv)}{self.name_suffix} {{")
-            self._addline(f'\tdescription "Pipe from {self.t_table_from(ipv)} to {self.t_table_to(ipv)}{self.name_suffix}";')
+            self._addline(f'  description "Pipe from {self.t_table_from(ipv)} to {self.t_table_to(ipv)}{self.name_suffix}";')
             self._addline("")
-            self._addline(f"\ttable {self.t_table_from(ipv)};")
-            self._addline(f"\tpeer table {self.t_table_to(ipv)}{self.name_suffix};")
+            self._addline(f"  table {self.t_table_from(ipv)};")
+            self._addline(f"  peer table {self.t_table_to(ipv)}{self.name_suffix};")
             self._addline("")
 
             # Check if we're doing export filtering
             if self.table_export_filtered:
-                self._addline(f"\texport filter f_{self.table_from(ipv)}_{self.table_to(ipv)}_export;")
+                self._addline(f"  export filter f_{self.table_from(ipv)}_{self.table_to(ipv)}_export;")
             # If not add per normal
             else:
-                self._addline(f"\texport {self.table_export};")
+                self._addline(f"  export {self.table_export};")
 
             # Check if we're doing import filtering
             if self.table_import_filtered:
-                self._addline(f"\timport filter f_{self.table_from(ipv)}_{self.table_to(ipv)}_import;")
+                self._addline(f"  import filter f_{self.table_from(ipv)}_{self.table_to(ipv)}_import;")
             # If not add per normal
             else:
-                self._addline(f"\timport {self.table_import};")
+                self._addline(f"  import {self.table_import};")
 
             self._addline("};")
             self._addline("")

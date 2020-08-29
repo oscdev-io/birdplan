@@ -70,25 +70,25 @@ class BirdConfigProtocolBGP(BirdConfigBase):
             self._addline("")
 
             self._addline(f"filter f_bgp_originate{ipv}_import {{")
-            self._addline("\t# Origination import")
-            self._addline("\tbgp_import_own(20);")
-            self._addline("\taccept;")
+            self._addline("  # Origination import")
+            self._addline("  bgp_import_own(20);")
+            self._addline("  accept;")
             self._addline("};")
 
             self._addline(f"protocol static bgp_originate{ipv} {{")
-            self._addline(f'\tdescription "BGP route origination for IPv{ipv}";')
+            self._addline(f'  description "BGP route origination for IPv{ipv}";')
             self._addline("")
-            self._addline(f"\tipv{ipv} {{")
-            self._addline(f"\t\ttable t_bgp_originate{ipv};")
-            self._addline("\t\texport none;")
-            self._addline(f"\t\timport filter f_bgp_originate{ipv}_import;")
-            self._addline("\t};")
+            self._addline(f"  ipv{ipv} {{")
+            self._addline(f"    table t_bgp_originate{ipv};")
+            self._addline("    export none;")
+            self._addline(f"    import filter f_bgp_originate{ipv}_import;")
+            self._addline("  };")
             # If we have IPv4 routes
             if routes[ipv]:
                 self._addline("")
                 # Output the routes
                 for route in routes[ipv]:
-                    self._addline(f"\troute {route};")
+                    self._addline(f"  route {route};")
             self._addline("};")
             self._addline("")
 
@@ -106,12 +106,12 @@ class BirdConfigProtocolBGP(BirdConfigBase):
         self._addline(f"filter f_bgp{ipv}_master{ipv}_export {{")
         # Check if we accept the default route, if not block it
         if not self.accept_default:
-            self._addline("\t# Do not export default routes to the master")
-            self._addline(f"\tif (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self._addline("\t\treject;")
-            self._addline("\t}")
+            self._addline("  # Do not export default routes to the master")
+            self._addline(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
+            self._addline("    reject;")
+            self._addline("  }")
         # Else accept
-        self._addline("\taccept;")
+        self._addline("  accept;")
         self._addline("};")
         self._addline("")
 
@@ -122,29 +122,29 @@ class BirdConfigProtocolBGP(BirdConfigBase):
         self._addline("{")
         # Redistribute kernel routes
         if self.import_kernel:
-            self._addline("\t# Import kernel routes into BGP")
-            self._addline("\tif (source = RTS_INHERIT) then {")
-            self._addline("\t\tbgp_import_own(5);")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Import kernel routes into BGP")
+            self._addline("  if (source = RTS_INHERIT) then {")
+            self._addline("    bgp_import_own(5);")
+            self._addline("    accept;")
+            self._addline("  }")
         # Redistribute kernel routes
         if self.import_static:
-            self._addline("\t# Import static routes into BGP")
-            self._addline("\tif (source = RTS_STATIC) then {")
-            self._addline("\t\tbgp_import_own(10);")
-            self._addline("\t\taccept;")
-            self._addline("\t}")
+            self._addline("  # Import static routes into BGP")
+            self._addline("  if (source = RTS_STATIC) then {")
+            self._addline("    bgp_import_own(10);")
+            self._addline("    accept;")
+            self._addline("  }")
         # Else accept
-        self._addline("\treject;")
+        self._addline("  reject;")
         self._addline("};")
         self._addline("")
 
     def _bgp_to_direct_import_filter(self, ipv):
         # Configure import filter to direct
         self._addline(f"filter f_bgp{ipv}_direct{ipv}_import {{")
-        self._addline("\t# Origination import")
-        self._addline("\tbgp_import_own(10);")
-        self._addline("\taccept;")
+        self._addline("  # Origination import")
+        self._addline("  bgp_import_own(10);")
+        self._addline("  accept;")
         self._addline("};")
         self._addline("")
 
