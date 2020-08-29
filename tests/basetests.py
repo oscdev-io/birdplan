@@ -18,11 +18,10 @@
 
 """Base test classes for our tests."""
 
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods,no-self-use
 
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 import pytest
-from nsnetsim.generic_node import GenericNode
 from simulation import Simulation
 from birdplan import BirdPlan  # pylint: disable=import-error
 
@@ -40,31 +39,41 @@ class BirdPlanBaseTestCase:
     routers: List[str] = []
     sim: Simulation
 
-    def _test_configure(self, sim, tmpdir):
+    def _test_configure(self, sim: Simulation, tmpdir: str, extra_macros: Optional[Dict[str, str]] = None):
         """Create our configuration files."""
         # Generate config files
         for router in self.routers:
             bird_conffile = f"{tmpdir}/bird.conf.{router}"
             bird_logfile = f"{tmpdir}/bird.log.{router}"
+
             # Lets start configuring...
             birdplan = BirdPlan()
+
             # Set test mode
             birdplan.birdconf.test_mode = True
+
+            # Work out the macro's we'll be using
+            macros = {"@LOGFILE@": bird_logfile}
+            if extra_macros:
+                macros.update(extra_macros)
+
             # Load yaml config
-            birdplan.load(f"{self.test_dir}/{router}.yaml", {"@LOGFILE@": bird_logfile})
+            birdplan.load(f"{self.test_dir}/{router}.yaml", macros)
+
             # Generate BIRD config
             birdplan.generate(bird_conffile)
             sim.add_conffile(f"CONFFILE({router})", bird_conffile)
             sim.add_logfile(f"LOGFILE({router})", bird_logfile)
+
             # Add the birdplan configuration object to the simulation
             sim.add_config(router, birdplan)
 
-    def _bird_route_table(self, sim: Simulation, node: GenericNode, route_table_name: str, **kwargs) -> Any:
+    def _bird_route_table(self, sim: Simulation, name: str, route_table_name: str, **kwargs) -> Any:
         """Routing table retrieval helper."""
         # Grab the route table
-        route_table = sim.node(node).birdc_show_route_table(route_table_name, **kwargs)
+        route_table = sim.node(name).birdc_show_route_table(route_table_name, **kwargs)
         # Add report
-        sim.add_report_obj(f"BIRD({node})[{route_table_name}]", route_table)
+        sim.add_report_obj(f"BIRD({name})[{route_table_name}]", route_table)
         # Return route table
         return route_table
 

@@ -37,6 +37,10 @@ class Simulation:
 
     def __init__(self):
         """Initialize object."""
+        self.new()
+
+    def new(self):
+        """Prepare for simulation of a new topology."""
         self._configs = {}
         self._report = {}
         self._conffiles = {}
