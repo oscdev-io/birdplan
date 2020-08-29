@@ -171,17 +171,25 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("# Prefix sizes we will be using")
         self._addline(f"define BGP_PREFIX_MAXLEN4_IMPORT = {self.bgp_prefix_maxlen4_import};")
         self._addline(f"define BGP_PREFIX_MAXLEN4_EXPORT = {self.bgp_prefix_maxlen4_export};")
-        self._addline(f"define BGP_PREFIX_MINLEN4_IMPORT = {self.bgp_prefix_minlen4_import};")
-        self._addline(f"define BGP_PREFIX_MINLEN4_EXPORT = {self.bgp_prefix_minlen4_export};")
+        # If we're in test mode, we need to restrict the minimum length so we can trigger tests with 100.64.0.0/X<16
+        if self.test_mode:
+            self._addline("define BGP_PREFIX_MINLEN4_IMPORT = 16;")
+            self._addline("define BGP_PREFIX_MINLEN4_EXPORT = 16;")
+        else:
+            self._addline(f"define BGP_PREFIX_MINLEN4_IMPORT = {self.bgp_prefix_minlen4_import};")
+            self._addline(f"define BGP_PREFIX_MINLEN4_EXPORT = {self.bgp_prefix_minlen4_export};")
+
         # If we're in test mode, allow smaller prefixes
         if self.test_mode:
             self._addline("define BGP_PREFIX_MAXLEN6_IMPORT = 64;")
             self._addline("define BGP_PREFIX_MAXLEN6_EXPORT = 64;")
+            self._addline("define BGP_PREFIX_MINLEN6_IMPORT = 32;")
+            self._addline("define BGP_PREFIX_MINLEN6_EXPORT = 32;")
         else:
             self._addline(f"define BGP_PREFIX_MAXLEN6_IMPORT = {self.bgp_prefix_maxlen6_import};")
             self._addline(f"define BGP_PREFIX_MAXLEN6_EXPORT = {self.bgp_prefix_maxlen6_export};")
-        self._addline(f"define BGP_PREFIX_MINLEN6_IMPORT = {self.bgp_prefix_minlen6_import};")
-        self._addline(f"define BGP_PREFIX_MINLEN6_EXPORT = {self.bgp_prefix_minlen6_export};")
+            self._addline(f"define BGP_PREFIX_MINLEN6_IMPORT = {self.bgp_prefix_minlen6_import};")
+            self._addline(f"define BGP_PREFIX_MINLEN6_EXPORT = {self.bgp_prefix_minlen6_export};")
 
         self._addline("# Preferences")
         self._addline("define BGP_PREF_OWN = 950;")  # -20 = Originate, -10 = static, -5 = kernel
