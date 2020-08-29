@@ -747,6 +747,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             type_lines.append(f"\t\tbgp_filter_size_v{ipv}();")
             type_lines.append("\t\tbgp_filter_asn_long();")
             type_lines.append("\t\tbgp_filter_asn_short();")
+            type_lines.append("\t\tbgp_filter_nexthop_not_peerip();")
             type_lines.append(f"\t\tbgp_filter_asn_invalid({self.asn});")
             type_lines.append("\t\tbgp_filter_asn_transit();")
         # Peers
@@ -760,6 +761,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
             type_lines.append(f"\t\tbgp_filter_size_v{ipv}();")
             type_lines.append("\t\tbgp_filter_asn_long();")
             type_lines.append("\t\tbgp_filter_asn_short();")
+            type_lines.append("\t\tbgp_filter_nexthop_not_peerip();")
             type_lines.append(f"\t\tbgp_filter_asn_invalid({self.asn});")
             type_lines.append("\t\tbgp_filter_asn_transit();")
         # Routecollector
@@ -808,6 +810,7 @@ class BirdConfigProtocolBGPPeer(BirdConfigBase):
                 type_lines.append(f"\t\tbgp_filter_size_v{ipv}();")
             type_lines.append("\t\tbgp_filter_asn_long();")
             type_lines.append("\t\tbgp_filter_asn_short();")
+            type_lines.append("\t\tbgp_filter_nexthop_not_peerip();")
             type_lines.append(f"\t\tbgp_filter_asn_invalid({self.asn});")
         else:
             raise BirdPlanError(f"The BGP peer type '{self.type}' is not supported")

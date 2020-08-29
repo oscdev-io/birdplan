@@ -522,6 +522,17 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("}")
         self._addline("")
 
+        self._addline("# Filter peer != next_hop")
+        self._addline("function bgp_filter_nexthop_not_peerip() {")
+        self._addline("\tif (from != bgp_next_hop) then {")
+        self._addline(
+            '\t\tprint "[bgp_filter_nexthop_not_peerip] Adding BGP_LC_FILTERED_NEXT_HOP_NOT_PEER_IP to ", net;', debug=True
+        )
+        self._addline("\t\tbgp_large_community.add(BGP_LC_FILTERED_NEXT_HOP_NOT_PEER_IP);")
+        self._addline("\t}")
+        self._addline("}")
+        self._addline("")
+
         self._addline("# Filter for QUARANTINE mode")
         self._addline("function bgp_filter_quarantine() {")
         self._addline('\tprint "[bgp_filter_quarantine] Adding BGP_LC_FILTERED_QUARANTINED to ", net;', debug=True)
