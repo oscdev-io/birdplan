@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGP test for filtering invalid prefixes."""
+"""BGP filtering of bogons."""
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
@@ -32,7 +32,7 @@ class BGPFilteringBogonBase(BGPFilteringBase):
     routers = ["r1"]
 
     def _announce_bogon(self, sim) -> Tuple:
-        """Announce a bogon from ExaBGP to bird."""
+        """Announce a bogon from ExaBGP to BIRD."""
 
         self._exabgpcli(sim, "e1", ["neighbor 100.64.0.1 announce route 172.16.0.0/24 next-hop 100.64.0.2"])
         self._exabgpcli(sim, "e1", ["neighbor fc00:100::1 announce route 2001:db8::/48 next-hop fc00:100::2"])
