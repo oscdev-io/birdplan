@@ -36,7 +36,7 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
 
     def test_configure(self, sim, tmpdir):
         """Create our configuration files."""
-        super()._test_configure(sim, tmpdir)
+        self._test_configure(sim, tmpdir)
 
     def test_create_topology(self, sim, tmpdir):
         """Test topology creation."""
