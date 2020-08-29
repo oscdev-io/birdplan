@@ -362,6 +362,8 @@ class BirdPlan:
                 "prefix_maxlen6_export",
                 "prefix_minlen6_import",
                 "prefix_minlen6_export",
+                "bgp_as_path_maxlen",
+                "bgp_as_path_minlen",
                 # Origination
                 "originate",
                 "accept",
@@ -407,9 +409,11 @@ class BirdPlan:
             "prefix_maxlen6_export",
             "prefix_minlen6_import",
             "prefix_minlen6_export",
+            "bgp_as_path_maxlen",
+            "bgp_as_path_minlen",
         ]:
             if item in self.config["bgp"]:
-                setattr(self._birdconf.bgp, item, self.config["bgp"][item])
+                setattr(self._birdconf.constants, item, self.config["bgp"][item])
 
         # Set our route reflector cluster id
         if "rr_cluster_id" in self.config["bgp"]:

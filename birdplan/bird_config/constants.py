@@ -43,6 +43,8 @@ class BirdConfigConstants(BirdConfigBase):
             "prefix_maxlen6_export": 48,
             "prefix_minlen6_import": 16,
             "prefix_minlen6_export": 16,
+            "as_path_maxlen": 100,
+            "as_path_minlen": 1,
         }
 
     def _configure_defaults(self):
@@ -190,6 +192,10 @@ class BirdConfigConstants(BirdConfigBase):
             self._addline(f"define BGP_PREFIX_MAXLEN6_EXPORT = {self.bgp_prefix_maxlen6_export};")
             self._addline(f"define BGP_PREFIX_MINLEN6_IMPORT = {self.bgp_prefix_minlen6_import};")
             self._addline(f"define BGP_PREFIX_MINLEN6_EXPORT = {self.bgp_prefix_minlen6_export};")
+
+        self._addline("# BGP AS path min and max lengths")
+        self._addline(f"define BGP_AS_PATH_MAXLEN = {self.bgp_as_path_maxlen};")
+        self._addline(f"define BGP_AS_PATH_MINLEN = {self.bgp_as_path_minlen};")
 
         self._addline("# Preferences")
         self._addline("define BGP_PREF_OWN = 950;")  # -20 = Originate, -10 = static, -5 = kernel
@@ -507,7 +513,7 @@ class BirdConfigConstants(BirdConfigBase):
 
         self._addline("# Filter long AS paths")
         self._addline("function bgp_filter_asn_long() {")
-        self._addline("  if (bgp_path.len > 100) then {")
+        self._addline("  if (bgp_path.len > BGP_AS_PATH_MAXLEN) then {")
         self._addline('    print "[bgp_filter_asn_long] Adding BGP_LC_FILTERED_AS_PATH_TOO_LONG to ", net;', debug=True)
         self._addline("    bgp_large_community.add(BGP_LC_FILTERED_AS_PATH_TOO_LONG);")
         self._addline("  }")
@@ -516,7 +522,7 @@ class BirdConfigConstants(BirdConfigBase):
 
         self._addline("# Filter short AS paths")
         self._addline("function bgp_filter_asn_short() {")
-        self._addline("  if (bgp_path.len < 1) then {")
+        self._addline("  if (bgp_path.len < BGP_AS_PATH_MINLEN) then {")
         self._addline('    print "[bgp_filter_asn_short] Adding BGP_LC_FILTERED_AS_PATH_TOO_SHORT to ", net;', debug=True)
         self._addline("    bgp_large_community.add(BGP_LC_FILTERED_AS_PATH_TOO_SHORT);")
         self._addline("  }")
@@ -784,3 +790,25 @@ class BirdConfigConstants(BirdConfigBase):
     def bgp_prefix_minlen6_export(self, value):
         """SET BGP PREFIX_MINLEN6_EXPORT."""
         self._bgp["prefix_minlen6_export"] = value
+
+    # AS_PATH
+
+    @property
+    def bgp_as_path_maxlen(self):
+        """Return BGP_AS_PATH_MAXLEN constant."""
+        return self.bgp["as_path_maxlen"]
+
+    @bgp_as_path_maxlen.setter
+    def bgp_as_path_maxlen(self, value):
+        """Set BGP_AS_PATH_MAXLEN constant."""
+        self._bgp["as_path_maxlen"] = value
+
+    @property
+    def bgp_as_path_minlen(self):
+        """Return BGP_AS_PATH_MINLEN constant."""
+        return self.bgp["as_path_minlen"]
+
+    @bgp_as_path_minlen.setter
+    def bgp_as_path_minlen(self, value):
+        """Set BGP_AS_PATH_MINLEN constant."""
+        self._bgp["as_path_minlen"] = value
