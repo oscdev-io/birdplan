@@ -79,15 +79,7 @@ class BirdPlanBaseTestCase:
 
     def _bird_bgp_peer_table(self, sim: Simulation, name: str, peer_name: str, ipv: int) -> str:
         """Get a bird BGP peer table name."""
-        # Grab BirdConfig object for this router name
-        birdconf = sim.config(name).birdconf
-
-        # Work-around for mypy error saying its undefined...
-        if not birdconf:
-            raise RuntimeError("It should not happen that birdconf.bgp is not set")
-
-        # Grab BGP peer BGP table name
-        return birdconf.bgp.peer(peer_name).bgp_table_name(ipv)
+        return sim.config(name).birdconf.bgp.peer(peer_name).bgp_table_name(ipv)
 
     def _exabgpcli(self, sim: Simulation, name: str, args: List[str], report_title: str = "") -> List[str]:
         """Run the ExaBGP cli."""
