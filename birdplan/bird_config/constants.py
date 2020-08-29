@@ -485,6 +485,16 @@ class BirdConfigConstants(BirdConfigBase):
         self._addline("}")
         self._addline("")
 
+        self._addline("# Filter bogon ASNs")
+        self._addline("function bgp_filter_asn_bogons() {")
+        self._addline("  # Filter bogon ASNs")
+        self._addline("  if (bgp_path ~ BOGON_ASNS) then {")
+        self._addline('    print "[bgp_filter_asn_bogons] Adding BGP_LC_FILTERED_BOGON_ASN to ", net;', debug=True)
+        self._addline("    bgp_large_community.add(BGP_LC_FILTERED_BOGON_ASN);")
+        self._addline("  }")
+        self._addline("}")
+        self._addline("")
+
         self._addline("# Filter transit ASNs")
         self._addline("function bgp_filter_asn_transit() {")
         self._addline("  # Filter transit ASNs")
