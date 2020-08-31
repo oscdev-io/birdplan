@@ -18,41 +18,37 @@
 
 """BIRD kernel protocol configuration."""
 
-from ..base import BirdConfigBase
+from .base import SectionProtocolBase
 
 
-class BirdConfigProtocolKernel(BirdConfigBase):
+class ProtocolKernel(SectionProtocolBase):
     """BIRD kernel protocol configuration."""
+
+    _section = "Kernel Protocol"
 
     def configure(self):
         """Configure the kernel protocol."""
-        self._addtitle("Kernel Protocol")
-
-        # Setup kernel tables
-        self._addline("ipv4 table t_kernel4;")
-        self._addline("ipv6 table t_kernel6;")
+        super().configure()
 
         # Configure the kernel protocol
         self._configure_protocol_kernel(4)
         self._configure_protocol_kernel(6)
 
-        self._addline("")
-
     def _configure_protocol_kernel(self, ipv: int):
         """Protocol configuration."""
-        self._addline("")
-        self._addline(f"protocol kernel kernel{ipv} {{")
-        self._addline(f'  description "Kernel protocol for IPv{ipv}";')
-        self._addline("")
-        self._addline("  metric 600; # Set the BIRD metric to be used when creating kernel routes to fall in line with our OS")
-        self._addline("  learn; # Learn routes from the kernel")
-        self._addline("  persist; # Dont remove routes on BIRD shutdown")
-        self._addline("  merge paths on; # Merge similar BGP paths into a multi-hop")
-        self._addline("")
-        self._addline(f"  ipv{ipv} {{")
-        self._addline(f"    table t_kernel{ipv};")
-        self._addline("")
-        self._addline("    export all;")
-        self._addline("    import all;")
-        self._addline("  };")
-        self._addline("};")
+        self.conf.add(f"protocol kernel kernel{ipv} {{")
+        self.conf.add(f'  description "Kernel protocol for IPv{ipv}";')
+        self.conf.add("")
+        self.conf.add("  metric 600; # Set the BIRD metric to be used when creating kernel routes to fall in line with our OS")
+        self.conf.add("  learn; # Learn routes from the kernel")
+        self.conf.add("  persist; # Dont remove routes on BIRD shutdown")
+        self.conf.add("  merge paths on; # Merge similar BGP paths into a multi-hop")
+        self.conf.add("")
+        self.conf.add(f"  ipv{ipv} {{")
+        self.conf.add(f"    table t_kernel{ipv};")
+        self.conf.add("")
+        self.conf.add("    export all;")
+        self.conf.add("    import all;")
+        self.conf.add("  };")
+        self.conf.add("};")
+        self.conf.add("")

@@ -16,21 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BIRD main configuration."""
+"""BIRD BGP protocol typing."""
 
-from .base import BirdConfigBase
+from typing import Any, Dict
 
-
-class BirdConfigMain(BirdConfigBase):
-    """BIRD main configuration."""
-
-    def configure(self):
-        """Configure main part of the config."""
-        self._addtitle("Main")
-
-        self._addline("# Set time format for compatibility with 3rd-party programs")
-        self._addline("timeformat base iso long;")
-        self._addline("timeformat log iso long;")
-        self._addline("timeformat protocol iso long;")
-        self._addline("timeformat route iso long;")
-        self._addline("")
+BGPPeerConfig = Dict[str, Any]

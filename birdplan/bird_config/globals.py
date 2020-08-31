@@ -16,24 +16,36 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BIRD logging configuration."""
+"""BirdConfig configuration globals."""
 
-from .base import BirdConfigBase
+from typing import Optional
 
 
-class BirdConfigLogging(BirdConfigBase):
-    """BIRD logging configuration."""
+class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
+    """
+    BirdConfig configuration globals.
 
-    def configure(self):
-        """Configure logging."""
-        self._addtitle("Logging")
-        # Grab logfile if we have one
-        log_file = self.parent.log_file
-        if log_file:
-            self._addline(f'log "{log_file}" all;')
-        else:
-            self._addline("log stderr all;")
-        # Check if we're in debug mode
-        if self.parent.debug:
-            self._addline("debug protocols { states, routes, filters, interfaces, events };")
-        self._addline("")
+    Attributes
+    ----------
+    log_File : Optional[str]
+        BIRD log file
+    debug : bool
+        Enable additional output from BIRD while running
+    test_mode : bool
+        Enable test mode, this modifies some internals to allow for better and more complete testing
+
+    """
+
+    log_file: Optional[str]
+    debug: bool
+    test_mode: bool
+
+    def __init__(self):
+        """Initialize object."""
+
+        # Log file
+        self.log_file = None
+
+        # Debugging
+        self.debug = False
+        self.test_mode = False

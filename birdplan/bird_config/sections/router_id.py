@@ -16,20 +16,36 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BIRD device protocol configuration."""
+"""BIRD router ID configuration section."""
 
-from ..base import BirdConfigBase
+from .base import SectionBase
 
 
-class BirdConfigProtocolDevice(BirdConfigBase):
-    """BIRD device protocol configuration."""
+class SectionRouterID(SectionBase):
+    """BIRD router ID configuration section."""
+
+    _section = "Router ID"
+
+    _router_id: str
+
+    def __init__(self, **kwargs):
+        """Initialize object."""
+        super().__init__(**kwargs)
+        self._router_id = "0.0.0.0"
 
     def configure(self):
-        """Configure the device protocol."""
-        self._addtitle("Device Protocol")
-        self._addline("protocol device {")
-        self._addline('  description "Device protocol";')
-        self._addline("")
-        self._addline("  scan time 10;")
-        self._addline("};")
-        self._addline("")
+        """Configure routing id."""
+        super().configure()
+
+        self.conf.add(f"router id {self.router_id};")
+        self.conf.add("")
+
+    @property
+    def router_id(self) -> str:
+        """Return our router_id."""
+        return self._router_id
+
+    @router_id.setter
+    def router_id(self, router_id: str):
+        """Set our router_id."""
+        self._router_id = router_id

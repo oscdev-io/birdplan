@@ -104,7 +104,7 @@ class BirdPlan:
         self._config_bgp()
 
         # Generate the configuration
-        config_lines = self._birdconf.get_config()
+        config_lines = self.birdconf.get_config()
 
         # If we have a filename, write out
         if output_filename:
@@ -122,22 +122,22 @@ class BirdPlan:
         # Check that a router ID was specified
         if "router_id" not in self.config:
             raise BirdPlanError("The 'router_id' attribute must be specified")
-        self._birdconf.router_id = self.config["router_id"]
+        self.birdconf.router_id = self.config["router_id"]
 
         # Check if we have a log_file specified to use
         if "log_file" in self.config:
-            self._birdconf.log_file = self.config["log_file"]
+            self.birdconf.log_file = self.config["log_file"]
 
         # Check if we're in debugging mode or not
         if "debug" in self.config:
-            self._birdconf.debug = self.config["debug"]
+            self.birdconf.debug = self.config["debug"]
 
     def _config_static(self):
         """Configure static section."""
         # Static routes
         if "static" in self.config:
             for route in self.config["static"]:
-                self._birdconf.static.add_route(route)
+                self.birdconf.protocols.static.add_route(route)
 
     def _config_export_kernel(self):
         """Configure export_kernel section."""
@@ -148,16 +148,16 @@ class BirdPlan:
             for export, export_config in self.config["export_kernel"].items():
                 # Static routes
                 if export == "static":
-                    self._birdconf.master.export_kernel_static = export_config
+                    self.birdconf.tables.master.export_kernel_static = export_config
                 # RIP routes
                 elif export == "rip":
-                    self._birdconf.master.export_kernel_rip = export_config
+                    self.birdconf.tables.master.export_kernel_rip = export_config
                 # OSPF routes
                 elif export == "ospf":
-                    self._birdconf.master.export_kernel_ospf = export_config
+                    self.birdconf.tables.master.export_kernel_ospf = export_config
                 # BGP routes
                 elif export == "bgp":
-                    self._birdconf.master.export_kernel_bgp = export_config
+                    self.birdconf.tables.master.export_kernel_bgp = export_config
                 # If we don't understand this 'accept' entry, throw an error
                 else:
                     raise BirdPlanError(f"Configuration item '{export}' not understood in 'export_kernel'")
@@ -189,7 +189,7 @@ class BirdPlan:
         for accept, accept_config in self.config["rip"]["accept"].items():
             # Allow accept of the default route
             if accept == "default":
-                self._birdconf.rip.accept_default = accept_config
+                self.birdconf.protocols.rip.accept_default = accept_config
             # If we don't understand this 'accept' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in RIP accept")
@@ -205,19 +205,19 @@ class BirdPlan:
         for redistribute, redistribute_config in self.config["rip"]["redistribute"].items():
             # Add connected route redistribution
             if redistribute == "connected":
-                self._birdconf.rip.redistribute_connected = redistribute_config
+                self.birdconf.protocols.rip.redistribute_connected = redistribute_config
             # Add static route redistribution
             elif redistribute == "static":
-                self._birdconf.rip.redistribute_static = redistribute_config
+                self.birdconf.protocols.rip.redistribute_static = redistribute_config
             # Add kernel route redistribution
             elif redistribute == "kernel":
-                self._birdconf.rip.redistribute_kernel = redistribute_config
+                self.birdconf.protocols.rip.redistribute_kernel = redistribute_config
             # Allow redistribution of the default route
             elif redistribute == "default":
-                self._birdconf.rip.redistribute_default = redistribute_config
+                self.birdconf.protocols.rip.redistribute_default = redistribute_config
             # Allow redistribution of RIP routes
             elif redistribute == "rip":
-                self._birdconf.rip.redistribute_rip = redistribute_config
+                self.birdconf.protocols.rip.redistribute_rip = redistribute_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in rip:redistribute")
@@ -241,7 +241,7 @@ class BirdPlan:
                 else:
                     raise BirdPlanError(f"Configuration item '{config_item}' not understood in RIP area")
             # Add interface
-            self._birdconf.rip.add_interface(interface_name, interface_config)
+            self.birdconf.protocols.rip.add_interface(interface_name, interface_config)
 
     def _config_ospf(self):
         """Configure OSPF section."""
@@ -270,7 +270,7 @@ class BirdPlan:
         for accept, accept_config in self.config["ospf"]["accept"].items():
             # Allow accept of the default route
             if accept == "default":
-                self._birdconf.ospf.accept_default = accept_config
+                self.birdconf.protocols.ospf.accept_default = accept_config
             # If we don't understand this 'accept' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in ospf:accept")
@@ -286,16 +286,16 @@ class BirdPlan:
         for redistribute, redistribute_config in self.config["ospf"]["redistribute"].items():
             # Add static route redistribution
             if redistribute == "static":
-                self._birdconf.ospf.redistribute_static = redistribute_config
+                self.birdconf.protocols.ospf.redistribute_static = redistribute_config
             # Add connected route redistribution
             elif redistribute == "connected":
-                self._birdconf.ospf.redistribute_connected = redistribute_config
+                self.birdconf.protocols.ospf.redistribute_connected = redistribute_config
             # Add kernel route redistribution
             elif redistribute == "kernel":
-                self._birdconf.ospf.redistribute_kernel = redistribute_config
+                self.birdconf.protocols.ospf.redistribute_kernel = redistribute_config
             # Allow redistribution of the default route
             elif redistribute == "default":
-                self._birdconf.ospf.redistribute_default = redistribute_config
+                self.birdconf.protocols.ospf.redistribute_default = redistribute_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")
@@ -331,11 +331,11 @@ class BirdPlan:
                     else:
                         raise BirdPlanError("Configuration item '{config_item}' not understood in OSPF area")
             # Add area
-            self._birdconf.ospf.add_area(area_name, area_config)
+            self.birdconf.protocols.ospf.add_area(area_name, area_config)
             # Loop with interfaces in area
             for interface_name, interface_config in area["interfaces"].items():
                 # Add interface to area
-                self._birdconf.ospf.add_interface(area_name, interface_name, interface_config)
+                self.birdconf.protocols.ospf.add_interface(area_name, interface_name, interface_config)
 
     def _config_bgp(self):
         """Configure bgp section."""
@@ -347,7 +347,7 @@ class BirdPlan:
         # Set our ASN
         if "asn" not in self.config["bgp"]:
             raise BirdPlanError('BGP configuration must have an "asn" item defined')
-        self._birdconf.bgp.set_asn(self.config["bgp"]["asn"])
+        self.birdconf.protocols.bgp.asn = self.config["bgp"]["asn"]
 
         # Check configuration options are supported
         for config_item in self.config["bgp"]:
@@ -362,8 +362,8 @@ class BirdPlan:
                 "prefix_maxlen6_export",
                 "prefix_minlen6_import",
                 "prefix_minlen6_export",
-                "bgp_as_path_maxlen",
-                "bgp_as_path_minlen",
+                "aspath_maxlen",
+                "aspath_minlen",
                 # Origination
                 "originate",
                 "accept",
@@ -391,7 +391,7 @@ class BirdPlan:
         for accept, accept_config in self.config["bgp"]["accept"].items():
             # Allow accept of the default route
             if accept == "default":
-                self._birdconf.bgp.accept_default = accept_config
+                self.birdconf.protocols.bgp.route_policy_accept.default = accept_config
             # If we don't understand this 'accept' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in bgp:accept")
@@ -409,15 +409,15 @@ class BirdPlan:
             "prefix_maxlen6_export",
             "prefix_minlen6_import",
             "prefix_minlen6_export",
-            "bgp_as_path_maxlen",
-            "bgp_as_path_minlen",
+            "aspath_maxlen",
+            "aspath_minlen",
         ]:
             if item in self.config["bgp"]:
-                setattr(self._birdconf.constants, item, self.config["bgp"][item])
+                setattr(self.birdconf.protocols.bgp, item, self.config["bgp"][item])
 
         # Set our route reflector cluster id
         if "rr_cluster_id" in self.config["bgp"]:
-            self._birdconf.bgp.rr_cluster_id = self.config["bgp"]["rr_cluster_id"]
+            self.birdconf.protocols.bgp.rr_cluster_id = self.config["bgp"]["rr_cluster_id"]
 
     def _config_bgp_originate(self):
         """Configure bgp:originate section."""
@@ -428,7 +428,7 @@ class BirdPlan:
 
         # Add origination routes
         for route in self.config["bgp"]["originate"]:
-            self._birdconf.bgp.add_originate_route(route)
+            self.birdconf.protocols.bgp.add_originated_route(route)
 
     def _config_bgp_import(self):
         """Configure bgp:import section."""
@@ -441,13 +441,13 @@ class BirdPlan:
         for import_type, import_config in self.config["bgp"]["import"].items():
             # Import connected routes into the main BGP table
             if import_type == "connected":
-                self._birdconf.bgp.import_connected = import_config
+                self.birdconf.protocols.bgp.route_policy_import.connected = import_config
             # Import kernel routes into the main BGP table
             elif import_type == "kernel":
-                self._birdconf.bgp.import_kernel = import_config
+                self.birdconf.protocols.bgp.route_policy_import.kernel = import_config
             # Import static routes into the main BGP table
             elif import_type == "static":
-                self._birdconf.bgp.import_static = import_config
+                self.birdconf.protocols.bgp.route_policy_import.static = import_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{import_type}' not understood in bgp:import")
@@ -572,7 +572,7 @@ class BirdPlan:
             raise BirdPlanError(f"Configuration item 'bgp:peers:{peer_name}' must have a 'source_address6'")
 
         # Make sure we have items we need
-        self._birdconf.bgp.add_peer(peer_name, peer)  # type: ignore
+        self.birdconf.protocols.bgp.add_peer(peer_name, peer)  # type: ignore
 
     @property
     def plan_file(self) -> Optional[str]:
