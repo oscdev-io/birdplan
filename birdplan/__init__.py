@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Birdplan package."""
+"""BirdPlan package."""
 
 from typing import Any, Dict, Optional
 import yaml
@@ -189,7 +189,7 @@ class BirdPlan:
         for accept, accept_config in self.config["rip"]["accept"].items():
             # Allow accept of the default route
             if accept == "default":
-                self.birdconf.protocols.rip.accept_default = accept_config
+                self.birdconf.protocols.rip.route_policy_accept.default = accept_config
             # If we don't understand this 'accept' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in RIP accept")
@@ -205,19 +205,19 @@ class BirdPlan:
         for redistribute, redistribute_config in self.config["rip"]["redistribute"].items():
             # Add connected route redistribution
             if redistribute == "connected":
-                self.birdconf.protocols.rip.redistribute_connected = redistribute_config
+                self.birdconf.protocols.rip.route_policy_redistribute.connected = redistribute_config
             # Add static route redistribution
             elif redistribute == "static":
-                self.birdconf.protocols.rip.redistribute_static = redistribute_config
+                self.birdconf.protocols.rip.route_policy_redistribute.static = redistribute_config
             # Add kernel route redistribution
             elif redistribute == "kernel":
-                self.birdconf.protocols.rip.redistribute_kernel = redistribute_config
+                self.birdconf.protocols.rip.route_policy_redistribute.kernel = redistribute_config
             # Allow redistribution of the default route
             elif redistribute == "default":
-                self.birdconf.protocols.rip.redistribute_default = redistribute_config
+                self.birdconf.protocols.rip.route_policy_redistribute.default = redistribute_config
             # Allow redistribution of RIP routes
             elif redistribute == "rip":
-                self.birdconf.protocols.rip.redistribute_rip = redistribute_config
+                self.birdconf.protocols.rip.route_policy_redistribute.rip = redistribute_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in rip:redistribute")
@@ -270,7 +270,7 @@ class BirdPlan:
         for accept, accept_config in self.config["ospf"]["accept"].items():
             # Allow accept of the default route
             if accept == "default":
-                self.birdconf.protocols.ospf.accept_default = accept_config
+                self.birdconf.protocols.ospf.route_policy_accept.default = accept_config
             # If we don't understand this 'accept' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in ospf:accept")
@@ -286,16 +286,16 @@ class BirdPlan:
         for redistribute, redistribute_config in self.config["ospf"]["redistribute"].items():
             # Add static route redistribution
             if redistribute == "static":
-                self.birdconf.protocols.ospf.redistribute_static = redistribute_config
+                self.birdconf.protocols.ospf.route_policy_redistribute.static = redistribute_config
             # Add connected route redistribution
             elif redistribute == "connected":
-                self.birdconf.protocols.ospf.redistribute_connected = redistribute_config
+                self.birdconf.protocols.ospf.route_policy_redistribute.connected = redistribute_config
             # Add kernel route redistribution
             elif redistribute == "kernel":
-                self.birdconf.protocols.ospf.redistribute_kernel = redistribute_config
+                self.birdconf.protocols.ospf.route_policy_redistribute.kernel = redistribute_config
             # Allow redistribution of the default route
             elif redistribute == "default":
-                self.birdconf.protocols.ospf.redistribute_default = redistribute_config
+                self.birdconf.protocols.ospf.route_policy_redistribute.default = redistribute_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")

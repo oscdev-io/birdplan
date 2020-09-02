@@ -19,7 +19,7 @@
 """BIRD BGP protocol configuration."""
 
 from typing import Dict, Optional
-from .bgp_attributes import BGPAttributes, RoutePolicyAccept, RoutePolicyImport
+from .bgp_attributes import BGPAttributes, BGPRoutePolicyAccept, BGPRoutePolicyImport
 from .peer import ProtocolBGPPeer
 from .typing import BGPPeerConfig
 from ..pipe import ProtocolPipe
@@ -822,12 +822,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.bgp_attributes.rr_cluster_id = rr_cluster_id
 
     @property
-    def route_policy_accept(self) -> RoutePolicyAccept:
+    def route_policy_accept(self) -> BGPRoutePolicyAccept:
         """Return our route policy for accepting of routes from peers into the main BGP table."""
         return self.bgp_attributes.route_policy_accept
 
     @property
-    def route_policy_import(self) -> RoutePolicyImport:
+    def route_policy_import(self) -> BGPRoutePolicyImport:
         """Return our route policy for importing of routes from internal tables."""
         return self.bgp_attributes.route_policy_import
 
