@@ -25,7 +25,7 @@ import os
 from template import BGPFilteringBase
 
 
-class BGPFilteringASPathTooLongBase(BGPFilteringBase):
+class BGPFilteringASPathTooShortBase(BGPFilteringBase):
     """Base class for BGP filtering of AS paths that are too short."""
 
     test_dir = os.path.dirname(__file__)
@@ -62,7 +62,7 @@ class BGPFilteringASPathTooLongBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringASPathTooLongCustomer(BGPFilteringASPathTooLongBase):
+class TestBGPFilteringASPathTooShortCustomer(BGPFilteringASPathTooShortBase):
     """Test filtering of AS paths that are too short for the 'customer' peer type."""
 
     # BIRD configuration
@@ -135,7 +135,7 @@ class TestBGPFilteringASPathTooLongCustomer(BGPFilteringASPathTooLongBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringASPathTooLongPeer(BGPFilteringASPathTooLongBase):
+class TestBGPFilteringASPathTooShortPeer(BGPFilteringASPathTooShortBase):
     """Test filtering of AS paths that are too short for the 'peer' peer type."""
 
     # BIRD configuration
@@ -204,7 +204,7 @@ class TestBGPFilteringASPathTooLongPeer(BGPFilteringASPathTooLongBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringASPathTooLongTransit(BGPFilteringASPathTooLongBase):
+class TestBGPFilteringASPathTooShortTransit(BGPFilteringASPathTooShortBase):
     """Test filtering of AS paths that are too short for the 'transit' peer type."""
 
     # BIRD configuration
@@ -273,7 +273,7 @@ class TestBGPFilteringASPathTooLongTransit(BGPFilteringASPathTooLongBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringASPathTooLongRrclient(BGPFilteringASPathTooLongBase):
+class TestBGPFilteringASPathTooShortRrclient(BGPFilteringASPathTooShortBase):
     """Test filtering of AS paths that are too short for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -393,7 +393,7 @@ class TestBGPFilteringASPathTooLongRrclient(BGPFilteringASPathTooLongBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringASPathTooLongRrserver(BGPFilteringASPathTooLongBase):
+class TestBGPFilteringASPathTooShortRrserver(BGPFilteringASPathTooShortBase):
     """Test filtering of AS paths that are too short for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -513,7 +513,7 @@ class TestBGPFilteringASPathTooLongRrserver(BGPFilteringASPathTooLongBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringASPathTooLongRrserverRrserver(BGPFilteringASPathTooLongBase):
+class TestBGPFilteringASPathTooShortRrserverRrserver(BGPFilteringASPathTooShortBase):
     """Test filtering of AS paths that are too short for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -633,7 +633,7 @@ class TestBGPFilteringASPathTooLongRrserverRrserver(BGPFilteringASPathTooLongBas
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringASPathTooLongRoutecollector(BGPFilteringASPathTooLongBase):
+class TestBGPFilteringASPathTooShortRoutecollector(BGPFilteringASPathTooShortBase):
     """Test filtering of AS paths that are too short for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -702,7 +702,7 @@ class TestBGPFilteringASPathTooLongRoutecollector(BGPFilteringASPathTooLongBase)
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringASPathTooLongRouteserver(BGPFilteringASPathTooLongBase):
+class TestBGPFilteringASPathTooShortRouteserver(BGPFilteringASPathTooShortBase):
     """Test filtering of AS paths that are too short for the 'routeserver' peer type."""
 
     # BIRD configuration
