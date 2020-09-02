@@ -25,8 +25,8 @@ from ..pipe import ProtocolPipe
 from ..base import SectionProtocolBase
 from .....exceptions import BirdPlanError
 
-RIPInterface = Union[bool, Dict[str, str]]
-RIPInterfaces = Dict[str, RIPInterface]
+RIPInterfaceConfig = Union[bool, Dict[str, str]]
+RIPInterfaces = Dict[str, RIPInterfaceConfig]
 
 
 class ProtocolRIP(SectionProtocolBase):
@@ -116,20 +116,22 @@ class ProtocolRIP(SectionProtocolBase):
             )
             self.conf.add(rip_direct_pipe)
 
-    def add_interface(self, interface_name, interface_config):
+    def add_interface(self, interface_name: str, interface_config: RIPInterfaceConfig):
         """Add interface to RIP."""
         # Make sure the interface exists
         if interface_name not in self.interfaces:
-            self._rip_interfaces[interface_name] = []
+            self._rip_interfaces[interface_name] = {}
         # Grab the config so its easier to work with below
         config = self.interfaces[interface_name]
+        # If the interface is just a boolean, we can return...
+        if isinstance(interface_config, bool):
+            return
         # Work through supported configuration
-        for item in interface_config:
-            for key, value in item.items():
-                if key in ("metric", "update-time"):
-                    config.append({key: value})
-                else:
-                    raise BirdPlanError(f"The RIP config for interface '{interface_name}' item '{key}' hasnt been added")
+        for key, value in interface_config.items():
+            if key in ("metric", "update-time"):
+                config[key] = value
+            else:
+                raise BirdPlanError(f"The RIP config for interface '{interface_name}' item '{key}' hasnt been added")
 
     def _interface_config(self):
         """Generate interface configuration."""
@@ -140,13 +142,11 @@ class ProtocolRIP(SectionProtocolBase):
             interface = self.interfaces[interface_name]
             interface_lines.append(f'  interface "{interface_name}" {{')
             # Loop with config items
-            for config_item in interface:
-                # Loop with key-value pairs
-                for key, value in config_item.items():
-                    if (key == "update-time") and value:
-                        interface_lines.append(f"    update time {value};")
-                    else:
-                        interface_lines.append(f"    {key} {value};")
+            for key, value in interface.items():
+                if (key == "update-time") and value:
+                    interface_lines.append(f"    update time {value};")
+                else:
+                    interface_lines.append(f"    {key} {value};")
             interface_lines.append("  };")
 
         return interface_lines

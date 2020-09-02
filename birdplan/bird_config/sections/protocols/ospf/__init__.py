@@ -123,7 +123,7 @@ class ProtocolOSPF(SectionProtocolBase):
             )
             self.conf.add(ospf_direct_pipe)
 
-    def add_area(self, area_name, area_config: OSPFAreaConfig):
+    def add_area(self, area_name: str, area_config: OSPFAreaConfig):
         """Add area to OSPF."""
         # Make sure the area exists
         if area_name not in self.areas:

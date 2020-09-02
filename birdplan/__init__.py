@@ -232,11 +232,11 @@ class BirdPlan:
         # Loop with each interface and its config
         for interface_name, interface in self.config["rip"]["interfaces"].items():
             # See if we have interface config
-            interface_config = []
+            interface_config = {}
             # Loop with each config item in the peer
             for config_item, config_value in interface.items():
                 if config_item in ("update-time", "metric"):
-                    interface_config.append({config_item: config_value})
+                    interface_config[config_item] = config_value
                 # If we don't understand this 'redistribute' entry, throw an error
                 else:
                     raise BirdPlanError(f"Configuration item '{config_item}' not understood in RIP area")
