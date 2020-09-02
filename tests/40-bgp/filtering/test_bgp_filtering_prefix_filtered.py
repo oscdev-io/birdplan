@@ -52,7 +52,7 @@ class BGPFilteringPrefixFilteredBase(BGPFilteringBase):
 
 
 class TestBGPFilteringPrefixFilteredCustomer(BGPFilteringPrefixFilteredBase):
-    """Test filtering of filtered prefixess for the 'customer' peer type."""
+    """Test filtering of filtered prefixes for the 'customer' peer type."""
 
     # BIRD configuration
     peer_type = "customer"
@@ -62,7 +62,7 @@ class TestBGPFilteringPrefixFilteredCustomer(BGPFilteringPrefixFilteredBase):
 """
 
     def test_filtered_prefix_announce(self, sim, tmpdir, helpers):
-        """Test filtering of filtered prefixess for the 'customer' peer type."""
+        """Test filtering of filtered prefixes for the 'customer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -125,7 +125,7 @@ class TestBGPFilteringPrefixFilteredCustomer(BGPFilteringPrefixFilteredBase):
 
 
 class TestBGPFilteringPrefixFilteredPeer(BGPFilteringPrefixFilteredBase):
-    """Test filtering of filtered prefixess for the 'peer' peer type."""
+    """Test filtering of filtered prefixes for the 'peer' peer type."""
 
     # BIRD configuration
     peer_type = "peer"
@@ -135,7 +135,7 @@ class TestBGPFilteringPrefixFilteredPeer(BGPFilteringPrefixFilteredBase):
 """
 
     def test_filtered_prefix_announce(self, sim, tmpdir, helpers):
-        """Test filtering of filtered prefixess for the 'peer' peer type."""
+        """Test filtering of filtered prefixes for the 'peer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -198,7 +198,7 @@ class TestBGPFilteringPrefixFilteredPeer(BGPFilteringPrefixFilteredBase):
 
 
 class TestBGPFilteringPrefixFilteredTransit(BGPFilteringPrefixFilteredBase):
-    """Test filtering of filtered prefixess for the 'transit' peer type."""
+    """Test filtering of filtered prefixes for the 'transit' peer type."""
 
     # BIRD configuration
     peer_type = "transit"
@@ -208,7 +208,7 @@ class TestBGPFilteringPrefixFilteredTransit(BGPFilteringPrefixFilteredBase):
 """
 
     def test_filtered_prefix_announce(self, sim, tmpdir, helpers):
-        """Test filtering of filtered prefixess for the 'transit' peer type."""
+        """Test filtering of filtered prefixes for the 'transit' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -271,7 +271,7 @@ class TestBGPFilteringPrefixFilteredTransit(BGPFilteringPrefixFilteredBase):
 
 
 class TestBGPFilteringPrefixFilteredRrclient(BGPFilteringPrefixFilteredBase):
-    """Test filtering of filtered prefixess for the 'rrclient' peer type."""
+    """Test filtering of filtered prefixes for the 'rrclient' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -284,7 +284,7 @@ class TestBGPFilteringPrefixFilteredRrclient(BGPFilteringPrefixFilteredBase):
 """
 
     def test_filtered_prefix_announce(self, sim, tmpdir, helpers):
-        """Test filtering of filtered prefixess for the 'rrclient' peer type."""
+        """Test filtering of filtered prefixes for the 'rrclient' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -345,7 +345,7 @@ class TestBGPFilteringPrefixFilteredRrclient(BGPFilteringPrefixFilteredBase):
 
 
 class TestBGPFilteringPrefixFilteredRrserver(BGPFilteringPrefixFilteredBase):
-    """Test filtering of filtered prefixess for the 'rrserver' peer type."""
+    """Test filtering of filtered prefixes for the 'rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -357,7 +357,7 @@ class TestBGPFilteringPrefixFilteredRrserver(BGPFilteringPrefixFilteredBase):
 """
 
     def test_filtered_prefix_announce(self, sim, tmpdir, helpers):
-        """Test filtering of filtered prefixess for the 'rrserver' peer type."""
+        """Test filtering of filtered prefixes for the 'rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -418,7 +418,7 @@ class TestBGPFilteringPrefixFilteredRrserver(BGPFilteringPrefixFilteredBase):
 
 
 class TestBGPFilteringPrefixFilteredRrserverRrserver(BGPFilteringPrefixFilteredBase):
-    """Test filtering of filtered prefixess for the 'rrserver-rrserver' peer type."""
+    """Test filtering of filtered prefixes for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -431,7 +431,7 @@ class TestBGPFilteringPrefixFilteredRrserverRrserver(BGPFilteringPrefixFilteredB
 """
 
     def test_filtered_prefix_announce(self, sim, tmpdir, helpers):
-        """Test filtering of filtered prefixess for the 'rrserver-rrserver' peer type."""
+        """Test filtering of filtered prefixes for the 'rrserver-rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -492,7 +492,7 @@ class TestBGPFilteringPrefixFilteredRrserverRrserver(BGPFilteringPrefixFilteredB
 
 
 class TestBGPFilteringPrefixFilteredRoutecollector(BGPFilteringPrefixFilteredBase):
-    """Test filtering of filtered prefixess for the 'routecollector' peer type."""
+    """Test filtering of filtered prefixes for the 'routecollector' peer type."""
 
     # BIRD configuration
     peer_type = "routecollector"
@@ -502,7 +502,7 @@ class TestBGPFilteringPrefixFilteredRoutecollector(BGPFilteringPrefixFilteredBas
 """
 
     def test_filtered_prefix_announce(self, sim, tmpdir, helpers):
-        """Test filtering of filtered prefixess for the 'routecollector' peer type."""
+        """Test filtering of filtered prefixes for the 'routecollector' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -565,7 +565,7 @@ class TestBGPFilteringPrefixFilteredRoutecollector(BGPFilteringPrefixFilteredBas
 
 
 class TestBGPFilteringPrefixFilteredRouteserver(BGPFilteringPrefixFilteredBase):
-    """Test filtering of filtered prefixess for the 'routeserver' peer type."""
+    """Test filtering of filtered prefixes for the 'routeserver' peer type."""
 
     # BIRD configuration
     peer_type = "routeserver"
@@ -575,7 +575,7 @@ class TestBGPFilteringPrefixFilteredRouteserver(BGPFilteringPrefixFilteredBase):
 """
 
     def test_filtered_prefix_announce(self, sim, tmpdir, helpers):
-        """Test filtering of filtered prefixess for the 'routeserver' peer type."""
+        """Test filtering of filtered prefixes for the 'routeserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)

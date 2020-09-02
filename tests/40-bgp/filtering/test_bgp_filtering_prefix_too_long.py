@@ -52,7 +52,7 @@ class BGPFilteringPrefixTooLongBase(BGPFilteringBase):
 
 
 class TestBGPFilteringPrefixTooLongCustomer(BGPFilteringPrefixTooLongBase):
-    """Test filtering of too long prefixess for the 'customer' peer type."""
+    """Test filtering of too long prefixes for the 'customer' peer type."""
 
     # BIRD configuration
     peer_type = "customer"
@@ -62,7 +62,7 @@ class TestBGPFilteringPrefixTooLongCustomer(BGPFilteringPrefixTooLongBase):
 """
 
     def test_prefix_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too long prefixess for the 'customer' peer type."""
+        """Test filtering of too long prefixes for the 'customer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -125,13 +125,13 @@ class TestBGPFilteringPrefixTooLongCustomer(BGPFilteringPrefixTooLongBase):
 
 
 class TestBGPFilteringPrefixTooLongPeer(BGPFilteringPrefixTooLongBase):
-    """Test filtering of too long prefixess for the 'peer' peer type."""
+    """Test filtering of too long prefixes for the 'peer' peer type."""
 
     # BIRD configuration
     peer_type = "peer"
 
     def test_prefix_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too long prefixess for the 'peer' peer type."""
+        """Test filtering of too long prefixes for the 'peer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -194,13 +194,13 @@ class TestBGPFilteringPrefixTooLongPeer(BGPFilteringPrefixTooLongBase):
 
 
 class TestBGPFilteringPrefixTooLongTransit(BGPFilteringPrefixTooLongBase):
-    """Test filtering of too long prefixess for the 'transit' peer type."""
+    """Test filtering of too long prefixes for the 'transit' peer type."""
 
     # BIRD configuration
     peer_type = "transit"
 
     def test_prefix_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too long prefixess for the 'transit' peer type."""
+        """Test filtering of too long prefixes for the 'transit' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -263,7 +263,7 @@ class TestBGPFilteringPrefixTooLongTransit(BGPFilteringPrefixTooLongBase):
 
 
 class TestBGPFilteringPrefixTooLongRrclient(BGPFilteringPrefixTooLongBase):
-    """Test filtering of too long prefixess for the 'rrclient' peer type."""
+    """Test filtering of too long prefixes for the 'rrclient' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -273,7 +273,7 @@ class TestBGPFilteringPrefixTooLongRrclient(BGPFilteringPrefixTooLongBase):
 """
 
     def test_prefix_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too long prefixess for the 'rrclient' peer type."""
+        """Test filtering of too long prefixes for the 'rrclient' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -359,7 +359,7 @@ class TestBGPFilteringPrefixTooLongRrclient(BGPFilteringPrefixTooLongBase):
 
 
 class TestBGPFilteringPrefixTooLongRrserver(BGPFilteringPrefixTooLongBase):
-    """Test filtering of too long prefixess for the 'rrserver' peer type."""
+    """Test filtering of too long prefixes for the 'rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -369,7 +369,7 @@ class TestBGPFilteringPrefixTooLongRrserver(BGPFilteringPrefixTooLongBase):
 """
 
     def test_prefix_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too long prefixess for the 'rrserver' peer type."""
+        """Test filtering of too long prefixes for the 'rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -455,7 +455,7 @@ class TestBGPFilteringPrefixTooLongRrserver(BGPFilteringPrefixTooLongBase):
 
 
 class TestBGPFilteringPrefixTooLongRrserverRrserver(BGPFilteringPrefixTooLongBase):
-    """Test filtering of too long prefixess for the 'rrserver-rrserver' peer type."""
+    """Test filtering of too long prefixes for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -465,7 +465,7 @@ class TestBGPFilteringPrefixTooLongRrserverRrserver(BGPFilteringPrefixTooLongBas
 """
 
     def test_prefix_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too long prefixess for the 'rrserver-rrserver' peer type."""
+        """Test filtering of too long prefixes for the 'rrserver-rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -551,13 +551,13 @@ class TestBGPFilteringPrefixTooLongRrserverRrserver(BGPFilteringPrefixTooLongBas
 
 
 class TestBGPFilteringPrefixTooLongRoutecollector(BGPFilteringPrefixTooLongBase):
-    """Test filtering of too long prefixess for the 'routecollector' peer type."""
+    """Test filtering of too long prefixes for the 'routecollector' peer type."""
 
     # BIRD configuration
     peer_type = "routecollector"
 
     def test_prefix_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too long prefixess for the 'routecollector' peer type."""
+        """Test filtering of too long prefixes for the 'routecollector' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
@@ -620,13 +620,13 @@ class TestBGPFilteringPrefixTooLongRoutecollector(BGPFilteringPrefixTooLongBase)
 
 
 class TestBGPFilteringPrefixTooLongRouteserver(BGPFilteringPrefixTooLongBase):
-    """Test filtering of too long prefixess for the 'routeserver' peer type."""
+    """Test filtering of too long prefixes for the 'routeserver' peer type."""
 
     # BIRD configuration
     peer_type = "routeserver"
 
     def test_prefix_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too long prefixess for the 'routeserver' peer type."""
+        """Test filtering of too long prefixes for the 'routeserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
