@@ -19,7 +19,7 @@
 """Bird configuration utility functions."""
 
 
-def sanitize_large_community(large_community):
+def sanitize_large_community(large_community: str) -> str:
     """Sanitize a string representation of a large community."""
     # Split on :
     large_community_components = large_community.split(":")

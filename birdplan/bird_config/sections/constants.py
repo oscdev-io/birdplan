@@ -26,6 +26,8 @@ class SectionConstants(SectionBase):
 
     _section = "Global Constants"
 
+    _need_bogons: bool
+
     def __init__(self, **kwargs):
         """Initialize the object."""
         super().__init__(**kwargs)
