@@ -20,6 +20,9 @@ Tests done include:
   * Prefix filtered
     * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
 
+  * Quarantine
+    * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
+
 ```plantuml
 @startuml
 hide circle
