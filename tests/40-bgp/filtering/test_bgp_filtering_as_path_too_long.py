@@ -69,7 +69,7 @@ class TestBGPFilteringASPathTooLongCustomer(BGPFilteringASPathTooLongBase):
     peer_type = "customer"
     extra_config = """
       filter:
-        asns: [65001, 23456]
+        asns: [65001]
 """
 
     def test_as_path_too_long_announce(self, sim, tmpdir, helpers):
