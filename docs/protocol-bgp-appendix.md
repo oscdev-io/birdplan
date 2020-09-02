@@ -19,14 +19,14 @@ These are globals which can be overridden in configuration.
 
 | Constant | Size | Description |
 | --- | --- | --- |
-| BGP_PREFIX_MAXLEN4_IMPORT | 24 | Maximum IPv4 CIDR length to import |
-| BGP_PREFIX_MAXLEN4_EXPORT | 24 | Maximum IPv4 CIDR length to export |
-| BGP_PREFIX_MINLEN4_IMPORT | 8 | Minimum IPv4 CIDR length to import |
-| BGP_PREFIX_MINLEN4_EXPORT | 8 | Minimum IPv4 CIDR length to export |
-| BGP_PREFIX_MAXLEN6_IMPORT | 48 | Maximum IPv6 CIDR length to import |
-| BGP_PREFIX_MAXLEN6_EXPORT | 48 | Maximum IPv6 CIDR length to export |
-| BGP_PREFIX_MINLEN6_IMPORT | 16 | Minimum IPv6 CIDR length to import |
-| BGP_PREFIX_MINLEN6_EXPORT | 16 | Minimum IPv6 CIDR length to export |
+| PREFIX_MAXLEN4_IMPORT | 24 | Maximum IPv4 CIDR length to import |
+| PREFIX_MAXLEN4_EXPORT | 24 | Maximum IPv4 CIDR length to export |
+| PREFIX_MINLEN4_IMPORT | 8 | Minimum IPv4 CIDR length to import |
+| PREFIX_MINLEN4_EXPORT | 8 | Minimum IPv4 CIDR length to export |
+| PREFIX_MAXLEN6_IMPORT | 48 | Maximum IPv6 CIDR length to import |
+| PREFIX_MAXLEN6_EXPORT | 48 | Maximum IPv6 CIDR length to export |
+| PREFIX_MINLEN6_IMPORT | 16 | Minimum IPv6 CIDR length to import |
+| PREFIX_MINLEN6_EXPORT | 16 | Minimum IPv6 CIDR length to export |
 
 # Large Communities
 
@@ -42,12 +42,12 @@ Large communities are in the form of (OWN_ASN, FUNCTION, XXX) and are described 
 | 3 | Relation [^lc-function-3] |
 | 4 | ASN-based selective NOEXPORT [^lc-function-4] |
 | 5 | TODO: Location-based selective NOEXPORT [^lc-function-5] |
-| 6 | ASN-Based Selective AS_PATH Prepending (one) [^lc-function-6] |
-| 62 | ENHANCED: ASN-Based Selective AS_PATH Prepending (two) [^lc-function-6] |
-| 63 | ENHANCED: ASN-Based Selective AS_PATH Prepending (three) [^lc-function-6] |
-| 7 | TODO: Location-Based Selective AS_PATH Prepending (one) [^lc-function-7] |
-| 71 | TODO ENHANCED: Location-Based Selective AS_PATH Prepending (one) [^lc-function-7] |
-| 72 | TODO ENHANCED: Location-Based Selective AS_PATH Prepending (one) [^lc-function-7] |
+| 6 | ASN-Based Selective AS Path Prepending (one) [^lc-function-6] |
+| 62 | ENHANCED: ASN-Based Selective AS Path Prepending (two) [^lc-function-6] |
+| 63 | ENHANCED: ASN-Based Selective AS Path Prepending (three) [^lc-function-6] |
+| 7 | TODO: Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
+| 71 | TODO ENHANCED: Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
+| 72 | TODO ENHANCED: Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
 | 8 | TODO ENHANCED: Manipulation of the LOCAL_PREF Attribute (set to 1, 2, 3) [^lc-function-8] |
 | 1101 | Filtered |
 
@@ -61,9 +61,9 @@ Large communities are in the form of (OWN_ASN, FUNCTION, XXX) and are described 
 
 [^lc-function-5]: Location-based selective NOEXPORT. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 4.1.2 pg 8.
 
-[^lc-function-6]: ASN-Based Selective AS_PATH Prepending. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 4.2.1 pg 9.
+[^lc-function-6]: ASN-Based Selective AS Path Prepending. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 4.2.1 pg 9.
 
-[^lc-function-7]: Location-Based Selective AS_PATH Prepending. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 4.2.2 pg 10.
+[^lc-function-7]: Location-Based Selective AS Path Prepending. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 4.2.2 pg 10.
 
 [^lc-function-8]: Manipulation of the LOCAL_PREF Attribute. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 4.3 pg 10/11.
 

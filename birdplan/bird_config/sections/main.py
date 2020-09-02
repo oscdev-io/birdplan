@@ -16,16 +16,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BIRD router ID configuration."""
+"""BIRD main configuration section."""
 
-from .base import BirdConfigBase
+from .base import SectionBase
 
 
-class BirdConfigRouterID(BirdConfigBase):
-    """BIRD router ID configuration."""
+class SectionMain(SectionBase):
+    """BIRD main configuration section."""
+
+    _section = "Main"
 
     def configure(self):
-        """Configure routing id."""
-        self._addtitle("Router ID")
-        self._addline(f"router id {self.parent.router_id};")
-        self._addline("")
+        """Configure main part of the config."""
+        super().configure()
+
+        self.conf.add("# Set time format for compatibility with 3rd-party programs")
+        self.conf.add("timeformat base iso long;")
+        self.conf.add("timeformat log iso long;")
+        self.conf.add("timeformat protocol iso long;")
+        self.conf.add("timeformat route iso long;")
+        self.conf.add("")

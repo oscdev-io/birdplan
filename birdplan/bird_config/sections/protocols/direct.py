@@ -18,20 +18,25 @@
 
 """BIRD direct protocol configuration."""
 
-from ..base import BirdConfigBase
+from typing import List
+from .base import SectionProtocolBase
 
 
-class BirdConfigProtocolDirect(BirdConfigBase):
+class ProtocolDirect(SectionProtocolBase):
     """BIRD direct protocol configuration."""
 
-    def __init__(self, parent, name="", **kwargs):
+    _name_suffix: str
+    _interfaces: List[str]
+
+    def __init__(self, name: str = "", **kwargs):
         """Initialize the object."""
-        super().__init__(parent, **kwargs)
+        super().__init__(**kwargs)
 
         # Add a suffix if we have a name
         if name:
             self._name_suffix = f"_{name}"
         else:
+            self._section = "Direct Protocol"
             self._name_suffix = ""
 
         # Grab the list of interfaces we need
@@ -39,9 +44,7 @@ class BirdConfigProtocolDirect(BirdConfigBase):
 
     def configure(self):
         """Configure the direct protocol."""
-        # If we're not handling a specific direct protocol, add a title
-        if not self.name_suffix:
-            self._addtitle("Direct Protocol")
+        super().configure()
 
         # If we have a list of interfaces, create the config lines
         interface_lines = []
@@ -55,36 +58,37 @@ class BirdConfigProtocolDirect(BirdConfigBase):
             interface_lines.append("")
             interface_lines.append(f"  interface {interface_str};")
 
-        self._addline(f"ipv4 table t_direct4{self.name_suffix};")
-        self._addline(f"ipv6 table t_direct6{self.name_suffix};")
-        self._addline("")
+        self.tables.conf.append(f"# Direct Tables: {self.name_suffix}")
+        self.tables.conf.append(f"ipv4 table t_direct4{self.name_suffix};")
+        self.tables.conf.append(f"ipv6 table t_direct6{self.name_suffix};")
+        self.tables.conf.append("")
 
         self._setup_protocol(4, interface_lines)
         self._setup_protocol(6, interface_lines)
 
-    def _setup_protocol(self, ipv, lines):
+    def _setup_protocol(self, ipv: int, lines: List[str]):
 
         protocol_name = f"direct{ipv}{self.name_suffix}"
 
-        self._addline(f"protocol direct {protocol_name} {{")
-        self._addline('  description "Direct protocol for IPv%s";' % ipv)
-        self._addline("")
-        self._addline("  ipv%s {" % ipv)
-        self._addline(f"    table t_{protocol_name};")
-        self._addline("")
-        self._addline("    export none;")
-        self._addline("    import all;")
-        self._addline("  };")
-        self._addlines(lines)
-        self._addline("};")
-        self._addline("")
+        self.conf.add(f"protocol direct {protocol_name} {{")
+        self.conf.add('  description "Direct protocol for IPv%s";' % ipv)
+        self.conf.add("")
+        self.conf.add("  ipv%s {" % ipv)
+        self.conf.add(f"    table t_{protocol_name};")
+        self.conf.add("")
+        self.conf.add("    export none;")
+        self.conf.add("    import all;")
+        self.conf.add("  };")
+        self.conf.add(lines)
+        self.conf.add("};")
+        self.conf.add("")
 
     @property
-    def name_suffix(self):
+    def name_suffix(self) -> str:
         """Return our name suffix."""
         return self._name_suffix
 
     @property
-    def interfaces(self):
+    def interfaces(self) -> List[str]:
         """Return our interfaces."""
         return self._interfaces

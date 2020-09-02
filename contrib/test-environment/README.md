@@ -22,14 +22,14 @@ From there you can `cd` into `somewhere/birdplan/contrib/test-environment`.
 
 To run all tests use the following command...
 ```bash
-docker-compose run birdplan /root/runtest
+docker-compose run --rm birdplan /root/runtest
 ```
 
 # Running a single test set
 
 To run a single test set use the following command...
 ```bash
-docker-compose run birdplan /root/runtest tests/40-bgp/redistribute_connected
+docker-compose run --rm birdplan /root/runtest tests/40-bgp/redistribute_connected
 ```
 
 # Increasing verbosity
@@ -38,11 +38,11 @@ To increase verbosity to get addtional report data you can use the below example
 
 For output of logs...
 ```bash
- docker-compose run birdplan /root/runtest "-v tests/40-bgp/features/quarantine"
+ docker-compose run --rm birdplan /root/runtest "-v tests/40-bgp/features/quarantine"
 ```
 
 For logs and configurations...
 ```bash
-docker-compose run birdplan /root/runtest "-vv tests/40-bgp/features/quarantine"
+docker-compose run --rm birdplan /root/runtest "-vv tests/40-bgp/features/quarantine"
 ```
 

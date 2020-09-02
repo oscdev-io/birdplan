@@ -19,167 +19,95 @@
 """Bird configuration package."""
 
 from typing import Optional
-from .base import BirdConfigBase
-from .constants import BirdConfigConstants
-from .logging import BirdConfigLogging
-from .main import BirdConfigMain
-from .master import BirdConfigMaster
-from .protocol.device import BirdConfigProtocolDevice
-from .protocol.kernel import BirdConfigProtocolKernel
-from .protocol.static import BirdConfigProtocolStatic
-from .protocol.rip import BirdConfigProtocolRIP
-from .protocol.ospf import BirdConfigProtocolOSPF
-from .protocol.bgp import BirdConfigProtocolBGP
-from .router_id import BirdConfigRouterID
+
+from .globals import BirdConfigGlobals
+from .sections import Sections, SectionConstants, SectionProtocols, SectionTables
 
 
-class BirdConfig(BirdConfigBase):  # pylint: disable=too-many-instance-attributes
+class BirdConfig:
     """BirdConfig is responsible for configuring Bird."""
 
-    _router_id: str
-    _log_file: Optional[str]
-    _debug: bool
-    _test_mode: bool
+    _birdconf_globals: BirdConfigGlobals
 
-    _constants: BirdConfigConstants
-    _master: BirdConfigMaster
-    _static: BirdConfigProtocolStatic
-    _rip: BirdConfigProtocolRIP
-    _ospf: BirdConfigProtocolOSPF
-    _bgp: BirdConfigProtocolBGP
+    _sections: Sections
 
     def __init__(self):
         """Initialize the object."""
-        super().__init__(root=self)
+        super().__init__()
 
-        # Router ID
-        self._router_id = "0.0.0.0"
-
-        # Log file
-        self._log_file = None
-
-        # Debugging
-        self._debug = False
-        self._test_mode = False
-
-        # Constants
-        self._constants = BirdConfigConstants(parent=self)
-        # Master tables
-        self._master = BirdConfigMaster(parent=self)
-        # Static protocol
-        self._static = BirdConfigProtocolStatic(parent=self)
-        # RIP protocol
-        self._rip = BirdConfigProtocolRIP(parent=self)
-        # OSPF protocol
-        self._ospf = BirdConfigProtocolOSPF(parent=self)
-        # BGP protocol
-        self._bgp = BirdConfigProtocolBGP(parent=self)
-
-    def static_add_route(self, route):
-        """Add static route."""
-        self.static.add_route(route)
+        self._birdconf_globals = BirdConfigGlobals()
+        self._sections = Sections(birdconf_globals=self.birdconf_globals)
 
     def get_config(self):
         """Return the Bird configuration."""
 
-        main = BirdConfigMain(parent=self)
-        main.configure()
+        self.sections.configure()
 
-        logging = BirdConfigLogging(parent=self)
-        logging.configure()
-
-        router_id = BirdConfigRouterID(parent=self)
-        router_id.configure()
-
-        self.constants.configure()
-
-        protocol_device = BirdConfigProtocolDevice(parent=self)
-        protocol_device.configure()
-
-        protocol_kernel = BirdConfigProtocolKernel(parent=self)
-        protocol_kernel.configure()
-
-        self.master.configure()
-
-        self.static.configure()
-
-        if self.rip.interfaces:
-            self.rip.configure()
-
-        if self.ospf.areas:
-            self.ospf.configure()
-
-        if self.bgp.peers_config:
-            self.bgp.configure()
-
-        return self.config_lines
+        return self.sections.conf.lines
 
     @property
-    def router_id(self) -> str:
-        """Return our router_id."""
-        return self._router_id
+    def birdconf_globals(self) -> BirdConfigGlobals:
+        """Return our global configuration options."""
+        return self._birdconf_globals
 
-    @router_id.setter
-    def router_id(self, router_id: str):
-        """Set router_id."""
-        self._router_id = router_id
+    # HELPERS
 
     @property
     def log_file(self) -> Optional[str]:
         """Return the log file to use."""
-        return self._log_file
+        return self.birdconf_globals.log_file
 
     @log_file.setter
     def log_file(self, log_file: str):
         """Set the log file to use."""
-        self._log_file = log_file
+        self.birdconf_globals.log_file = log_file
 
     @property
     def debug(self) -> bool:
         """Return debugging mode."""
-        return self._debug
+        return self.birdconf_globals.debug
 
     @debug.setter
     def debug(self, debug: bool):
         """Set debugging mode."""
-        self._debug = debug
+        self.birdconf_globals.debug = debug
 
     @property
     def test_mode(self) -> bool:
         """Return if we're running in test mode."""
-        return self._test_mode
+        return self.birdconf_globals.test_mode
 
     @test_mode.setter
     def test_mode(self, test_mode: bool):
         """Set test mode."""
-        self._test_mode = test_mode
+        self.birdconf_globals.test_mode = test_mode
 
     @property
-    def constants(self) -> BirdConfigConstants:
+    def router_id(self) -> str:
+        """Return our router_id."""
+        return self.sections.router_id.router_id
+
+    @router_id.setter
+    def router_id(self, router_id: str):
+        """Set router_id."""
+        self.sections.router_id.router_id = router_id
+
+    @property
+    def sections(self) -> Sections:
+        """Return our sections."""
+        return self._sections
+
+    @property
+    def constants(self) -> SectionConstants:
         """Return our constants."""
-        return self._constants
+        return self.sections.constants
 
     @property
-    def master(self) -> BirdConfigMaster:
+    def tables(self) -> SectionTables:
         """Return our master config."""
-        return self._master
+        return self.sections.tables
 
     @property
-    def static(self) -> BirdConfigProtocolStatic:
-        """Return our static protocol config."""
-        return self._static
-
-    @property
-    def rip(self) -> BirdConfigProtocolRIP:
-        """Return our RIP protocol config."""
-        return self._rip
-
-    @property
-    def ospf(self) -> BirdConfigProtocolOSPF:
-        """Return our OSPF protocol config."""
-        return self._ospf
-
-    @property
-    def bgp(self) -> BirdConfigProtocolBGP:
-        """Return our BGP protocol config."""
-        return self._bgp
+    def protocols(self) -> SectionProtocols:
+        """Return our protocols."""
+        return self.sections.protocols

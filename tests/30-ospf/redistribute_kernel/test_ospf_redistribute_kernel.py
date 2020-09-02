@@ -290,28 +290,6 @@ class TestOSPFRedistributeKernel(BirdPlanBaseTestCase):
         }
         assert r2_table == correct_result, "Result for R2 BIRD t_kernel6 routing table does not match what it should be"
 
-    def test_bird_tables_static4(self, sim):
-        """Test BIRD static4 table."""
-
-        r1_table = self._bird_route_table(sim, "r1", "t_static4")
-        r2_table = self._bird_route_table(sim, "r2", "t_static4")
-
-        # Check static4 BIRD table
-        correct_result = {}
-        assert r1_table == correct_result, "Result for R1 BIRD t_static4 routing table does not match what it should be"
-        assert r2_table == correct_result, "Result for R2 BIRD t_static4 routing table does not match what it should be"
-
-    def test_bird_tables_static6(self, sim):
-        """Test BIRD static6 table."""
-
-        r1_table = self._bird_route_table(sim, "r1", "t_static6")
-        r2_table = self._bird_route_table(sim, "r2", "t_static6")
-
-        # Check static6 BIRD table
-        correct_result = {}
-        assert r1_table == correct_result, "Result for R1 BIRD t_static6 routing table does not match what it should be"
-        assert r2_table == correct_result, "Result for R2 BIRD t_static6 routing table does not match what it should be"
-
     def test_bird_tables_master4(self, sim, helpers):
         """Test BIRD master4 table."""
 

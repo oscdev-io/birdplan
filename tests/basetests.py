@@ -79,7 +79,7 @@ class BirdPlanBaseTestCase:
 
     def _bird_bgp_peer_table(self, sim: Simulation, name: str, peer_name: str, ipv: int) -> str:
         """Get a bird BGP peer table name."""
-        return sim.config(name).birdconf.bgp.peer(peer_name).bgp_table_name(ipv)
+        return sim.config(name).birdconf.protocols.bgp.peer(peer_name).bgp_table_name(ipv)
 
     def _exabgpcli(self, sim: Simulation, name: str, args: List[str], report_title: str = "") -> List[str]:
         """Run the ExaBGP cli."""

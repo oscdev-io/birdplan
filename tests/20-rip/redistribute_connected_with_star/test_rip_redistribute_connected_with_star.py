@@ -21,8 +21,6 @@
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
 import os
-import pytest
-from nsnetsim.exceptions import NsNetSimError
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.switch_node import SwitchNode
 from basetests import BirdPlanBaseTestCase
@@ -79,9 +77,6 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         """Test BIRD direct4_rip table."""
 
         r1_table = self._bird_route_table(sim, "r1", "t_direct4_rip", expect_count=1)
-        # There is no direct4_rip table for r2
-        with pytest.raises(NsNetSimError, match=r".* CF_SYM_UNDEFINED, .*"):
-            sim.node("r2").birdc_show_route_table("t_direct4_rip")
 
         # Check direct4_rip BIRD table
         correct_result = {
@@ -102,9 +97,6 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
         """Test BIRD direct6_rip table."""
 
         r1_table = self._bird_route_table(sim, "r1", "t_direct6_rip", expect_count=1)
-        # There is no direct6_rip table for r2
-        with pytest.raises(NsNetSimError, match=r".* CF_SYM_UNDEFINED, .*"):
-            sim.node("r2").birdc_show_route_table("t_direct6_rip")
 
         # Check direct6_rip BIRD table
         correct_result = {
@@ -120,28 +112,6 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
             ]
         }
         assert r1_table == correct_result, "Result for R1 BIRD t_direct6_rip routing table does not match what it should be"
-
-    def test_bird_tables_static4(self, sim):
-        """Test BIRD static4 table."""
-
-        r1_table = self._bird_route_table(sim, "r1", "t_static4")
-        r2_table = self._bird_route_table(sim, "r2", "t_static4")
-
-        # Check static4 BIRD table
-        correct_result = {}
-        assert r1_table == correct_result, "Result for R1 BIRD t_static4 routing table does not match what it should be"
-        assert r2_table == correct_result, "Result for R2 BIRD t_static4 routing table does not match what it should be"
-
-    def test_bird_tables_static6(self, sim):
-        """Test BIRD static6 table."""
-
-        r1_table = self._bird_route_table(sim, "r1", "t_static6")
-        r2_table = self._bird_route_table(sim, "r2", "t_static6")
-
-        # Check static6 BIRD table
-        correct_result = {}
-        assert r1_table == correct_result, "Result for R1 BIRD t_static6 routing table does not match what it should be"
-        assert r2_table == correct_result, "Result for R2 BIRD t_static6 routing table does not match what it should be"
 
     def test_bird_tables_master4(self, sim, helpers):
         """Test BIRD master4 table."""

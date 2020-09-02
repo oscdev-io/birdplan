@@ -32,14 +32,14 @@ class BGPFilteringASPathTooLongBase(BGPFilteringBase):
     routers = ["r1"]
     too_long_as_path: List[int] = []
     global_config = """
-  bgp_as_path_maxlen: 50
+  aspath_maxlen: 50
 """
 
     def _announce_as_path_too_long(self, sim) -> Tuple:
         """Announce a prefix that has a AS path that is too long from ExaBGP to BIRD."""
 
         # Set the maximum AS path plus one
-        self.too_long_as_path = [65001 for x in range(0, sim.config("r1").birdconf.constants.bgp_as_path_maxlen + 1)]
+        self.too_long_as_path = [65001 for x in range(0, sim.config("r1").birdconf.protocols.bgp.aspath_maxlen + 1)]
 
         self._exabgpcli(
             sim, "e1", [f"neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 as-path {self.too_long_as_path}"]
