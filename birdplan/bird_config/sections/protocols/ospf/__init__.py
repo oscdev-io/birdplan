@@ -158,8 +158,8 @@ class ProtocolOSPF(SectionProtocolBase):
             area_lines.append(f"  area {area_name} {{")
             # Loop with area config items
             # NK: NOT USED ATM
-#            for key, value in self.areas[area_name].items():
-#                area_lines.append(f"    {key} {value};")
+            #            for key, value in self.areas[area_name].items():
+            #                area_lines.append(f"    {key} {value};")
             # Loop with interfaces
             for interface_name in sorted(self.interfaces[area_name].keys()):
                 interface = self.interfaces[area_name][interface_name]

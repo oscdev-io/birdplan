@@ -353,6 +353,7 @@ class TestBGPFilteringPrefixFilteredRrserver(BGPFilteringPrefixFilteredBase):
     extra_config = """
       filter:
         prefixes: ["100.64.102.0/24", "fc00:102::/64"]
+
   rr_cluster_id: 0.0.0.1
 """
 
