@@ -18,9 +18,9 @@
 
 """BIRD master table configuration."""
 
-from typing import Dict
-from ..base import SectionBase
-from ..protocols.pipe import ProtocolPipe
+from .master_attributes import MasterTableAttributes, MasterTableRoutePolicyExport
+from ...base import SectionBase
+from ...protocols.pipe import ProtocolPipe
 
 
 class TableMaster(SectionBase):
@@ -28,19 +28,13 @@ class TableMaster(SectionBase):
 
     _section = "Master Table"
 
-    _export_kernel: Dict[str, bool]
+    _master_attributes: MasterTableAttributes
 
     def __init__(self, **kwargs):
         """Initialize the object."""
         super().__init__(**kwargs)
 
-        # Are we going to export routes to the kernel
-        self._export_kernel = {
-            "static": True,
-            "rip": True,
-            "ospf": True,
-            "bgp": True,
-        }
+        self._master_attributes = MasterTableAttributes()
 
     def configure(self):
         """Configure the master tables."""
@@ -80,26 +74,26 @@ class TableMaster(SectionBase):
         # Configure export filter to master table
         self.conf.add(f"filter f_master{ipv}_kernel{ipv}_export {{")
 
-        if self.export_kernel_static:
+        if self.route_policy_export.kernel.static:
             self.conf.add("  # Export static routes to kernel")
             self.conf.add("  if (source = RTS_STATIC) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
 
-        if self.export_kernel_rip:
+        if self.route_policy_export.kernel.rip:
             self.conf.add("  # Export RIP routes to kernel")
             self.conf.add("  if (source = RTS_RIP) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
 
-        if self.export_kernel_ospf:
+        if self.route_policy_export.kernel.ospf:
             self.conf.add("  # Export OSPF routes to kernel")
             # NK: We cannot seem to filter out the device routes
             self.conf.add("  if (source ~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2]) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
 
-        if self.export_kernel_bgp:
+        if self.route_policy_export.kernel.bgp:
             self.conf.add("  # Export BGP routes to kernel")
             self.conf.add("  if (source = RTS_BGP) then {")
             self.conf.add("    accept;")
@@ -110,41 +104,11 @@ class TableMaster(SectionBase):
         self.conf.add("")
 
     @property
-    def export_kernel_static(self) -> bool:
-        """Return if we're exporting static to kernel."""
-        return self._export_kernel["static"]
-
-    @export_kernel_static.setter
-    def export_kernel_static(self, export_kernel_static: bool):
-        """Set if we're exporting static routes to kernel."""
-        self._export_kernel["static"] = export_kernel_static
+    def master_attributes(self) -> MasterTableAttributes:
+        """Return our table attributes."""
+        return self._master_attributes
 
     @property
-    def export_kernel_rip(self) -> bool:
-        """Return if we're exporting RIP to kernel."""
-        return self._export_kernel["rip"]
-
-    @export_kernel_rip.setter
-    def export_kernel_rip(self, export_kernel_rip: bool):
-        """Set if we're exporting RIP routes to kernel."""
-        self._export_kernel["rip"] = export_kernel_rip
-
-    @property
-    def export_kernel_ospf(self) -> bool:
-        """Return if we're exporting OSPF to kernel."""
-        return self._export_kernel["ospf"]
-
-    @export_kernel_ospf.setter
-    def export_kernel_ospf(self, export_kernel_ospf: bool):
-        """Set if we're exporting OSPF routes to kernel."""
-        self._export_kernel["ospf"] = export_kernel_ospf
-
-    @property
-    def export_kernel_bgp(self) -> bool:
-        """Return if we're exporting BGP to kernel."""
-        return self._export_kernel["bgp"]
-
-    @export_kernel_bgp.setter
-    def export_kernel_bgp(self, export_kernel_bgp: bool):
-        """Set if we're exporting BGP routes to kernel."""
-        self._export_kernel["bgp"] = export_kernel_bgp
+    def route_policy_export(self) -> MasterTableRoutePolicyExport:
+        """Return our route policy for exporting routes from the master table."""
+        return self.master_attributes.route_policy_export

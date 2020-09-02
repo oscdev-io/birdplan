@@ -148,16 +148,16 @@ class BirdPlan:
             for export, export_config in self.config["export_kernel"].items():
                 # Static routes
                 if export == "static":
-                    self.birdconf.tables.master.export_kernel_static = export_config
+                    self.birdconf.tables.master.route_policy_export.kernel.static = export_config
                 # RIP routes
                 elif export == "rip":
-                    self.birdconf.tables.master.export_kernel_rip = export_config
+                    self.birdconf.tables.master.route_policy_export.kernel.rip = export_config
                 # OSPF routes
                 elif export == "ospf":
-                    self.birdconf.tables.master.export_kernel_ospf = export_config
+                    self.birdconf.tables.master.route_policy_export.kernel.ospf = export_config
                 # BGP routes
                 elif export == "bgp":
-                    self.birdconf.tables.master.export_kernel_bgp = export_config
+                    self.birdconf.tables.master.route_policy_export.kernel.bgp = export_config
                 # If we don't understand this 'accept' entry, throw an error
                 else:
                     raise BirdPlanError(f"Configuration item '{export}' not understood in 'export_kernel'")
