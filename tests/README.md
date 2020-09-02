@@ -68,8 +68,7 @@
 
 [Redistribute Kernel](40-bgp/redistribute_kernel/README.md)
 
-## Features
+## Filtering
 
 [Filtering](40-bgp/features/filtering/README.md)
 
-[Quarantine](40-bgp/features/quarantine/README.md)

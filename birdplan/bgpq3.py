@@ -18,7 +18,7 @@
 
 """BGPQ3 support class."""
 
-
+from typing import Any, Dict, List
 import ipaddress
 import json
 import subprocess  # nosec
@@ -26,6 +26,10 @@ import subprocess  # nosec
 
 class BGPQ3:
     """BGPQ3 support class."""
+
+    _host: str
+    _port: int
+    _sources: str
 
     def __init__(self, **kwargs):
         """Initialize object."""
@@ -35,25 +39,25 @@ class BGPQ3:
         self._port = kwargs.get("port", 43)
         self._sources = kwargs.get("sources", "RADB")
 
-    def get_asns(self, objects):
+    def get_asns(self, objects: List[str]) -> List[str]:
         """Get prefixes."""
         # Grab ASNs
-        asns_bgpq3 = dict()
+        asns_bgpq3 = {}
         for obj in objects:
             asns_bgpq3.update(self._bgpq3(["-l", "asns", "-t", "-3", obj]))
 
         return asns_bgpq3["asns"]
 
-    def get_prefixes(self, objects):
+    def get_prefixes(self, objects: List[str]) -> Dict[str, List[str]]:
         """Get prefixes."""
         # Grab IPv4 and IPv6 prefixes
-        prefixes_bgpq3 = dict()
+        prefixes_bgpq3 = {}
         for obj in objects:
             prefixes_bgpq3.update(self._bgpq3(["-l", "ipv4", "-m", "24", "-4", "-A", obj]))
             prefixes_bgpq3.update(self._bgpq3(["-l", "ipv6", "-m", "48", "-6", "-A", obj]))
 
         # Start out with no prefixes
-        prefixes = {"ipv4": [], "ipv6": []}
+        prefixes: Dict[str, List[str]] = {"ipv4": [], "ipv6": []}
 
         for family in ("ipv4", "ipv6"):
             for prefix in prefixes_bgpq3[family]:
@@ -71,7 +75,7 @@ class BGPQ3:
 
         return prefixes
 
-    def _bgpq3(self, args):
+    def _bgpq3(self, args: List[str]) -> Any:
         """Run bgpq3."""
 
         # Run the IP tool with JSON output
@@ -86,16 +90,16 @@ class BGPQ3:
         return json.loads(result)
 
     @property
-    def server(self):
+    def server(self) -> str:
         """Return the server we're using."""
         return f"{self.host}:{self.port}"
 
     @property
-    def host(self):
+    def host(self) -> str:
         """Return the host we're using."""
         return self._host
 
     @property
-    def port(self):
+    def port(self) -> int:
         """Return the port we're using."""
         return self._port

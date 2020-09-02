@@ -21,7 +21,7 @@
 from typing import Dict, Optional
 
 
-class RoutePolicyAccept:  # pylint: disable=too-few-public-methods
+class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
     """
     BGP route policy for acceptance of routes from BGP peers into the main BGP table.
 
@@ -39,7 +39,7 @@ class RoutePolicyAccept:  # pylint: disable=too-few-public-methods
         self.default = False
 
 
-class RoutePolicyImport:  # pylint: disable=too-few-public-methods
+class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
     """
     BGP route policy for importing of routes internally.
 
@@ -76,17 +76,17 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
         BGP ASN.
     rr_cluster_id : Optional[str]
         Route relfector cluster ID in the case of us being a route reflector.
-    route_policy_accept : RoutePolicyAccept
+    route_policy_accept : BGPRoutePolicyAccept
         Route policy for acceptance of routes from BGP peers into our main BGP table.
-    route_policy_import : RoutePolicyImport
+    route_policy_import : BGPRoutePolicyImport
         Route policy for importing of routes from internal tables into our main BGP table.
 
     """
 
     asn: Optional[int]
     rr_cluster_id: Optional[str]
-    route_policy_accept: RoutePolicyAccept
-    route_policy_import: RoutePolicyImport
+    route_policy_accept: BGPRoutePolicyAccept
+    route_policy_import: BGPRoutePolicyImport
 
     prefix_import_maxlen4: int = 24
     prefix_import_minlen4: int = 8
@@ -110,5 +110,5 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
 
         self.rr_cluster_id = None
 
-        self.route_policy_accept = RoutePolicyAccept()
-        self.route_policy_import = RoutePolicyImport()
+        self.route_policy_accept = BGPRoutePolicyAccept()
+        self.route_policy_import = BGPRoutePolicyImport()

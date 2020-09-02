@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Birdplan package."""
+"""BirdPlan package."""
 
 from typing import Any, Dict, Optional
 import yaml
@@ -148,16 +148,16 @@ class BirdPlan:
             for export, export_config in self.config["export_kernel"].items():
                 # Static routes
                 if export == "static":
-                    self.birdconf.tables.master.export_kernel_static = export_config
+                    self.birdconf.tables.master.route_policy_export.kernel.static = export_config
                 # RIP routes
                 elif export == "rip":
-                    self.birdconf.tables.master.export_kernel_rip = export_config
+                    self.birdconf.tables.master.route_policy_export.kernel.rip = export_config
                 # OSPF routes
                 elif export == "ospf":
-                    self.birdconf.tables.master.export_kernel_ospf = export_config
+                    self.birdconf.tables.master.route_policy_export.kernel.ospf = export_config
                 # BGP routes
                 elif export == "bgp":
-                    self.birdconf.tables.master.export_kernel_bgp = export_config
+                    self.birdconf.tables.master.route_policy_export.kernel.bgp = export_config
                 # If we don't understand this 'accept' entry, throw an error
                 else:
                     raise BirdPlanError(f"Configuration item '{export}' not understood in 'export_kernel'")
@@ -189,7 +189,7 @@ class BirdPlan:
         for accept, accept_config in self.config["rip"]["accept"].items():
             # Allow accept of the default route
             if accept == "default":
-                self.birdconf.protocols.rip.accept_default = accept_config
+                self.birdconf.protocols.rip.route_policy_accept.default = accept_config
             # If we don't understand this 'accept' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in RIP accept")
@@ -205,19 +205,19 @@ class BirdPlan:
         for redistribute, redistribute_config in self.config["rip"]["redistribute"].items():
             # Add connected route redistribution
             if redistribute == "connected":
-                self.birdconf.protocols.rip.redistribute_connected = redistribute_config
+                self.birdconf.protocols.rip.route_policy_redistribute.connected = redistribute_config
             # Add static route redistribution
             elif redistribute == "static":
-                self.birdconf.protocols.rip.redistribute_static = redistribute_config
+                self.birdconf.protocols.rip.route_policy_redistribute.static = redistribute_config
             # Add kernel route redistribution
             elif redistribute == "kernel":
-                self.birdconf.protocols.rip.redistribute_kernel = redistribute_config
+                self.birdconf.protocols.rip.route_policy_redistribute.kernel = redistribute_config
             # Allow redistribution of the default route
             elif redistribute == "default":
-                self.birdconf.protocols.rip.redistribute_default = redistribute_config
+                self.birdconf.protocols.rip.route_policy_redistribute.default = redistribute_config
             # Allow redistribution of RIP routes
             elif redistribute == "rip":
-                self.birdconf.protocols.rip.redistribute_rip = redistribute_config
+                self.birdconf.protocols.rip.route_policy_redistribute.rip = redistribute_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in rip:redistribute")
@@ -232,11 +232,11 @@ class BirdPlan:
         # Loop with each interface and its config
         for interface_name, interface in self.config["rip"]["interfaces"].items():
             # See if we have interface config
-            interface_config = []
+            interface_config = {}
             # Loop with each config item in the peer
             for config_item, config_value in interface.items():
                 if config_item in ("update-time", "metric"):
-                    interface_config.append({config_item: config_value})
+                    interface_config[config_item] = config_value
                 # If we don't understand this 'redistribute' entry, throw an error
                 else:
                     raise BirdPlanError(f"Configuration item '{config_item}' not understood in RIP area")
@@ -270,7 +270,7 @@ class BirdPlan:
         for accept, accept_config in self.config["ospf"]["accept"].items():
             # Allow accept of the default route
             if accept == "default":
-                self.birdconf.protocols.ospf.accept_default = accept_config
+                self.birdconf.protocols.ospf.route_policy_accept.default = accept_config
             # If we don't understand this 'accept' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in ospf:accept")
@@ -286,16 +286,16 @@ class BirdPlan:
         for redistribute, redistribute_config in self.config["ospf"]["redistribute"].items():
             # Add static route redistribution
             if redistribute == "static":
-                self.birdconf.protocols.ospf.redistribute_static = redistribute_config
+                self.birdconf.protocols.ospf.route_policy_redistribute.static = redistribute_config
             # Add connected route redistribution
             elif redistribute == "connected":
-                self.birdconf.protocols.ospf.redistribute_connected = redistribute_config
+                self.birdconf.protocols.ospf.route_policy_redistribute.connected = redistribute_config
             # Add kernel route redistribution
             elif redistribute == "kernel":
-                self.birdconf.protocols.ospf.redistribute_kernel = redistribute_config
+                self.birdconf.protocols.ospf.route_policy_redistribute.kernel = redistribute_config
             # Allow redistribution of the default route
             elif redistribute == "default":
-                self.birdconf.protocols.ospf.redistribute_default = redistribute_config
+                self.birdconf.protocols.ospf.route_policy_redistribute.default = redistribute_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")
@@ -354,14 +354,14 @@ class BirdPlan:
             if config_item not in [
                 # Globals
                 "asn",
-                "prefix_maxlen4_import",
-                "prefix_maxlen4_export",
-                "prefix_minlen4_import",
-                "prefix_minlen4_export",
-                "prefix_maxlen6_import",
-                "prefix_maxlen6_export",
-                "prefix_minlen6_import",
-                "prefix_minlen6_export",
+                "prefix_import_maxlen4",
+                "prefix_export_maxlen4",
+                "prefix_import_minlen4",
+                "prefix_export_minlen4",
+                "prefix_import_maxlen6",
+                "prefix_export_maxlen6",
+                "prefix_import_minlen6",
+                "prefix_export_minlen6",
                 "aspath_maxlen",
                 "aspath_minlen",
                 # Origination
@@ -401,14 +401,14 @@ class BirdPlan:
 
         # Setup prefix lengths
         for item in [
-            "prefix_maxlen4_import",
-            "prefix_maxlen4_export",
-            "prefix_minlen4_import",
-            "prefix_minlen4_export",
-            "prefix_maxlen6_import",
-            "prefix_maxlen6_export",
-            "prefix_minlen6_import",
-            "prefix_minlen6_export",
+            "prefix_import_maxlen4",
+            "prefix_export_maxlen4",
+            "prefix_import_minlen4",
+            "prefix_export_minlen4",
+            "prefix_import_maxlen6",
+            "prefix_export_maxlen6",
+            "prefix_import_minlen6",
+            "prefix_export_minlen6",
             "aspath_maxlen",
             "aspath_minlen",
         ]:

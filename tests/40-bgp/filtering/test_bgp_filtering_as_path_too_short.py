@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGP filtering of AS paths that are too long."""
+"""BGP filtering of AS paths that are too short."""
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
@@ -25,45 +25,45 @@ import os
 from template import BGPFilteringBase
 
 
-class BGPFilteringASPathTooLongBase(BGPFilteringBase):
-    """Base class for BGP filtering of AS paths that are too long."""
+class BGPFilteringASPathTooShortBase(BGPFilteringBase):
+    """Base class for BGP filtering of AS paths that are too short."""
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1"]
-    too_long_as_path: List[int] = []
+    too_short_as_path: List[int] = []
     global_config = """
-  aspath_maxlen: 50
+  aspath_minlen: 2
 """
 
-    def _announce_as_path_too_long(self, sim) -> Tuple:
-        """Announce a prefix that has a AS path that is too long from ExaBGP to BIRD."""
+    def _announce_as_path_too_short(self, sim) -> Tuple:
+        """Announce a prefix that has a AS path that is too short from ExaBGP to BIRD."""
 
         # Set the maximum AS path plus one
-        self.too_long_as_path = [65001 for x in range(0, sim.config("r1").birdconf.protocols.bgp.aspath_maxlen + 1)]
+        self.too_short_as_path = [65001 for x in range(0, sim.config("r1").birdconf.protocols.bgp.aspath_minlen - 1)]
 
         self._exabgpcli(
-            sim, "e1", [f"neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 as-path {self.too_long_as_path}"]
+            sim, "e1", [f"neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 as-path {self.too_short_as_path}"]
         )
         self._exabgpcli(
-            sim, "e1", [f"neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 as-path {self.too_long_as_path}"]
+            sim, "e1", [f"neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 as-path {self.too_short_as_path}"]
         )
 
         # Grab IPv4 table name and get entries
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r1", "e1", 4)
         peer_bgp4_table = self._bird_route_table(sim, "r1", peer_bgp_table_name, expect_count=1)
-        assert len(peer_bgp4_table) == 1, "Failed to announce IPv4 with AS path that is too long"
+        assert len(peer_bgp4_table) == 1, "Failed to announce IPv4 with AS path that is too short"
 
         # Grab IPv6 table name and get entries
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r1", "e1", 6)
         peer_bgp6_table = self._bird_route_table(sim, "r1", peer_bgp_table_name, expect_count=1)
-        assert len(peer_bgp6_table) == 1, "Failed to announce IPv6 with AS path that is too long"
+        assert len(peer_bgp6_table) == 1, "Failed to announce IPv6 with AS path that is too short"
 
         # Return our two routing tables
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringASPathTooLongCustomer(BGPFilteringASPathTooLongBase):
-    """Test filtering of AS paths that are too long for the 'customer' peer type."""
+class TestBGPFilteringASPathTooShortCustomer(BGPFilteringASPathTooShortBase):
+    """Test filtering of AS paths that are too short for the 'customer' peer type."""
 
     # BIRD configuration
     peer_type = "customer"
@@ -72,14 +72,14 @@ class TestBGPFilteringASPathTooLongCustomer(BGPFilteringASPathTooLongBase):
         asns: [65001]
 """
 
-    def test_as_path_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of AS paths that are too long for the 'customer' peer type."""
+    def test_as_path_too_short_announce(self, sim, tmpdir, helpers):
+        """Test filtering of AS paths that are too short for the 'customer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
+        ipv4_table, ipv6_table = self._announce_as_path_too_short(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
@@ -87,8 +87,8 @@ class TestBGPFilteringASPathTooLongCustomer(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
-                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 5)],
+                        "BGP.as_path": self.too_short_as_path,
+                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 6)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -112,8 +112,8 @@ class TestBGPFilteringASPathTooLongCustomer(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
-                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 5)],
+                        "BGP.as_path": self.too_short_as_path,
+                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 6)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -135,20 +135,20 @@ class TestBGPFilteringASPathTooLongCustomer(BGPFilteringASPathTooLongBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringASPathTooLongPeer(BGPFilteringASPathTooLongBase):
-    """Test filtering of AS paths that are too long for the 'peer' peer type."""
+class TestBGPFilteringASPathTooShortPeer(BGPFilteringASPathTooShortBase):
+    """Test filtering of AS paths that are too short for the 'peer' peer type."""
 
     # BIRD configuration
     peer_type = "peer"
 
-    def test_as_path_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of AS paths that are too long for the 'peer' peer type."""
+    def test_as_path_too_short_announce(self, sim, tmpdir, helpers):
+        """Test filtering of AS paths that are too short for the 'peer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
+        ipv4_table, ipv6_table = self._announce_as_path_too_short(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
@@ -156,8 +156,8 @@ class TestBGPFilteringASPathTooLongPeer(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
-                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 5)],
+                        "BGP.as_path": self.too_short_as_path,
+                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 6)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -181,8 +181,8 @@ class TestBGPFilteringASPathTooLongPeer(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
-                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 5)],
+                        "BGP.as_path": self.too_short_as_path,
+                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 6)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -204,20 +204,20 @@ class TestBGPFilteringASPathTooLongPeer(BGPFilteringASPathTooLongBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringASPathTooLongTransit(BGPFilteringASPathTooLongBase):
-    """Test filtering of AS paths that are too long for the 'transit' peer type."""
+class TestBGPFilteringASPathTooShortTransit(BGPFilteringASPathTooShortBase):
+    """Test filtering of AS paths that are too short for the 'transit' peer type."""
 
     # BIRD configuration
     peer_type = "transit"
 
-    def test_as_path_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of AS paths that are too long for the 'transit' peer type."""
+    def test_as_path_too_short_announce(self, sim, tmpdir, helpers):
+        """Test filtering of AS paths that are too short for the 'transit' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
+        ipv4_table, ipv6_table = self._announce_as_path_too_short(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
@@ -225,8 +225,8 @@ class TestBGPFilteringASPathTooLongTransit(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
-                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 5)],
+                        "BGP.as_path": self.too_short_as_path,
+                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 6)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -250,8 +250,8 @@ class TestBGPFilteringASPathTooLongTransit(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
-                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 5)],
+                        "BGP.as_path": self.too_short_as_path,
+                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 6)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -273,8 +273,8 @@ class TestBGPFilteringASPathTooLongTransit(BGPFilteringASPathTooLongBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringASPathTooLongRrclient(BGPFilteringASPathTooLongBase):
-    """Test filtering of AS paths that are too long for the 'rrclient' peer type."""
+class TestBGPFilteringASPathTooShortRrclient(BGPFilteringASPathTooShortBase):
+    """Test filtering of AS paths that are too short for the 'rrclient' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -283,14 +283,14 @@ class TestBGPFilteringASPathTooLongRrclient(BGPFilteringASPathTooLongBase):
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_as_path_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of AS paths that are too long for the 'rrclient' peer type."""
+    def test_as_path_too_short_announce(self, sim, tmpdir, helpers):
+        """Test filtering of AS paths that are too short for the 'rrclient' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
+        ipv4_table, ipv6_table = self._announce_as_path_too_short(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
@@ -298,7 +298,7 @@ class TestBGPFilteringASPathTooLongRrclient(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -322,7 +322,7 @@ class TestBGPFilteringASPathTooLongRrclient(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -350,7 +350,7 @@ class TestBGPFilteringASPathTooLongRrclient(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -374,7 +374,7 @@ class TestBGPFilteringASPathTooLongRrclient(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -393,8 +393,8 @@ class TestBGPFilteringASPathTooLongRrclient(BGPFilteringASPathTooLongBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringASPathTooLongRrserver(BGPFilteringASPathTooLongBase):
-    """Test filtering of AS paths that are too long for the 'rrserver' peer type."""
+class TestBGPFilteringASPathTooShortRrserver(BGPFilteringASPathTooShortBase):
+    """Test filtering of AS paths that are too short for the 'rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -403,14 +403,14 @@ class TestBGPFilteringASPathTooLongRrserver(BGPFilteringASPathTooLongBase):
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_as_path_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of AS paths that are too long for the 'rrserver' peer type."""
+    def test_as_path_too_short_announce(self, sim, tmpdir, helpers):
+        """Test filtering of AS paths that are too short for the 'rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
+        ipv4_table, ipv6_table = self._announce_as_path_too_short(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
@@ -418,7 +418,7 @@ class TestBGPFilteringASPathTooLongRrserver(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -442,7 +442,7 @@ class TestBGPFilteringASPathTooLongRrserver(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -470,7 +470,7 @@ class TestBGPFilteringASPathTooLongRrserver(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -494,7 +494,7 @@ class TestBGPFilteringASPathTooLongRrserver(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -513,8 +513,8 @@ class TestBGPFilteringASPathTooLongRrserver(BGPFilteringASPathTooLongBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringASPathTooLongRrserverRrserver(BGPFilteringASPathTooLongBase):
-    """Test filtering of AS paths that are too long for the 'rrserver-rrserver' peer type."""
+class TestBGPFilteringASPathTooShortRrserverRrserver(BGPFilteringASPathTooShortBase):
+    """Test filtering of AS paths that are too short for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -523,14 +523,14 @@ class TestBGPFilteringASPathTooLongRrserverRrserver(BGPFilteringASPathTooLongBas
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_as_path_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of AS paths that are too long for the 'rrserver-rrserver' peer type."""
+    def test_as_path_too_short_announce(self, sim, tmpdir, helpers):
+        """Test filtering of AS paths that are too short for the 'rrserver-rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
+        ipv4_table, ipv6_table = self._announce_as_path_too_short(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
@@ -538,7 +538,7 @@ class TestBGPFilteringASPathTooLongRrserverRrserver(BGPFilteringASPathTooLongBas
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -562,7 +562,7 @@ class TestBGPFilteringASPathTooLongRrserverRrserver(BGPFilteringASPathTooLongBas
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -590,7 +590,7 @@ class TestBGPFilteringASPathTooLongRrserverRrserver(BGPFilteringASPathTooLongBas
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -614,7 +614,7 @@ class TestBGPFilteringASPathTooLongRrserverRrserver(BGPFilteringASPathTooLongBas
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -633,20 +633,20 @@ class TestBGPFilteringASPathTooLongRrserverRrserver(BGPFilteringASPathTooLongBas
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringASPathTooLongRoutecollector(BGPFilteringASPathTooLongBase):
-    """Test filtering of AS paths that are too long for the 'routecollector' peer type."""
+class TestBGPFilteringASPathTooShortRoutecollector(BGPFilteringASPathTooShortBase):
+    """Test filtering of AS paths that are too short for the 'routecollector' peer type."""
 
     # BIRD configuration
     peer_type = "routecollector"
 
-    def test_as_path_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of AS paths that are too long for the 'routecollector' peer type."""
+    def test_as_path_too_short_announce(self, sim, tmpdir, helpers):
+        """Test filtering of AS paths that are too short for the 'routecollector' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
+        ipv4_table, ipv6_table = self._announce_as_path_too_short(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
@@ -654,7 +654,7 @@ class TestBGPFilteringASPathTooLongRoutecollector(BGPFilteringASPathTooLongBase)
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.large_community": [(65000, 1101, 17)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
@@ -679,7 +679,7 @@ class TestBGPFilteringASPathTooLongRoutecollector(BGPFilteringASPathTooLongBase)
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
+                        "BGP.as_path": self.too_short_as_path,
                         "BGP.large_community": [(65000, 1101, 17)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
@@ -702,20 +702,20 @@ class TestBGPFilteringASPathTooLongRoutecollector(BGPFilteringASPathTooLongBase)
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringASPathTooLongRouteserver(BGPFilteringASPathTooLongBase):
-    """Test filtering of AS paths that are too long for the 'routeserver' peer type."""
+class TestBGPFilteringASPathTooShortRouteserver(BGPFilteringASPathTooShortBase):
+    """Test filtering of AS paths that are too short for the 'routeserver' peer type."""
 
     # BIRD configuration
     peer_type = "routeserver"
 
-    def test_as_path_too_long_announce(self, sim, tmpdir, helpers):
-        """Test filtering of AS paths that are too long for the 'routeserver' peer type."""
+    def test_as_path_too_short_announce(self, sim, tmpdir, helpers):
+        """Test filtering of AS paths that are too short for the 'routeserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
+        ipv4_table, ipv6_table = self._announce_as_path_too_short(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
@@ -723,8 +723,8 @@ class TestBGPFilteringASPathTooLongRouteserver(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
-                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 5)],
+                        "BGP.as_path": self.too_short_as_path,
+                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 6)],
                         "BGP.local_pref": 450,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -748,8 +748,8 @@ class TestBGPFilteringASPathTooLongRouteserver(BGPFilteringASPathTooLongBase):
                 {
                     "asn": "AS65001",
                     "attributes": {
-                        "BGP.as_path": self.too_long_as_path,
-                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 5)],
+                        "BGP.as_path": self.too_short_as_path,
+                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 6)],
                         "BGP.local_pref": 450,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",

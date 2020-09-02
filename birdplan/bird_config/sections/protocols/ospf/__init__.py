@@ -18,10 +18,18 @@
 
 """BIRD OSPF protocol configuration."""
 
-from .direct import ProtocolDirect
-from .pipe import ProtocolPipe
-from .base import SectionProtocolBase
-from ....exceptions import BirdPlanError
+from typing import Any, Dict, List
+from .ospf_attributes import OSPFAttributes, OSPFRoutePolicyAccept, OSPFRoutePolicyRedistribute
+from ..direct import ProtocolDirect
+from ..pipe import ProtocolPipe
+from ..base import SectionProtocolBase
+from .....exceptions import BirdPlanError
+
+OSPFAreaConfig = Dict[str, str]
+OSPFAreas = Dict[str, OSPFAreaConfig]
+
+OSPFInterfaceConfig = Dict[str, Any]
+OSPFInterfaces = Dict[str, OSPFInterfaceConfig]
 
 
 class ProtocolOSPF(SectionProtocolBase):
@@ -29,26 +37,20 @@ class ProtocolOSPF(SectionProtocolBase):
 
     _section = "OSPF Protocol"
 
+    _areas: OSPFAreas
+    _interfaces: OSPFInterfaces
+
+    _ospf_attributes: OSPFAttributes
+
     def __init__(self, **kwargs):
         """Initialize the object."""
         super().__init__(**kwargs)
 
         # Areas and interfaces
-        self._ospf_areas = {}
-        self._ospf_interfaces = {}
+        self._areas = {}
+        self._interfaces = {}
 
-        # Some tunables...
-        self._ospf_accept = {
-            "default": False,
-        }
-
-        # OSPF route redistribution
-        self._ospf_redistribute = {
-            "connected": {},
-            "static": False,
-            "kernel": False,
-            "default": False,
-        }
+        self._ospf_attributes = OSPFAttributes()
 
     def configure(self):
         """Configure the OSPF protocol."""
@@ -96,8 +98,8 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add(ospf_master_pipe)
 
         # Check if we're redistributing connected routes, if we are, create the protocol and pipe
-        if self.redistribute_connected:
-            if "interfaces" not in self.redistribute_connected:
+        if self.route_policy_redistribute.connected:
+            if "interfaces" not in self.route_policy_redistribute.connected:
                 raise BirdPlanError("OSPF redistribute connected requires a list in item 'interfaces' to match interface names")
             # Add direct protocol for redistribution of connected routes
             ospf_direct_protocol = ProtocolDirect(
@@ -106,7 +108,7 @@ class ProtocolOSPF(SectionProtocolBase):
                 tables=self.tables,
                 birdconf_globals=self.birdconf_globals,
                 name="ospf",
-                interfaces=self.redistribute_connected["interfaces"],
+                interfaces=self.route_policy_redistribute.connected["interfaces"],
             )
             self.conf.add(ospf_direct_protocol)
             # Add pipe
@@ -121,20 +123,20 @@ class ProtocolOSPF(SectionProtocolBase):
             )
             self.conf.add(ospf_direct_pipe)
 
-    def add_area(self, area_name, area_config=None):
+    def add_area(self, area_name: str, area_config: OSPFAreaConfig):
         """Add area to OSPF."""
         # Make sure the area exists
         if area_name not in self.areas:
-            self._ospf_areas[area_name] = area_config
+            self._areas[area_name] = area_config
 
-    def add_interface(self, area_name, interface_name, interface_config):
+    def add_interface(self, area_name: str, interface_name: str, interface_config: OSPFInterfaceConfig):
         """Add interface to OSPF."""
         # Make sure the area exists
         if area_name not in self.interfaces:
-            self._ospf_interfaces[area_name] = {}
+            self._interfaces[area_name] = {}
         # Make sure the interface exists
         if interface_name not in self.interfaces[area_name]:
-            self._ospf_interfaces[area_name][interface_name] = []
+            self._interfaces[area_name][interface_name] = []
         # Grab the config so its easier to work with below
         config = self.interfaces[area_name][interface_name]
         # Work through supported configuration
@@ -148,17 +150,16 @@ class ProtocolOSPF(SectionProtocolBase):
             else:
                 raise BirdPlanError(f"The OSPF config for interface '{interface_name}' item '{key}' hasnt been added to Salt yet")
 
-    def _area_config(self):
+    def _area_config(self) -> List[str]:
         """Generate area configuration."""
 
         area_lines = []
         for area_name in self.interfaces:
             area_lines.append(f"  area {area_name} {{")
             # Loop with area config items
-            for config_item in self.areas[area_name]:
-                # Loop with key-value pairs
-                for key, value in config_item.items():
-                    area_lines.append(f"    {key} {value};")
+            # NK: NOT USED ATM
+            #            for key, value in self.areas[area_name].items():
+            #                area_lines.append(f"    {key} {value};")
             # Loop with interfaces
             for interface_name in sorted(self.interfaces[area_name].keys()):
                 interface = self.interfaces[area_name][interface_name]
@@ -198,25 +199,25 @@ class ProtocolOSPF(SectionProtocolBase):
 
         self.conf.add(f"filter f_ospf_export{ipv} {{")
         # Redistribute the default route
-        if not self.redistribute_default:
+        if not self.route_policy_redistribute.default:
             self.conf.add("  # Reject redistribution of the default route")
             self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self.conf.add("    reject;")
             self.conf.add("  }")
         # Redistribute connected
-        if self.redistribute_connected:
+        if self.route_policy_redistribute.connected:
             self.conf.add("  # Redistribute connected")
             self.conf.add("  if (source = RTS_DEVICE) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute static routes
-        if self.redistribute_static:
+        if self.route_policy_redistribute.static:
             self.conf.add("  # Redistribute static routes")
             self.conf.add("  if (source = RTS_STATIC) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute kernel routes
-        if self.redistribute_kernel:
+        if self.route_policy_redistribute.kernel:
             self.conf.add("  # Redistribute kernel routes")
             self.conf.add("  if (source = RTS_INHERIT) then {")
             self.conf.add("    accept;")
@@ -241,7 +242,7 @@ class ProtocolOSPF(SectionProtocolBase):
         # Configure export filter to master table
         self.conf.add(f"filter f_ospf{ipv}_master{ipv}_export {{")
         # Check if we accept the default route, if not block it
-        if not self.accept_default:
+        if not self.route_policy_accept.default:
             self.conf.add("  # Do not export default route to master (no accept:default)")
             self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self.conf.add("    reject;")
@@ -263,25 +264,25 @@ class ProtocolOSPF(SectionProtocolBase):
         # Configure import filter to master table
         self.conf.add(f"filter f_ospf{ipv}_master{ipv}_import {{")
         # Redistribute the default route
-        if not self.redistribute_default:
+        if not self.route_policy_redistribute.default:
             self.conf.add("  # Deny import of default route into OSPF (no redistribute_default)")
             self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self.conf.add("    reject;")
             self.conf.add("  }")
         # Redistribute connected
-        if self.redistribute_connected:
+        if self.route_policy_redistribute.connected:
             self.conf.add("  # Import RTS_DEVICE routes into OSPF (redistribute_connected)")
             self.conf.add("  if (source = RTS_DEVICE) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute static routes
-        if self.redistribute_static:
+        if self.route_policy_redistribute.static:
             self.conf.add("  # Import RTS_STATIC routes into OSPF (redistribute_static)")
             self.conf.add("  if (source = RTS_STATIC) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute kernel routes
-        if self.redistribute_kernel:
+        if self.route_policy_redistribute.kernel:
             self.conf.add("  # Import RTS_INHERIT routes (kernel routes) into OSPF (redistribute_kernel)")
             self.conf.add("  if (source = RTS_INHERIT) then {")
             self.conf.add("    accept;")
@@ -292,61 +293,26 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("")
 
     @property
-    def accept_default(self):
-        """Return if we accept the default route if we get it via OSPF."""
-        return self._ospf_accept["default"]
-
-    @accept_default.setter
-    def accept_default(self, value):
-        """Set if we accept the default route if we get it via OSPF."""
-        self._ospf_accept["default"] = value
-
-    @property
-    def redistribute_connected(self):
-        """Return if we redistribute connected routes."""
-        return self._ospf_redistribute["connected"]
-
-    @redistribute_connected.setter
-    def redistribute_connected(self, value):
-        """Set redistribute connected routes."""
-        self._ospf_redistribute["connected"] = value
-
-    @property
-    def redistribute_static(self):
-        """Return if we redistribute static routes."""
-        return self._ospf_redistribute["static"]
-
-    @redistribute_static.setter
-    def redistribute_static(self, value):
-        """Set if we redistribute static routes."""
-        self._ospf_redistribute["static"] = value
-
-    @property
-    def redistribute_kernel(self):
-        """Return if we redistribute kernel routes."""
-        return self._ospf_redistribute["kernel"]
-
-    @redistribute_kernel.setter
-    def redistribute_kernel(self, value):
-        """Set if we redistribute kernel routes."""
-        self._ospf_redistribute["kernel"] = value
-
-    @property
-    def redistribute_default(self):
-        """Return if we redistribute the default route."""
-        return self._ospf_redistribute["default"]
-
-    @redistribute_default.setter
-    def redistribute_default(self, value):
-        """Set if we redistribute the default route."""
-        self._ospf_redistribute["default"] = value
-
-    @property
-    def areas(self):
+    def areas(self) -> OSPFAreas:
         """Return OSPF areas."""
-        return self._ospf_areas
+        return self._areas
 
     @property
-    def interfaces(self):
+    def interfaces(self) -> OSPFInterfaces:
         """Return OSPF interfaces."""
-        return self._ospf_interfaces
+        return self._interfaces
+
+    @property
+    def ospf_attributes(self) -> OSPFAttributes:
+        """Return our OSPF protocol attributes."""
+        return self._ospf_attributes
+
+    @property
+    def route_policy_accept(self) -> OSPFRoutePolicyAccept:
+        """Return our route policy for accepting of routes from peers into the master table."""
+        return self.ospf_attributes.route_policy_accept
+
+    @property
+    def route_policy_redistribute(self) -> OSPFRoutePolicyRedistribute:
+        """Return our route policy for redistributing of routes to the main OSPF table."""
+        return self.ospf_attributes.route_policy_redistribute

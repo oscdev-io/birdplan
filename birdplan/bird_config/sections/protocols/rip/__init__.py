@@ -18,16 +18,25 @@
 
 """BIRD RIP protocol configuration."""
 
-from .direct import ProtocolDirect
-from .pipe import ProtocolPipe
-from .base import SectionProtocolBase
-from ....exceptions import BirdPlanError
+from typing import Dict, Union
+from .rip_attributes import RIPAttributes, RIPRoutePolicyAccept, RIPRoutePolicyRedistribute
+from ..direct import ProtocolDirect
+from ..pipe import ProtocolPipe
+from ..base import SectionProtocolBase
+from .....exceptions import BirdPlanError
+
+RIPInterfaceConfig = Union[bool, Dict[str, str]]
+RIPInterfaces = Dict[str, RIPInterfaceConfig]
 
 
 class ProtocolRIP(SectionProtocolBase):
     """BIRD RIP protocol configuration."""
 
     _section = "RIP Protocol"
+
+    _rip_interfaces: RIPInterfaces
+
+    _rip_attributes: RIPAttributes
 
     def __init__(self, **kwargs):
         """Initialize the object."""
@@ -36,19 +45,7 @@ class ProtocolRIP(SectionProtocolBase):
         # Interfaces
         self._rip_interfaces = {}
 
-        # Some tunables...
-        self._rip_accept = {
-            "default": False,
-        }
-
-        # RIP route redistribution
-        self._rip_redistribute = {
-            "connected": {},
-            "static": False,
-            "kernel": False,
-            "default": False,
-            "rip": True,
-        }
+        self._rip_attributes = RIPAttributes()
 
     def configure(self):
         """Configure the RIP protocol."""
@@ -94,8 +91,8 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add(rip_master_pipe)
 
         # Check if we're redistributing connected routes, if we are, create the protocol and pipe
-        if self.redistribute_connected:
-            if "interfaces" not in self.redistribute_connected:
+        if self.route_policy_redistribute.connected:
+            if "interfaces" not in self.route_policy_redistribute.connected:
                 raise BirdPlanError("RIP redistribute connected requires a list in item 'interfaces' to match interface names")
             # Add direct protocol for redistribution of connected routes
             rip_direct_protocol = ProtocolDirect(
@@ -104,7 +101,7 @@ class ProtocolRIP(SectionProtocolBase):
                 tables=self.tables,
                 birdconf_globals=self.birdconf_globals,
                 name="rip",
-                interfaces=self.redistribute_connected["interfaces"],
+                interfaces=self.route_policy_redistribute.connected["interfaces"],
             )
             self.conf.add(rip_direct_protocol)
             # Add pipe
@@ -119,20 +116,22 @@ class ProtocolRIP(SectionProtocolBase):
             )
             self.conf.add(rip_direct_pipe)
 
-    def add_interface(self, interface_name, interface_config):
+    def add_interface(self, interface_name: str, interface_config: RIPInterfaceConfig):
         """Add interface to RIP."""
         # Make sure the interface exists
         if interface_name not in self.interfaces:
-            self._rip_interfaces[interface_name] = []
+            self._rip_interfaces[interface_name] = {}
         # Grab the config so its easier to work with below
         config = self.interfaces[interface_name]
+        # If the interface is just a boolean, we can return...
+        if isinstance(interface_config, bool):
+            return
         # Work through supported configuration
-        for item in interface_config:
-            for key, value in item.items():
-                if key in ("metric", "update-time"):
-                    config.append({key: value})
-                else:
-                    raise BirdPlanError(f"The RIP config for interface '{interface_name}' item '{key}' hasnt been added")
+        for key, value in interface_config.items():
+            if key in ("metric", "update-time"):
+                config[key] = value
+            else:
+                raise BirdPlanError(f"The RIP config for interface '{interface_name}' item '{key}' hasnt been added")
 
     def _interface_config(self):
         """Generate interface configuration."""
@@ -143,13 +142,11 @@ class ProtocolRIP(SectionProtocolBase):
             interface = self.interfaces[interface_name]
             interface_lines.append(f'  interface "{interface_name}" {{')
             # Loop with config items
-            for config_item in interface:
-                # Loop with key-value pairs
-                for key, value in config_item.items():
-                    if (key == "update-time") and value:
-                        interface_lines.append(f"    update time {value};")
-                    else:
-                        interface_lines.append(f"    {key} {value};")
+            for key, value in interface.items():
+                if (key == "update-time") and value:
+                    interface_lines.append(f"    update time {value};")
+                else:
+                    interface_lines.append(f"    {key} {value};")
             interface_lines.append("  };")
 
         return interface_lines
@@ -177,31 +174,31 @@ class ProtocolRIP(SectionProtocolBase):
         """RIP export filter setup."""
         self.conf.add(f"filter f_rip_export{ipv} {{")
         # Redistribute the default route
-        if not self.redistribute_default:
+        if not self.route_policy_redistribute.default:
             self.conf.add("  # Reject redistribution of the default route")
             self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self.conf.add("    reject;")
             self.conf.add("  }")
         # Redistribute connected
-        if self.redistribute_connected:
+        if self.route_policy_redistribute.connected:
             self.conf.add("  # Redistribute connected")
             self.conf.add("  if (source = RTS_DEVICE) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute static routes
-        if self.redistribute_static:
+        if self.route_policy_redistribute.static:
             self.conf.add("  # Redistribute static routes")
             self.conf.add("  if (source = RTS_STATIC) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute kernel routes
-        if self.redistribute_kernel:
+        if self.route_policy_redistribute.kernel:
             self.conf.add("  # Redistribute kernel routes")
             self.conf.add("  if (source = RTS_INHERIT) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute RIP routes
-        if self.redistribute_rip:
+        if self.route_policy_redistribute.rip:
             self.conf.add("  # Redistribute RIP routes")
             self.conf.add("  if (source = RTS_RIP) then {")
             self.conf.add("    accept;")
@@ -226,7 +223,7 @@ class ProtocolRIP(SectionProtocolBase):
         # Configure export filter to master4
         self.conf.add(f"filter f_rip{ipv}_master{ipv}_export {{")
         # Check if we accept the default route, if not block it
-        if not self.accept_default:
+        if not self.route_policy_accept.default:
             self.conf.add("  # Do not export default route to master (no accept:default)")
             self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self.conf.add("    reject;")
@@ -247,25 +244,25 @@ class ProtocolRIP(SectionProtocolBase):
         # Configure import filter to master table
         self.conf.add(f"filter f_rip{ipv}_master{ipv}_import {{")
         # Redistribute the default route
-        if not self.redistribute_default:
+        if not self.route_policy_redistribute.default:
             self.conf.add("  # Deny import of default route into RIP (no redistribute_default)")
             self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
             self.conf.add("    reject;")
             self.conf.add("  }")
         # Redistribute connected
-        if self.redistribute_connected:
+        if self.route_policy_redistribute.connected:
             self.conf.add("  # Import RTS_DEVICE routes into RIP (redistribute_connected)")
             self.conf.add("  if (source = RTS_DEVICE) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute static routes
-        if self.redistribute_static:
+        if self.route_policy_redistribute.static:
             self.conf.add("  # Import RTS_STATIC routes into RIP (redistribute_static)")
             self.conf.add("  if (source = RTS_STATIC) then {")
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute kernel routes
-        if self.redistribute_kernel:
+        if self.route_policy_redistribute.kernel:
             self.conf.add("  # Import RTS_INHERIT routes (kernel routes) into RIP (redistribute_kernel)")
             self.conf.add("  if (source = RTS_INHERIT) then {")
             self.conf.add("    accept;")
@@ -276,66 +273,21 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add("")
 
     @property
-    def accept_default(self):
-        """Return if we will accept the default route if we get it via RIP."""
-        return self._rip_accept["default"]
-
-    @accept_default.setter
-    def accept_default(self, value):
-        """Set we will accept the default route if we get it via RIP."""
-        self._rip_accept["default"] = value
-
-    @property
-    def redistribute_connected(self):
-        """Return if we redistribute connected routes."""
-        return self._rip_redistribute["connected"]
-
-    @redistribute_connected.setter
-    def redistribute_connected(self, value):
-        """Set redistribute connected routes."""
-        self._rip_redistribute["connected"] = value
-
-    @property
-    def redistribute_static(self):
-        """Return if we redistribute static routes."""
-        return self._rip_redistribute["static"]
-
-    @redistribute_static.setter
-    def redistribute_static(self, value):
-        """Set redistribute static routes."""
-        self._rip_redistribute["static"] = value
-
-    @property
-    def redistribute_kernel(self):
-        """Return if we redistribute kernel routes."""
-        return self._rip_redistribute["kernel"]
-
-    @redistribute_kernel.setter
-    def redistribute_kernel(self, value):
-        """Set redistribute kernel routes."""
-        self._rip_redistribute["kernel"] = value
-
-    @property
-    def redistribute_default(self):
-        """Return if we redistribute the default route."""
-        return self._rip_redistribute["default"]
-
-    @redistribute_default.setter
-    def redistribute_default(self, value):
-        """Set redistribute the default route."""
-        self._rip_redistribute["default"] = value
-
-    @property
-    def redistribute_rip(self):
-        """Return if we redistribute RIP routes."""
-        return self._rip_redistribute["rip"]
-
-    @redistribute_rip.setter
-    def redistribute_rip(self, value):
-        """Set redistribute RIP routes."""
-        self._rip_redistribute["rip"] = value
-
-    @property
     def interfaces(self):
         """Return RIP interfaces."""
         return self._rip_interfaces
+
+    @property
+    def rip_attributes(self) -> RIPAttributes:
+        """Return our RIP protocol attributes."""
+        return self._rip_attributes
+
+    @property
+    def route_policy_accept(self) -> RIPRoutePolicyAccept:
+        """Return our route policy for accepting of routes from peers into the master table."""
+        return self.rip_attributes.route_policy_accept
+
+    @property
+    def route_policy_redistribute(self) -> RIPRoutePolicyRedistribute:
+        """Return our route policy for redistributing of routes to the main RIP table."""
+        return self.rip_attributes.route_policy_redistribute

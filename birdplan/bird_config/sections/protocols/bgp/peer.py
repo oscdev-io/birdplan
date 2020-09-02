@@ -840,19 +840,20 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         else:
             raise BirdPlanError(f"The BGP peer type '{self.type}' is not supported")
 
-        # Check if we're filtering allowed ASNs
-        if self.filter_asns:
-            type_lines.append("    # Filter on the allowed ASNs")
-            type_lines.append(f"    bgp_filter_asns({self.asn_list_name});")
-
-        # Check if we're filtering allowed prefixes
-        if self.filter_prefixes:
-            type_lines.append("    # Filter on the allowed prefixes")
-            type_lines.append(f"    bgp_filter_prefixes_v{ipv}({self.prefix_list_name(ipv)});")
-
-        # Quarantine mode...
-        if self.quarantined:
-            type_lines.append("    bgp_filter_quarantine();")
+        # In terms of a routecollector we only get a route collector large community filter, not any others
+        if self.type != "routecollector":
+            # Check if we're filtering allowed ASNs
+            if self.filter_asns:
+                type_lines.append("    # Filter on the allowed ASNs")
+                type_lines.append(f"    bgp_filter_asns({self.asn_list_name});")
+            # Check if we're filtering allowed prefixes
+            if self.filter_prefixes:
+                type_lines.append("    # Filter on the allowed prefixes")
+                type_lines.append(f"    bgp_filter_prefixes_v{ipv}({self.prefix_list_name(ipv)});")
+            # Quarantine mode...
+            if self.quarantined:
+                type_lines.append("    # Quarantine all prefixes received")
+                type_lines.append("    bgp_filter_quarantine();")
 
         # Check if we are adding a large community to incoming routes
         for large_community in sorted(self.incoming_large_communities):

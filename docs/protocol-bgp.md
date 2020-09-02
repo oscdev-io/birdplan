@@ -25,6 +25,7 @@ bgp:
 ...
 ```
 
+
 # asn
 
 Our BGP ASN. This is mandatory.
@@ -36,6 +37,7 @@ router_id: 0.0.0.1
 bgp:
   asn: 65000
 ```
+
 
 # import
 
@@ -77,6 +79,151 @@ bgp:
     - '100.101.0.0/24 blackhole'
     - 'fc00:101::/48 blackhole'
 ```
+
+
+# prefix_import_maxlen4
+
+Maximum IPv4 prefix length to import from a BGP peer without filtering. Defaults to `24`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_import_maxlen4: 25
+...
+```
+
+
+# prefix_import_minlen4
+
+Minimum IPv4 prefix length to import from a BGP peer without filtering. Defaults to `8`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_import_minlen4: 7
+...
+```
+
+
+# prefix_export_maxlen4
+
+Maximum IPv4 prefix length to export to a BGP peer. Defaults to `24`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_export_maxlen4: 25
+...
+```
+
+
+# prefix_export_minlen4
+
+Minimum IPv4 prefix length to export to a BGP peer. Defaults to `8`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_export_minlen4: 7
+...
+```
+
+
+# prefix_import_maxlen6
+
+Maximum IPv6 prefix length to import from a BGP peer without filtering. Defaults to `48`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_import_maxlen6: 47
+...
+```
+
+
+# prefix_import_minlen6
+
+Minimum IPv6 prefix length to import from a BGP peer without filtering. Defaults to `16`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_import_minlen6: 15
+...
+```
+
+
+# prefix_export_maxlen6
+
+Maximum IPv6 prefix length to export to a BGP peer. Defaults to `48`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_export_maxlen6: 47
+...
+```
+
+
+# prefix_export_minlen6
+
+Minimum IPv6 prefix length to export to a BGP peer. Defaults to `16`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_export_minlen6: 15
+...
+```
+
+
+# aspath_maxlen
+
+Maximum AS-PATH length to allow from a BGP peer without filtering. Defaults to `100`.
+
+You probably only want to change this if you know exactly what you're doing!
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  aspath_maxlen: 90
+...
+```
+
+
+# aspath_minlen
+
+Minimum AS-PATH length to allow from a BGP peer without filtering. Defaults to `1`.
+
+You probably NEVER want to change this.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  aspath_minlen: 2
+...
+```
+
 
 
 # peers
