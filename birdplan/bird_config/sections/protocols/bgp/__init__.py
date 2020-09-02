@@ -177,30 +177,30 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("")
 
         self.constants.conf.append("# Prefix sizes we will be using")
-        self.constants.conf.append(f"define BGP_PREFIX_MAXLEN4_IMPORT = {self.bgp_attributes.prefix_import_maxlen4};")
+        self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MAXLEN4 = {self.bgp_attributes.prefix_import_maxlen4};")
         # If we're in test mode, we need to restrict the minimum length so we can trigger tests with 100.64.0.0/X<16
         if self.birdconf_globals.test_mode:
-            self.constants.conf.append("define BGP_PREFIX_MINLEN4_IMPORT = 16;")
+            self.constants.conf.append("define BGP_PREFIX_IMPORT_MINLEN4 = 16;")
         else:
-            self.constants.conf.append(f"define BGP_PREFIX_MINLEN4_IMPORT = {self.bgp_attributes.prefix_import_minlen4};")
-        self.constants.conf.append(f"define BGP_PREFIX_MAXLEN4_EXPORT = {self.bgp_attributes.prefix_export_maxlen4};")
+            self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MINLEN4 = {self.bgp_attributes.prefix_import_minlen4};")
+        self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MAXLEN4 = {self.bgp_attributes.prefix_export_maxlen4};")
         # If we're in test mode, we need to restrict the minimum length so we can trigger tests with 100.64.0.0/X<16
         if self.birdconf_globals.test_mode:
-            self.constants.conf.append("define BGP_PREFIX_MINLEN4_EXPORT = 16;")
+            self.constants.conf.append("define BGP_PREFIX_EXPORT_MINLEN4 = 16;")
         else:
-            self.constants.conf.append(f"define BGP_PREFIX_MINLEN4_EXPORT = {self.bgp_attributes.prefix_export_minlen4};")
+            self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MINLEN4 = {self.bgp_attributes.prefix_export_minlen4};")
 
         # If we're in test mode, allow smaller prefixes
         if self.birdconf_globals.test_mode:
-            self.constants.conf.append("define BGP_PREFIX_MAXLEN6_IMPORT = 64;")
-            self.constants.conf.append("define BGP_PREFIX_MINLEN6_IMPORT = 32;")
-            self.constants.conf.append("define BGP_PREFIX_MAXLEN6_EXPORT = 64;")
-            self.constants.conf.append("define BGP_PREFIX_MINLEN6_EXPORT = 32;")
+            self.constants.conf.append("define BGP_PREFIX_IMPORT_MAXLEN6 = 64;")
+            self.constants.conf.append("define BGP_PREFIX_IMPORT_MINLEN6 = 32;")
+            self.constants.conf.append("define BGP_PREFIX_EXPORT_MAXLEN6 = 64;")
+            self.constants.conf.append("define BGP_PREFIX_EXPORT_MINLEN6 = 32;")
         else:
-            self.constants.conf.append(f"define BGP_PREFIX_MAXLEN6_IMPORT = {self.bgp_attributes.prefix_import_maxlen6};")
-            self.constants.conf.append(f"define BGP_PREFIX_MINLEN6_IMPORT = {self.bgp_attributes.prefix_import_minlen6};")
-            self.constants.conf.append(f"define BGP_PREFIX_MAXLEN6_EXPORT = {self.bgp_attributes.prefix_export_maxlen6};")
-            self.constants.conf.append(f"define BGP_PREFIX_MINLEN6_EXPORT = {self.bgp_attributes.prefix_export_minlen6};")
+            self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MAXLEN6 = {self.bgp_attributes.prefix_import_maxlen6};")
+            self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MINLEN6 = {self.bgp_attributes.prefix_import_minlen6};")
+            self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MAXLEN6 = {self.bgp_attributes.prefix_export_maxlen6};")
+            self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MINLEN6 = {self.bgp_attributes.prefix_export_minlen6};")
         self.constants.conf.append("")
 
         self.constants.conf.append("# BGP AS path min and max lengths")
@@ -413,11 +413,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         self.functions.conf.append("# Filter IPv4 prefix size")
         self.functions.conf.append("function bgp_filter_size_v4() {")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_MAXLEN4_IMPORT) then {")
+        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_IMPORT_MAXLEN4) then {")
         self.functions.conf.append('    print "[bgp_filter_size_v4] Adding BGP_FILTERED_PREFIX_LEN_TOO_LONG to ", net;', debug=True)
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_LONG);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_MINLEN4_IMPORT) then {")
+        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_IMPORT_MINLEN4) then {")
         self.functions.conf.append(
             '    print "[bgp_filter_size_v4] Adding BGP_FILTERED_PREFIX_LEN_TOO_SHORT to ", net;', debug=True
         )
@@ -428,11 +428,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         self.functions.conf.append("# Filter IPv6 prefix size")
         self.functions.conf.append("function bgp_filter_size_v6() {")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_MAXLEN6_IMPORT) then {")
+        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_IMPORT_MAXLEN6) then {")
         self.functions.conf.append('    print "[bgp_filter_size_v6] Adding BGP_FILTERED_PREFIX_LEN_TOO_LONG to ", net;', debug=True)
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_LONG);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_MINLEN6_IMPORT) then {")
+        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_IMPORT_MINLEN6) then {")
         self.functions.conf.append(
             '    print "[bgp_filter_size_v6] Adding BGP_FILTERED_PREFIX_LEN_TOO_SHORT to ", net;', debug=True
         )
@@ -596,15 +596,15 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Validate route before export")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_MAXLEN4_EXPORT) then {")
+        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_EXPORT_MAXLEN4) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v4] Not exporting due to prefix length > BGP_PREFIX_MAXLEN4_EXPORT for ", net;', debug=True
+            '    print "[bgp_can_export_v4] Not exporting due to prefix length > BGP_PREFIX_EXPORT_MAXLEN4 for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_MINLEN4_EXPORT) then {")
+        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_EXPORT_MINLEN4) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v4] Not exporting due to prefix length < BGP_PREFIX_MINLEN4_EXPORT for ", net;', debug=True
+            '    print "[bgp_can_export_v4] Not exporting due to prefix length < BGP_PREFIX_EXPORT_MINLEN4 for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
@@ -630,15 +630,15 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Validate route before export")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_MAXLEN6_EXPORT) then {")
+        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_EXPORT_MAXLEN6) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v6] Not exporting due to prefix length > BGP_PREFIX_MAXLEN6_EXPORT for ", net;', debug=True
+            '    print "[bgp_can_export_v6] Not exporting due to prefix length > BGP_PREFIX_EXPORT_MAXLEN6 for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_MINLEN6_EXPORT) then {")
+        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_EXPORT_MINLEN6) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v6] Not exporting due to prefix length < BGP_PREFIX_MINLEN6_EXPORT for ", net;', debug=True
+            '    print "[bgp_can_export_v6] Not exporting due to prefix length < BGP_PREFIX_EXPORT_MINLEN6 for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
@@ -849,89 +849,89 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     # IPV4 IMPORT PREFIX LENGTHS
 
     @property
-    def prefix_maxlen4_import(self):
-        """Return the current value of prefix_maxlen4_import."""
+    def prefix_import_maxlen4(self):
+        """Return the current value of prefix_import_maxlen4."""
         return self.bgp_attributes.prefix_import_maxlen4
 
-    @prefix_maxlen4_import.setter
-    def prefix_maxlen4_import(self, prefix_import_maxlen4: int):
-        """Setter for prefix_maxlen4_import."""
+    @prefix_import_maxlen4.setter
+    def prefix_import_maxlen4(self, prefix_import_maxlen4: int):
+        """Setter for prefix_import_maxlen4."""
         self.bgp_attributes.prefix_import_maxlen4 = prefix_import_maxlen4
 
     @property
-    def prefix_minlen4_import(self):
-        """Return the current value of prefix_minlen4_import."""
+    def prefix_import_minlen4(self):
+        """Return the current value of prefix_import_minlen4."""
         return self.bgp_attributes.prefix_import_minlen4
 
-    @prefix_minlen4_import.setter
-    def prefix_minlen4_import(self, prefix_import_minlen4: int):
-        """Setter for prefix_minlen4_import."""
+    @prefix_import_minlen4.setter
+    def prefix_import_minlen4(self, prefix_import_minlen4: int):
+        """Setter for prefix_import_minlen4."""
         self.bgp_attributes.prefix_import_minlen4 = prefix_import_minlen4
 
     # IPV4 EXPORT PREFIX LENGHTS
 
     @property
-    def prefix_maxlen4_export(self):
-        """Return the current value of prefix_maxlen4_export."""
+    def prefix_export_maxlen4(self):
+        """Return the current value of prefix_export_maxlen4."""
         return self.bgp_attributes.prefix_export_maxlen4
 
-    @prefix_maxlen4_export.setter
-    def prefix_maxlen4_export(self, prefix_export_maxlen4: int):
-        """Setter for prefix_maxlen4_export."""
+    @prefix_export_maxlen4.setter
+    def prefix_export_maxlen4(self, prefix_export_maxlen4: int):
+        """Setter for prefix_export_maxlen4."""
         self.bgp_attributes.prefix_export_maxlen4 = prefix_export_maxlen4
 
     @property
-    def prefix_minlen4_export(self):
-        """Return the current value of prefix_minlen4_export."""
+    def prefix_export_minlen4(self):
+        """Return the current value of prefix_export_minlen4."""
         return self.bgp_attributes.prefix_export_minlen4
 
-    @prefix_minlen4_export.setter
-    def prefix_minlen4_export(self, prefix_export_minlen4: int):
-        """Setter for prefix_minlen4_export."""
+    @prefix_export_minlen4.setter
+    def prefix_export_minlen4(self, prefix_export_minlen4: int):
+        """Setter for prefix_export_minlen4."""
         self.bgp_attributes.prefix_export_minlen4 = prefix_export_minlen4
 
     # IPV6 IMPORT LENGTHS
 
     @property
-    def prefix_maxlen6_import(self):
-        """Return the current value of prefix_maxlen6_import."""
+    def prefix_import_maxlen6(self):
+        """Return the current value of prefix_import_maxlen6."""
         return self.bgp_attributes.prefix_import_maxlen6
 
-    @prefix_maxlen6_import.setter
-    def prefix_maxlen6_import(self, prefix_import_maxlen6: int):
-        """Setter for prefix_maxlen6_import."""
+    @prefix_import_maxlen6.setter
+    def prefix_import_maxlen6(self, prefix_import_maxlen6: int):
+        """Setter for prefix_import_maxlen6."""
         self.bgp_attributes.prefix_import_maxlen6 = prefix_import_maxlen6
 
     @property
-    def prefix_minlen6_import(self):
-        """Return the current value of prefix_minlen6_import."""
+    def prefix_import_minlen6(self):
+        """Return the current value of prefix_import_minlen6."""
         return self.bgp_attributes.prefix_import_minlen6
 
-    @prefix_minlen6_import.setter
-    def prefix_minlen6_import(self, prefix_import_minlen6: int):
-        """Setter for prefix_minlen6_import."""
+    @prefix_import_minlen6.setter
+    def prefix_import_minlen6(self, prefix_import_minlen6: int):
+        """Setter for prefix_import_minlen6."""
         self.bgp_attributes.prefix_import_minlen6 = prefix_import_minlen6
 
     # IPV6 EXPORT LENGTHS
 
     @property
-    def prefix_minlen6_export(self):
-        """Return the current value of prefix_minlen6_export."""
+    def prefix_export_minlen6(self):
+        """Return the current value of prefix_export_minlen6."""
         return self.bgp_attributes.prefix_export_minlen6
 
-    @prefix_minlen6_export.setter
-    def prefix_minlen6_export(self, prefix_export_minlen6: int):
-        """Setter for prefix_minlen6_export."""
+    @prefix_export_minlen6.setter
+    def prefix_export_minlen6(self, prefix_export_minlen6: int):
+        """Setter for prefix_export_minlen6."""
         self.bgp_attributes.prefix_export_minlen6 = prefix_export_minlen6
 
     @property
-    def prefix_maxlen6_export(self):
-        """Return the current value of prefix_maxlen6_export."""
+    def prefix_export_maxlen6(self):
+        """Return the current value of prefix_export_maxlen6."""
         return self.bgp_attributes.prefix_export_maxlen6
 
-    @prefix_maxlen6_export.setter
-    def prefix_maxlen6_export(self, prefix_export_maxlen6: int):
-        """Setter for prefix_maxlen6_export."""
+    @prefix_export_maxlen6.setter
+    def prefix_export_maxlen6(self, prefix_export_maxlen6: int):
+        """Setter for prefix_export_maxlen6."""
         self.bgp_attributes.prefix_export_maxlen6 = prefix_export_maxlen6
 
     # AS PATH LENGTHS

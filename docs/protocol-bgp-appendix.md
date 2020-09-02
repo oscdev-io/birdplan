@@ -19,14 +19,14 @@ These are globals which can be overridden in configuration.
 
 | Constant | Size | Description |
 | --- | --- | --- |
-| PREFIX_MAXLEN4_IMPORT | 24 | Maximum IPv4 CIDR length to import |
-| PREFIX_MAXLEN4_EXPORT | 24 | Maximum IPv4 CIDR length to export |
-| PREFIX_MINLEN4_IMPORT | 8 | Minimum IPv4 CIDR length to import |
-| PREFIX_MINLEN4_EXPORT | 8 | Minimum IPv4 CIDR length to export |
-| PREFIX_MAXLEN6_IMPORT | 48 | Maximum IPv6 CIDR length to import |
-| PREFIX_MAXLEN6_EXPORT | 48 | Maximum IPv6 CIDR length to export |
-| PREFIX_MINLEN6_IMPORT | 16 | Minimum IPv6 CIDR length to import |
-| PREFIX_MINLEN6_EXPORT | 16 | Minimum IPv6 CIDR length to export |
+| PREFIX_IMPORT_MAXLEN4 | 24 | Maximum IPv4 CIDR length to import |
+| PREFIX_IMPORT_MINLEN4 | 8 | Minimum IPv4 CIDR length to import |
+| PREFIX_EXPORT_MAXLEN4 | 24 | Maximum IPv4 CIDR length to export |
+| PREFIX_EXPORT_MINLEN4 | 8 | Minimum IPv4 CIDR length to export |
+| PREFIX_IMPORT_MAXLEN6 | 48 | Maximum IPv6 CIDR length to import |
+| PREFIX_IMPORT_MINLEN6 | 16 | Minimum IPv6 CIDR length to import |
+| PREFIX_EXPORT_MAXLEN6 | 48 | Maximum IPv6 CIDR length to export |
+| PREFIX_EXPORT_MINLEN6 | 16 | Minimum IPv6 CIDR length to export |
 
 # Large Communities
 

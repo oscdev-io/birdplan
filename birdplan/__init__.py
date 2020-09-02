@@ -354,14 +354,14 @@ class BirdPlan:
             if config_item not in [
                 # Globals
                 "asn",
-                "prefix_maxlen4_import",
-                "prefix_maxlen4_export",
-                "prefix_minlen4_import",
-                "prefix_minlen4_export",
-                "prefix_maxlen6_import",
-                "prefix_maxlen6_export",
-                "prefix_minlen6_import",
-                "prefix_minlen6_export",
+                "prefix_import_maxlen4",
+                "prefix_export_maxlen4",
+                "prefix_import_minlen4",
+                "prefix_export_minlen4",
+                "prefix_import_maxlen6",
+                "prefix_export_maxlen6",
+                "prefix_import_minlen6",
+                "prefix_export_minlen6",
                 "aspath_maxlen",
                 "aspath_minlen",
                 # Origination
@@ -401,14 +401,14 @@ class BirdPlan:
 
         # Setup prefix lengths
         for item in [
-            "prefix_maxlen4_import",
-            "prefix_maxlen4_export",
-            "prefix_minlen4_import",
-            "prefix_minlen4_export",
-            "prefix_maxlen6_import",
-            "prefix_maxlen6_export",
-            "prefix_minlen6_import",
-            "prefix_minlen6_export",
+            "prefix_import_maxlen4",
+            "prefix_export_maxlen4",
+            "prefix_import_minlen4",
+            "prefix_export_minlen4",
+            "prefix_import_maxlen6",
+            "prefix_export_maxlen6",
+            "prefix_import_minlen6",
+            "prefix_export_minlen6",
             "aspath_maxlen",
             "aspath_minlen",
         ]:
