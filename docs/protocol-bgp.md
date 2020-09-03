@@ -251,7 +251,8 @@ bgp:
 
 The `accept` key contains a dictionary of routes we will accept. Namely...
 
-* `default` - Allows us to accept a default route from the BGP peer. The default is `False`.
+* `default` - Allows us to accept a default route from the BGP peer. The default is `False`. An exception will be raised if this is set to `True`
+for peers of type `customer`, `peer` and `routeserver`.
 
 Below is a configuration example...
 ```yaml
@@ -369,8 +370,14 @@ bgp:
 Filtering of routes received from a peer. Options available are below...
 
 * `prefixes` will filter on a list of allowed prefixes
-* `asns` will filter on a list of allowed ASN's
+* `asns` will filter on a list of allowed origin ASN's
 * `as_sets` will filter on a list of as-sets, resolving them at the same time.
+
+In the context of peer types `customer` and `peer` the above forms the ALLOW list. Everything other than what is specified will be filtered.
+
+In the context of peer types `transit` and `routeserver` the above forms the DENY list. Everything specified will be filtered.
+
+In the context of peer t ypes `rrclient`, `rrserver`, `rrserver-rrserver` and `routecollector` the above makes no sense. But will form a DENY list.
 
 An example is however below...
 ```yaml
@@ -566,7 +573,8 @@ bgp:
 
 Types of routes to redistribute to the peer, valid options are detailed below...
 
-* `default` will redistribute the default route, the type of route also needs to be redistributed. eg. `static`. Defaults to `False`.
+* `default` will redistribute the default route, the type of route also needs to be redistributed. eg. `static`. Defaults to `False` except
+for peer type `rrserver-rrserver` which defaults to `True`.
 * `connected` will redistribute connected routes. Defaults to `False`.
 * `static` will redistribute static routes in our global static configuration. Defaults to `False`.
 * `kernel` will redistribute kernel routes. Defaults to `False`.

@@ -459,22 +459,20 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-        self.functions.conf.append("# Filter IPv4 prefixes")
-        self.functions.conf.append("function bgp_filter_prefixes_v4(prefix set prefix_list) {")
+        self.functions.conf.append("# Filter prefixes (ALLOW)")
+        self.functions.conf.append("function bgp_filter_allow_prefixes(prefix set prefix_list) {")
         self.functions.conf.append("  if (net !~ prefix_list) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_prefixes_v4] Adding BGP_LC_FILTERED_PREFIX_FILTERED to ", net;', debug=True
+            '    print "[bgp_filter_allow_prefixes] Adding BGP_LC_FILTERED_PREFIX_FILTERED to ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_FILTERED);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
-        self.functions.conf.append("")
-
-        self.functions.conf.append("# Filter IPv6 prefixes")
-        self.functions.conf.append("function bgp_filter_prefixes_v6(prefix set prefix_list) {")
-        self.functions.conf.append("  if (net !~ prefix_list) then {")
+        self.functions.conf.append("# Filter prefixes (DENY)")
+        self.functions.conf.append("function bgp_filter_deny_prefixes(prefix set prefix_list) {")
+        self.functions.conf.append("  if (net ~ prefix_list) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_prefixes_v6] Adding BGP_LC_FILTERED_PREFIX_FILTERED to ", net;', debug=True
+            '    print "[bgp_filter_deny_prefixes] Adding BGP_LC_FILTERED_PREFIX_FILTERED to ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_FILTERED);")
         self.functions.conf.append("  }")
@@ -505,10 +503,17 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-        self.functions.conf.append("# Filter ASNs")
-        self.functions.conf.append("function bgp_filter_asns(int set asns) {")
+        self.functions.conf.append("# Filter ASNs (ALLOW list)")
+        self.functions.conf.append("function bgp_filter_allow_asns(int set asns) {")
         self.functions.conf.append("  if (bgp_path.last_nonaggregated !~ asns) then {")
-        self.functions.conf.append('    print "[bgp_filter_asns] Adding BGP_LC_FILTERED_ORIGIN_AS to ", net;', debug=True)
+        self.functions.conf.append('    print "[bgp_filter_allow_asns] Adding BGP_LC_FILTERED_ORIGIN_AS to ", net;', debug=True)
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ORIGIN_AS);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("# Filter ASNs (DENY list)")
+        self.functions.conf.append("function bgp_filter_deny_asns(int set asns) {")
+        self.functions.conf.append("  if (bgp_path.last_nonaggregated ~ asns) then {")
+        self.functions.conf.append('    print "[bgp_filter_deny_asns] Adding BGP_LC_FILTERED_ORIGIN_AS to ", net;', debug=True)
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ORIGIN_AS);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")

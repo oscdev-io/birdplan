@@ -227,7 +227,7 @@ class TestBGPFilteringOriginASFilteredTransit(BGPFilteringOriginASFilteredBase):
                     "asn": "AS65003",
                     "attributes": {
                         "BGP.as_path": [65001, 65003],
-                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 10)],
+                        "BGP.large_community": [(65000, 3, 4)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -252,7 +252,7 @@ class TestBGPFilteringOriginASFilteredTransit(BGPFilteringOriginASFilteredBase):
                     "asn": "AS65003",
                     "attributes": {
                         "BGP.as_path": [65001, 65003],
-                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 10)],
+                        "BGP.large_community": [(65000, 3, 4)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -270,8 +270,58 @@ class TestBGPFilteringOriginASFilteredTransit(BGPFilteringOriginASFilteredBase):
         }
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
-        # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        bgp4_table = self._bird_route_table(sim, "r1", "t_bgp4")
+        bgp6_table = self._bird_route_table(sim, "r1", "t_bgp6")
+
+        # Check bgp4 BIRD table
+        correct_result = {
+            "100.64.101.0/24": [
+                {
+                    "asn": "AS65003",
+                    "attributes": {
+                        "BGP.as_path": [65001, 65003],
+                        "BGP.large_community": [(65000, 3, 4)],
+                        "BGP.local_pref": 150,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp4_AS65001_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/64": [
+                {
+                    "asn": "AS65003",
+                    "attributes": {
+                        "BGP.as_path": [65001, 65003],
+                        "BGP.large_community": [(65000, 3, 4)],
+                        "BGP.local_pref": 150,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp6_AS65001_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
 class TestBGPFilteringOriginASFilteredRrclient(BGPFilteringOriginASFilteredBase):
@@ -303,7 +353,6 @@ class TestBGPFilteringOriginASFilteredRrclient(BGPFilteringOriginASFilteredBase)
                     "asn": "AS65003",
                     "attributes": {
                         "BGP.as_path": [65001, 65003],
-                        "BGP.large_community": [(65000, 1101, 10)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -328,7 +377,6 @@ class TestBGPFilteringOriginASFilteredRrclient(BGPFilteringOriginASFilteredBase)
                     "asn": "AS65003",
                     "attributes": {
                         "BGP.as_path": [65001, 65003],
-                        "BGP.large_community": [(65000, 1101, 10)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -346,8 +394,56 @@ class TestBGPFilteringOriginASFilteredRrclient(BGPFilteringOriginASFilteredBase)
         }
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
-        # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        bgp4_table = self._bird_route_table(sim, "r1", "t_bgp4")
+        bgp6_table = self._bird_route_table(sim, "r1", "t_bgp6")
+
+        # Check bgp4 BIRD table
+        correct_result = {
+            "100.64.101.0/24": [
+                {
+                    "asn": "AS65003",
+                    "attributes": {
+                        "BGP.as_path": [65001, 65003],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "from": "100.64.0.2",
+                    "pref": 100,
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp4_AS65000_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/64": [
+                {
+                    "asn": "AS65003",
+                    "attributes": {
+                        "BGP.as_path": [65001, 65003],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "from": "fc00:100::2",
+                    "pref": 100,
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp6_AS65000_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
 class TestBGPFilteringOriginASFilteredRrserver(BGPFilteringOriginASFilteredBase):
@@ -379,7 +475,6 @@ class TestBGPFilteringOriginASFilteredRrserver(BGPFilteringOriginASFilteredBase)
                     "asn": "AS65003",
                     "attributes": {
                         "BGP.as_path": [65001, 65003],
-                        "BGP.large_community": [(65000, 1101, 10)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -404,7 +499,6 @@ class TestBGPFilteringOriginASFilteredRrserver(BGPFilteringOriginASFilteredBase)
                     "asn": "AS65003",
                     "attributes": {
                         "BGP.as_path": [65001, 65003],
-                        "BGP.large_community": [(65000, 1101, 10)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -422,8 +516,56 @@ class TestBGPFilteringOriginASFilteredRrserver(BGPFilteringOriginASFilteredBase)
         }
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
-        # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        bgp4_table = self._bird_route_table(sim, "r1", "t_bgp4")
+        bgp6_table = self._bird_route_table(sim, "r1", "t_bgp6")
+
+        # Check bgp4 BIRD table
+        correct_result = {
+            "100.64.101.0/24": [
+                {
+                    "asn": "AS65003",
+                    "attributes": {
+                        "BGP.as_path": [65001, 65003],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "from": "100.64.0.2",
+                    "pref": 100,
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp4_AS65000_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/64": [
+                {
+                    "asn": "AS65003",
+                    "attributes": {
+                        "BGP.as_path": [65001, 65003],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "from": "fc00:100::2",
+                    "pref": 100,
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp6_AS65000_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
 class TestBGPFilteringOriginASFilteredRrserverRrserver(BGPFilteringOriginASFilteredBase):
@@ -455,7 +597,6 @@ class TestBGPFilteringOriginASFilteredRrserverRrserver(BGPFilteringOriginASFilte
                     "asn": "AS65003",
                     "attributes": {
                         "BGP.as_path": [65001, 65003],
-                        "BGP.large_community": [(65000, 1101, 10)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -480,7 +621,6 @@ class TestBGPFilteringOriginASFilteredRrserverRrserver(BGPFilteringOriginASFilte
                     "asn": "AS65003",
                     "attributes": {
                         "BGP.as_path": [65001, 65003],
-                        "BGP.large_community": [(65000, 1101, 10)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -498,8 +638,56 @@ class TestBGPFilteringOriginASFilteredRrserverRrserver(BGPFilteringOriginASFilte
         }
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
-        # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        bgp4_table = self._bird_route_table(sim, "r1", "t_bgp4")
+        bgp6_table = self._bird_route_table(sim, "r1", "t_bgp6")
+
+        # Check bgp4 BIRD table
+        correct_result = {
+            "100.64.101.0/24": [
+                {
+                    "asn": "AS65003",
+                    "attributes": {
+                        "BGP.as_path": [65001, 65003],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "from": "100.64.0.2",
+                    "pref": 100,
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp4_AS65000_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/64": [
+                {
+                    "asn": "AS65003",
+                    "attributes": {
+                        "BGP.as_path": [65001, 65003],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "from": "fc00:100::2",
+                    "pref": 100,
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp6_AS65000_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
 class TestBGPFilteringOriginASFilteredRoutecollector(BGPFilteringOriginASFilteredBase):
@@ -601,7 +789,7 @@ class TestBGPFilteringOriginASFilteredRouteserver(BGPFilteringOriginASFilteredBa
                     "asn": "AS65003",
                     "attributes": {
                         "BGP.as_path": [65001, 65003],
-                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 10)],
+                        "BGP.large_community": [(65000, 3, 5)],
                         "BGP.local_pref": 450,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -626,7 +814,7 @@ class TestBGPFilteringOriginASFilteredRouteserver(BGPFilteringOriginASFilteredBa
                     "asn": "AS65003",
                     "attributes": {
                         "BGP.as_path": [65001, 65003],
-                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 10)],
+                        "BGP.large_community": [(65000, 3, 5)],
                         "BGP.local_pref": 450,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -644,5 +832,55 @@ class TestBGPFilteringOriginASFilteredRouteserver(BGPFilteringOriginASFilteredBa
         }
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
-        # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        bgp4_table = self._bird_route_table(sim, "r1", "t_bgp4")
+        bgp6_table = self._bird_route_table(sim, "r1", "t_bgp6")
+
+        # Check bgp4 BIRD table
+        correct_result = {
+            "100.64.101.0/24": [
+                {
+                    "asn": "AS65003",
+                    "attributes": {
+                        "BGP.as_path": [65001, 65003],
+                        "BGP.large_community": [(65000, 3, 5)],
+                        "BGP.local_pref": 450,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp4_AS65001_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/64": [
+                {
+                    "asn": "AS65003",
+                    "attributes": {
+                        "BGP.as_path": [65001, 65003],
+                        "BGP.large_community": [(65000, 3, 5)],
+                        "BGP.local_pref": 450,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp6_AS65001_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
