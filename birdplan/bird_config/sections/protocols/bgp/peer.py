@@ -369,9 +369,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         prefix_lists = {"4": [], "6": []}
         for prefix in sorted(self.filter_prefixes):
             if ":" in prefix:
-                prefix_lists["4"].append(prefix)
-            else:
                 prefix_lists["6"].append(prefix)
+            else:
+                prefix_lists["4"].append(prefix)
 
         # Grab IRR prefixes
         irr_prefixes = {"ipv4": [], "ipv6": []}
@@ -387,7 +387,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             prefixes = []
             # Add statically defined prefix list
             if prefix_list:
-                prefixes.append(f"# {len(prefix_list)} statically defined")
+                prefixes.append(f"# {len(prefix_list)} explicitly defined")
                 prefixes.extend(prefix_list)
             # Add prefix list from IRR
             if prefix_list_irr:
@@ -806,16 +806,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append("    bgp_filter_asn_long();")
             type_lines.append("    bgp_filter_asn_short();")
             type_lines.append("    bgp_filter_asn_transit();")
-        # Route reflector client
-        elif self.type == "rrclient":
-            if not self.accept_default:
-                type_lines.append(f"    bgp_filter_default_v{ipv}();")
-        # Route reflector server
-        elif self.type == "rrserver":
-            if not self.accept_default:
-                type_lines.append(f"    bgp_filter_default_v{ipv}();")
-        # Route reflector server to route reflector server
-        elif self.type == "rrserver-rrserver":
+        # Route reflector peer types
+        elif self.type in ("rrclient", "rrserver", "rrserver-rrserver"):
             if not self.accept_default:
                 type_lines.append(f"    bgp_filter_default_v{ipv}();")
         # Transit providers
@@ -840,16 +832,30 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         else:
             raise BirdPlanError(f"The BGP peer type '{self.type}' is not supported")
 
-        # In terms of a routecollector we only get a route collector large community filter, not any others
-        if self.type != "routecollector":
+        # Flip around the meaning of filters depending on peer type
+        # For customer and peer, it is an ALLOW list
+        if self.type in ("customer", "peer"):
             # Check if we're filtering allowed ASNs
             if self.filter_asns:
                 type_lines.append("    # Filter on the allowed ASNs")
-                type_lines.append(f"    bgp_filter_asns({self.asn_list_name});")
+                type_lines.append(f"    bgp_filter_allow_asns({self.asn_list_name});")
             # Check if we're filtering allowed prefixes
             if self.filter_prefixes:
                 type_lines.append("    # Filter on the allowed prefixes")
-                type_lines.append(f"    bgp_filter_prefixes_v{ipv}({self.prefix_list_name(ipv)});")
+                type_lines.append(f"    bgp_filter_allow_prefixes({self.prefix_list_name(ipv)});")
+        # For everything else it is a DENY list
+        elif self.type != "routecollector":
+            # Check if we're filtering allowed ASNs
+            if self.filter_asns:
+                type_lines.append("    # Filter on the allowed ASNs")
+                type_lines.append(f"    bgp_filter_deny_asns({self.asn_list_name});")
+            # Check if we're filtering allowed prefixes
+            if self.filter_prefixes:
+                type_lines.append("    # Filter on the allowed prefixes")
+                type_lines.append(f"    bgp_filter_deny_prefixes({self.prefix_list_name(ipv)});")
+
+        # In terms of a routecollector we only get a route collector large community filter, not any others
+        if self.type != "routecollector":
             # Quarantine mode...
             if self.quarantined:
                 type_lines.append("    # Quarantine all prefixes received")

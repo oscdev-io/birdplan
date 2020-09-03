@@ -369,8 +369,14 @@ bgp:
 Filtering of routes received from a peer. Options available are below...
 
 * `prefixes` will filter on a list of allowed prefixes
-* `asns` will filter on a list of allowed ASN's
+* `asns` will filter on a list of allowed origin ASN's
 * `as_sets` will filter on a list of as-sets, resolving them at the same time.
+
+In the context of peer types `customer` and `peer` the above forms the ALLOW list. Everything other than what is specified will be filtered.
+
+In the context of peer types `transit` and `routeserver` the above forms the DENY list. Everything specified will be filtered.
+
+In the context of peer t ypes `rrclient`, `rrserver`, `rrserver-rrserver` and `routecollector` the above makes no sense. But will form a DENY list.
 
 An example is however below...
 ```yaml
