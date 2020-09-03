@@ -23,7 +23,7 @@ from typing import Dict, Optional
 
 class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
     """
-    BGP route policy for acceptance of routes from BGP peers into the main BGP table.
+    BGP route policy for acceptance of routes from the main BGP table into the master table.
 
     Attributes
     ----------
@@ -77,7 +77,7 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
     rr_cluster_id : Optional[str]
         Route relfector cluster ID in the case of us being a route reflector.
     route_policy_accept : BGPRoutePolicyAccept
-        Route policy for acceptance of routes from BGP peers into our main BGP table.
+        Route policy for acceptance of routes from the main BGP table into the master table.
     route_policy_import : BGPRoutePolicyImport
         Route policy for importing of routes from internal tables into our main BGP table.
 
