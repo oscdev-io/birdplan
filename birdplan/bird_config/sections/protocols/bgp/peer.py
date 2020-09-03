@@ -229,6 +229,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self._accept = {
             "default": False,
         }
+        # If this is a rrserver to rrserver peer, we need to by default redistribute the default route (if we have one)
+        if self.type == "rrserver-rrserver":
+            self._accept["default"] = True
         # Work out what we're going to be accepting
         if "accept" in peer_config:
             for accept_type, accept_config in peer_config["accept"].items():
@@ -757,12 +760,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # If this is the route from our peer, we need to check what type it is
         type_lines = []
 
+        # Check accept default is valid
+        if self.accept_default and self.type not in ("rrclient", "rrserver", "rrserver-rrserver", "transit"):
+            raise BirdPlanError(f"Having 'accept[default]' as True for a '{self.type}' makes no sense")
+
         # Clients
         if self.type == "customer":
             type_lines.append("    bgp_lc_remove_internal();")
             type_lines.append(f"    bgp_import_customer({self.asn}, {self.cost});")
-            if self.accept_default:
-                raise BirdPlanError("Having 'accept[default]' as True for a 'customer' makes no sense")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
             type_lines.append(f"    bgp_filter_size_v{ipv}();")
@@ -776,8 +781,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         elif self.type == "peer":
             type_lines.append("    bgp_lc_remove_all();")
             type_lines.append(f"    bgp_import_peer({self.asn}, {self.cost});")
-            if self.accept_default:
-                raise BirdPlanError("Having 'accept[default]' as True for a 'peer' makes no sense")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
             type_lines.append(f"    bgp_filter_size_v{ipv}();")
@@ -790,15 +793,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Routecollector
         elif self.type == "routecollector":
             type_lines.append("    bgp_lc_remove_all();")
-            if self.accept_default:
-                raise BirdPlanError("Having 'accept[default]' as True for a 'routecollector' makes no sense")
             type_lines.append("    bgp_filter_routecollector();")
         # Routeserver
         elif self.type == "routeserver":
             type_lines.append("    bgp_lc_remove_all();")
             type_lines.append(f"    bgp_import_routeserver({self.asn}, {self.cost});")
-            if self.accept_default:
-                raise BirdPlanError("Having 'accept[default]' as True for a 'routeserver' makes no sense")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
             type_lines.append(f"    bgp_filter_size_v{ipv}();")
