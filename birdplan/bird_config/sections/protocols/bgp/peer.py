@@ -363,9 +363,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Configure export filter to our main BGP table
         self.conf.add("# Export filter TO the main BGP table from the BGP peer table")
-        self.conf.add(f"filter {self.filter_name_export_bgp((ipv))}")
-        self.conf.add("int accept_route;")
-        self.conf.add("{")
+        self.conf.add(f"filter {self.filter_name_export_bgp((ipv))} {{")
         # Check if we're accepting the route...
         self.conf.add("  if (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_FILTERED, *)]) then {")
         self.conf.add(f'    print "[{self.filter_name_export_bgp((ipv))}] Filtered ", net, " to main BGP table";', debug=True)
@@ -707,7 +705,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Clients
         if self.peer_type == "customer":
-            type_lines.append("    bgp_large_community_strip_internal();")
+            type_lines.append("    bgp_communities_strip_internal();")
             type_lines.append(f"    bgp_import_customer({self.asn}, {self.cost});")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
@@ -721,7 +719,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append("    bgp_filter_community_length();")
         # Peers
         elif self.peer_type == "peer":
-            type_lines.append("    bgp_large_community_strip_all();")
+            type_lines.append("    bgp_communities_strip_all();")
             type_lines.append(f"    bgp_import_peer({self.asn}, {self.cost});")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
@@ -735,11 +733,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append("    bgp_filter_community_length();")
         # Routecollector
         elif self.peer_type == "routecollector":
-            type_lines.append("    bgp_large_community_strip_all();")
+            type_lines.append("    bgp_communities_strip_all();")
             type_lines.append("    bgp_filter_routecollector();")
         # Routeserver
         elif self.peer_type == "routeserver":
-            type_lines.append("    bgp_large_community_strip_all();")
+            type_lines.append("    bgp_communities_strip_all();")
             type_lines.append(f"    bgp_import_routeserver({self.asn}, {self.cost});")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
@@ -755,7 +753,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 type_lines.append(f"    bgp_filter_default_v{ipv}();")
         # Transit providers
         elif self.peer_type == "transit":
-            type_lines.append("    bgp_large_community_strip_all();")
+            type_lines.append("    bgp_communities_strip_all();")
             type_lines.append(f"    bgp_import_transit({self.asn}, {self.cost});")
             if self.route_policy_accept.default:
                 type_lines.append("    # Bypass bogon and size filters for the default route")
