@@ -18,6 +18,8 @@
 
 """BIRD BGP protocol configuration."""
 
+# pylint: disable=too-many-lines
+
 from typing import Dict, Optional
 from .bgp_attributes import BGPAttributes, BGPRoutePolicyAccept, BGPRoutePolicyImport
 from .peer import ProtocolBGPPeer
