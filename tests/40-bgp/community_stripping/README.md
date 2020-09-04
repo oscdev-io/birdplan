@@ -3,7 +3,11 @@
 Router r1 should be receiving routes from e1 test cases.
 
 Tests done include:
+  * Stripping community
+    * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
   * Stripping large community - filtered
+    * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
+  * Stripping large community - information
     * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
 
 ```plantuml
