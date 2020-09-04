@@ -208,6 +208,22 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append(f"define BGP_ASPATH_MINLEN = {self.bgp_attributes.aspath_minlen};")
         self.constants.conf.append("")
 
+        self.constants.conf.append("# Community maximum lengths")
+        self.constants.conf.append(f"define BGP_COMMUNITY_MAXLEN = {self.bgp_attributes.community_maxlen};")
+        self.constants.conf.append(f"define BGP_EXTENDED_COMMUNITY_MAXLEN = {self.bgp_attributes.extended_community_maxlen};")
+        self.constants.conf.append(f"define BGP_LARGE_COMMUNITY_MAXLEN = {self.bgp_attributes.large_community_maxlen};")
+        self.constants.conf.append("")
+        # NK: IMPORTANT IF THE ABOVE CHANGES UPDATE THE BELOW
+        self.constants.conf.append("# Community stripping")
+        if self.birdconf_globals.test_mode:
+            self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (2..65534, *) ];  # TESTING: Start changed from 1 to 2")
+        else:
+            self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (1..65534, *) ];")
+        self.constants.conf.append(
+            "define BGP_LARGE_COMMUNITY_STRIP = [ (BGP_ASN, 5, *), (BGP_ASN, 7..61, *), (BGP_ASN, 64..1100, *), "
+            "(BGP_ASN, 1102..65535) ];"
+        )
+
         self.constants.conf.append("# BGP Route Preferences")
         self.constants.conf.append("define BGP_PREF_OWN = 950;")  # -20 = Originate, -10 = static, -5 = kernel
         self.constants.conf.append("define BGP_PREF_CUSTOMER = 750;")
@@ -217,7 +233,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community functions")
-        # NK: IMPORTANT IF YOU CHANGE THE BELOW, UPDATE BGP_LC_STRIP
+        # NK: IMPORTANT IF YOU CHANGE THE BELOW, UPDATE BGP_LARGE_COMMUNITY_STRIP
         self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_ISO = 1;")
         self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_UN = 2;")
         self.constants.conf.append("define BGP_LC_FUNCTION_RELATION = 3;")
@@ -226,10 +242,6 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_TWO = 62;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_THREE = 63;")
         self.constants.conf.append("define BGP_LC_FUNCTION_FILTERED = 1101;")
-        # NK: IMPORTANT IF THE ABOVE CHANGES UPDATE THE BELOW
-        self.constants.conf.append(
-            "define BGP_LC_STRIP = [ (BGP_ASN, 5, *), (BGP_ASN, 7..61, *), (BGP_ASN, 64..1100, *), (BGP_ASN, 1102..65535) ];"
-        )
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community noexport")
@@ -265,6 +277,10 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_FILTERED_TOO_MANY_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 16);")
         self.constants.conf.append("define BGP_LC_FILTERED_ROUTECOLLECTOR = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 17);")
         self.constants.conf.append("define BGP_LC_FILTERED_QUARANTINED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 18);")
+        self.constants.conf.append(
+            "define BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 19);"
+        )
+        self.constants.conf.append("define BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 20);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Ref http://bgpfilterguide.nlnog.net/guides/no_transit_leaks")
@@ -298,41 +314,51 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append_title("BGP Functions")
 
         self.functions.conf.append("# Clear all our own BGP large communities")
-        self.functions.conf.append("function bgp_lc_remove_all() {")
+        self.functions.conf.append("function bgp_large_community_strip_all() {")
         self.functions.conf.append("  # Remove all our own")
         self.functions.conf.append("  if (bgp_large_community ~ [(BGP_ASN, *, *)]) then {")
-        self.functions.conf.append('    print "[bgp_lc_remove_all] Removing own communities from ", net;', debug=True)
+        self.functions.conf.append('    print "[bgp_large_community_strip_all] Removing own communities from ", net;', debug=True)
         self.functions.conf.append("    bgp_large_community.delete([(BGP_ASN, *, *)]);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
         self.functions.conf.append("# Clear internal large communities")
-        self.functions.conf.append("function bgp_lc_remove_internal() {")
+        self.functions.conf.append("function bgp_large_community_strip_internal() {")
         self.functions.conf.append("  # Remove location ISO")
         self.functions.conf.append("  if (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_LOCATION_ISO, *)]) then {")
-        self.functions.conf.append('    print "[bgp_lc_remove_internal] Removing location ISO communities from ", net;', debug=True)
+        self.functions.conf.append(
+            '    print "[bgp_large_community_strip_internal] Removing location ISO communities from ", net;', debug=True
+        )
         self.functions.conf.append("    bgp_large_community.delete([(BGP_ASN, BGP_LC_FUNCTION_LOCATION_ISO, *)]);")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Remove location UN")
         self.functions.conf.append("  if (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_LOCATION_UN, *)]) then {")
-        self.functions.conf.append('    print "[bgp_lc_remove_internal] Removing location UN communities from ", net;', debug=True)
+        self.functions.conf.append(
+            '    print "[bgp_large_community_strip_internal] Removing location UN communities from ", net;', debug=True
+        )
         self.functions.conf.append("    bgp_large_community.delete([(BGP_ASN, BGP_LC_FUNCTION_LOCATION_UN, *)]);")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Remove relations")
         self.functions.conf.append("  if (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_RELATION, *)]) then {")
-        self.functions.conf.append('    print "[bgp_lc_remove_internal] Removing relation communities from ", net;', debug=True)
+        self.functions.conf.append(
+            '    print "[bgp_large_community_strip_internal] Removing relation communities from ", net;', debug=True
+        )
         self.functions.conf.append("    bgp_large_community.delete([(BGP_ASN, BGP_LC_FUNCTION_RELATION, *)]);")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Remove filtered")
         self.functions.conf.append("  if (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_FILTERED, *)]) then {")
-        self.functions.conf.append('    print "[bgp_lc_remove_internal] Removing filtered communities from ", net;', debug=True)
+        self.functions.conf.append(
+            '    print "[bgp_large_community_strip_internal] Removing filtered communities from ", net;', debug=True
+        )
         self.functions.conf.append("    bgp_large_community.delete([(BGP_ASN, BGP_LC_FUNCTION_FILTERED, *)]);")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Remove stripped communities")
-        self.functions.conf.append("  if (bgp_large_community ~ BGP_LC_STRIP) then {")
-        self.functions.conf.append('    print "[bgp_lc_remove_internal] Removing stripped communities from ", net;', debug=True)
-        self.functions.conf.append("    bgp_large_community.delete(BGP_LC_STRIP);")
+        self.functions.conf.append("  if (bgp_large_community ~ BGP_LARGE_COMMUNITY_STRIP) then {")
+        self.functions.conf.append(
+            '    print "[bgp_large_community_strip_internal] Removing stripped communities from ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.delete(BGP_LARGE_COMMUNITY_STRIP);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
@@ -560,6 +586,36 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             '    print "[bgp_filter_asn_short] Adding BGP_LC_FILTERED_ASPATH_TOO_SHORT to ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ASPATH_TOO_SHORT);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Filter too many communities")
+        self.functions.conf.append("function bgp_filter_community_length() {")
+        self.functions.conf.append("  if (bgp_community.len > BGP_COMMUNITY_MAXLEN) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_community_length] Adding BGP_LC_FILTERED_TOO_MANY_COMMUNITIES to ", net, '
+            '" counted ", bgp_community.len;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_TOO_MANY_COMMUNITIES);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  if (bgp_ext_community.len > BGP_EXTENDED_COMMUNITY_MAXLEN) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_community_length] Adding BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES to ", net, '
+            '" counted ", bgp_ext_community.len;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("")
+        self.functions.conf.append("  if (bgp_large_community.len > BGP_LARGE_COMMUNITY_MAXLEN) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_community_length] Adding BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES to ", net, '
+            '" counted ", bgp_large_community.len;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
@@ -963,3 +1019,35 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     def aspath_maxlen(self, aspath_maxlen: int):
         """Set the AS path maxlen."""
         self.bgp_attributes.aspath_maxlen = aspath_maxlen
+
+    # COMMUNITY LENGTHS
+
+    @property
+    def community_maxlen(self) -> int:
+        """Return the current value of community_maxlen."""
+        return self.bgp_attributes.community_maxlen
+
+    @community_maxlen.setter
+    def community_maxlen(self, community_maxlen: int):
+        """Set the value of community_maxlen."""
+        self.bgp_attributes.community_maxlen = community_maxlen
+
+    @property
+    def extended_community_maxlen(self) -> int:
+        """Return the current value of extended_community_maxlen."""
+        return self.bgp_attributes.extended_community_maxlen
+
+    @extended_community_maxlen.setter
+    def extended_community_maxlen(self, extended_community_maxlen: int):
+        """Set the value of extended_community_maxlen."""
+        self.bgp_attributes.extended_community_maxlen = extended_community_maxlen
+
+    @property
+    def large_community_maxlen(self) -> int:
+        """Return the current value of large_community_maxlen."""
+        return self.bgp_attributes.large_community_maxlen
+
+    @large_community_maxlen.setter
+    def large_community_maxlen(self, large_community_maxlen: int):
+        """Set the value of large_community_maxlen."""
+        self.bgp_attributes.large_community_maxlen = large_community_maxlen

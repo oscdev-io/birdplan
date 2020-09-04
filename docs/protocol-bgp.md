@@ -225,6 +225,53 @@ bgp:
 ```
 
 
+# community_maxlen
+
+Maximum number of communities before the prefix gets filtered. Defaults to `100`.
+
+You probably only want to change this if you know exactly what you're doing!
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  community_maxlen: 90
+...
+```
+
+
+# extended_community_maxlen
+
+Maximum number of extended communities before the prefix gets filtered. Defaults to `100`.
+
+You probably only want to change this if you know exactly what you're doing!
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  extended_community_maxlen: 90
+...
+```
+
+
+# large_community_maxlen
+
+Maximum number of large communities before the prefix gets filtered. Defaults to `100`.
+
+You probably only want to change this if you know exactly what you're doing!
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  large_community_maxlen: 90
+...
+```
+
 
 # peers
 

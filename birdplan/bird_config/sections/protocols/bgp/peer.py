@@ -707,7 +707,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Clients
         if self.peer_type == "customer":
-            type_lines.append("    bgp_lc_remove_internal();")
+            type_lines.append("    bgp_large_community_strip_internal();")
             type_lines.append(f"    bgp_import_customer({self.asn}, {self.cost});")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
@@ -715,12 +715,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append("    bgp_filter_asn_bogons();")
             type_lines.append("    bgp_filter_asn_long();")
             type_lines.append("    bgp_filter_asn_short();")
-            type_lines.append("    bgp_filter_nexthop_not_peerip();")
             type_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
             type_lines.append("    bgp_filter_asn_transit();")
+            type_lines.append("    bgp_filter_nexthop_not_peerip();")
+            type_lines.append("    bgp_filter_community_length();")
         # Peers
         elif self.peer_type == "peer":
-            type_lines.append("    bgp_lc_remove_all();")
+            type_lines.append("    bgp_large_community_strip_all();")
             type_lines.append(f"    bgp_import_peer({self.asn}, {self.cost});")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
@@ -731,13 +732,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append("    bgp_filter_nexthop_not_peerip();")
             type_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
             type_lines.append("    bgp_filter_asn_transit();")
+            type_lines.append("    bgp_filter_community_length();")
         # Routecollector
         elif self.peer_type == "routecollector":
-            type_lines.append("    bgp_lc_remove_all();")
+            type_lines.append("    bgp_large_community_strip_all();")
             type_lines.append("    bgp_filter_routecollector();")
         # Routeserver
         elif self.peer_type == "routeserver":
-            type_lines.append("    bgp_lc_remove_all();")
+            type_lines.append("    bgp_large_community_strip_all();")
             type_lines.append(f"    bgp_import_routeserver({self.asn}, {self.cost});")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
@@ -746,13 +748,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append("    bgp_filter_asn_long();")
             type_lines.append("    bgp_filter_asn_short();")
             type_lines.append("    bgp_filter_asn_transit();")
+            type_lines.append("    bgp_filter_community_length();")
         # Route reflector peer types
         elif self.peer_type in ("rrclient", "rrserver", "rrserver-rrserver"):
             if not self.route_policy_accept.default:
                 type_lines.append(f"    bgp_filter_default_v{ipv}();")
         # Transit providers
         elif self.peer_type == "transit":
-            type_lines.append("    bgp_lc_remove_all();")
+            type_lines.append("    bgp_large_community_strip_all();")
             type_lines.append(f"    bgp_import_transit({self.asn}, {self.cost});")
             if self.route_policy_accept.default:
                 type_lines.append("    # Bypass bogon and size filters for the default route")
@@ -767,8 +770,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append("    bgp_filter_asn_bogons();")
             type_lines.append("    bgp_filter_asn_long();")
             type_lines.append("    bgp_filter_asn_short();")
-            type_lines.append("    bgp_filter_nexthop_not_peerip();")
             type_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
+            type_lines.append("    bgp_filter_nexthop_not_peerip();")
+            type_lines.append("    bgp_filter_community_length();")
         else:
             raise BirdPlanError(f"The BGP peer type '{self.peer_type}' is not supported")
 
