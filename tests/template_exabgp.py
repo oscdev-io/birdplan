@@ -27,7 +27,7 @@ from nsnetsim.switch_node import SwitchNode
 from basetests import BirdPlanBaseTestCase
 
 
-class BGPFilteringBase(BirdPlanBaseTestCase):
+class BirdplanBaseTestCaseExabgp(BirdPlanBaseTestCase):
     """BGP base test for filtering."""
 
     test_dir = os.path.dirname(__file__)

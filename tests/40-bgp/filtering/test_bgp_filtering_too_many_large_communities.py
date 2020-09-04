@@ -22,10 +22,10 @@
 
 from typing import List, Tuple
 import os
-from template import BGPFilteringBase
+from template_exabgp import BirdplanBaseTestCaseExabgp
 
 
-class BGPFilteringTooManyLargeCommunitiesBase(BGPFilteringBase):
+class BGPFilteringTooManyLargeCommunitiesBase(BirdplanBaseTestCaseExabgp):
     """Base class for BGP filtering of too many large communities."""
 
     test_dir = os.path.dirname(__file__)

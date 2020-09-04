@@ -22,10 +22,10 @@
 
 from typing import Tuple
 import os
-from template import BGPFilteringBase
+from template_exabgp import BirdplanBaseTestCaseExabgp
 
 
-class BGPFilteringDefaultNotAllowedBase(BGPFilteringBase):
+class BGPFilteringDefaultNotAllowedBase(BirdplanBaseTestCaseExabgp):
     """Base class for BGP filtering of default route not allowed."""
 
     test_dir = os.path.dirname(__file__)

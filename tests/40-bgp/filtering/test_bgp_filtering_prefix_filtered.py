@@ -22,10 +22,10 @@
 
 from typing import Tuple
 import os
-from template import BGPFilteringBase
+from template_exabgp import BirdplanBaseTestCaseExabgp
 
 
-class BGPFilteringPrefixFilteredBase(BGPFilteringBase):
+class BGPFilteringPrefixFilteredBase(BirdplanBaseTestCaseExabgp):
     """Base class for BGP filtering of filtered prefixes."""
 
     test_dir = os.path.dirname(__file__)
