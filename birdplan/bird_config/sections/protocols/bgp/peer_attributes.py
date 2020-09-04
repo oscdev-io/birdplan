@@ -237,27 +237,28 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods
     peer_type: str
     asn: int
 
-    neighbor4: Optional[str]
-    neighbor6: Optional[str]
-    source_address4: Optional[str]
-    source_address6: Optional[str]
+    neighbor4: Optional[str] = None
+    neighbor6: Optional[str] = None
+    source_address4: Optional[str] = None
+    source_address6: Optional[str] = None
 
-    connect_delay_time: Optional[str]
-    connect_retry_time: Optional[str]
-    error_wait_time: Optional[str]
-    multihop: Optional[str]
-    password: Optional[str]
+    connect_delay_time: Optional[str] = None
+    connect_retry_time: Optional[str] = None
+    error_wait_time: Optional[str] = None
+    multihop: Optional[str] = None
+    password: Optional[str] = None
 
-    cost: int
+    cost: int = 0
 
     large_communities: BGPPeerLargeCommunities
 
-    passive: bool
+    # Default to disabling passive mode
+    passive: bool = False
 
-    quarantined: bool
+    quarantined: bool = False
 
-    prefix_limit4: Optional[str]
-    prefix_limit6: Optional[str]
+    prefix_limit4: Optional[str] = None
+    prefix_limit6: Optional[str] = None
 
     route_policy_accept: BGPPeerRoutePolicyAccept
     route_policy_redistribute: BGPPeerRoutePolicyRedistribute
@@ -275,30 +276,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods
         self.peer_type = None
         self.asn = None
 
-        self.neighbor4 = None
-        self.neighbor6 = None
-        self.source_address4 = None
-        self.source_address6 = None
-
-        self.connect_delay_time = None
-        self.connect_retry_time = None
-        self.error_wait_time = None
-        self.multihop = None
-        self.password = None
-
-        self.cost = 0
-
         self.large_communities = BGPPeerLargeCommunities()
-
-        # Default to disabling passive mode
-        self.passive = False
-
-        # Quarantine mode
-        self.quarantined = False
-
-        # Prefix limits
-        self.prefix_limit4 = None
-        self.prefix_limit6 = None
 
         # Route policies
         self.route_policy_accept = BGPPeerRoutePolicyAccept()

@@ -16,43 +16,60 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGP filtering of bogons."""
+"""BGP filtering of too many communities."""
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-from typing import Tuple
+from typing import List, Tuple
 import os
 from template import BGPFilteringBase
 
 
-class BGPFilteringBogonBase(BGPFilteringBase):
-    """Base class for BGP filtering of bogons."""
+class BGPFilteringTooManyCommunitiesBase(BGPFilteringBase):
+    """Base class for BGP filtering of too many communities."""
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1"]
+    too_many_communities: List[Tuple[int, int]] = []
+    global_config = """
+  community_maxlen: 50
+"""
 
-    def _announce_bogon(self, sim) -> Tuple:
-        """Announce a bogon from ExaBGP to BIRD."""
+    def _announce_too_many_communities(self, sim) -> Tuple:
+        """Announce a prefix that has a too many communities from ExaBGP to BIRD."""
 
-        self._exabgpcli(sim, "e1", ["neighbor 100.64.0.1 announce route 172.16.0.0/24 next-hop 100.64.0.2"])
-        self._exabgpcli(sim, "e1", ["neighbor fc00:100::1 announce route 2001:db8::/48 next-hop fc00:100::2"])
+        # Create tuple (1, x) for each x up to maxlen
+        self.too_many_communities = [(1, x) for x in range(0, sim.config("r1").birdconf.protocols.bgp.community_maxlen + 1)]
+        # Convert to a 1:x format separated by spaces for exabgp
+        too_many_communities_str = " ".join([f"{x[0]}:{x[1]}" for x in self.too_many_communities])
+
+        self._exabgpcli(
+            sim,
+            "e1",
+            ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 community [" + too_many_communities_str + "]"],
+        )
+        self._exabgpcli(
+            sim,
+            "e1",
+            ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 community [" + too_many_communities_str + "]"],
+        )
 
         # Grab IPv4 table name and get entries
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r1", "e1", 4)
         peer_bgp4_table = self._bird_route_table(sim, "r1", peer_bgp_table_name, expect_count=1)
-        assert len(peer_bgp4_table) == 1, "Failed to announce IPv4 bogon"
+        assert len(peer_bgp4_table) == 1, "Failed to announce IPv4 with too many communities"
 
         # Grab IPv6 table name and get entries
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r1", "e1", 6)
         peer_bgp6_table = self._bird_route_table(sim, "r1", peer_bgp_table_name, expect_count=1)
-        assert len(peer_bgp6_table) == 1, "Failed to announce IPv6 boggon"
+        assert len(peer_bgp6_table) == 1, "Failed to announce IPv6 with too many communities"
 
         # Return our two routing tables
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestCustomer(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'customer' peer type."""
+class TestCustomer(BGPFilteringTooManyCommunitiesBase):
+    """Test filtering of too many communities for the 'customer' peer type."""
 
     # BIRD configuration
     peer_type = "customer"
@@ -61,23 +78,24 @@ class TestCustomer(BGPFilteringBogonBase):
         asns: [65001]
 """
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'customer' peer type."""
+    def test_too_many_communities_announce(self, sim, tmpdir, helpers):
+        """Test filtering of too many communities for the 'customer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_too_many_communities(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
                     "asn": "AS65001",
                     "attributes": {
                         "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 3)],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 16)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -97,12 +115,13 @@ class TestCustomer(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
                     "asn": "AS65001",
                     "attributes": {
                         "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 3)],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 16)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -124,29 +143,30 @@ class TestCustomer(BGPFilteringBogonBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestPeer(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'peer' peer type."""
+class TestPeer(BGPFilteringTooManyCommunitiesBase):
+    """Test filtering of too many communities for the 'peer' peer type."""
 
     # BIRD configuration
     peer_type = "peer"
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'peer' peer type."""
+    def test_too_many_communities_announce(self, sim, tmpdir, helpers):
+        """Test filtering of too many communities for the 'peer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_too_many_communities(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
                     "asn": "AS65001",
                     "attributes": {
                         "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 3)],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 16)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -166,12 +186,13 @@ class TestPeer(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
                     "asn": "AS65001",
                     "attributes": {
                         "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 3)],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 16)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -193,29 +214,30 @@ class TestPeer(BGPFilteringBogonBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestTransit(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'transit' peer type."""
+class TestTransit(BGPFilteringTooManyCommunitiesBase):
+    """Test filtering of too many communities for the 'transit' peer type."""
 
     # BIRD configuration
     peer_type = "transit"
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'transit' peer type."""
+    def test_too_many_communities_announce(self, sim, tmpdir, helpers):
+        """Test filtering of too many communities for the 'transit' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_too_many_communities(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
                     "asn": "AS65001",
                     "attributes": {
                         "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 3)],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 16)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -235,12 +257,13 @@ class TestTransit(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
                     "asn": "AS65001",
                     "attributes": {
                         "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 3)],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 16)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -262,8 +285,8 @@ class TestTransit(BGPFilteringBogonBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestRrclient(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'rrclient' peer type."""
+class TestRrclient(BGPFilteringTooManyCommunitiesBase):
+    """Test filtering of too many communities for the 'rrclient' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -272,20 +295,26 @@ class TestRrclient(BGPFilteringBogonBase):
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'rrclient' peer type."""
+    def test_too_many_communities_announce(self, sim, tmpdir, helpers):
+        """Test filtering of too many communities for the 'rrclient' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_too_many_communities(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -301,9 +330,15 @@ class TestRrclient(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -323,9 +358,15 @@ class TestRrclient(BGPFilteringBogonBase):
 
         # Check bgp4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -341,9 +382,15 @@ class TestRrclient(BGPFilteringBogonBase):
 
         # Check bgp6 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -358,8 +405,8 @@ class TestRrclient(BGPFilteringBogonBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRrserver(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'rrserver' peer type."""
+class TestRrserver(BGPFilteringTooManyCommunitiesBase):
+    """Test filtering of too many communities for the 'rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -368,20 +415,26 @@ class TestRrserver(BGPFilteringBogonBase):
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'rrserver' peer type."""
+    def test_too_many_communities_announce(self, sim, tmpdir, helpers):
+        """Test filtering of too many communities for the 'rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_too_many_communities(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -397,9 +450,15 @@ class TestRrserver(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -419,9 +478,15 @@ class TestRrserver(BGPFilteringBogonBase):
 
         # Check bgp4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -437,9 +502,15 @@ class TestRrserver(BGPFilteringBogonBase):
 
         # Check bgp6 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -454,8 +525,8 @@ class TestRrserver(BGPFilteringBogonBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRrserverRrserver(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'rrserver-rrserver' peer type."""
+class TestRrserverRrserver(BGPFilteringTooManyCommunitiesBase):
+    """Test filtering of too many communities for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -464,20 +535,26 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'rrserver-rrserver' peer type."""
+    def test_too_many_communities_announce(self, sim, tmpdir, helpers):
+        """Test filtering of too many communities for the 'rrserver-rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_too_many_communities(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -493,9 +570,15 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -515,9 +598,15 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
 
         # Check bgp4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -533,9 +622,15 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
 
         # Check bgp6 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -550,28 +645,29 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRoutecollector(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'routecollector' peer type."""
+class TestRoutecollector(BGPFilteringTooManyCommunitiesBase):
+    """Test filtering of too many communities for the 'routecollector' peer type."""
 
     # BIRD configuration
     peer_type = "routecollector"
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'routecollector' peer type."""
+    def test_too_many_communities_announce(self, sim, tmpdir, helpers):
+        """Test filtering of too many communities for the 'routecollector' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_too_many_communities(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
                     "asn": "AS65001",
                     "attributes": {
                         "BGP.as_path": [65001],
+                        "BGP.community": self.too_many_communities,
                         "BGP.large_community": [(65000, 1101, 17)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
@@ -592,11 +688,12 @@ class TestRoutecollector(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
                     "asn": "AS65001",
                     "attributes": {
                         "BGP.as_path": [65001],
+                        "BGP.community": self.too_many_communities,
                         "BGP.large_community": [(65000, 1101, 17)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
@@ -619,29 +716,30 @@ class TestRoutecollector(BGPFilteringBogonBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestRouteserver(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'routeserver' peer type."""
+class TestRouteserver(BGPFilteringTooManyCommunitiesBase):
+    """Test filtering of too many communities for the 'routeserver' peer type."""
 
     # BIRD configuration
     peer_type = "routeserver"
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'routeserver' peer type."""
+    def test_too_many_communities_announce(self, sim, tmpdir, helpers):
+        """Test filtering of too many communities for the 'routeserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_too_many_communities(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
                     "asn": "AS65001",
                     "attributes": {
                         "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 3)],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 16)],
                         "BGP.local_pref": 450,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -661,12 +759,13 @@ class TestRouteserver(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
                     "asn": "AS65001",
                     "attributes": {
                         "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 3)],
+                        "BGP.community": self.too_many_communities,
+                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 16)],
                         "BGP.local_pref": 450,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",

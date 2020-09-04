@@ -364,6 +364,9 @@ class BirdPlan:
                 "prefix_export_minlen6",
                 "aspath_maxlen",
                 "aspath_minlen",
+                "community_maxlen",
+                "extended_community_maxlen",
+                "large_community_maxlen",
                 # Origination
                 "originate",
                 "accept",
@@ -411,6 +414,9 @@ class BirdPlan:
             "prefix_export_minlen6",
             "aspath_maxlen",
             "aspath_minlen",
+            "community_maxlen",
+            "extended_community_maxlen",
+            "large_community_maxlen",
         ]:
             if item in self.config["bgp"]:
                 setattr(self.birdconf.protocols.bgp, item, self.config["bgp"][item])

@@ -51,7 +51,7 @@ class BGPFilteringQuarantinedBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringQuarantinedCustomer(BGPFilteringQuarantinedBase):
+class TestCustomer(BGPFilteringQuarantinedBase):
     """Test filtering of quarantined peers for the 'customer' peer type."""
 
     # BIRD configuration
@@ -125,7 +125,7 @@ class TestBGPFilteringQuarantinedCustomer(BGPFilteringQuarantinedBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringQuarantinedPeer(BGPFilteringQuarantinedBase):
+class TestPeer(BGPFilteringQuarantinedBase):
     """Test filtering of quarantined peers for the 'peer' peer type."""
 
     # BIRD configuration
@@ -197,7 +197,7 @@ class TestBGPFilteringQuarantinedPeer(BGPFilteringQuarantinedBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringQuarantinedTransit(BGPFilteringQuarantinedBase):
+class TestTransit(BGPFilteringQuarantinedBase):
     """Test filtering of quarantined peers for the 'transit' peer type."""
 
     # BIRD configuration
@@ -269,7 +269,7 @@ class TestBGPFilteringQuarantinedTransit(BGPFilteringQuarantinedBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringQuarantinedRrclient(BGPFilteringQuarantinedBase):
+class TestRrclient(BGPFilteringQuarantinedBase):
     """Test filtering of quarantined peers for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -342,7 +342,7 @@ class TestBGPFilteringQuarantinedRrclient(BGPFilteringQuarantinedBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringQuarantinedRrserver(BGPFilteringQuarantinedBase):
+class TestRrserver(BGPFilteringQuarantinedBase):
     """Test filtering of quarantined peers for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -415,7 +415,7 @@ class TestBGPFilteringQuarantinedRrserver(BGPFilteringQuarantinedBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringQuarantinedRrserverRrserver(BGPFilteringQuarantinedBase):
+class TestRrserverRrserver(BGPFilteringQuarantinedBase):
     """Test filtering of quarantined peers for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -488,7 +488,7 @@ class TestBGPFilteringQuarantinedRrserverRrserver(BGPFilteringQuarantinedBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringQuarantinedRoutecollector(BGPFilteringQuarantinedBase):
+class TestRoutecollector(BGPFilteringQuarantinedBase):
     """Test filtering of quarantined peers for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -560,7 +560,7 @@ class TestBGPFilteringQuarantinedRoutecollector(BGPFilteringQuarantinedBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringQuarantinedRouteserver(BGPFilteringQuarantinedBase):
+class TestRouteserver(BGPFilteringQuarantinedBase):
     """Test filtering of quarantined peers for the 'routeserver' peer type."""
 
     # BIRD configuration

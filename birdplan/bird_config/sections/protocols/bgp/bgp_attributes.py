@@ -103,6 +103,10 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
     aspath_maxlen: int = 100
     aspath_minlen: int = 1
 
+    community_maxlen: int = 100
+    extended_community_maxlen: int = 100
+    large_community_maxlen: int = 100
+
     def __init__(self):
         """Initialize object."""
 

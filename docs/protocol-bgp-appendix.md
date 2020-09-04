@@ -123,4 +123,5 @@ Internally set, not allowable from any BGP peer type.
 | (OWN_ASN, 1101, 16) | Too many communities |
 | (OWN_ASN, 1101, 17) | Route collector |
 | (OWN_ASN, 1101, 18) | Quarantined |
-
+| (OWN_ASN, 1101, 19) | Too many extended communities |
+| (OWN_ASN, 1101, 20) | Too many large communities |

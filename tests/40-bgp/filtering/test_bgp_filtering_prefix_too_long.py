@@ -51,7 +51,7 @@ class BGPFilteringPrefixTooLongBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringPrefixTooLongCustomer(BGPFilteringPrefixTooLongBase):
+class TestCustomer(BGPFilteringPrefixTooLongBase):
     """Test filtering of too long prefixes for the 'customer' peer type."""
 
     # BIRD configuration
@@ -124,7 +124,7 @@ class TestBGPFilteringPrefixTooLongCustomer(BGPFilteringPrefixTooLongBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixTooLongPeer(BGPFilteringPrefixTooLongBase):
+class TestPeer(BGPFilteringPrefixTooLongBase):
     """Test filtering of too long prefixes for the 'peer' peer type."""
 
     # BIRD configuration
@@ -193,7 +193,7 @@ class TestBGPFilteringPrefixTooLongPeer(BGPFilteringPrefixTooLongBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixTooLongTransit(BGPFilteringPrefixTooLongBase):
+class TestTransit(BGPFilteringPrefixTooLongBase):
     """Test filtering of too long prefixes for the 'transit' peer type."""
 
     # BIRD configuration
@@ -262,7 +262,7 @@ class TestBGPFilteringPrefixTooLongTransit(BGPFilteringPrefixTooLongBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixTooLongRrclient(BGPFilteringPrefixTooLongBase):
+class TestRrclient(BGPFilteringPrefixTooLongBase):
     """Test filtering of too long prefixes for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -358,7 +358,7 @@ class TestBGPFilteringPrefixTooLongRrclient(BGPFilteringPrefixTooLongBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringPrefixTooLongRrserver(BGPFilteringPrefixTooLongBase):
+class TestRrserver(BGPFilteringPrefixTooLongBase):
     """Test filtering of too long prefixes for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -454,7 +454,7 @@ class TestBGPFilteringPrefixTooLongRrserver(BGPFilteringPrefixTooLongBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringPrefixTooLongRrserverRrserver(BGPFilteringPrefixTooLongBase):
+class TestRrserverRrserver(BGPFilteringPrefixTooLongBase):
     """Test filtering of too long prefixes for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -550,7 +550,7 @@ class TestBGPFilteringPrefixTooLongRrserverRrserver(BGPFilteringPrefixTooLongBas
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringPrefixTooLongRoutecollector(BGPFilteringPrefixTooLongBase):
+class TestRoutecollector(BGPFilteringPrefixTooLongBase):
     """Test filtering of too long prefixes for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -619,7 +619,7 @@ class TestBGPFilteringPrefixTooLongRoutecollector(BGPFilteringPrefixTooLongBase)
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixTooLongRouteserver(BGPFilteringPrefixTooLongBase):
+class TestRouteserver(BGPFilteringPrefixTooLongBase):
     """Test filtering of too long prefixes for the 'routeserver' peer type."""
 
     # BIRD configuration

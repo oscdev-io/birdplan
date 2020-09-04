@@ -51,7 +51,7 @@ class BGPFilteringWrongNexthopBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringWrongNexthopCustomer(BGPFilteringWrongNexthopBase):
+class TestCustomer(BGPFilteringWrongNexthopBase):
     """Test filtering of wrong nexthops for the 'customer' peer type."""
 
     # BIRD configuration
@@ -126,7 +126,7 @@ class TestBGPFilteringWrongNexthopCustomer(BGPFilteringWrongNexthopBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringWrongNexthopPeer(BGPFilteringWrongNexthopBase):
+class TestPeer(BGPFilteringWrongNexthopBase):
     """Test filtering of wrong nexthops for the 'peer' peer type."""
 
     # BIRD configuration
@@ -197,7 +197,7 @@ class TestBGPFilteringWrongNexthopPeer(BGPFilteringWrongNexthopBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringWrongNexthopTransit(BGPFilteringWrongNexthopBase):
+class TestTransit(BGPFilteringWrongNexthopBase):
     """Test filtering of wrong nexthops for the 'transit' peer type."""
 
     # BIRD configuration
@@ -268,7 +268,7 @@ class TestBGPFilteringWrongNexthopTransit(BGPFilteringWrongNexthopBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringWrongNexthopRrclient(BGPFilteringWrongNexthopBase):
+class TestRrclient(BGPFilteringWrongNexthopBase):
     """Test filtering of wrong nexthops for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -388,7 +388,7 @@ class TestBGPFilteringWrongNexthopRrclient(BGPFilteringWrongNexthopBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringWrongNexthopRrserver(BGPFilteringWrongNexthopBase):
+class TestRrserver(BGPFilteringWrongNexthopBase):
     """Test filtering of wrong nexthops for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -508,7 +508,7 @@ class TestBGPFilteringWrongNexthopRrserver(BGPFilteringWrongNexthopBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringWrongNexthopRrserverRrserver(BGPFilteringWrongNexthopBase):
+class TestRrserverRrserver(BGPFilteringWrongNexthopBase):
     """Test filtering of wrong nexthops for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -628,7 +628,7 @@ class TestBGPFilteringWrongNexthopRrserverRrserver(BGPFilteringWrongNexthopBase)
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringWrongNexthopRoutecollector(BGPFilteringWrongNexthopBase):
+class TestRoutecollector(BGPFilteringWrongNexthopBase):
     """Test filtering of wrong nexthops for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -699,7 +699,7 @@ class TestBGPFilteringWrongNexthopRoutecollector(BGPFilteringWrongNexthopBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringWrongNexthopRouteserver(BGPFilteringWrongNexthopBase):
+class TestRouteserver(BGPFilteringWrongNexthopBase):
     """Test filtering of wrong nexthops for the 'routeserver' peer type."""
 
     # BIRD configuration

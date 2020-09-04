@@ -51,7 +51,7 @@ class BGPFilteringPrefixTooShortBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringPrefixTooShortCustomer(BGPFilteringPrefixTooShortBase):
+class TestCustomer(BGPFilteringPrefixTooShortBase):
     """Test filtering of too short prefixes for the 'customer' peer type."""
 
     # BIRD configuration
@@ -124,7 +124,7 @@ class TestBGPFilteringPrefixTooShortCustomer(BGPFilteringPrefixTooShortBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixTooShortPeer(BGPFilteringPrefixTooShortBase):
+class TestPeer(BGPFilteringPrefixTooShortBase):
     """Test filtering of too short prefixes for the 'peer' peer type."""
 
     # BIRD configuration
@@ -193,7 +193,7 @@ class TestBGPFilteringPrefixTooShortPeer(BGPFilteringPrefixTooShortBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixTooShortTransit(BGPFilteringPrefixTooShortBase):
+class TestTransit(BGPFilteringPrefixTooShortBase):
     """Test filtering of too short prefixes for the 'transit' peer type."""
 
     # BIRD configuration
@@ -262,7 +262,7 @@ class TestBGPFilteringPrefixTooShortTransit(BGPFilteringPrefixTooShortBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixTooShortRrclient(BGPFilteringPrefixTooShortBase):
+class TestRrclient(BGPFilteringPrefixTooShortBase):
     """Test filtering of too short prefixes for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -358,7 +358,7 @@ class TestBGPFilteringPrefixTooShortRrclient(BGPFilteringPrefixTooShortBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringPrefixTooShortRrserver(BGPFilteringPrefixTooShortBase):
+class TestRrserver(BGPFilteringPrefixTooShortBase):
     """Test filtering of too short prefixes for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -454,7 +454,7 @@ class TestBGPFilteringPrefixTooShortRrserver(BGPFilteringPrefixTooShortBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringPrefixTooShortRrserverRrserver(BGPFilteringPrefixTooShortBase):
+class TestRrserverRrserver(BGPFilteringPrefixTooShortBase):
     """Test filtering of too short prefixes for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -550,7 +550,7 @@ class TestBGPFilteringPrefixTooShortRrserverRrserver(BGPFilteringPrefixTooShortB
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringPrefixTooShortRoutecollector(BGPFilteringPrefixTooShortBase):
+class TestRoutecollector(BGPFilteringPrefixTooShortBase):
     """Test filtering of too short prefixes for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -619,7 +619,7 @@ class TestBGPFilteringPrefixTooShortRoutecollector(BGPFilteringPrefixTooShortBas
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixTooShortRouteserver(BGPFilteringPrefixTooShortBase):
+class TestRouteserver(BGPFilteringPrefixTooShortBase):
     """Test filtering of too short prefixes for the 'routeserver' peer type."""
 
     # BIRD configuration

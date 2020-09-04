@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGP filtering of bogons."""
+"""BGP filtering of transit free ASNs."""
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
@@ -25,59 +25,63 @@ import os
 from template import BGPFilteringBase
 
 
-class BGPFilteringBogonBase(BGPFilteringBase):
-    """Base class for BGP filtering of bogons."""
+class BGPFilteringTransitFreeASNBase(BGPFilteringBase):
+    """Base class for BGP filtering of transit free ASNs."""
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1"]
 
-    def _announce_bogon(self, sim) -> Tuple:
-        """Announce a bogon from ExaBGP to BIRD."""
+    def _announce_transit_free_asn(self, sim) -> Tuple:
+        """Announce a prefix that has a transit free ASN from ExaBGP to BIRD."""
 
-        self._exabgpcli(sim, "e1", ["neighbor 100.64.0.1 announce route 172.16.0.0/24 next-hop 100.64.0.2"])
-        self._exabgpcli(sim, "e1", ["neighbor fc00:100::1 announce route 2001:db8::/48 next-hop fc00:100::2"])
+        self._exabgpcli(
+            sim, "e1", ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 as-path [ 65001 174 65002 ]"]
+        )
+        self._exabgpcli(
+            sim, "e1", ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 as-path [ 65001 174 65002 ]"]
+        )
 
         # Grab IPv4 table name and get entries
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r1", "e1", 4)
         peer_bgp4_table = self._bird_route_table(sim, "r1", peer_bgp_table_name, expect_count=1)
-        assert len(peer_bgp4_table) == 1, "Failed to announce IPv4 bogon"
+        assert len(peer_bgp4_table) == 1, "Failed to announce IPv4 with transit free ASN"
 
         # Grab IPv6 table name and get entries
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r1", "e1", 6)
         peer_bgp6_table = self._bird_route_table(sim, "r1", peer_bgp_table_name, expect_count=1)
-        assert len(peer_bgp6_table) == 1, "Failed to announce IPv6 boggon"
+        assert len(peer_bgp6_table) == 1, "Failed to announce IPv6 with transit free ASN"
 
         # Return our two routing tables
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestCustomer(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'customer' peer type."""
+class TestCustomer(BGPFilteringTransitFreeASNBase):
+    """Test filtering of transit free ASNs for the 'customer' peer type."""
 
     # BIRD configuration
     peer_type = "customer"
     extra_config = """
       filter:
-        asns: [65001]
+        asns: [65001, 65002]
 """
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'customer' peer type."""
+    def test_transit_free_asn_announce(self, sim, tmpdir, helpers):
+        """Test filtering of transit free ASNs for the 'customer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "asn": "AS65001",
+                    "asn": "AS65002",
                     "attributes": {
-                        "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 3)],
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 15)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -97,12 +101,12 @@ class TestCustomer(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "asn": "AS65001",
+                    "asn": "AS65002",
                     "attributes": {
-                        "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 3)],
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 1101, 15)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -124,29 +128,29 @@ class TestCustomer(BGPFilteringBogonBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestPeer(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'peer' peer type."""
+class TestPeer(BGPFilteringTransitFreeASNBase):
+    """Test filtering of transit free ASNs for the 'peer' peer type."""
 
     # BIRD configuration
     peer_type = "peer"
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'peer' peer type."""
+    def test_transit_free_asn_announce(self, sim, tmpdir, helpers):
+        """Test filtering of transit free ASNs for the 'peer' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "asn": "AS65001",
+                    "asn": "AS65002",
                     "attributes": {
-                        "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 3)],
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 15)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -166,12 +170,12 @@ class TestPeer(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "asn": "AS65001",
+                    "asn": "AS65002",
                     "attributes": {
-                        "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 3)],
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.large_community": [(65000, 3, 3), (65000, 1101, 15)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -193,29 +197,29 @@ class TestPeer(BGPFilteringBogonBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestTransit(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'transit' peer type."""
+class TestTransit(BGPFilteringTransitFreeASNBase):
+    """Test filtering of transit free ASNs for the 'transit' peer type."""
 
     # BIRD configuration
     peer_type = "transit"
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'transit' peer type."""
+    def test_transit_free_asn_announce(self, sim, tmpdir, helpers):
+        """Test filtering of transit free ASNs for the 'transit' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "asn": "AS65001",
+                    "asn": "AS65002",
                     "attributes": {
-                        "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 3)],
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.large_community": [(65000, 3, 4)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -235,12 +239,12 @@ class TestTransit(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "asn": "AS65001",
+                    "asn": "AS65002",
                     "attributes": {
-                        "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 4), (65000, 1101, 3)],
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.large_community": [(65000, 3, 4)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
@@ -259,11 +263,62 @@ class TestTransit(BGPFilteringBogonBase):
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
         # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        bgp4_table = self._bird_route_table(sim, "r1", "t_bgp4")
+        bgp6_table = self._bird_route_table(sim, "r1", "t_bgp6")
+
+        # Check bgp4 BIRD table
+        correct_result = {
+            "100.64.101.0/24": [
+                {
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.large_community": [(65000, 3, 4)],
+                        "BGP.local_pref": 150,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp4_AS65001_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.large_community": [(65000, 3, 4)],
+                        "BGP.local_pref": 150,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp6_AS65001_e1",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRrclient(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'rrclient' peer type."""
+class TestRrclient(BGPFilteringTransitFreeASNBase):
+    """Test filtering of transit free ASNs for the 'rrclient' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -272,20 +327,26 @@ class TestRrclient(BGPFilteringBogonBase):
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'rrclient' peer type."""
+    def test_transit_free_asn_announce(self, sim, tmpdir, helpers):
+        """Test filtering of transit free ASNs for the 'rrclient' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -301,9 +362,15 @@ class TestRrclient(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -323,9 +390,15 @@ class TestRrclient(BGPFilteringBogonBase):
 
         # Check bgp4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -341,9 +414,15 @@ class TestRrclient(BGPFilteringBogonBase):
 
         # Check bgp6 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -358,8 +437,8 @@ class TestRrclient(BGPFilteringBogonBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRrserver(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'rrserver' peer type."""
+class TestRrserver(BGPFilteringTransitFreeASNBase):
+    """Test filtering of transit free ASNs for the 'rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -368,20 +447,26 @@ class TestRrserver(BGPFilteringBogonBase):
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'rrserver' peer type."""
+    def test_transit_free_asn_announce(self, sim, tmpdir, helpers):
+        """Test filtering of transit free ASNs for the 'rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -397,9 +482,15 @@ class TestRrserver(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -419,9 +510,15 @@ class TestRrserver(BGPFilteringBogonBase):
 
         # Check bgp4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -437,9 +534,15 @@ class TestRrserver(BGPFilteringBogonBase):
 
         # Check bgp6 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -454,8 +557,8 @@ class TestRrserver(BGPFilteringBogonBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRrserverRrserver(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'rrserver-rrserver' peer type."""
+class TestRrserverRrserver(BGPFilteringTransitFreeASNBase):
+    """Test filtering of transit free ASNs for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
     peer_asn = "65000"
@@ -464,20 +567,26 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'rrserver-rrserver' peer type."""
+    def test_transit_free_asn_announce(self, sim, tmpdir, helpers):
+        """Test filtering of transit free ASNs for the 'rrserver-rrserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -493,9 +602,15 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -515,9 +630,15 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
 
         # Check bgp4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -533,9 +654,15 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
 
         # Check bgp6 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "asn": "AS65002",
+                    "attributes": {
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.local_pref": 100,
+                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.origin": "IGP",
+                    },
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -550,28 +677,28 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRoutecollector(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'routecollector' peer type."""
+class TestRoutecollector(BGPFilteringTransitFreeASNBase):
+    """Test filtering of transit free ASNs for the 'routecollector' peer type."""
 
     # BIRD configuration
     peer_type = "routecollector"
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'routecollector' peer type."""
+    def test_transit_free_asn_announce(self, sim, tmpdir, helpers):
+        """Test filtering of transit free ASNs for the 'routecollector' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "asn": "AS65001",
+                    "asn": "AS65002",
                     "attributes": {
-                        "BGP.as_path": [65001],
+                        "BGP.as_path": [65001, 174, 65002],
                         "BGP.large_community": [(65000, 1101, 17)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "100.64.0.2",
@@ -592,11 +719,11 @@ class TestRoutecollector(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "asn": "AS65001",
+                    "asn": "AS65002",
                     "attributes": {
-                        "BGP.as_path": [65001],
+                        "BGP.as_path": [65001, 174, 65002],
                         "BGP.large_community": [(65000, 1101, 17)],
                         "BGP.local_pref": 100,
                         "BGP.next_hop": "fc00:100::2",
@@ -619,29 +746,29 @@ class TestRoutecollector(BGPFilteringBogonBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestRouteserver(BGPFilteringBogonBase):
-    """Test filtering of bogons for the 'routeserver' peer type."""
+class TestRouteserver(BGPFilteringTransitFreeASNBase):
+    """Test filtering of transit free ASNs for the 'routeserver' peer type."""
 
     # BIRD configuration
     peer_type = "routeserver"
 
-    def test_bogon_announce(self, sim, tmpdir, helpers):
-        """Test filtering of bogons for the 'routeserver' peer type."""
+    def test_transit_free_asn_announce(self, sim, tmpdir, helpers):
+        """Test filtering of transit free ASNs for the 'routeserver' peer type."""
 
         # Setup environment
         self._setup(sim, tmpdir)
 
         # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_bogon(sim)
+        ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "172.16.0.0/24": [
+            "100.64.101.0/24": [
                 {
-                    "asn": "AS65001",
+                    "asn": "AS65002",
                     "attributes": {
-                        "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 3)],
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 15)],
                         "BGP.local_pref": 450,
                         "BGP.next_hop": "100.64.0.2",
                         "BGP.origin": "IGP",
@@ -661,12 +788,12 @@ class TestRouteserver(BGPFilteringBogonBase):
 
         # Check bgp_originate4 BIRD table
         correct_result = {
-            "2001:db8::/48": [
+            "fc00:101::/48": [
                 {
-                    "asn": "AS65001",
+                    "asn": "AS65002",
                     "attributes": {
-                        "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 3)],
+                        "BGP.as_path": [65001, 174, 65002],
+                        "BGP.large_community": [(65000, 3, 5), (65000, 1101, 15)],
                         "BGP.local_pref": 450,
                         "BGP.next_hop": "fc00:100::2",
                         "BGP.origin": "IGP",
