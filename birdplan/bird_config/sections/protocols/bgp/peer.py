@@ -117,12 +117,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.cost = peer_config["cost"]
 
         # Check if we are adding a large community to outgoing routes
-        if "incoming-large-communities" in peer_config:
-            for large_community in sorted(peer_config["incoming-large-communities"]):
+        if "incoming_large_communities" in peer_config:
+            for large_community in sorted(peer_config["incoming_large_communities"]):
                 self.large_communities.incoming.append(util.sanitize_large_community(large_community))
         # Check if we are adding a large community to outgoing routes
-        if "outgoing-large-communities" in peer_config:
-            for large_community in sorted(peer_config["outgoing-large-communities"]):
+        if "outgoing_large_communities" in peer_config:
+            for large_community in sorted(peer_config["outgoing_large_communities"]):
                 self.large_communities.outgoing.append(util.sanitize_large_community(large_community))
 
         # Turn on passive mode for route reflectors

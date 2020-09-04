@@ -50,25 +50,35 @@
 
 # BGP
 
-[No Export Kernel](40-bgp/no_export_kernel/README.md)
+[No Export Kernel](40-bgp/10-no_export_kernel/README.md)
 
-[Redistribute Connected](40-bgp/redistribute_connected/README.md)
+[Redistribute Connected](40-bgp/10-redistribute_connected/README.md)
 
-[Redistribute Connected (with star)](40-bgp/redistribute_connected_with_star/README.md)
+[Redistribute Connected (with star)](40-bgp/10-redistribute_connected_with_star/README.md)
 
-[Redistribute Originated](40-bgp/redistribute_originated/README.md)
+[Redistribute Kernel](40-bgp/10-redistribute_kernel/README.md)
 
-[Redistribute Only Default](40-bgp/redistribute_only_default/README.md)
+[Redistribute Only Default](40-bgp/10-redistribute_only_default/README.md)
 
-[Redistribute Static](40-bgp/redistribute_static/README.md)
+[Redistribute Originated](40-bgp/10-redistribute_originated/README.md)
 
-[Redistribute Static Default](40-bgp/redistribute_static_default/README.md)
+[Redistribute Static](40-bgp/10-redistribute_static/README.md)
 
-[Redistribute Static Without Default](40-bgp/redistribute_static_without_default/README.md)
+[Redistribute Static Default](40-bgp/10-redistribute_static_default/README.md)
 
-[Redistribute Kernel](40-bgp/redistribute_kernel/README.md)
+[Redistribute Static Without Default](40-bgp/10-redistribute_static_without_default/README.md)
+
+## Community stripping
+
+[Filtering](40-bgp/20-community_stripping/README.md)
+
+## Communities
+
+[Incoming Large Communities](40-bgp/30-incoming_large_communities/README.md)
+
+[Outgoing Large Communities](40-bgp/30-outgoing_large_communities/README.md)
 
 ## Filtering
 
-[Filtering](40-bgp/features/filtering/README.md)
+[Filtering](40-bgp/features/40-filtering/README.md)
 

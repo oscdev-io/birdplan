@@ -492,8 +492,8 @@ class BirdPlan:
                 "prefix_limit4",
                 "prefix_limit6",
                 "quarantine",
-                "incoming-large-communities",
-                "outgoing-large-communities",
+                "incoming_large_communities",
+                "outgoing_large_communities",
                 "cost",
             ):
                 peer[config_item] = config_value
