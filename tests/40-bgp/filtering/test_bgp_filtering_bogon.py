@@ -51,7 +51,7 @@ class BGPFilteringBogonBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringBogonCustomer(BGPFilteringBogonBase):
+class TestCustomer(BGPFilteringBogonBase):
     """Test filtering of bogons for the 'customer' peer type."""
 
     # BIRD configuration
@@ -124,7 +124,7 @@ class TestBGPFilteringBogonCustomer(BGPFilteringBogonBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringBogonPeer(BGPFilteringBogonBase):
+class TestPeer(BGPFilteringBogonBase):
     """Test filtering of bogons for the 'peer' peer type."""
 
     # BIRD configuration
@@ -193,7 +193,7 @@ class TestBGPFilteringBogonPeer(BGPFilteringBogonBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringBogonTransit(BGPFilteringBogonBase):
+class TestTransit(BGPFilteringBogonBase):
     """Test filtering of bogons for the 'transit' peer type."""
 
     # BIRD configuration
@@ -262,7 +262,7 @@ class TestBGPFilteringBogonTransit(BGPFilteringBogonBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringBogonRrclient(BGPFilteringBogonBase):
+class TestRrclient(BGPFilteringBogonBase):
     """Test filtering of bogons for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -358,7 +358,7 @@ class TestBGPFilteringBogonRrclient(BGPFilteringBogonBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringBogonRrserver(BGPFilteringBogonBase):
+class TestRrserver(BGPFilteringBogonBase):
     """Test filtering of bogons for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -454,7 +454,7 @@ class TestBGPFilteringBogonRrserver(BGPFilteringBogonBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringBogonRrserverRrserver(BGPFilteringBogonBase):
+class TestRrserverRrserver(BGPFilteringBogonBase):
     """Test filtering of bogons for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -550,7 +550,7 @@ class TestBGPFilteringBogonRrserverRrserver(BGPFilteringBogonBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringBogonRoutecollector(BGPFilteringBogonBase):
+class TestRoutecollector(BGPFilteringBogonBase):
     """Test filtering of bogons for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -619,7 +619,7 @@ class TestBGPFilteringBogonRoutecollector(BGPFilteringBogonBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringBogonRouteserver(BGPFilteringBogonBase):
+class TestRouteserver(BGPFilteringBogonBase):
     """Test filtering of bogons for the 'routeserver' peer type."""
 
     # BIRD configuration

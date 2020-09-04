@@ -51,7 +51,7 @@ class BGPFilteringDefaultNotAllowedBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringDefaultNotAllowedCustomer(BGPFilteringDefaultNotAllowedBase):
+class TestCustomer(BGPFilteringDefaultNotAllowedBase):
     """Test filtering of default route not allowed for the 'customer' peer type."""
 
     # BIRD configuration
@@ -124,7 +124,7 @@ class TestBGPFilteringDefaultNotAllowedCustomer(BGPFilteringDefaultNotAllowedBas
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringDefaultNotAllowedPeer(BGPFilteringDefaultNotAllowedBase):
+class TestPeer(BGPFilteringDefaultNotAllowedBase):
     """Test filtering of default route not allowed for the 'peer' peer type."""
 
     # BIRD configuration
@@ -193,7 +193,7 @@ class TestBGPFilteringDefaultNotAllowedPeer(BGPFilteringDefaultNotAllowedBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringDefaultNotAllowedTransit(BGPFilteringDefaultNotAllowedBase):
+class TestTransit(BGPFilteringDefaultNotAllowedBase):
     """Test filtering of default route not allowed for the 'transit' peer type."""
 
     # BIRD configuration
@@ -262,7 +262,7 @@ class TestBGPFilteringDefaultNotAllowedTransit(BGPFilteringDefaultNotAllowedBase
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringDefaultNotAllowedRrclient(BGPFilteringDefaultNotAllowedBase):
+class TestRrclient(BGPFilteringDefaultNotAllowedBase):
     """Test filtering of default route not allowed for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -333,7 +333,7 @@ class TestBGPFilteringDefaultNotAllowedRrclient(BGPFilteringDefaultNotAllowedBas
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringDefaultNotAllowedRrserver(BGPFilteringDefaultNotAllowedBase):
+class TestRrserver(BGPFilteringDefaultNotAllowedBase):
     """Test filtering of default route not allowed for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -404,7 +404,7 @@ class TestBGPFilteringDefaultNotAllowedRrserver(BGPFilteringDefaultNotAllowedBas
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringDefaultNotAllowedRrserverRrserver(BGPFilteringDefaultNotAllowedBase):
+class TestRrserverRrserver(BGPFilteringDefaultNotAllowedBase):
     """Test filtering of default route not allowed for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -477,7 +477,7 @@ class TestBGPFilteringDefaultNotAllowedRrserverRrserver(BGPFilteringDefaultNotAl
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringDefaultNotAllowedRoutecollector(BGPFilteringDefaultNotAllowedBase):
+class TestRoutecollector(BGPFilteringDefaultNotAllowedBase):
     """Test filtering of default route not allowed for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -546,7 +546,7 @@ class TestBGPFilteringDefaultNotAllowedRoutecollector(BGPFilteringDefaultNotAllo
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringDefaultNotAllowedRouteserver(BGPFilteringDefaultNotAllowedBase):
+class TestRouteserver(BGPFilteringDefaultNotAllowedBase):
     """Test filtering of default route not allowed for the 'routeserver' peer type."""
 
     # BIRD configuration

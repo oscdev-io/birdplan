@@ -78,7 +78,7 @@ class BGPFilteringTooManyExtendedCommunitiesBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringTooManyExtendedCommunitiesCustomer(BGPFilteringTooManyExtendedCommunitiesBase):
+class TestCustomer(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'customer' peer type."""
 
     # BIRD configuration
@@ -153,7 +153,7 @@ class TestBGPFilteringTooManyExtendedCommunitiesCustomer(BGPFilteringTooManyExte
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringTooManyExtendedCommunitiesPeer(BGPFilteringTooManyExtendedCommunitiesBase):
+class TestPeer(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'peer' peer type."""
 
     # BIRD configuration
@@ -224,7 +224,7 @@ class TestBGPFilteringTooManyExtendedCommunitiesPeer(BGPFilteringTooManyExtended
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringTooManyExtendedCommunitiesTransit(BGPFilteringTooManyExtendedCommunitiesBase):
+class TestTransit(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'transit' peer type."""
 
     # BIRD configuration
@@ -295,7 +295,7 @@ class TestBGPFilteringTooManyExtendedCommunitiesTransit(BGPFilteringTooManyExten
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringTooManyExtendedCommunitiesRrclient(BGPFilteringTooManyExtendedCommunitiesBase):
+class TestRrclient(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -415,7 +415,7 @@ class TestBGPFilteringTooManyExtendedCommunitiesRrclient(BGPFilteringTooManyExte
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringTooManyExtendedCommunitiesRrserver(BGPFilteringTooManyExtendedCommunitiesBase):
+class TestRrserver(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -535,7 +535,7 @@ class TestBGPFilteringTooManyExtendedCommunitiesRrserver(BGPFilteringTooManyExte
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringTooManyExtendedCommunitiesRrserverRrserver(BGPFilteringTooManyExtendedCommunitiesBase):
+class TestRrserverRrserver(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -655,7 +655,7 @@ class TestBGPFilteringTooManyExtendedCommunitiesRrserverRrserver(BGPFilteringToo
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringTooManyExtendedCommunitiesRoutecollector(BGPFilteringTooManyExtendedCommunitiesBase):
+class TestRoutecollector(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -726,7 +726,7 @@ class TestBGPFilteringTooManyExtendedCommunitiesRoutecollector(BGPFilteringTooMa
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringTooManyExtendedCommunitiesRouteserver(BGPFilteringTooManyExtendedCommunitiesBase):
+class TestRouteserver(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'routeserver' peer type."""
 
     # BIRD configuration

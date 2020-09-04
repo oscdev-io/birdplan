@@ -55,7 +55,7 @@ class BGPFilteringTransitFreeASNBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringTransitFreeASNCustomer(BGPFilteringTransitFreeASNBase):
+class TestCustomer(BGPFilteringTransitFreeASNBase):
     """Test filtering of transit free ASNs for the 'customer' peer type."""
 
     # BIRD configuration
@@ -128,7 +128,7 @@ class TestBGPFilteringTransitFreeASNCustomer(BGPFilteringTransitFreeASNBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringTransitFreeASNPeer(BGPFilteringTransitFreeASNBase):
+class TestPeer(BGPFilteringTransitFreeASNBase):
     """Test filtering of transit free ASNs for the 'peer' peer type."""
 
     # BIRD configuration
@@ -197,7 +197,7 @@ class TestBGPFilteringTransitFreeASNPeer(BGPFilteringTransitFreeASNBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringTransitFreeASNTransit(BGPFilteringTransitFreeASNBase):
+class TestTransit(BGPFilteringTransitFreeASNBase):
     """Test filtering of transit free ASNs for the 'transit' peer type."""
 
     # BIRD configuration
@@ -317,7 +317,7 @@ class TestBGPFilteringTransitFreeASNTransit(BGPFilteringTransitFreeASNBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringTransitFreeASNRrclient(BGPFilteringTransitFreeASNBase):
+class TestRrclient(BGPFilteringTransitFreeASNBase):
     """Test filtering of transit free ASNs for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -437,7 +437,7 @@ class TestBGPFilteringTransitFreeASNRrclient(BGPFilteringTransitFreeASNBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringTransitFreeASNRrserver(BGPFilteringTransitFreeASNBase):
+class TestRrserver(BGPFilteringTransitFreeASNBase):
     """Test filtering of transit free ASNs for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -557,7 +557,7 @@ class TestBGPFilteringTransitFreeASNRrserver(BGPFilteringTransitFreeASNBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringTransitFreeASNRrserverRrserver(BGPFilteringTransitFreeASNBase):
+class TestRrserverRrserver(BGPFilteringTransitFreeASNBase):
     """Test filtering of transit free ASNs for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -677,7 +677,7 @@ class TestBGPFilteringTransitFreeASNRrserverRrserver(BGPFilteringTransitFreeASNB
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringTransitFreeASNRoutecollector(BGPFilteringTransitFreeASNBase):
+class TestRoutecollector(BGPFilteringTransitFreeASNBase):
     """Test filtering of transit free ASNs for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -746,7 +746,7 @@ class TestBGPFilteringTransitFreeASNRoutecollector(BGPFilteringTransitFreeASNBas
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringTransitFreeASNRouteserver(BGPFilteringTransitFreeASNBase):
+class TestRouteserver(BGPFilteringTransitFreeASNBase):
     """Test filtering of transit free ASNs for the 'routeserver' peer type."""
 
     # BIRD configuration

@@ -51,7 +51,7 @@ class BGPFilteringPrefixFilteredBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringPrefixFilteredCustomer(BGPFilteringPrefixFilteredBase):
+class TestCustomer(BGPFilteringPrefixFilteredBase):
     """Test filtering of filtered prefixes for the 'customer' peer type."""
 
     # BIRD configuration
@@ -174,7 +174,7 @@ class TestBGPFilteringPrefixFilteredCustomer(BGPFilteringPrefixFilteredBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringPrefixFilteredPeer(BGPFilteringPrefixFilteredBase):
+class TestPeer(BGPFilteringPrefixFilteredBase):
     """Test filtering of filtered prefixes for the 'peer' peer type."""
 
     # BIRD configuration
@@ -297,7 +297,7 @@ class TestBGPFilteringPrefixFilteredPeer(BGPFilteringPrefixFilteredBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringPrefixFilteredTransit(BGPFilteringPrefixFilteredBase):
+class TestTransit(BGPFilteringPrefixFilteredBase):
     """Test filtering of filtered prefixes for the 'transit' peer type."""
 
     # BIRD configuration
@@ -370,7 +370,7 @@ class TestBGPFilteringPrefixFilteredTransit(BGPFilteringPrefixFilteredBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixFilteredRrclient(BGPFilteringPrefixFilteredBase):
+class TestRrclient(BGPFilteringPrefixFilteredBase):
     """Test filtering of filtered prefixes for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -444,7 +444,7 @@ class TestBGPFilteringPrefixFilteredRrclient(BGPFilteringPrefixFilteredBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixFilteredRrserver(BGPFilteringPrefixFilteredBase):
+class TestRrserver(BGPFilteringPrefixFilteredBase):
     """Test filtering of filtered prefixes for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -518,7 +518,7 @@ class TestBGPFilteringPrefixFilteredRrserver(BGPFilteringPrefixFilteredBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixFilteredRrserverRrserver(BGPFilteringPrefixFilteredBase):
+class TestRrserverRrserver(BGPFilteringPrefixFilteredBase):
     """Test filtering of filtered prefixes for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -592,7 +592,7 @@ class TestBGPFilteringPrefixFilteredRrserverRrserver(BGPFilteringPrefixFilteredB
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixFilteredRoutecollector(BGPFilteringPrefixFilteredBase):
+class TestRoutecollector(BGPFilteringPrefixFilteredBase):
     """Test filtering of filtered prefixes for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -665,7 +665,7 @@ class TestBGPFilteringPrefixFilteredRoutecollector(BGPFilteringPrefixFilteredBas
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringPrefixFilteredRouteserver(BGPFilteringPrefixFilteredBase):
+class TestRouteserver(BGPFilteringPrefixFilteredBase):
     """Test filtering of filtered prefixes for the 'routeserver' peer type."""
 
     # BIRD configuration

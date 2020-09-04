@@ -53,7 +53,7 @@ class BGPFilteringDefaultAllowedBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringDefaultAllowedCustomer(BGPFilteringDefaultAllowedBase):
+class TestCustomer(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'customer' peer type."""
 
     # BIRD configuration
@@ -73,7 +73,7 @@ class TestBGPFilteringDefaultAllowedCustomer(BGPFilteringDefaultAllowedBase):
             self._setup(sim, tmpdir)
 
 
-class TestBGPFilteringDefaultAllowedPeer(BGPFilteringDefaultAllowedBase):
+class TestPeer(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'peer' peer type."""
 
     # BIRD configuration
@@ -91,7 +91,7 @@ class TestBGPFilteringDefaultAllowedPeer(BGPFilteringDefaultAllowedBase):
             self._setup(sim, tmpdir)
 
 
-class TestBGPFilteringDefaultAllowedTransit(BGPFilteringDefaultAllowedBase):
+class TestTransit(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'transit' peer type."""
 
     # BIRD configuration
@@ -214,7 +214,7 @@ class TestBGPFilteringDefaultAllowedTransit(BGPFilteringDefaultAllowedBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringDefaultAllowedRrclient(BGPFilteringDefaultAllowedBase):
+class TestRrclient(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -331,7 +331,7 @@ class TestBGPFilteringDefaultAllowedRrclient(BGPFilteringDefaultAllowedBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringDefaultAllowedRrserver(BGPFilteringDefaultAllowedBase):
+class TestRrserver(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -448,7 +448,7 @@ class TestBGPFilteringDefaultAllowedRrserver(BGPFilteringDefaultAllowedBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringDefaultAllowedRrserverRrserver(BGPFilteringDefaultAllowedBase):
+class TestRrserverRrserver(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -563,7 +563,7 @@ class TestBGPFilteringDefaultAllowedRrserverRrserver(BGPFilteringDefaultAllowedB
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringDefaultAllowedRoutecollector(BGPFilteringDefaultAllowedBase):
+class TestRoutecollector(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -581,7 +581,7 @@ class TestBGPFilteringDefaultAllowedRoutecollector(BGPFilteringDefaultAllowedBas
             self._setup(sim, tmpdir)
 
 
-class TestBGPFilteringDefaultAllowedRouteserver(BGPFilteringDefaultAllowedBase):
+class TestRouteserver(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'routeserver' peer type."""
 
     # BIRD configuration

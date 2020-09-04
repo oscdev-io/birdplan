@@ -55,7 +55,7 @@ class BGPFilteringOriginASFilteredBase(BGPFilteringBase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestBGPFilteringOriginASFilteredCustomer(BGPFilteringOriginASFilteredBase):
+class TestCustomer(BGPFilteringOriginASFilteredBase):
     """Test filtering of filtered ASNs for the 'customer' peer type."""
 
     # BIRD configuration
@@ -128,7 +128,7 @@ class TestBGPFilteringOriginASFilteredCustomer(BGPFilteringOriginASFilteredBase)
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringOriginASFilteredPeer(BGPFilteringOriginASFilteredBase):
+class TestPeer(BGPFilteringOriginASFilteredBase):
     """Test filtering of filtered ASNs for the 'peer' peer type."""
 
     # BIRD configuration
@@ -201,7 +201,7 @@ class TestBGPFilteringOriginASFilteredPeer(BGPFilteringOriginASFilteredBase):
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringOriginASFilteredTransit(BGPFilteringOriginASFilteredBase):
+class TestTransit(BGPFilteringOriginASFilteredBase):
     """Test filtering of filtered ASNs for the 'transit' peer type."""
 
     # BIRD configuration
@@ -324,7 +324,7 @@ class TestBGPFilteringOriginASFilteredTransit(BGPFilteringOriginASFilteredBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringOriginASFilteredRrclient(BGPFilteringOriginASFilteredBase):
+class TestRrclient(BGPFilteringOriginASFilteredBase):
     """Test filtering of filtered ASNs for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -446,7 +446,7 @@ class TestBGPFilteringOriginASFilteredRrclient(BGPFilteringOriginASFilteredBase)
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringOriginASFilteredRrserver(BGPFilteringOriginASFilteredBase):
+class TestRrserver(BGPFilteringOriginASFilteredBase):
     """Test filtering of filtered ASNs for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -568,7 +568,7 @@ class TestBGPFilteringOriginASFilteredRrserver(BGPFilteringOriginASFilteredBase)
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringOriginASFilteredRrserverRrserver(BGPFilteringOriginASFilteredBase):
+class TestRrserverRrserver(BGPFilteringOriginASFilteredBase):
     """Test filtering of filtered ASNs for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -690,7 +690,7 @@ class TestBGPFilteringOriginASFilteredRrserverRrserver(BGPFilteringOriginASFilte
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestBGPFilteringOriginASFilteredRoutecollector(BGPFilteringOriginASFilteredBase):
+class TestRoutecollector(BGPFilteringOriginASFilteredBase):
     """Test filtering of filtered ASNs for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -763,7 +763,7 @@ class TestBGPFilteringOriginASFilteredRoutecollector(BGPFilteringOriginASFiltere
         self._check_main_bgp_tables(sim)
 
 
-class TestBGPFilteringOriginASFilteredRouteserver(BGPFilteringOriginASFilteredBase):
+class TestRouteserver(BGPFilteringOriginASFilteredBase):
     """Test filtering of filtered ASNs for the 'routeserver' peer type."""
 
     # BIRD configuration
