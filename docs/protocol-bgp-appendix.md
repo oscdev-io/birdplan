@@ -32,8 +32,11 @@ These are globals which can be overridden in configuration.
 
 Large communities are in the form of (OWN_ASN, FUNCTION, XXX) and are described below.
 
-## Functions
+Brief overview of FUNCTION assignments...
+  * `OWN_ASN:0-999:*` - Operational, some action is taken
+  * `OWN_ASN:1000-1999:*` - Informational, give some information about the route
 
+## Functions
 
 | Function Number | Description |
 | --- | --- |
@@ -49,7 +52,8 @@ Large communities are in the form of (OWN_ASN, FUNCTION, XXX) and are described 
 | 71 | TODO ENHANCED: Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
 | 72 | TODO ENHANCED: Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
 | 8 | TODO ENHANCED: Manipulation of the LOCAL_PREF Attribute (set to 1, 2, 3) [^lc-function-8] |
-| 1101 | Filtered |
+| 1000 | Route information |
+| 1101 | Route filtered |
 
 [^lc-function-1]: Route learned in ISO-3166-1 country. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 3.1.1 pg. 6
 
@@ -99,6 +103,15 @@ Allowable internally and by `customer`.
 | (OWN_ASN, 6, PEER_ASN) | Prepend 1x to PEER_ASN |
 | (OWN_ASN, 62, PEER_ASN) | Prepend 2x to PEER_ASN |
 | (OWN_ASN, 63, PEER_ASN) | Prepend 3x to PEER_ASN |
+
+## Route Information Communities
+
+Internally set, not allowable from any BGP peer type.
+
+| Community | Description |
+| --- | --- |
+| (OWN_ASN, 1000, 1) | Communities were stripped |
+| (OWN_ASN, 1000, 3) | Large communities were stripped |
 
 ## Filtered Communities
 

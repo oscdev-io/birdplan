@@ -23,11 +23,11 @@
 from typing import Tuple
 import os
 import pytest
-from template import BGPFilteringBase
+from template_exabgp import BirdplanBaseTestCaseExabgp
 from birdplan.exceptions import BirdPlanError
 
 
-class BGPFilteringDefaultAllowedBase(BGPFilteringBase):
+class BGPFilteringDefaultAllowedBase(BirdplanBaseTestCaseExabgp):
     """Base class for BGP filtering of default route allowed."""
 
     test_dir = os.path.dirname(__file__)

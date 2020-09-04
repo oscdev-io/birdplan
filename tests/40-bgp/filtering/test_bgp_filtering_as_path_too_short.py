@@ -22,10 +22,10 @@
 
 from typing import List, Tuple
 import os
-from template import BGPFilteringBase
+from template_exabgp import BirdplanBaseTestCaseExabgp
 
 
-class BGPFilteringASPathTooShortBase(BGPFilteringBase):
+class BGPFilteringASPathTooShortBase(BirdplanBaseTestCaseExabgp):
     """Base class for BGP filtering of AS paths that are too short."""
 
     test_dir = os.path.dirname(__file__)

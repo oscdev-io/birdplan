@@ -22,10 +22,10 @@
 
 from typing import Tuple
 import os
-from template import BGPFilteringBase
+from template_exabgp import BirdplanBaseTestCaseExabgp
 
 
-class BGPFilteringBogonASNBase(BGPFilteringBase):
+class BGPFilteringBogonASNBase(BirdplanBaseTestCaseExabgp):
     """Base class for BGP filtering of bogon ASNs."""
 
     test_dir = os.path.dirname(__file__)
