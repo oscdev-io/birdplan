@@ -72,7 +72,7 @@
 
 [Filtering](40-bgp/20-community_stripping/README.md)
 
-## Communities
+## Incoming/Outgoing Large Communities
 
 [Incoming Large Communities](40-bgp/30-incoming_large_communities/README.md)
 
