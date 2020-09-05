@@ -70,7 +70,11 @@
 
 ## Community stripping
 
-[Filtering](40-bgp/20-community_stripping/README.md)
+[Community Stripping](40-bgp/20-community_stripping/README.md)
+
+## Filtering
+
+[Filtering](40-bgp/40-filtering/README.md)
 
 ## Incoming/Outgoing Large Communities
 
@@ -78,7 +82,7 @@
 
 [Outgoing Large Communities](40-bgp/30-outgoing_large_communities/README.md)
 
-## Filtering
+## Large Community Functions
 
-[Filtering](40-bgp/features/40-filtering/README.md)
+[Filtering](40-bgp/50-large_community_functions/README.md)
 
