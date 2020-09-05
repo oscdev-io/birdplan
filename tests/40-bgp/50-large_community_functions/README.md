@@ -5,7 +5,9 @@ Router r1 should be receiving routes from e1 test cases. As we are dealing with 
 Tests done include:
   * NOEXPORT for PEER_ASN
     * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
-  * NOEXPORT for transit peer types
+  * NOEXPORT for the transit peer type
+    * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
+  * NOEXPORT for the peer peer type
     * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
 
 ```plantuml
