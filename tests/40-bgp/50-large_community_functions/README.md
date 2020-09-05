@@ -11,7 +11,12 @@ Tests done include:
     * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
   * NOEXPORT for the customer peer type
     * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
-
+  * PREPEND 1x
+    * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
+  * PREPEND 2x
+    * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
+  * PREPEND 3x
+    * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
 ```plantuml
 @startuml
 hide circle
