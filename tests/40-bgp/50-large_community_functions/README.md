@@ -3,7 +3,9 @@
 Router r1 should be receiving routes from e1 test cases. As we are dealing with filtering r1's main BGP routing table should be blank and the routes in the BGP peer routing table should all be marked filtered.
 
 Tests done include:
-  * Quarantine
+  * NOEXPORT for PEER_ASN
+    * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
+  * NOEXPORT for transit peer types
     * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
 
 ```plantuml
