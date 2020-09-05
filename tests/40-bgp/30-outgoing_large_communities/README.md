@@ -1,12 +1,12 @@
-# BGP adding of incoming large communities
+# BGP adding of outgoing large communities
 
-Router r1 should be exporting its static routes to r2, r2 should receive the static routes and add an incoming large community.
+Router r1 should be exporting its static routes to r2 with outgoing large communities, r2 should receive the static routes from r1 with the large communities added.
 
 
 ```plantuml
 @startuml
 hide circle
-title Test incoming large communities on r2
+title Test outgoing large communities from r1 to r2
 left to right direction
 
 
@@ -26,7 +26,7 @@ class "Router: r1" {
   .. BGP ..
 * AS65000
 }
-note top: Should export static routes to r2
+note top: Should export static routes to r2 with outgoing large communities
 
 
 class "Router: r2" {
@@ -41,7 +41,7 @@ class "Router: r2" {
   .. BGP ..
 * AS65001
 }
-note top: Should get static routes from r1 and, \n add a large community.
+note top: Should get static routes from r1 \n with the large communities added.
 
 
 class "Switch: s1" {}

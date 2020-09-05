@@ -273,6 +273,21 @@ bgp:
 ```
 
 
+# rr_cluster_id
+
+Route reflector cluster ID, this must be specified if we have peers of type `rrclient` or `rrserver-rrserver`.
+
+One can specify the route reflector cluster ID as per below...
+```yaml
+router_id: 0.0.0.1
+
+bgp:
+...
+  rr_cluster_id: 0.0.0.1
+```
+
+
+
 # peers
 
 The `peers` key contains a dictionary of our peers, with the below options.

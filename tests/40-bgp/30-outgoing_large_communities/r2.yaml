@@ -18,6 +18,3 @@ bgp:
       connect_retry_time: 2
       error_wait_time: 2,5
       type: peer
-      incoming_large_communities:
-        - "65001:4:65414"
-        - "65001:1:0"

@@ -3,10 +3,9 @@ log_file: "@LOGFILE@"
 debug: True
 
 bgp:
-  asn: 65001
-  import:
-    static: True
+  asn: 65002
   peers:
+
     r1:
       asn: 65000
       description: BGP session to r1
@@ -17,7 +16,4 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
-      type: peer
-      incoming_large_communities:
-        - "65001:4:65414"
-        - "65001:1:0"
+      type: transit

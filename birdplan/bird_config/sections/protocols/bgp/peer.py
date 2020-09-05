@@ -872,6 +872,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add(f"  ipv{ipv} {{")
         self.conf.add(f"    table {self.bgp_table_name(ipv)};")
         self.conf.add(f"    igp table master{ipv};")
+        # Set the nexthop to ourselves for external peers
+        if self.peer_type in ("customer", "peer", "transit", "routecollector", "routeserver"):
+            self.conf.add("    next hop self;")
         # Setup import and export table so we can do soft reconfiguration
         self.conf.add("    import table;")
         self.conf.add("    export table;")

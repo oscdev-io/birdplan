@@ -79,7 +79,7 @@ class TestCustomer(BGPFilteringBogonBase):
                         "BGP.as_path": [65001],
                         "BGP.large_community": [(65000, 3, 2), (65000, 1101, 3)],
                         "BGP.local_pref": 750,
-                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.next_hop": ["100.64.0.2"],
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
@@ -104,7 +104,7 @@ class TestCustomer(BGPFilteringBogonBase):
                         "BGP.as_path": [65001],
                         "BGP.large_community": [(65000, 3, 2), (65000, 1101, 3)],
                         "BGP.local_pref": 750,
-                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.next_hop": ["fc00:100::2"],
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
@@ -148,7 +148,7 @@ class TestPeer(BGPFilteringBogonBase):
                         "BGP.as_path": [65001],
                         "BGP.large_community": [(65000, 3, 3), (65000, 1101, 3)],
                         "BGP.local_pref": 470,
-                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.next_hop": ["100.64.0.2"],
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
@@ -173,7 +173,7 @@ class TestPeer(BGPFilteringBogonBase):
                         "BGP.as_path": [65001],
                         "BGP.large_community": [(65000, 3, 3), (65000, 1101, 3)],
                         "BGP.local_pref": 470,
-                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.next_hop": ["fc00:100::2"],
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
@@ -217,7 +217,7 @@ class TestTransit(BGPFilteringBogonBase):
                         "BGP.as_path": [65001],
                         "BGP.large_community": [(65000, 3, 4), (65000, 1101, 3)],
                         "BGP.local_pref": 150,
-                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.next_hop": ["100.64.0.2"],
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
@@ -242,7 +242,7 @@ class TestTransit(BGPFilteringBogonBase):
                         "BGP.as_path": [65001],
                         "BGP.large_community": [(65000, 3, 4), (65000, 1101, 3)],
                         "BGP.local_pref": 150,
-                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.next_hop": ["fc00:100::2"],
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
@@ -285,7 +285,7 @@ class TestRrclient(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["100.64.0.2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -303,7 +303,7 @@ class TestRrclient(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["fc00:100::2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -325,7 +325,7 @@ class TestRrclient(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["100.64.0.2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -343,7 +343,7 @@ class TestRrclient(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["fc00:100::2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -381,7 +381,7 @@ class TestRrserver(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["100.64.0.2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -399,7 +399,7 @@ class TestRrserver(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["fc00:100::2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -421,7 +421,7 @@ class TestRrserver(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["100.64.0.2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -439,7 +439,7 @@ class TestRrserver(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["fc00:100::2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -477,7 +477,7 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["100.64.0.2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -495,7 +495,7 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["fc00:100::2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -517,7 +517,7 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
         correct_result = {
             "172.16.0.0/24": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "100.64.0.2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["100.64.0.2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "100.64.0.2",
@@ -535,7 +535,7 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
         correct_result = {
             "2001:db8::/48": [
                 {
-                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": "fc00:100::2", "BGP.origin": "IGP"},
+                    "attributes": {"BGP.as_path": [], "BGP.local_pref": 100, "BGP.next_hop": ["fc00:100::2"], "BGP.origin": "IGP"},
                     "bestpath": True,
                     "bgp_type": "i",
                     "from": "fc00:100::2",
@@ -574,7 +574,7 @@ class TestRoutecollector(BGPFilteringBogonBase):
                         "BGP.as_path": [65001],
                         "BGP.large_community": [(65000, 1101, 17)],
                         "BGP.local_pref": 100,
-                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.next_hop": ["100.64.0.2"],
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
@@ -599,7 +599,7 @@ class TestRoutecollector(BGPFilteringBogonBase):
                         "BGP.as_path": [65001],
                         "BGP.large_community": [(65000, 1101, 17)],
                         "BGP.local_pref": 100,
-                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.next_hop": ["fc00:100::2"],
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
@@ -643,7 +643,7 @@ class TestRouteserver(BGPFilteringBogonBase):
                         "BGP.as_path": [65001],
                         "BGP.large_community": [(65000, 3, 5), (65000, 1101, 3)],
                         "BGP.local_pref": 450,
-                        "BGP.next_hop": "100.64.0.2",
+                        "BGP.next_hop": ["100.64.0.2"],
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
@@ -668,7 +668,7 @@ class TestRouteserver(BGPFilteringBogonBase):
                         "BGP.as_path": [65001],
                         "BGP.large_community": [(65000, 3, 5), (65000, 1101, 3)],
                         "BGP.local_pref": 450,
-                        "BGP.next_hop": "fc00:100::2",
+                        "BGP.next_hop": ["fc00:100::2"],
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,

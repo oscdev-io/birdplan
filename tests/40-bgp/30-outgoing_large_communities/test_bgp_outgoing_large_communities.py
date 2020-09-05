@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGP test for incoming large communities."""
+"""BGP test for outgoing large communities."""
 
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
@@ -26,8 +26,8 @@ from nsnetsim.switch_node import SwitchNode
 from basetests import BirdPlanBaseTestCase
 
 
-class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
-    """BGP test for incoming large communities."""
+class TestBGPOutgoingLargeCommunities(BirdPlanBaseTestCase):
+    """BGP test for outgoing large communities."""
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1", "r2"]
@@ -86,7 +86,7 @@ class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
         correct_result = {
             "100.101.0.0/24": [
                 {
-                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+                    "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1, 0), (65000, 4, 65414)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
                     "pref": 200,
                     "prefix_type": "unicast",
@@ -104,7 +104,7 @@ class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3), (65001, 1, 0), (65001, 4, 65414)],
+                        "BGP.large_community": [(65000, 1, 0), (65000, 3, 1), (65000, 4, 65414), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -135,7 +135,7 @@ class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
         correct_result = {
             "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+                    "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1, 0), (65000, 4, 65414)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
                     "pref": 200,
                     "prefix_type": "unicast",
@@ -153,7 +153,7 @@ class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3), (65001, 1, 0), (65001, 4, 65414)],
+                        "BGP.large_community": [(65000, 1, 0), (65000, 3, 1), (65000, 4, 65414), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -199,7 +199,7 @@ class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3), (65001, 1, 0), (65001, 4, 65414)],
+                        "BGP.large_community": [(65000, 1, 0), (65000, 3, 1), (65000, 4, 65414), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -245,7 +245,7 @@ class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3), (65001, 1, 0), (65001, 4, 65414)],
+                        "BGP.large_community": [(65000, 1, 0), (65000, 3, 1), (65000, 4, 65414), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
