@@ -50,7 +50,6 @@ class "Switch: s1" {}
 "Switch: s1" <-down- "Router: r1": r1 eth0
 "Switch: s1" <-down- "Router: r2": r2 eth0
 "Router: r1" --() NC: r1 eth1
-"Router: r2" --() NC: r2 eth1
 
 @enduml
 ```
