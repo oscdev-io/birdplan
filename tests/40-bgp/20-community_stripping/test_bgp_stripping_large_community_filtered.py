@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGP stripping of large communities."""
-
+# type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
+
+"""BGP stripping of large communities."""
 
 from typing import Tuple
 import os
@@ -455,9 +456,9 @@ class TestRrclient(BGPStrippingLargeCommunitiesBase):
                     },
                     "bestpath": True,
                     "bgp_type": "i",
-                    "from": "100.64.0.2",
+                    "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
                     "pref": 100,
-                    "prefix_type": "unreachable",
+                    "prefix_type": "unicast",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
                     "type": ["BGP", "univ"],
@@ -479,9 +480,9 @@ class TestRrclient(BGPStrippingLargeCommunitiesBase):
                     },
                     "bestpath": True,
                     "bgp_type": "i",
-                    "from": "fc00:100::2",
+                    "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
                     "pref": 100,
-                    "prefix_type": "unreachable",
+                    "prefix_type": "unicast",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
                     "type": ["BGP", "univ"],
@@ -526,9 +527,9 @@ class TestRrserver(BGPStrippingLargeCommunitiesBase):
                     },
                     "bestpath": True,
                     "bgp_type": "i",
-                    "from": "100.64.0.2",
+                    "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
                     "pref": 100,
-                    "prefix_type": "unreachable",
+                    "prefix_type": "unicast",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
                     "type": ["BGP", "univ"],
@@ -550,9 +551,9 @@ class TestRrserver(BGPStrippingLargeCommunitiesBase):
                     },
                     "bestpath": True,
                     "bgp_type": "i",
-                    "from": "fc00:100::2",
+                    "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
                     "pref": 100,
-                    "prefix_type": "unreachable",
+                    "prefix_type": "unicast",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
                     "type": ["BGP", "univ"],
@@ -597,9 +598,9 @@ class TestRrserverRrserver(BGPStrippingLargeCommunitiesBase):
                     },
                     "bestpath": True,
                     "bgp_type": "i",
-                    "from": "100.64.0.2",
+                    "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
                     "pref": 100,
-                    "prefix_type": "unreachable",
+                    "prefix_type": "unicast",
                     "protocol": "bgp4_AS65000_e1",
                     "since": helpers.bird_since_field(),
                     "type": ["BGP", "univ"],
@@ -621,9 +622,9 @@ class TestRrserverRrserver(BGPStrippingLargeCommunitiesBase):
                     },
                     "bestpath": True,
                     "bgp_type": "i",
-                    "from": "fc00:100::2",
+                    "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
                     "pref": 100,
-                    "prefix_type": "unreachable",
+                    "prefix_type": "unicast",
                     "protocol": "bgp6_AS65000_e1",
                     "since": helpers.bird_since_field(),
                     "type": ["BGP", "univ"],

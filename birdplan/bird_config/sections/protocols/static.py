@@ -21,6 +21,10 @@
 from typing import Dict
 from .pipe import ProtocolPipe
 from .base import SectionProtocolBase
+from ..constants import SectionConstants
+from ..functions import SectionFunctions
+from ..tables import SectionTables
+from ...globals import BirdConfigGlobals
 from ....exceptions import BirdPlanError
 
 StaticRoutes = Dict[str, str]
@@ -33,19 +37,21 @@ class ProtocolStatic(SectionProtocolBase):
 
     _routes: StaticRoutes
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
+    ):
         """Initialize the object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals, constants, functions, tables)
 
         # Initialize our route list
         self._routes = {}
 
-    def add_route(self, route: str):
+    def add_route(self, route: str) -> None:
         """Add static route."""
         (prefix, route_info) = route.split(" ", 1)
         self.routes[prefix] = route_info
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the static protocol."""
         super().configure()
 
@@ -104,7 +110,11 @@ class ProtocolStatic(SectionProtocolBase):
 
         # Configure static route pipe to the kernel
         static_kernel_pipe = ProtocolPipe(
-            birdconf_globals=self.birdconf_globals, table_from="static", table_to="master", table_export="all", table_import="none"
+            birdconfig_globals=self.birdconfig_globals,
+            table_from="static",
+            table_to="master",
+            table_export="all",
+            table_import="none",
         )
         self.conf.add(static_kernel_pipe)
 

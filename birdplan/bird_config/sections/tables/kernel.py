@@ -24,7 +24,7 @@ from ..base import SectionBase
 class TableKernel(SectionBase):
     """BIRD kernel table configuration."""
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the kernel tables."""
         super().configure()
 

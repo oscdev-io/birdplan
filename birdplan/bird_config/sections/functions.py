@@ -18,24 +18,25 @@
 
 """BIRD functions configuration."""
 
+from birdplan.bird_config.globals import BirdConfigGlobals
 from .base import SectionBase
 
 
 class SectionFunctions(SectionBase):
     """BIRD functions configuration."""
 
-    _section = "Global Functions"
+    _section: str = "Global Functions"
 
     _need_functions: bool
 
-    def __init__(self, **kwargs):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize the object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals)
 
         # Add functions to output
         self._need_functions = False
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure global constants."""
         super().configure()
 
@@ -43,7 +44,7 @@ class SectionFunctions(SectionBase):
         if self.need_functions:
             self._configure_functions()
 
-    def _configure_functions(self):
+    def _configure_functions(self) -> None:
         """Configure functions."""
         self.conf.add('# Match a prefix longer than "size".')
         self.conf.add("function prefix_is_longer(int size) {")
@@ -92,6 +93,6 @@ class SectionFunctions(SectionBase):
         return self._need_functions
 
     @need_functions.setter
-    def need_functions(self, need_functions: bool):
+    def need_functions(self, need_functions: bool) -> None:
         """Set if functions should be added to our output constants block."""
         self._need_functions = need_functions

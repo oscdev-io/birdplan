@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""OSPF test for redistributed connected routes using a star."""
-
+# type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
+
+"""OSPF test for redistributed connected routes using a star."""
 
 import os
 from nsnetsim.bird_router_node import BirdRouterNode
@@ -116,30 +117,20 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
     def test_bird_tables_master4(self, sim, helpers):
         """Test BIRD master4 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master4", expect_count=1, expect_content="'OSPF.router_id': '0.0.0.2'")
+        r1_table = self._bird_route_table(sim, "r1", "master4", expect_count=2, expect_content="'OSPF.router_id': '0.0.0.2'")
         r2_table = self._bird_route_table(sim, "r2", "master4", expect_count=2)
 
         # Check master4 BIRD table
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
-                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
-                    "ospf_type": "I",
-                    "pref": 150,
+                    "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "ospf4",
-                    "router_id": "0.0.0.2",
+                    "protocol": "direct4",
                     "since": helpers.bird_since_field(),
-                    "type": ["OSPF", "univ"],
-                }
-            ]
-        }
-        assert r1_table == correct_result, "Result for R1 BIRD master4 routing table does not match what it should be"
-
-        correct_result = {
-            "192.168.0.0/24": [
+                    "type": ["device", "univ"],
+                },
                 {
                     "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
                     "metric1": 10,
@@ -151,7 +142,43 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
                     "router_id": "0.0.0.2",
                     "since": helpers.bird_since_field(),
                     "type": ["OSPF", "univ"],
+                },
+            ],
+            "192.168.1.0/24": [
+                {
+                    "nexthops": [{"interface": "eth10"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
                 }
+            ],
+        }
+        assert r1_table == correct_result, "Result for R1 BIRD master4 routing table does not match what it should be"
+
+        correct_result = {
+            "192.168.0.0/24": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                },
+                {
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
+                    "nexthops": [{"interface": "eth0"}],
+                    "ospf_type": "I",
+                    "pref": 150,
+                    "prefix_type": "unicast",
+                    "protocol": "ospf4",
+                    "router_id": "0.0.0.2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["OSPF", "univ"],
+                },
             ],
             "192.168.1.0/24": [
                 {
@@ -179,30 +206,20 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
     def test_bird_tables_master6(self, sim, helpers):
         """Test BIRD master6 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master6", expect_count=1, expect_content="'OSPF.router_id': '0.0.0.2'")
+        r1_table = self._bird_route_table(sim, "r1", "master6", expect_count=2, expect_content="'OSPF.router_id': '0.0.0.2'")
         r2_table = self._bird_route_table(sim, "r2", "master6", expect_count=2)
 
         # Check master6 BIRD table
         correct_result = {
             "fc00::/64": [
                 {
-                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
-                    "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
-                    "ospf_type": "I",
-                    "pref": 150,
+                    "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "ospf6",
-                    "router_id": "0.0.0.2",
+                    "protocol": "direct6",
                     "since": helpers.bird_since_field(),
-                    "type": ["OSPF", "univ"],
-                }
-            ]
-        }
-        assert r1_table == correct_result, "Result for R1 BIRD master6 routing table does not match what it should be"
-
-        correct_result = {
-            "fc00::/64": [
+                    "type": ["device", "univ"],
+                },
                 {
                     "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
                     "metric1": 10,
@@ -214,7 +231,43 @@ class TestOSPFRedistributeConnectedWithStar(BirdPlanBaseTestCase):
                     "router_id": "0.0.0.2",
                     "since": helpers.bird_since_field(),
                     "type": ["OSPF", "univ"],
+                },
+            ],
+            "fc01::/64": [
+                {
+                    "nexthops": [{"interface": "eth10"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
                 }
+            ],
+        }
+        assert r1_table == correct_result, "Result for R1 BIRD master6 routing table does not match what it should be"
+
+        correct_result = {
+            "fc00::/64": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                },
+                {
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+                    "metric1": 10,
+                    "nexthops": [{"interface": "eth0"}],
+                    "ospf_type": "I",
+                    "pref": 150,
+                    "prefix_type": "unicast",
+                    "protocol": "ospf6",
+                    "router_id": "0.0.0.2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["OSPF", "univ"],
+                },
             ],
             "fc01::/64": [
                 {

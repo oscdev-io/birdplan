@@ -18,6 +18,7 @@
 
 """BIRD master table configuration."""
 
+from birdplan.bird_config.globals import BirdConfigGlobals
 from .master_attributes import MasterTableAttributes, MasterTableRoutePolicyExport
 from ...base import SectionBase
 from ...protocols.pipe import ProtocolPipe
@@ -30,26 +31,26 @@ class TableMaster(SectionBase):
 
     _master_attributes: MasterTableAttributes
 
-    def __init__(self, **kwargs):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize the object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals)
 
         self._master_attributes = MasterTableAttributes()
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the master tables."""
         super().configure()
 
         # Setup filters
-        self._master_to_kernel_export_filter(4)
-        self._master_to_kernel_export_filter(6)
+        self._master_to_kernel_export_filter("4")
+        self._master_to_kernel_export_filter("6")
 
-        self._master_to_kernel_import_filter(4)
-        self._master_to_kernel_import_filter(6)
+        self._master_to_kernel_import_filter("4")
+        self._master_to_kernel_import_filter("6")
 
         # Configure pipe from kernel table to master table
         kernel_master_pipe = ProtocolPipe(
-            birdconf_globals=self.birdconf_globals,
+            birdconfig_globals=self.birdconfig_globals,
             table_from="master",
             table_to="kernel",
             table_export_filtered=True,
@@ -57,7 +58,7 @@ class TableMaster(SectionBase):
         )
         self.conf.add(kernel_master_pipe)
 
-    def _master_to_kernel_import_filter(self, ipv: int):
+    def _master_to_kernel_import_filter(self, ipv: str) -> None:
         """Master to kernel import filter setup."""
         # Configure import filter to master table
         self.conf.add(f"filter f_master{ipv}_kernel{ipv}_import {{")
@@ -69,7 +70,7 @@ class TableMaster(SectionBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _master_to_kernel_export_filter(self, ipv: int):
+    def _master_to_kernel_export_filter(self, ipv: str) -> None:
         """Master to kernel export filter setup."""
         # Configure export filter to master table
         self.conf.add(f"filter f_master{ipv}_kernel{ipv}_export {{")

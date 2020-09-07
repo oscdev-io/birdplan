@@ -18,7 +18,7 @@
 
 """BIRD BGP protocol attributes."""
 
-from typing import Dict, Optional
+from typing import List, Optional, Union
 
 
 class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
@@ -34,7 +34,7 @@ class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
 
     default: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
         self.default = False
 
@@ -55,13 +55,13 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
 
     """
 
-    connected: Dict[str, bool]
+    connected: Union[bool, List[str]]
     kernel: bool
     static: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
-        self.connected = {}
+        self.connected = False
         self.kernel = False
         self.static = False
 
@@ -107,7 +107,7 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
     extended_community_maxlen: int = 100
     large_community_maxlen: int = 100
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
 
         self.asn = None

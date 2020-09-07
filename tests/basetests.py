@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Base test classes for our tests."""
+# type: ignore
+# pylint: disable=import-error,too-few-public-methods,no-self-use
 
-# pylint: disable=too-few-public-methods,no-self-use
+"""Base test classes for our tests."""
 
 from typing import Any, Dict, List, Optional
 import pytest

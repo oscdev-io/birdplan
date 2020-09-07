@@ -31,15 +31,15 @@ SectionConfigItems = Dict[int, SectionConfigItemList]
 class SectionBaseConfig:  # pylint: disable=too-few-public-methods
     """Configuration contents of the section."""
 
-    _birdconf_globals: BirdConfigGlobals
+    _birdconfig_globals: BirdConfigGlobals
     _items: SectionConfigItems
 
-    def __init__(self, birdconf_globals: BirdConfigGlobals):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals) -> None:
         """Initialize object."""
-        self._birdconf_globals = birdconf_globals
+        self._birdconfig_globals = birdconfig_globals
         self._items = {}
 
-    def add(self, item: SectionConfigItem, order: int = 10, deferred: bool = False, debug: bool = False):
+    def add(self, item: SectionConfigItem, order: int = 10, deferred: bool = False, debug: bool = False) -> None:
         """
         Add configuration to the output we're going to generate.
 
@@ -61,7 +61,7 @@ class SectionBaseConfig:  # pylint: disable=too-few-public-methods
             raise RuntimeError("Only SectionBase objects can be used as deferred configuration")
 
         # If we have a debug line,  exclude it if we're not in debugging mode
-        if debug and not self.birdconf_globals.debug:
+        if debug and not self.birdconfig_globals.debug:
             return
 
         # Make sure this ordering position is initialized
@@ -84,7 +84,7 @@ class SectionBaseConfig:  # pylint: disable=too-few-public-methods
         else:
             items.append(item)
 
-    def append(self, item: SectionConfigItem, deferred: bool = False, debug: bool = False):
+    def append(self, item: SectionConfigItem, deferred: bool = False, debug: bool = False) -> None:
         """
         Add configuration to the output we're going to generate.
 
@@ -103,7 +103,7 @@ class SectionBaseConfig:  # pylint: disable=too-few-public-methods
         """
         self.add(item=item, order=50, deferred=deferred, debug=debug)
 
-    def title(self, title: str, order: int = 10):
+    def title(self, title: str, order: int = 10) -> None:
         """
         Add a title block.
 
@@ -120,7 +120,7 @@ class SectionBaseConfig:  # pylint: disable=too-few-public-methods
         self.add("#", order=order)
         self.add("", order=order)
 
-    def append_title(self, title: str):
+    def append_title(self, title: str) -> None:
         """
         Add a title block.
 
@@ -161,37 +161,47 @@ class SectionBaseConfig:  # pylint: disable=too-few-public-methods
         return lines
 
     @property
-    def birdconf_globals(self) -> BirdConfigGlobals:
+    def birdconfig_globals(self) -> BirdConfigGlobals:
         """Return our BirdConfig globals."""
-        return self._birdconf_globals
+        return self._birdconfig_globals
 
 
 class SectionBase:
     """Base class for a BIRD configuration section."""
 
     # Section title
-    _section = ""
+    _section: str = ""
 
     # Globals
-    _birdconf_globals: BirdConfigGlobals
+    _birdconfig_globals: BirdConfigGlobals
 
     # Configuration lines to output
     _config: SectionBaseConfig
 
     # pylint: disable=unused-argument
-    def __init__(self, **kwargs):
-        """Initialize the object."""
+    def __init__(self, birdconfig_globals: BirdConfigGlobals) -> None:
+        """
+        Initialize the object.
 
-        # Make sure we have our globals
-        if "birdconf_globals" not in kwargs:
-            raise RuntimeError("A child of SectionBase should always have birdconf_globals passed")
+        Returns
+        -------
+        Nothing.
 
-        self._birdconf_globals = kwargs.get("birdconf_globals")
+        """
 
-        self._config = SectionBaseConfig(birdconf_globals=self.birdconf_globals)
+        self._birdconfig_globals = birdconfig_globals
 
-    def configure(self):
-        """Configure this section."""
+        self._config = SectionBaseConfig(birdconfig_globals=self.birdconfig_globals)
+
+    def configure(self) -> None:
+        """
+        Configure this section.
+
+        Returns
+        -------
+        Nothing.
+
+        """
         if self.section:
             self.conf.title(self.section)
 
@@ -201,9 +211,9 @@ class SectionBase:
         return self._section
 
     @property
-    def birdconf_globals(self) -> BirdConfigGlobals:
+    def birdconfig_globals(self) -> BirdConfigGlobals:
         """Return our BirdConfig globals."""
-        return self._birdconf_globals
+        return self._birdconfig_globals
 
     @property
     def conf(self) -> SectionBaseConfig:

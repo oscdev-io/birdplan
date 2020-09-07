@@ -18,6 +18,7 @@
 
 """BIRD routing tables section."""
 
+from birdplan.bird_config.globals import BirdConfigGlobals
 from .kernel import TableKernel
 from .master import TableMaster
 from ..base import SectionBase
@@ -31,14 +32,14 @@ class SectionTables(SectionBase):
     _kernel: TableKernel
     _master: TableMaster
 
-    def __init__(self, **kwargs):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals) -> None:
         """Initialize object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals)
 
-        self._kernel = TableKernel(**kwargs)
-        self._master = TableMaster(**kwargs)
+        self._kernel = TableKernel(birdconfig_globals)
+        self._master = TableMaster(birdconfig_globals)
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure all protocols."""
         super().configure()
 

@@ -18,6 +18,7 @@
 
 """BIRD constants configuration."""
 
+from birdplan.bird_config.globals import BirdConfigGlobals
 from .base import SectionBase
 
 
@@ -28,14 +29,14 @@ class SectionConstants(SectionBase):
 
     _need_bogons: bool
 
-    def __init__(self, **kwargs):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize the object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals)
 
         # Add bogon constants to output
         self._need_bogons = False
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure global constants."""
         super().configure()
 
@@ -45,20 +46,20 @@ class SectionConstants(SectionBase):
             self._configure_bogons_ipv4()
             self._configure_bogons_ipv6()
 
-    def _configure_defaults(self):
+    def _configure_defaults(self) -> None:
         """Configure default routes."""
         self.conf.add("# Default routes")
         self.conf.add("define DEFAULT_ROUTE_V4 = 0.0.0.0/0; # IPv4 default route")
         self.conf.add("define DEFAULT_ROUTE_V6 = ::/0; # IPv6 default route")
         self.conf.add("")
 
-    def _configure_bogons_ipv4(self):
+    def _configure_bogons_ipv4(self) -> None:
         """Configure IPv4 bogons."""
         self.conf.add("# As per http://bgpfilterguide.nlnog.net/guides/bogon_prefixes/")
         self.conf.add("define BOGONS_V4 = [")
         self.conf.add("  0.0.0.0/8+, # RFC 1122 'this' network")
         self.conf.add("  10.0.0.0/8+, # RFC 1918 private space")
-        if self.birdconf_globals.test_mode:
+        if self.birdconfig_globals.test_mode:
             self.conf.add("  # EXCLUDING DUE TO TESTING: 100.64.0.0/10+, # RFC 6598 Carrier grade nat space")
         else:
             self.conf.add("  100.64.0.0/10+, # RFC 6598 Carrier grade nat space")
@@ -76,7 +77,7 @@ class SectionConstants(SectionBase):
         self.conf.add("];")
         self.conf.add("")
 
-    def _configure_bogons_ipv6(self):
+    def _configure_bogons_ipv6(self) -> None:
         """Configure IPv6 bogons."""
         self.conf.add("# As per http://bgpfilterguide.nlnog.net/guides/bogon_prefixes/")
         self.conf.add("define BOGONS_V6 = [")
@@ -87,7 +88,7 @@ class SectionConstants(SectionBase):
         self.conf.add("  2001:db8::/32+, # RFC 3849 documentation")
         self.conf.add("  2002::/16+, # RFC 7526 6to4 anycast relay")
         self.conf.add("  3ffe::/16+, # RFC 3701 old 6bone")
-        if self.birdconf_globals.test_mode:
+        if self.birdconfig_globals.test_mode:
             self.conf.add("  # EXCLUDING DUE TO TESTING: fc00::/7+, # RFC 4193 unique local unicast")
         else:
             self.conf.add("  fc00::/7+, # RFC 4193 unique local unicast")
@@ -103,6 +104,6 @@ class SectionConstants(SectionBase):
         return self._need_bogons
 
     @need_bogons.setter
-    def need_bogons(self, need_bogons: bool):
+    def need_bogons(self, need_bogons: bool) -> None:
         """Add bogons to our output."""
         self._need_bogons = need_bogons

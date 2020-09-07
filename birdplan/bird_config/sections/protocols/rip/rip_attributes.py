@@ -18,7 +18,7 @@
 
 """BIRD RIP protocol attributes."""
 
-from typing import Dict
+from typing import List, Union
 
 
 class RIPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
@@ -34,7 +34,7 @@ class RIPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
 
     default: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
         self.default = False
 
@@ -59,14 +59,14 @@ class RIPRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
 
     """
 
-    connected: Dict[str, bool]
+    connected: Union[bool, List[str]]
     default: bool
     kernel: bool
     static: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
-        self.connected = {}
+        self.connected = False
         self.default = False
         self.kernel = False
         self.rip = True
@@ -89,7 +89,7 @@ class RIPAttributes:  # pylint: disable=too-few-public-methods
     route_policy_accept: RIPRoutePolicyAccept
     route_policy_redistribute: RIPRoutePolicyRedistribute
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
 
         self.route_policy_accept = RIPRoutePolicyAccept()

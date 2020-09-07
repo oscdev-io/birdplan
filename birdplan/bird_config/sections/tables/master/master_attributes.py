@@ -41,7 +41,7 @@ class MasterTableRoutePolicyExportKernel:  # pylint: disable=too-few-public-meth
     rip: bool
     static: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
         self.bgp = True
         self.ospf = True
@@ -62,7 +62,7 @@ class MasterTableRoutePolicyExport:  # pylint: disable=too-few-public-methods
 
     kernel: MasterTableRoutePolicyExportKernel
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
         self.kernel = MasterTableRoutePolicyExportKernel()
 
@@ -80,7 +80,7 @@ class MasterTableAttributes:  # pylint: disable=too-few-public-methods
 
     route_policy_export: MasterTableRoutePolicyExport
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
 
         self.route_policy_export = MasterTableRoutePolicyExport()

@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""RIP test for no exporting to kernel."""
-
+# type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
+
+"""RIP test for no exporting to kernel."""
 
 import os
 from nsnetsim.bird_router_node import BirdRouterNode
@@ -190,11 +191,31 @@ class TestRIPNoExportKernel(BirdPlanBaseTestCase):
     def test_bird_tables_master4(self, sim, helpers):
         """Test BIRD master4 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master4", expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", "master4", expect_count=1)
+        r1_table = self._bird_route_table(sim, "r1", "master4", expect_count=3)
+        r2_table = self._bird_route_table(sim, "r2", "master4", expect_count=2)
 
         # Check master4 BIRD table
         correct_result = {
+            "192.168.0.0/24": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
+            "192.168.1.0/24": [
+                {
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
             "192.168.20.0/24": [
                 {
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
@@ -204,11 +225,21 @@ class TestRIPNoExportKernel(BirdPlanBaseTestCase):
                     "since": helpers.bird_since_field(),
                     "type": ["static", "univ"],
                 }
-            ]
+            ],
         }
         assert r1_table == correct_result, "Result for R1 BIRD master4 routing table does not match what it should be"
 
         correct_result = {
+            "192.168.0.0/24": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
             "192.168.20.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
@@ -220,18 +251,38 @@ class TestRIPNoExportKernel(BirdPlanBaseTestCase):
                     "since": helpers.bird_since_field(),
                     "type": ["RIP", "univ"],
                 }
-            ]
+            ],
         }
         assert r2_table == correct_result, "Result for R2 BIRD master4 routing table does not match what it should be"
 
     def test_bird_tables_master6(self, sim, helpers):
         """Test BIRD master6 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master6", expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", "master6", expect_count=1)
+        r1_table = self._bird_route_table(sim, "r1", "master6", expect_count=3)
+        r2_table = self._bird_route_table(sim, "r2", "master6", expect_count=2)
 
         # Check master6 BIRD table
         correct_result = {
+            "fc00::/64": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
+            "fc01::/64": [
+                {
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
             "fc20::/64": [
                 {
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
@@ -241,11 +292,21 @@ class TestRIPNoExportKernel(BirdPlanBaseTestCase):
                     "since": helpers.bird_since_field(),
                     "type": ["static", "univ"],
                 }
-            ]
+            ],
         }
         assert r1_table == correct_result, "Result for R1 BIRD master6 routing table does not match what it should be"
 
         correct_result = {
+            "fc00::/64": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
             "fc20::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
@@ -257,7 +318,7 @@ class TestRIPNoExportKernel(BirdPlanBaseTestCase):
                     "since": helpers.bird_since_field(),
                     "type": ["RIP", "univ"],
                 }
-            ]
+            ],
         }
         assert r2_table == correct_result, "Result for R2 BIRD master6 routing table does not match what it should be"
 

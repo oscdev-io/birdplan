@@ -18,6 +18,7 @@
 
 """BIRD configuration sections."""
 
+from birdplan.bird_config.globals import BirdConfigGlobals
 from .base import SectionBase
 from .constants import SectionConstants
 from .functions import SectionFunctions
@@ -39,19 +40,19 @@ class Sections(SectionBase):
     _tables: SectionTables
     _protocols: SectionProtocols
 
-    def __init__(self, **kwargs):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals)
 
-        self._logging = SectionLogging(**kwargs)
-        self._main = SectionMain(**kwargs)
-        self._router_id = SectionRouterID(**kwargs)
-        self._constants = SectionConstants(**kwargs)
-        self._functions = SectionFunctions(**kwargs)
-        self._tables = SectionTables(**kwargs)
-        self._protocols = SectionProtocols(constants=self.constants, functions=self.functions, tables=self.tables, **kwargs)
+        self._logging = SectionLogging(birdconfig_globals)
+        self._main = SectionMain(birdconfig_globals)
+        self._router_id = SectionRouterID(birdconfig_globals)
+        self._constants = SectionConstants(birdconfig_globals)
+        self._functions = SectionFunctions(birdconfig_globals)
+        self._tables = SectionTables(birdconfig_globals)
+        self._protocols = SectionProtocols(birdconfig_globals, self.constants, self.functions, self.tables)
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure all sections."""
         self.conf.add(self.logging)
         self.conf.add(self.main)

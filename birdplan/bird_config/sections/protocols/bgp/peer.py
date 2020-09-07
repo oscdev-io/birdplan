@@ -20,7 +20,8 @@
 
 # pylint: disable=too-many-lines
 
-from typing import Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
+
 from .bgp_attributes import BGPAttributes
 from .peer_attributes import (
     BGPPeerAttributes,
@@ -35,12 +36,16 @@ from .peer_attributes import (
 from .typing import BGPPeerConfig
 from ..pipe import ProtocolPipe
 from ..base import SectionProtocolBase
+from ...constants import SectionConstants
+from ...functions import SectionFunctions
+from ...tables import SectionTables
 from .... import util
+from ....globals import BirdConfigGlobals
 from .....bgpq3 import BGPQ3
 from .....exceptions import BirdPlanError
 
 
-BGPPeerRedistributeItem = Union[bool, Dict]
+BGPPeerRedistributeItem = Union[bool, Dict[str, Any]]
 
 
 class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
@@ -50,10 +55,17 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     _peer_attributes: BGPPeerAttributes
 
     def __init__(
-        self, bgp_attributes: BGPAttributes, peer_name: str, peer_config: BGPPeerConfig, **kwargs
-    ):  # pylint: disable=too-many-branches,too-many-statements
+        self,
+        birdconfig_globals: BirdConfigGlobals,
+        constants: SectionConstants,
+        functions: SectionFunctions,
+        tables: SectionTables,
+        bgp_attributes: BGPAttributes,
+        peer_name: str,
+        peer_config: BGPPeerConfig,
+    ):  # pylint: disable=too-many-branches,too-many-statements,too-many-arguments
         """Initialize the object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals, constants, functions, tables)
 
         # Initialize our attributes
         self._peer_attributes = BGPPeerAttributes()
@@ -193,7 +205,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "quarantine" in peer_config and peer_config["quarantine"]:
             self.quarantined = True
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure BGP peer."""
         super().configure()
 
@@ -217,7 +229,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Configure pipe from the BGP peer table to the main BGP table
         bgp_peer_pipe = ProtocolPipe(
-            birdconf_globals=self.birdconf_globals,
+            birdconfig_globals=self.birdconfig_globals,
             table_from=self.bgp_table_name,
             table_to="bgp",
             table_export_filtered=True,
@@ -230,44 +242,44 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # End of peer
         self.conf.add("")
 
-    def protocol_name(self, ipv: int) -> str:
+    def protocol_name(self, ipv: str) -> str:
         """Return the IP versioned protocol name."""
         return f"bgp{ipv}_AS{self.asn}_{self.name}"
 
-    def bgp_table_name(self, ipv: int) -> str:
+    def bgp_table_name(self, ipv: str) -> str:
         """Return the IP versioned BGP table name."""
         return f"t_bgp{ipv}_AS{self.asn}_{self.name}_peer"
 
-    def filter_name_export(self, ipv: int) -> str:
+    def filter_name_export(self, ipv: str) -> str:
         """Return the IP versioned peer export filter name."""
         return f"f_bgp{ipv}_AS{self.asn}_{self.name}_peer_export"
 
-    def filter_name_import(self, ipv: int) -> str:
+    def filter_name_import(self, ipv: str) -> str:
         """Return the IP versioned peer import filter name."""
         return f"f_bgp{ipv}_AS{self.asn}_{self.name}_peer_import"
 
-    def filter_name_export_bgp(self, ipv: int) -> str:
+    def filter_name_export_bgp(self, ipv: str) -> str:
         """Return the IP versioned BGP export filter name."""
         return f"f_bgp{ipv}_AS{self.asn}_{self.name}_peer_bgp{ipv}_export"
 
-    def filter_name_import_bgp(self, ipv: int) -> str:
+    def filter_name_import_bgp(self, ipv: str) -> str:
         """Return the IP versioned BGP import filter name."""
         return f"f_bgp{ipv}_AS{self.asn}_{self.name}_peer_bgp{ipv}_import"
 
-    def prefix_list_name(self, ipv: int) -> str:
+    def prefix_list_name(self, ipv: str) -> str:
         """Return our prefix list name."""
         return f"bgp{ipv}_AS{self.asn}_{self.name}_prefixes"
 
-    def _setup_peer_tables(self):
+    def _setup_peer_tables(self) -> None:
         """Peering routing table setup."""
         self.tables.conf.append(f"# BGP Peer Tables: {self.asn} - {self.name}")
         if self.has_ipv4:
-            self.tables.conf.append(f"ipv4 table {self.bgp_table_name(4)};")
+            self.tables.conf.append(f"ipv4 table {self.bgp_table_name('4')};")
         if self.has_ipv6:
-            self.tables.conf.append(f"ipv6 table {self.bgp_table_name(6)};")
+            self.tables.conf.append(f"ipv6 table {self.bgp_table_name('6')};")
         self.tables.conf.append("")
 
-    def _setup_peer_asns(self):
+    def _setup_peer_asns(self) -> None:
         """ASN list setup."""
 
         # Short circuit and exit if we have none
@@ -278,7 +290,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         irr_asns = []
         if self.filter_policy.as_sets:
             bgpq3 = BGPQ3()
-            irr_asns = bgpq3.get_asns([self.filter_policy.as_sets])
+            irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
 
         self.conf.add(f"define {self.asn_list_name} = [")
         asns = []
@@ -303,14 +315,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("];")
         self.conf.add("")
 
-    def _setup_peer_prefixes(self):
+    def _setup_peer_prefixes(self) -> None:
         """Prefix list setup."""
         # Short circuit and exit if we have none
         if not self.has_prefix_filter:
             return
 
         # Work out prefixes
-        prefix_lists = {"4": [], "6": []}
+        prefix_lists: Dict[str, List[str]] = {"4": [], "6": []}
         for prefix in sorted(self.filter_policy.prefixes):
             if ":" in prefix:
                 prefix_lists["6"].append(prefix)
@@ -318,10 +330,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 prefix_lists["4"].append(prefix)
 
         # Grab IRR prefixes
-        irr_prefixes = {"ipv4": [], "ipv6": []}
+        irr_prefixes: Dict[str, List[str]] = {"ipv4": [], "ipv6": []}
         if self.filter_policy.as_sets:
             bgpq3 = BGPQ3()
-            irr_prefixes = bgpq3.get_prefixes([self.filter_policy.as_sets])
+            irr_prefixes = bgpq3.get_prefixes(self.filter_policy.as_sets)
 
         # Output prefix definitions
         for ipv in ["4", "6"]:
@@ -349,7 +361,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("];")
             self.conf.add("")
 
-    def _add_redistribute_properties(self, redistribute: BGPPeerRedistributeItem):
+    def _add_redistribute_properties(self, redistribute: BGPPeerRedistributeItem) -> None:
         """Redistribution properties to add to the route."""
         if isinstance(redistribute, dict):
             if "redistribute-large-communities" in redistribute:
@@ -358,7 +370,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     self.conf.add(f'    print "[redistribute-large-communities] Adding {bird_lc} to ", net;', debug=True)
                     self.conf.add(f"    bgp_large_community.add({bird_lc});")
 
-    def _peer_to_bgp_export_filter(self, ipv: int):
+    def _peer_to_bgp_export_filter(self, ipv: str) -> None:
         """Export filters into our main BGP routing table from the BGP peer table."""
 
         # Configure export filter to our main BGP table
@@ -375,7 +387,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _peer_to_bgp_import_filter(self, ipv: int):  # pylint: disable=too-many-branches,too-many-statements
+    def _peer_to_bgp_import_filter(self, ipv: str) -> None:  # pylint: disable=too-many-branches,too-many-statements
         """Import filter FROM the main BGP table to the BGP peer table."""
 
         # Configure import filter from our main BGP table
@@ -431,9 +443,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add("  # Redistribute connected routes")
-            self.conf.add("  if (source = RTS_DEVICE) then {")
+            self.conf.add(f'  if (proto = "direct{ipv}_bgp") then {{')
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on RTS_DEVICE '
+                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on direct{ipv}_bgp '
                 '(redistribute connected)";',
                 debug=True,
             )
@@ -442,9 +454,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  }")
         else:
             self.conf.add("  # Do not redistribute connected routes")
-            self.conf.add("  if (source = RTS_DEVICE) then {")
+            self.conf.add(f'  if (proto = "direct{ipv}_bgp") then {{')
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on RTS_DEVICE '
+                f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on direct{ipv}_bgp '
                 '(no redistribute connected)";',
                 debug=True,
             )
@@ -670,7 +682,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _peer_export_filter(self, ipv: int):
+    def _peer_export_filter(self, ipv: str) -> None:
         """Peer export filter setup from peer table to peer."""
 
         # Configure export filter to the BGP peer
@@ -689,7 +701,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _peer_import_filter(self, ipv: int):  # pylint: disable=too-many-branches,too-many-statements
+    def _peer_import_filter(self, ipv: str) -> None:  # pylint: disable=too-many-branches,too-many-statements
         """Peer import filter setup from peer to peer table."""
 
         # Configure import filter from the BGP peer
@@ -805,7 +817,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Check if we are adding a large community to incoming routes
         for large_community in sorted(self.large_communities.incoming):
-            if self.birdconf_globals.debug:
+            if self.birdconfig_globals.debug:
                 type_lines.append(f'    print "[{self.filter_name_import(ipv)}] Adding LC {large_community} to ", net;')
             type_lines.append(f"    bgp_large_community.add({large_community});")
 
@@ -820,7 +832,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _setup_peer_protocol(self, ipv: int):
+    def _setup_peer_protocol(self, ipv: str) -> None:
         """Peer protocol setup for a single protocol."""
 
         # Get our source and neighbor addresses
@@ -889,39 +901,39 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("}")
         self.conf.add("")
 
-    def _setup_peer_protocols(self):
+    def _setup_peer_protocols(self) -> None:
         """Peer protocols setup."""
         if self.has_ipv4:
-            self._setup_peer_protocol(4)
+            self._setup_peer_protocol("4")
         if self.has_ipv6:
-            self._setup_peer_protocol(6)
+            self._setup_peer_protocol("6")
 
-    def _setup_peer_to_bgp_filters(self):
+    def _setup_peer_to_bgp_filters(self) -> None:
         """Peer filters to the main BGP table."""
         # Setup peer to main BGP table export filter
         if self.has_ipv4:
-            self._peer_to_bgp_export_filter(4)
+            self._peer_to_bgp_export_filter("4")
         if self.has_ipv6:
-            self._peer_to_bgp_export_filter(6)
+            self._peer_to_bgp_export_filter("6")
         # Setup peer to main BGP table import filter
         if self.has_ipv4:
-            self._peer_to_bgp_import_filter(4)
+            self._peer_to_bgp_import_filter("4")
         if self.has_ipv6:
-            self._peer_to_bgp_import_filter(6)
+            self._peer_to_bgp_import_filter("6")
 
-    def _setup_peer_filters(self):
+    def _setup_peer_filters(self) -> None:
         """Peer filter setup."""
         # Setup export filters
         if self.has_ipv4:
-            self._peer_export_filter(4)
+            self._peer_export_filter("4")
         if self.has_ipv6:
-            self._peer_export_filter(6)
+            self._peer_export_filter("6")
 
         # Setup import filters
         if self.has_ipv4:
-            self._peer_import_filter(4)
+            self._peer_import_filter("4")
         if self.has_ipv6:
-            self._peer_import_filter(6)
+            self._peer_import_filter("6")
 
     @property
     def bgp_attributes(self) -> BGPAttributes:
@@ -939,7 +951,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.name
 
     @name.setter
-    def name(self, name: str):
+    def name(self, name: str) -> None:
         """Set our name."""
         self.peer_attributes.name = name
 
@@ -949,7 +961,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.description
 
     @description.setter
-    def description(self, description: str):
+    def description(self, description: str) -> None:
         """Set our description."""
         self.peer_attributes.description = description
 
@@ -959,7 +971,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.peer_type
 
     @peer_type.setter
-    def peer_type(self, peer_type: str):
+    def peer_type(self, peer_type: str) -> None:
         """Set our peer_type."""
         self.peer_attributes.peer_type = peer_type
 
@@ -969,7 +981,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.asn
 
     @asn.setter
-    def asn(self, asn: int):
+    def asn(self, asn: int) -> None:
         """Set our asn."""
         self.peer_attributes.asn = asn
 
@@ -979,7 +991,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.neighbor4
 
     @neighbor4.setter
-    def neighbor4(self, neighbor4: str):
+    def neighbor4(self, neighbor4: str) -> None:
         """Set our IPv4 neighbor address."""
         self.peer_attributes.neighbor4 = neighbor4
 
@@ -989,7 +1001,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.neighbor6
 
     @neighbor6.setter
-    def neighbor6(self, neighbor6: str):
+    def neighbor6(self, neighbor6: str) -> None:
         """Set our IPv4 neighbor address."""
         self.peer_attributes.neighbor6 = neighbor6
 
@@ -999,7 +1011,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.source_address4
 
     @source_address4.setter
-    def source_address4(self, source_address4: str):
+    def source_address4(self, source_address4: str) -> None:
         """Set our IPv4 source_address4 address."""
         self.peer_attributes.source_address4 = source_address4
 
@@ -1009,7 +1021,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.source_address6
 
     @source_address6.setter
-    def source_address6(self, source_address6: str):
+    def source_address6(self, source_address6: str) -> None:
         """Set our IPv4 source_address6 address."""
         self.peer_attributes.source_address6 = source_address6
 
@@ -1019,7 +1031,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.connect_delay_time
 
     @connect_delay_time.setter
-    def connect_delay_time(self, connect_delay_time: str):
+    def connect_delay_time(self, connect_delay_time: str) -> None:
         """Set the value of our connect_delay_time option."""
         self.peer_attributes.connect_delay_time = connect_delay_time
 
@@ -1029,7 +1041,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.connect_retry_time
 
     @connect_retry_time.setter
-    def connect_retry_time(self, connect_retry_time: str):
+    def connect_retry_time(self, connect_retry_time: str) -> None:
         """Set the value of our connect_retry_time option."""
         self.peer_attributes.connect_retry_time = connect_retry_time
 
@@ -1039,7 +1051,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.error_wait_time
 
     @error_wait_time.setter
-    def error_wait_time(self, error_wait_time: str):
+    def error_wait_time(self, error_wait_time: str) -> None:
         """Set the value of our error_wait_time option."""
         self.peer_attributes.error_wait_time = error_wait_time
 
@@ -1049,7 +1061,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.multihop
 
     @multihop.setter
-    def multihop(self, multihop: str):
+    def multihop(self, multihop: str) -> None:
         """Set the value of our multihop option."""
         self.peer_attributes.multihop = multihop
 
@@ -1059,7 +1071,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.password
 
     @password.setter
-    def password(self, password: str):
+    def password(self, password: str) -> None:
         """Set the value of our password option."""
         self.peer_attributes.password = password
 
@@ -1069,7 +1081,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.cost
 
     @cost.setter
-    def cost(self, cost: int):
+    def cost(self, cost: int) -> None:
         """Set our prefix cost."""
         self.peer_attributes.cost = cost
 
@@ -1084,7 +1096,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.passive
 
     @passive.setter
-    def passive(self, passive: bool):
+    def passive(self, passive: bool) -> None:
         """Set our passive mode."""
         self.peer_attributes.passive = passive
 
@@ -1109,7 +1121,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.prefix_limit4
 
     @prefix_limit4.setter
-    def prefix_limit4(self, prefix_limit4: str):
+    def prefix_limit4(self, prefix_limit4: str) -> None:
         """Set our IPv4 prefix limit."""
         self.peer_attributes.prefix_limit4 = prefix_limit4
 
@@ -1119,7 +1131,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.prefix_limit6
 
     @prefix_limit6.setter
-    def prefix_limit6(self, prefix_limit6: str):
+    def prefix_limit6(self, prefix_limit6: str) -> None:
         """Set our IPv6 prefix limit."""
         self.peer_attributes.prefix_limit6 = prefix_limit6
 
@@ -1163,6 +1175,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.quarantined
 
     @quarantined.setter
-    def quarantined(self, quarantined: bool):
+    def quarantined(self, quarantined: bool) -> None:
         """Set quarantined status."""
         self.peer_attributes.quarantined = quarantined

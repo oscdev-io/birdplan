@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# type: ignore
+
 """Test case simulation class."""
 
 from typing import Any, Dict, List, Tuple
