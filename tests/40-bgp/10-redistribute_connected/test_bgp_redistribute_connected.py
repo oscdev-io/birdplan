@@ -316,22 +316,31 @@ class TestBGPRedistributeConnected(BirdPlanBaseTestCase):
     def test_bird_tables_master4(self, sim, helpers):
         """Test BIRD master4 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master4", expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", "master4", expect_count=2)
+        r1_table = self._bird_route_table(sim, "r1", "master4", expect_count=2)
+        r2_table = self._bird_route_table(sim, "r2", "master4", expect_count=3)
 
         # Check master4 BIRD table
         correct_result = {
             "100.101.0.0/24": [
                 {
-                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"interface": "eth1"}],
                     "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "direct4_bgp",
+                    "protocol": "direct4",
                     "since": helpers.bird_since_field(),
                     "type": ["device", "univ"],
                 }
-            ]
+            ],
+            "100.64.0.0/24": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
         }
         assert r1_table == correct_result, "Result for R1 BIRD master4 routing table does not match what it should be"
 
@@ -358,11 +367,20 @@ class TestBGPRedistributeConnected(BirdPlanBaseTestCase):
             ],
             "100.102.0.0/24": [
                 {
-                    "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"interface": "eth1"}],
                     "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "direct4_bgp",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
+            "100.64.0.0/24": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
                     "since": helpers.bird_since_field(),
                     "type": ["device", "univ"],
                 }
@@ -373,26 +391,45 @@ class TestBGPRedistributeConnected(BirdPlanBaseTestCase):
     def test_bird_tables_master6(self, sim, helpers):
         """Test BIRD master6 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master6", expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", "master6", expect_count=2)
+        r1_table = self._bird_route_table(sim, "r1", "master6", expect_count=2)
+        r2_table = self._bird_route_table(sim, "r2", "master6", expect_count=3)
 
         # Check master6 BIRD table
         correct_result = {
-            "fc00:101::/48": [
+            "fc00:100::/64": [
                 {
-                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
-                    "nexthops": [{"interface": "eth1"}],
+                    "nexthops": [{"interface": "eth0"}],
                     "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "direct6_bgp",
+                    "protocol": "direct6",
                     "since": helpers.bird_since_field(),
                     "type": ["device", "univ"],
                 }
-            ]
+            ],
+            "fc00:101::/48": [
+                {
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
         }
         assert r1_table == correct_result, "Result for R1 BIRD master6 routing table does not match what it should be"
 
         correct_result = {
+            "fc00:100::/64": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
             "fc00:101::/48": [
                 {
                     "asn": "AS65000",
@@ -415,11 +452,10 @@ class TestBGPRedistributeConnected(BirdPlanBaseTestCase):
             ],
             "fc00:102::/48": [
                 {
-                    "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"interface": "eth1"}],
                     "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "direct6_bgp",
+                    "protocol": "direct6",
                     "since": helpers.bird_since_field(),
                     "type": ["device", "univ"],
                 }
