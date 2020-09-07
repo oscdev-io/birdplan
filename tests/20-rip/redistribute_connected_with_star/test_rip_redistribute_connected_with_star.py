@@ -117,14 +117,45 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
     def test_bird_tables_master4(self, sim, helpers):
         """Test BIRD master4 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master4")
-        r2_table = self._bird_route_table(sim, "r2", "master4", expect_count=1)
+        r1_table = self._bird_route_table(sim, "r1", "master4", expect_count=2)
+        r2_table = self._bird_route_table(sim, "r2", "master4", expect_count=2)
 
         # Check master4 BIRD table
-        correct_result = {}
+        correct_result = {
+            "192.168.0.0/24": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
+            "192.168.1.0/24": [
+                {
+                    "nexthops": [{"interface": "eth10"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
+        }
         assert r1_table == correct_result, "Result for R1 BIRD master4 routing table does not match what it should be"
 
         correct_result = {
+            "192.168.0.0/24": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
             "192.168.1.0/24": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
@@ -136,21 +167,52 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
                     "since": helpers.bird_since_field(),
                     "type": ["RIP", "univ"],
                 }
-            ]
+            ],
         }
         assert r2_table == correct_result, "Result for R2 BIRD master4 routing table does not match what it should be"
 
     def test_bird_tables_master6(self, sim, helpers):
         """Test BIRD master6 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master6")
-        r2_table = self._bird_route_table(sim, "r2", "master6", expect_count=1)
+        r1_table = self._bird_route_table(sim, "r1", "master6", expect_count=2)
+        r2_table = self._bird_route_table(sim, "r2", "master6", expect_count=2)
 
         # Check master6 BIRD table
-        correct_result = {}
+        correct_result = {
+            "fc00::/64": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
+            "fc01::/64": [
+                {
+                    "nexthops": [{"interface": "eth10"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
+        }
         assert r1_table == correct_result, "Result for R1 BIRD master6 routing table does not match what it should be"
 
         correct_result = {
+            "fc00::/64": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                }
+            ],
             "fc01::/64": [
                 {
                     "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
@@ -162,7 +224,7 @@ class TestRIPRedistributeConnectedWithStar(BirdPlanBaseTestCase):
                     "since": helpers.bird_since_field(),
                     "type": ["RIP", "univ"],
                 }
-            ]
+            ],
         }
         assert r2_table == correct_result, "Result for R2 BIRD master6 routing table does not match what it should be"
 

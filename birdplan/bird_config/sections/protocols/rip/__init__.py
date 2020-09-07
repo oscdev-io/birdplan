@@ -200,7 +200,7 @@ class ProtocolRIP(SectionProtocolBase):
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add("  # Redistribute connected")
-            self.conf.add("  if (source = RTS_DEVICE) then {")
+            self.conf.add(f'  if (proto = "direct{ipv}_rip") then {{')
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute static routes
@@ -269,8 +269,8 @@ class ProtocolRIP(SectionProtocolBase):
             self.conf.add("  }")
         # Redistribute connected
         if self.route_policy_redistribute.connected:
-            self.conf.add("  # Import RTS_DEVICE routes into RIP (redistribute_connected)")
-            self.conf.add("  if (source = RTS_DEVICE) then {")
+            self.conf.add("  # Import routes from our own direct table into RIP (redistribute_connected)")
+            self.conf.add(f'  if (proto = "direct{ipv}_rip") then {{')
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute static routes
