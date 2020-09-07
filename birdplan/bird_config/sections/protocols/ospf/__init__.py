@@ -214,7 +214,7 @@ class ProtocolOSPF(SectionProtocolBase):
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add("  # Redistribute connected")
-            self.conf.add("  if (source = RTS_DEVICE) then {")
+            self.conf.add(f'  if (proto = "direct{ipv}_ospf") then {{')
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute static routes
@@ -279,7 +279,7 @@ class ProtocolOSPF(SectionProtocolBase):
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add("  # Import RTS_DEVICE routes into OSPF (redistribute_connected)")
-            self.conf.add("  if (source = RTS_DEVICE) then {")
+            self.conf.add(f'  if (proto = "direct{ipv}_ospf") then {{')
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Redistribute static routes

@@ -117,23 +117,41 @@ class TestOSPFRedistributeStatic(BirdPlanBaseTestCase):
     def test_bird_tables_master4(self, sim, helpers):
         """Test BIRD master4 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master4", expect_count=2)
+        r1_table = self._bird_route_table(sim, "r1", "master4", expect_count=3, expect_content="'OSPF.router_id': '0.0.0.2'")
         r2_table = self._bird_route_table(sim, "r2", "master4", expect_count=2)
 
         # Check master4 BIRD table
         correct_result = {
             "192.168.0.0/24": [
                 {
-                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.1"},
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                },
+                {
+                    "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
                     "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
                     "ospf_type": "I",
                     "pref": 150,
                     "prefix_type": "unicast",
                     "protocol": "ospf4",
-                    "router_id": "0.0.0.1",
+                    "router_id": "0.0.0.2",
                     "since": helpers.bird_since_field(),
                     "type": ["OSPF", "univ"],
+                },
+            ],
+            "192.168.1.0/24": [
+                {
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
                 }
             ],
             "192.168.20.0/24": [
@@ -152,6 +170,14 @@ class TestOSPFRedistributeStatic(BirdPlanBaseTestCase):
         correct_result = {
             "192.168.0.0/24": [
                 {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                },
+                {
                     "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
                     "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
@@ -162,7 +188,7 @@ class TestOSPFRedistributeStatic(BirdPlanBaseTestCase):
                     "router_id": "0.0.0.2",
                     "since": helpers.bird_since_field(),
                     "type": ["OSPF", "univ"],
-                }
+                },
             ],
             "192.168.20.0/24": [
                 {
@@ -190,12 +216,20 @@ class TestOSPFRedistributeStatic(BirdPlanBaseTestCase):
     def test_bird_tables_master6(self, sim, helpers):
         """Test BIRD master6 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master6", expect_count=2)
+        r1_table = self._bird_route_table(sim, "r1", "master6", expect_count=3, expect_content="'OSPF.router_id': '0.0.0.2'")
         r2_table = self._bird_route_table(sim, "r2", "master6", expect_count=2)
 
         # Check master6 BIRD table
         correct_result = {
             "fc00::/64": [
+                {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                },
                 {
                     "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
                     "metric1": 10,
@@ -207,6 +241,16 @@ class TestOSPFRedistributeStatic(BirdPlanBaseTestCase):
                     "router_id": "0.0.0.2",
                     "since": helpers.bird_since_field(),
                     "type": ["OSPF", "univ"],
+                },
+            ],
+            "fc01::/64": [
+                {
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
                 }
             ],
             "fc20::/64": [
@@ -225,6 +269,14 @@ class TestOSPFRedistributeStatic(BirdPlanBaseTestCase):
         correct_result = {
             "fc00::/64": [
                 {
+                    "nexthops": [{"interface": "eth0"}],
+                    "pref": 240,
+                    "prefix_type": "unicast",
+                    "protocol": "direct6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["device", "univ"],
+                },
+                {
                     "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
                     "metric1": 10,
                     "nexthops": [{"interface": "eth0"}],
@@ -235,7 +287,7 @@ class TestOSPFRedistributeStatic(BirdPlanBaseTestCase):
                     "router_id": "0.0.0.2",
                     "since": helpers.bird_since_field(),
                     "type": ["OSPF", "univ"],
-                }
+                },
             ],
             "fc20::/64": [
                 {
