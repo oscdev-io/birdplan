@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""RIP test for no exporting to kernel."""
-
+# type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
+
+"""RIP test for no exporting to kernel."""
 
 import os
 from nsnetsim.bird_router_node import BirdRouterNode

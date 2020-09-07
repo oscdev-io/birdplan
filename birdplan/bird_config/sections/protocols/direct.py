@@ -18,8 +18,12 @@
 
 """BIRD direct protocol configuration."""
 
-from typing import List
+from typing import List, Optional
 from .base import SectionProtocolBase
+from ..constants import SectionConstants
+from ..functions import SectionFunctions
+from ..tables import SectionTables
+from ...globals import BirdConfigGlobals
 
 
 class ProtocolDirect(SectionProtocolBase):
@@ -28,9 +32,17 @@ class ProtocolDirect(SectionProtocolBase):
     _name_suffix: str
     _interfaces: List[str]
 
-    def __init__(self, name: str = "", **kwargs):
+    def __init__(
+        self,
+        birdconfig_globals: BirdConfigGlobals,
+        constants: SectionConstants,
+        functions: SectionFunctions,
+        tables: SectionTables,
+        name: str = "",
+        interfaces: Optional[List[str]] = None,
+    ):
         """Initialize the object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals, constants, functions, tables)
 
         # Add a suffix if we have a name
         if name:
@@ -40,9 +52,12 @@ class ProtocolDirect(SectionProtocolBase):
             self._name_suffix = ""
 
         # Grab the list of interfaces we need
-        self._interfaces = kwargs.get("interfaces", [])
+        if interfaces:
+            self._interfaces = interfaces
+        else:
+            self._interfaces = []
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the direct protocol."""
         super().configure()
 
@@ -63,10 +78,10 @@ class ProtocolDirect(SectionProtocolBase):
         self.tables.conf.append(f"ipv6 table t_direct6{self.name_suffix};")
         self.tables.conf.append("")
 
-        self._setup_protocol(4, interface_lines)
-        self._setup_protocol(6, interface_lines)
+        self._setup_protocol("4", interface_lines)
+        self._setup_protocol("6", interface_lines)
 
-    def _setup_protocol(self, ipv: int, lines: List[str]):
+    def _setup_protocol(self, ipv: str, lines: List[str]) -> None:
 
         protocol_name = f"direct{ipv}{self.name_suffix}"
 

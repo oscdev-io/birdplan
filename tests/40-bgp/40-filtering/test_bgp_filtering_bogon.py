@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGP filtering of bogons."""
-
+# type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
+
+"""BGP filtering of bogons."""
 
 from typing import Tuple
 import os

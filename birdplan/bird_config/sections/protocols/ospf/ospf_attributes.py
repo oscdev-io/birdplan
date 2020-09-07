@@ -18,7 +18,7 @@
 
 """BIRD OSPF protocol attributes."""
 
-from typing import Dict
+from typing import List, Union
 
 
 class OSPFRoutePolicyAccept:  # pylint: disable=too-few-public-methods
@@ -34,7 +34,7 @@ class OSPFRoutePolicyAccept:  # pylint: disable=too-few-public-methods
 
     default: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
         self.default = False
 
@@ -57,14 +57,14 @@ class OSPFRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
 
     """
 
-    connected: Dict[str, bool]
+    connected: Union[bool, List[str]]
     default: bool
     kernel: bool
     static: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
-        self.connected = {}
+        self.connected = False
         self.default = False
         self.kernel = False
         self.static = False
@@ -86,7 +86,7 @@ class OSPFAttributes:  # pylint: disable=too-few-public-methods
     route_policy_accept: OSPFRoutePolicyAccept
     route_policy_redistribute: OSPFRoutePolicyRedistribute
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
 
         self.route_policy_accept = OSPFRoutePolicyAccept()

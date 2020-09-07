@@ -45,7 +45,7 @@ class BGPPeerLargeCommunities:  # pylint: disable=too-few-public-methods
 
     outgoing: List[str]
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
         self.incoming = []
         self.outgoing = []
@@ -64,7 +64,7 @@ class BGPPeerRoutePolicyAccept:  # pylint: disable=too-few-public-methods
 
     default: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
         self.default = False
 
@@ -91,7 +91,7 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
 
     route_policy_accept: BGPPeerRoutePolicyAccept
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
         self.connected = {}
         self.kernel = False
@@ -117,14 +117,14 @@ class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
     asns: BGPPeerFilterItem
     as_sets: BGPPeerFilterItem
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
         self.prefixes = []
         self.asns = []
         self.as_sets = []
 
 
-class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
+class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """
     BGP peer route policy for redistributing of routes.
 
@@ -164,7 +164,7 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
     bgp_peering: bool
     bgp_transit: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
         self.connected = False
         self.default = False
@@ -178,7 +178,7 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
         self.bgp_transit = False
 
 
-class BGPPeerAttributes:  # pylint: disable=too-few-public-methods
+class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """
     BGP peer attributes.
 
@@ -231,11 +231,11 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods
 
     """
 
-    name: str
-    description: str
+    _name: Optional[str]
+    _description: Optional[str]
 
-    peer_type: str
-    asn: int
+    _peer_type: Optional[str]
+    _asn: Optional[int]
 
     neighbor4: Optional[str] = None
     neighbor6: Optional[str] = None
@@ -265,16 +265,16 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods
 
     filter_policy: BGPPeerFilterPolicy
 
-    _peeringdb: BGPPeerPeeringDB
+    _peeringdb: Optional[BGPPeerPeeringDB]
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
 
-        self.name = None
-        self.description = None
+        self._name = None
+        self._description = None
 
-        self.peer_type = None
-        self.asn = None
+        self._peer_type = None
+        self._asn = None
 
         self.large_communities = BGPPeerLargeCommunities()
 
@@ -299,3 +299,51 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods
             raise BirdPlanError("PeeringDB returned and empty result")
         # Lastly return it
         return self._peeringdb
+
+    @property
+    def name(self) -> str:
+        """Return our name."""
+        if not self._name:
+            raise BirdPlanError("Peer name must be set")
+        return self._name
+
+    @name.setter
+    def name(self, name: str) -> None:
+        """Set our name."""
+        self._name = name
+
+    @property
+    def description(self) -> str:
+        """Return our description."""
+        if not self._description:
+            raise BirdPlanError("Peer description must be set")
+        return self._description
+
+    @description.setter
+    def description(self, description: str) -> None:
+        """Set our description."""
+        self._description = description
+
+    @property
+    def peer_type(self) -> str:
+        """Return our peer_type."""
+        if not self._peer_type:
+            raise BirdPlanError("Peer peer_type must be set")
+        return self._peer_type
+
+    @peer_type.setter
+    def peer_type(self, peer_type: str) -> None:
+        """Set our peer_type."""
+        self._peer_type = peer_type
+
+    @property
+    def asn(self) -> int:
+        """Return our asn."""
+        if not self._asn:
+            raise BirdPlanError("Peer asn must be set")
+        return self._asn
+
+    @asn.setter
+    def asn(self, asn: int) -> None:
+        """Set our asn."""
+        self._asn = asn

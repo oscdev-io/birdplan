@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGP base test for filtering."""
+# type: ignore
+# pylint: disable=too-few-public-methods
 
-# pylint: disable=import-error,too-few-public-methods,no-self-use
+"""BGP base test for filtering."""
 
 import os
 from nsnetsim.bird_router_node import BirdRouterNode

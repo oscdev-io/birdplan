@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGP test for redistribution of kernel routes."""
-
+# type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use,too-many-lines
+
+"""BGP test for redistribution of kernel routes."""
 
 import os
 from nsnetsim.bird_router_node import BirdRouterNode

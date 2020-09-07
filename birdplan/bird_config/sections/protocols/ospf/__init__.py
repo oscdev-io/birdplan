@@ -23,6 +23,10 @@ from .ospf_attributes import OSPFAttributes, OSPFRoutePolicyAccept, OSPFRoutePol
 from ..direct import ProtocolDirect
 from ..pipe import ProtocolPipe
 from ..base import SectionProtocolBase
+from ...constants import SectionConstants
+from ...functions import SectionFunctions
+from ...tables import SectionTables
+from ....globals import BirdConfigGlobals
 from .....exceptions import BirdPlanError
 
 OSPFAreaConfig = Dict[str, str]
@@ -42,9 +46,11 @@ class ProtocolOSPF(SectionProtocolBase):
 
     _ospf_attributes: OSPFAttributes
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
+    ):
         """Initialize the object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals, constants, functions, tables)
 
         # Areas and interfaces
         self._areas = {}
@@ -52,7 +58,7 @@ class ProtocolOSPF(SectionProtocolBase):
 
         self._ospf_attributes = OSPFAttributes()
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the OSPF protocol."""
         super().configure()
 
@@ -66,30 +72,30 @@ class ProtocolOSPF(SectionProtocolBase):
         self.tables.conf.append("")
 
         # OSPF export filters
-        self._ospf_export_filter(4)
-        self._ospf_export_filter(6)
+        self._ospf_export_filter("4")
+        self._ospf_export_filter("6")
 
         # OSPF import filters
-        self._ospf_import_filter(4)
-        self._ospf_import_filter(6)
+        self._ospf_import_filter("4")
+        self._ospf_import_filter("6")
 
         # OSPF to master export filters
-        self._ospf_to_master_export_filter(4)
-        self._ospf_to_master_export_filter(6)
+        self._ospf_to_master_export_filter("4")
+        self._ospf_to_master_export_filter("6")
 
         # OSPF to master import filters
-        self._ospf_to_master_import_filter(4)
-        self._ospf_to_master_import_filter(6)
+        self._ospf_to_master_import_filter("4")
+        self._ospf_to_master_import_filter("6")
 
         # OSPF protocol configuration
         # FIXME - assigned but not used?  # pylint:disable=fixme
         # area_lines = self._area_config()
-        self._setup_protocol(4)
-        self._setup_protocol(6)
+        self._setup_protocol("4")
+        self._setup_protocol("6")
 
         # Configure pipe from OSPF to the master routing table
         ospf_master_pipe = ProtocolPipe(
-            birdconf_globals=self.birdconf_globals,
+            birdconfig_globals=self.birdconfig_globals,
             table_from="ospf",
             table_to="master",
             table_export_filtered=True,
@@ -99,23 +105,24 @@ class ProtocolOSPF(SectionProtocolBase):
 
         # Check if we're redistributing connected routes, if we are, create the protocol and pipe
         if self.route_policy_redistribute.connected:
-            if "interfaces" not in self.route_policy_redistribute.connected:
-                raise BirdPlanError("OSPF redistribute connected requires a list in item 'interfaces' to match interface names")
+            # Create an interface list to feed to our routing table
+            interfaces: List[str] = []
+            if isinstance(self.route_policy_redistribute.connected, list):
+                interfaces = self.route_policy_redistribute.connected
             # Add direct protocol for redistribution of connected routes
             ospf_direct_protocol = ProtocolDirect(
-                constants=self.constants,
-                functions=self.functions,
-                tables=self.tables,
-                birdconf_globals=self.birdconf_globals,
+                self.birdconfig_globals,
+                self.constants,
+                self.functions,
+                self.tables,
                 name="ospf",
-                interfaces=self.route_policy_redistribute.connected["interfaces"],
+                interfaces=interfaces,
             )
             self.conf.add(ospf_direct_protocol)
             # Add pipe
             ospf_direct_pipe = ProtocolPipe(
-                birdconf_globals=self.birdconf_globals,
+                self.birdconfig_globals,
                 name="ospf",
-                descospftion="ospf",
                 table_from="ospf",
                 table_to="direct",
                 table_export="none",
@@ -123,13 +130,13 @@ class ProtocolOSPF(SectionProtocolBase):
             )
             self.conf.add(ospf_direct_pipe)
 
-    def add_area(self, area_name: str, area_config: OSPFAreaConfig):
+    def add_area(self, area_name: str, area_config: OSPFAreaConfig) -> None:
         """Add area to OSPF."""
         # Make sure the area exists
         if area_name not in self.areas:
             self._areas[area_name] = area_config
 
-    def add_interface(self, area_name: str, interface_name: str, interface_config: OSPFInterfaceConfig):
+    def add_interface(self, area_name: str, interface_name: str, interface_config: OSPFInterfaceConfig) -> None:
         """Add interface to OSPF."""
         # Make sure the area exists
         if area_name not in self.interfaces:
@@ -178,7 +185,7 @@ class ProtocolOSPF(SectionProtocolBase):
 
         return area_lines
 
-    def _setup_protocol(self, ipv: int):
+    def _setup_protocol(self, ipv: str) -> None:
         self.conf.add(f"protocol ospf v3 ospf{ipv} {{")
         self.conf.add(f'  description "OSPF protocol for IPv{ipv}";')
         self.conf.add("")
@@ -194,7 +201,7 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _ospf_export_filter(self, ipv: int):
+    def _ospf_export_filter(self, ipv: str) -> None:
         """OSPF export filter setup."""
 
         self.conf.add(f"filter f_ospf_export{ipv} {{")
@@ -227,7 +234,7 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _ospf_import_filter(self, ipv: int):
+    def _ospf_import_filter(self, ipv: str) -> None:
         """OSPF import filter setup."""
         # Configure import4 filter
         self.conf.add(f"filter f_ospf_import{ipv} {{")
@@ -237,7 +244,7 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _ospf_to_master_export_filter(self, ipv: int):
+    def _ospf_to_master_export_filter(self, ipv: str) -> None:
         """OSPF to master export filter setup."""
         # Configure export filter to master table
         self.conf.add(f"filter f_ospf{ipv}_master{ipv}_export {{")
@@ -259,7 +266,7 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _ospf_to_master_import_filter(self, ipv: int):
+    def _ospf_to_master_import_filter(self, ipv: str) -> None:
         """OSPF to master import filter setup."""
         # Configure import filter to master table
         self.conf.add(f"filter f_ospf{ipv}_master{ipv}_import {{")

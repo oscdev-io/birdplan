@@ -20,13 +20,17 @@
 
 # pylint: disable=too-many-lines
 
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 from .bgp_attributes import BGPAttributes, BGPRoutePolicyAccept, BGPRoutePolicyImport
 from .peer import ProtocolBGPPeer
 from .typing import BGPPeerConfig
 from ..pipe import ProtocolPipe
 from ..direct import ProtocolDirect
 from ..base import SectionProtocolBase
+from ...constants import SectionConstants
+from ...functions import SectionFunctions
+from ...tables import SectionTables
+from ....globals import BirdConfigGlobals
 from .....exceptions import BirdPlanError
 
 BGPPeersConfig = Dict[str, BGPPeerConfig]
@@ -49,9 +53,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     _peers_config: BGPPeersConfig
     _originated_routes: BGPOriginatedRoutes
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
+    ):
         """Initialize the object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals, constants, functions, tables)
 
         # BGP
         self._peers = {}
@@ -62,7 +68,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Setup BGP attributes
         self._bgp_attributes = BGPAttributes()
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the BGP protocol."""
         super().configure()
 
@@ -86,7 +92,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         # Configure pipe from BGP to the master routing table
         bgp_master_pipe = ProtocolPipe(
-            birdconf_globals=self.birdconf_globals,
+            birdconfig_globals=self.birdconfig_globals,
             table_from="bgp",
             table_to="master",
             table_export_filtered=True,
@@ -96,24 +102,25 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         # Check if we're importing connected routes, if we are, create the protocol and pipe
         if self.route_policy_import.connected:
-            if "interfaces" not in self.route_policy_import.connected:
-                raise BirdPlanError("BGP import connected requires a list in item 'interfaces' to match interface names")
+            # Create an interface list to feed to our routing table
+            interfaces: List[str] = []
+            if isinstance(self.route_policy_import.connected, list):
+                interfaces = self.route_policy_import.connected
             # Add direct protocol for redistribution of connected routes
             bgp_direct_protocol = ProtocolDirect(
-                constants=self.constants,
-                functions=self.functions,
-                tables=self.tables,
-                birdconf_globals=self.birdconf_globals,
+                self.birdconfig_globals,
+                self.constants,
+                self.functions,
+                self.tables,
                 name="bgp",
-                interfaces=self.route_policy_import.connected["interfaces"],
+                interfaces=interfaces,
             )
             self.conf.add(bgp_direct_protocol)
             # Add pipe
             self._setup_bgp_to_direct_import_filters()
             bgp_direct_pipe = ProtocolPipe(
-                birdconf_globals=self.birdconf_globals,
+                self.birdconfig_globals,
                 name="bgp",
-                description="BGP",
                 table_from="bgp",
                 table_to="direct",
                 table_export="none",
@@ -124,24 +131,24 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Loop with BGP peers and configure them
         for peer_name, peer_config in sorted(self.peers_config.items()):
             peer = ProtocolBGPPeer(
-                constants=self.constants,
-                functions=self.functions,
-                tables=self.tables,
-                birdconf_globals=self.birdconf_globals,
-                bgp_attributes=self.bgp_attributes,
-                peer_name=peer_name,
-                peer_config=peer_config,
+                self.birdconfig_globals,
+                self.constants,
+                self.functions,
+                self.tables,
+                self.bgp_attributes,
+                peer_name,
+                peer_config,
             )
             self.conf.add(peer)
             # Add to our list of peer objects
             self.peers[peer_name] = peer
 
-    def add_originated_route(self, route: str):
+    def add_originated_route(self, route: str) -> None:
         """Add originated route."""
         (prefix, route_info) = route.split(" ", 1)
         self.originated_routes[prefix] = route_info
 
-    def add_peer(self, peer_name: str, peer_config: BGPPeerConfig):
+    def add_peer(self, peer_name: str, peer_config: BGPPeerConfig) -> None:
         """Add peer to BGP."""
         if peer_name not in self.peers_config:
             self.peers_config[peer_name] = peer_config
@@ -150,7 +157,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         """Return a BGP peer configuration object."""
         return self.peers[name]
 
-    def _configure_constants_bogon_asns(self):
+    def _configure_constants_bogon_asns(self) -> None:
         """Configure ASN bogons."""
 
         self.constants.conf.append("# Ref http://bgpfilterguide.nlnog.net/guides/bogon_asns/")
@@ -158,7 +165,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("  0, # RFC 7607")
         self.constants.conf.append("  23456, # RFC 4893 AS_TRANS")
         self.constants.conf.append("  64496..64511, # RFC 5398 and documentation/example ASNs")
-        if self.birdconf_globals.test_mode:
+        if self.birdconfig_globals.test_mode:
             self.constants.conf.append("  # EXCLUDING DUE TO TESTING: 64512..65534, # RFC 6996 Private ASNs")
         else:
             self.constants.conf.append("  64512..65534, # RFC 6996 Private ASNs")
@@ -170,7 +177,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("];")
         self.constants.conf.append("")
 
-    def _configure_constants_bgp(self):  # pylint: disable=too-many-statements
+    def _configure_constants_bgp(self) -> None:  # pylint: disable=too-many-statements
         """Configure BGP constants."""
         self.constants.conf.append_title("BGP Constants")
 
@@ -181,19 +188,19 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("# Prefix sizes we will be using")
         self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MAXLEN4 = {self.bgp_attributes.prefix_import_maxlen4};")
         # If we're in test mode, we need to restrict the minimum length so we can trigger tests with 100.64.0.0/X<16
-        if self.birdconf_globals.test_mode:
+        if self.birdconfig_globals.test_mode:
             self.constants.conf.append("define BGP_PREFIX_IMPORT_MINLEN4 = 16;")
         else:
             self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MINLEN4 = {self.bgp_attributes.prefix_import_minlen4};")
         self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MAXLEN4 = {self.bgp_attributes.prefix_export_maxlen4};")
         # If we're in test mode, we need to restrict the minimum length so we can trigger tests with 100.64.0.0/X<16
-        if self.birdconf_globals.test_mode:
+        if self.birdconfig_globals.test_mode:
             self.constants.conf.append("define BGP_PREFIX_EXPORT_MINLEN4 = 16;")
         else:
             self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MINLEN4 = {self.bgp_attributes.prefix_export_minlen4};")
 
         # If we're in test mode, allow smaller prefixes
-        if self.birdconf_globals.test_mode:
+        if self.birdconfig_globals.test_mode:
             self.constants.conf.append("define BGP_PREFIX_IMPORT_MAXLEN6 = 64;")
             self.constants.conf.append("define BGP_PREFIX_IMPORT_MINLEN6 = 32;")
             self.constants.conf.append("define BGP_PREFIX_EXPORT_MAXLEN6 = 64;")
@@ -217,7 +224,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("")
         # NK: IMPORTANT IF THE ABOVE CHANGES UPDATE THE BELOW
         self.constants.conf.append("# Community stripping")
-        if self.birdconf_globals.test_mode:
+        if self.birdconfig_globals.test_mode:
             self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (2..65534, *) ];  # TESTING: Start changed from 1 to 2")
         else:
             self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (1..65534, *) ];")
@@ -316,7 +323,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("];")
         self.constants.conf.append("")
 
-    def _configure_constants_functions(self):  # pylint: disable=too-many-statements
+    def _configure_constants_functions(self) -> None:  # pylint: disable=too-many-statements
         """Configure BGP functions."""
         self.functions.conf.append_title("BGP Functions")
 
@@ -767,9 +774,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-    def _configure_originated_routes(self):
+    def _configure_originated_routes(self) -> None:
         # Work out static v4 and v6 routes
-        routes = {"4": [], "6": []}
+        routes: Dict[str, List[str]] = {"4": [], "6": []}
         for prefix in sorted(self.originated_routes.keys()):
             info = self.originated_routes[prefix]
             if "." in prefix:
@@ -811,7 +818,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         # Configure BGP origination route pipe to the bgp table
         originate_pipe = ProtocolPipe(
-            birdconf_globals=self.birdconf_globals,
+            birdconfig_globals=self.birdconfig_globals,
             table_from="bgp_originate",
             table_to="bgp",
             table_export="all",
@@ -819,7 +826,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         )
         self.conf.add(originate_pipe)
 
-    def _bgp_to_master_export_filter(self, ipv: int):
+    def _bgp_to_master_export_filter(self, ipv: str) -> None:
         """BGP to master filter."""
 
         # Configure export filter to master
@@ -836,7 +843,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add("};")
         self.conf.add("")
 
-    def _bgp_to_master_import_filter(self, ipv: int):
+    def _bgp_to_master_import_filter(self, ipv: str) -> None:
         # Configure import filter to master
         self.conf.add("# Import filter FROM master table TO BGP table")
         self.conf.add(f"filter f_bgp{ipv}_master{ipv}_import")
@@ -860,7 +867,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add("};")
         self.conf.add("")
 
-    def _bgp_to_direct_import_filter(self, ipv: int):
+    def _bgp_to_direct_import_filter(self, ipv: str) -> None:
         # Configure import filter to direct
         self.conf.add(f"filter f_bgp{ipv}_direct{ipv}_import {{")
         self.conf.add("  # Origination import")
@@ -869,20 +876,20 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add("};")
         self.conf.add("")
 
-    def _setup_bgp_to_master_export_filters(self):
+    def _setup_bgp_to_master_export_filters(self) -> None:
         """BGP main table to master export filters setup."""
-        self._bgp_to_master_export_filter(4)
-        self._bgp_to_master_export_filter(6)
+        self._bgp_to_master_export_filter("4")
+        self._bgp_to_master_export_filter("6")
 
-    def _setup_bgp_to_master_import_filters(self):
+    def _setup_bgp_to_master_import_filters(self) -> None:
         """BGP main table to master import filters setup."""
-        self._bgp_to_master_import_filter(4)
-        self._bgp_to_master_import_filter(6)
+        self._bgp_to_master_import_filter("4")
+        self._bgp_to_master_import_filter("6")
 
-    def _setup_bgp_to_direct_import_filters(self):
+    def _setup_bgp_to_direct_import_filters(self) -> None:
         """BGP main table to direct import filters setup."""
-        self._bgp_to_direct_import_filter(4)
-        self._bgp_to_direct_import_filter(6)
+        self._bgp_to_direct_import_filter("4")
+        self._bgp_to_direct_import_filter("6")
 
     # PROPERTIES
 
@@ -897,7 +904,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         return self.bgp_attributes.asn
 
     @asn.setter
-    def asn(self, asn: int):
+    def asn(self, asn: int) -> None:
         """Set our ASN."""
         self.bgp_attributes.asn = asn
         # Enable bogon constants
@@ -910,7 +917,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         return self.bgp_attributes.rr_cluster_id
 
     @rr_cluster_id.setter
-    def rr_cluster_id(self, rr_cluster_id: str):
+    def rr_cluster_id(self, rr_cluster_id: str) -> None:
         """Set our route reflector cluster ID."""
         self.bgp_attributes.rr_cluster_id = rr_cluster_id
 
@@ -942,88 +949,88 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     # IPV4 IMPORT PREFIX LENGTHS
 
     @property
-    def prefix_import_maxlen4(self):
+    def prefix_import_maxlen4(self) -> int:
         """Return the current value of prefix_import_maxlen4."""
         return self.bgp_attributes.prefix_import_maxlen4
 
     @prefix_import_maxlen4.setter
-    def prefix_import_maxlen4(self, prefix_import_maxlen4: int):
+    def prefix_import_maxlen4(self, prefix_import_maxlen4: int) -> None:
         """Setter for prefix_import_maxlen4."""
         self.bgp_attributes.prefix_import_maxlen4 = prefix_import_maxlen4
 
     @property
-    def prefix_import_minlen4(self):
+    def prefix_import_minlen4(self) -> int:
         """Return the current value of prefix_import_minlen4."""
         return self.bgp_attributes.prefix_import_minlen4
 
     @prefix_import_minlen4.setter
-    def prefix_import_minlen4(self, prefix_import_minlen4: int):
+    def prefix_import_minlen4(self, prefix_import_minlen4: int) -> None:
         """Setter for prefix_import_minlen4."""
         self.bgp_attributes.prefix_import_minlen4 = prefix_import_minlen4
 
     # IPV4 EXPORT PREFIX LENGHTS
 
     @property
-    def prefix_export_maxlen4(self):
+    def prefix_export_maxlen4(self) -> int:
         """Return the current value of prefix_export_maxlen4."""
         return self.bgp_attributes.prefix_export_maxlen4
 
     @prefix_export_maxlen4.setter
-    def prefix_export_maxlen4(self, prefix_export_maxlen4: int):
+    def prefix_export_maxlen4(self, prefix_export_maxlen4: int) -> None:
         """Setter for prefix_export_maxlen4."""
         self.bgp_attributes.prefix_export_maxlen4 = prefix_export_maxlen4
 
     @property
-    def prefix_export_minlen4(self):
+    def prefix_export_minlen4(self) -> int:
         """Return the current value of prefix_export_minlen4."""
         return self.bgp_attributes.prefix_export_minlen4
 
     @prefix_export_minlen4.setter
-    def prefix_export_minlen4(self, prefix_export_minlen4: int):
+    def prefix_export_minlen4(self, prefix_export_minlen4: int) -> None:
         """Setter for prefix_export_minlen4."""
         self.bgp_attributes.prefix_export_minlen4 = prefix_export_minlen4
 
     # IPV6 IMPORT LENGTHS
 
     @property
-    def prefix_import_maxlen6(self):
+    def prefix_import_maxlen6(self) -> int:
         """Return the current value of prefix_import_maxlen6."""
         return self.bgp_attributes.prefix_import_maxlen6
 
     @prefix_import_maxlen6.setter
-    def prefix_import_maxlen6(self, prefix_import_maxlen6: int):
+    def prefix_import_maxlen6(self, prefix_import_maxlen6: int) -> None:
         """Setter for prefix_import_maxlen6."""
         self.bgp_attributes.prefix_import_maxlen6 = prefix_import_maxlen6
 
     @property
-    def prefix_import_minlen6(self):
+    def prefix_import_minlen6(self) -> int:
         """Return the current value of prefix_import_minlen6."""
         return self.bgp_attributes.prefix_import_minlen6
 
     @prefix_import_minlen6.setter
-    def prefix_import_minlen6(self, prefix_import_minlen6: int):
+    def prefix_import_minlen6(self, prefix_import_minlen6: int) -> None:
         """Setter for prefix_import_minlen6."""
         self.bgp_attributes.prefix_import_minlen6 = prefix_import_minlen6
 
     # IPV6 EXPORT LENGTHS
 
     @property
-    def prefix_export_minlen6(self):
+    def prefix_export_minlen6(self) -> int:
         """Return the current value of prefix_export_minlen6."""
         return self.bgp_attributes.prefix_export_minlen6
 
     @prefix_export_minlen6.setter
-    def prefix_export_minlen6(self, prefix_export_minlen6: int):
+    def prefix_export_minlen6(self, prefix_export_minlen6: int) -> None:
         """Setter for prefix_export_minlen6."""
         self.bgp_attributes.prefix_export_minlen6 = prefix_export_minlen6
 
     @property
-    def prefix_export_maxlen6(self):
+    def prefix_export_maxlen6(self) -> int:
         """Return the current value of prefix_export_maxlen6."""
         return self.bgp_attributes.prefix_export_maxlen6
 
     @prefix_export_maxlen6.setter
-    def prefix_export_maxlen6(self, prefix_export_maxlen6: int):
+    def prefix_export_maxlen6(self, prefix_export_maxlen6: int) -> None:
         """Setter for prefix_export_maxlen6."""
         self.bgp_attributes.prefix_export_maxlen6 = prefix_export_maxlen6
 
@@ -1035,7 +1042,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         return self.bgp_attributes.aspath_minlen
 
     @aspath_minlen.setter
-    def aspath_minlen(self, aspath_minlen: int):
+    def aspath_minlen(self, aspath_minlen: int) -> None:
         """Set the AS path minlen."""
         self.bgp_attributes.aspath_minlen = aspath_minlen
 
@@ -1045,7 +1052,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         return self.bgp_attributes.aspath_maxlen
 
     @aspath_maxlen.setter
-    def aspath_maxlen(self, aspath_maxlen: int):
+    def aspath_maxlen(self, aspath_maxlen: int) -> None:
         """Set the AS path maxlen."""
         self.bgp_attributes.aspath_maxlen = aspath_maxlen
 
@@ -1057,7 +1064,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         return self.bgp_attributes.community_maxlen
 
     @community_maxlen.setter
-    def community_maxlen(self, community_maxlen: int):
+    def community_maxlen(self, community_maxlen: int) -> None:
         """Set the value of community_maxlen."""
         self.bgp_attributes.community_maxlen = community_maxlen
 
@@ -1067,7 +1074,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         return self.bgp_attributes.extended_community_maxlen
 
     @extended_community_maxlen.setter
-    def extended_community_maxlen(self, extended_community_maxlen: int):
+    def extended_community_maxlen(self, extended_community_maxlen: int) -> None:
         """Set the value of extended_community_maxlen."""
         self.bgp_attributes.extended_community_maxlen = extended_community_maxlen
 
@@ -1077,6 +1084,6 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         return self.bgp_attributes.large_community_maxlen
 
     @large_community_maxlen.setter
-    def large_community_maxlen(self, large_community_maxlen: int):
+    def large_community_maxlen(self, large_community_maxlen: int) -> None:
         """Set the value of large_community_maxlen."""
         self.bgp_attributes.large_community_maxlen = large_community_maxlen

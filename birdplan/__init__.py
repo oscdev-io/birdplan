@@ -18,7 +18,7 @@
 
 """BirdPlan package."""
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 import yaml
 from .bird_config import BirdConfig
 from .exceptions import BirdPlanError
@@ -42,14 +42,14 @@ class BirdPlan:
     _config: Dict[Any, Any]
     _birdconf: BirdConfig
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
 
         self._plan_file = None
         self._config = {}
         self._birdconf = BirdConfig()
 
-    def load(self, plan_file: str, macros: Optional[Dict[str, str]] = None):
+    def load(self, plan_file: str, macros: Optional[Dict[str, str]] = None) -> None:
         """
         Initialize object.
 
@@ -116,7 +116,7 @@ class BirdPlan:
 
         return "\n".join(config_lines)
 
-    def _config_global(self):
+    def _config_global(self) -> None:
         """Configure global options."""
 
         # Check that a router ID was specified
@@ -132,14 +132,14 @@ class BirdPlan:
         if "debug" in self.config:
             self.birdconf.debug = self.config["debug"]
 
-    def _config_static(self):
+    def _config_static(self) -> None:
         """Configure static section."""
         # Static routes
         if "static" in self.config:
             for route in self.config["static"]:
                 self.birdconf.protocols.static.add_route(route)
 
-    def _config_export_kernel(self):
+    def _config_export_kernel(self) -> None:
         """Configure export_kernel section."""
 
         # Check if we're exporting routes from the master tables to the kernel tables
@@ -162,7 +162,7 @@ class BirdPlan:
                 else:
                     raise BirdPlanError(f"Configuration item '{export}' not understood in 'export_kernel'")
 
-    def _config_rip(self):
+    def _config_rip(self) -> None:
         """Configure rip section."""
 
         # If we have no rip section, just return
@@ -178,7 +178,7 @@ class BirdPlan:
         self._config_rip_redistribute()
         self._config_rip_interfaces()
 
-    def _config_rip_accept(self):
+    def _config_rip_accept(self) -> None:
         """Configure rip:accept section."""
 
         # If we don't have an accept section, just return
@@ -194,7 +194,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in RIP accept")
 
-    def _config_rip_redistribute(self):
+    def _config_rip_redistribute(self) -> None:
         """Configure rip:redistribute section."""
 
         # If we don't have a redistribute section just return
@@ -205,7 +205,25 @@ class BirdPlan:
         for redistribute, redistribute_config in self.config["rip"]["redistribute"].items():
             # Add connected route redistribution
             if redistribute == "connected":
-                self.birdconf.protocols.rip.route_policy_redistribute.connected = redistribute_config
+                # Set type
+                redistribute_connected: Union[bool, List[str]]
+                # Check what kind of config we go...
+                if isinstance(redistribute_config, bool):
+                    redistribute_connected = redistribute_config
+                # Else if its a dict, we need to treat it a bit differently
+                elif isinstance(redistribute_config, dict):
+                    # Check it has an "interfaces" key
+                    if "interfaces" not in redistribute_config:
+                        raise BirdPlanError(f"Configurion item '{redistribute}' has no 'interfaces' option in bgp:redistribute")
+                    # If it does, check that it is a list
+                    if not isinstance(redistribute_config["interfaces"], list):
+                        raise BirdPlanError(f"Configurion item '{redistribute}:interfaces' has an invalid type in bgp:redistribute")
+                    # Set redistribute_connected as the interface list
+                    redistribute_connected = redistribute_config["interfaces"]
+                else:
+                    raise BirdPlanError(f"Configurion item '{redistribute}' has an unsupported value")
+                # Add configuration
+                self.birdconf.protocols.rip.route_policy_redistribute.connected = redistribute_connected
             # Add static route redistribution
             elif redistribute == "static":
                 self.birdconf.protocols.rip.route_policy_redistribute.static = redistribute_config
@@ -222,7 +240,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in rip:redistribute")
 
-    def _config_rip_interfaces(self):
+    def _config_rip_interfaces(self) -> None:
         """Configure rip:interfaces section."""
 
         # If we don't have interfaces in our rip section, just return
@@ -243,7 +261,7 @@ class BirdPlan:
             # Add interface
             self.birdconf.protocols.rip.add_interface(interface_name, interface_config)
 
-    def _config_ospf(self):
+    def _config_ospf(self) -> None:
         """Configure OSPF section."""
 
         # If we have no ospf section, just return
@@ -259,7 +277,7 @@ class BirdPlan:
         self._config_ospf_redistribute()
         self._config_ospf_areas()
 
-    def _config_ospf_accept(self):
+    def _config_ospf_accept(self) -> None:
         """Configure ospf:accept section."""
 
         # If we don't have an accept section, just return
@@ -275,7 +293,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in ospf:accept")
 
-    def _config_ospf_redistribute(self):
+    def _config_ospf_redistribute(self) -> None:
         """Configure ospf:redistribute section."""
 
         # If we don't have a redistribute section just return
@@ -289,7 +307,25 @@ class BirdPlan:
                 self.birdconf.protocols.ospf.route_policy_redistribute.static = redistribute_config
             # Add connected route redistribution
             elif redistribute == "connected":
-                self.birdconf.protocols.ospf.route_policy_redistribute.connected = redistribute_config
+                # Set type
+                redistribute_connected: Union[bool, List[str]]
+                # Check what kind of config we go...
+                if isinstance(redistribute_config, bool):
+                    redistribute_connected = redistribute_config
+                # Else if its a dict, we need to treat it a bit differently
+                elif isinstance(redistribute_config, dict):
+                    # Check it has an "interfaces" key
+                    if "interfaces" not in redistribute_config:
+                        raise BirdPlanError(f"Configurion item '{redistribute}' has no 'interfaces' option in bgp:redistribute")
+                    # If it does, check that it is a list
+                    if not isinstance(redistribute_config["interfaces"], list):
+                        raise BirdPlanError(f"Configurion item '{redistribute}:interfaces' has an invalid type in bgp:redistribute")
+                    # Set redistribute_connected as the interface list
+                    redistribute_connected = redistribute_config["interfaces"]
+                else:
+                    raise BirdPlanError(f"Configurion item '{redistribute}' has an unsupported value")
+                # Add configuration
+                self.birdconf.protocols.ospf.route_policy_redistribute.connected = redistribute_connected
             # Add kernel route redistribution
             elif redistribute == "kernel":
                 self.birdconf.protocols.ospf.route_policy_redistribute.kernel = redistribute_config
@@ -300,7 +336,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")
 
-    def _config_ospf_areas(self):
+    def _config_ospf_areas(self) -> None:
         """Configure ospf:interfaces section."""
 
         # If we don't have areas in our ospf section, just return
@@ -337,7 +373,7 @@ class BirdPlan:
                 # Add interface to area
                 self.birdconf.protocols.ospf.add_interface(area_name, interface_name, interface_config)
 
-    def _config_bgp(self):
+    def _config_bgp(self) -> None:
         """Configure bgp section."""
 
         # If we have no rip section, just return
@@ -383,7 +419,7 @@ class BirdPlan:
         self._config_bgp_import()
         self._config_bgp_peers()
 
-    def _config_bgp_accept(self):
+    def _config_bgp_accept(self) -> None:
         """Configure bgp:accept section."""
 
         # If we don't have an accept section, just return
@@ -399,7 +435,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in bgp:accept")
 
-    def _config_bgp_globals(self):
+    def _config_bgp_globals(self) -> None:
         """Configure bgp globals."""
 
         # Setup prefix lengths
@@ -425,7 +461,7 @@ class BirdPlan:
         if "rr_cluster_id" in self.config["bgp"]:
             self.birdconf.protocols.bgp.rr_cluster_id = self.config["bgp"]["rr_cluster_id"]
 
-    def _config_bgp_originate(self):
+    def _config_bgp_originate(self) -> None:
         """Configure bgp:originate section."""
 
         # If we don't have an accept section, just return
@@ -436,7 +472,7 @@ class BirdPlan:
         for route in self.config["bgp"]["originate"]:
             self.birdconf.protocols.bgp.add_originated_route(route)
 
-    def _config_bgp_import(self):
+    def _config_bgp_import(self) -> None:
         """Configure bgp:import section."""
 
         # If we don't have the option then just return
@@ -447,7 +483,25 @@ class BirdPlan:
         for import_type, import_config in self.config["bgp"]["import"].items():
             # Import connected routes into the main BGP table
             if import_type == "connected":
-                self.birdconf.protocols.bgp.route_policy_import.connected = import_config
+                # Set type
+                import_connected: Union[bool, List[str]]
+                # Check what kind of config we go...
+                if isinstance(import_config, bool):
+                    import_connected = import_config
+                # Else if its a dict, we need to treat it a bit differently
+                elif isinstance(import_config, dict):
+                    # Check it has an "interfaces" key
+                    if "interfaces" not in import_config:
+                        raise BirdPlanError(f"Configurion item '{import_type}' has no 'interfaces' option in bgp:import")
+                    # If it does, check that it is a list
+                    if not isinstance(import_config["interfaces"], list):
+                        raise BirdPlanError(f"Configurion item '{import_type}:interfaces' has an invalid type in bgp:import")
+                    # Set import_connected as the interface list
+                    import_connected = import_config["interfaces"]
+                else:
+                    raise BirdPlanError(f"Configurion item '{import_type}' has an unsupported value")
+                # Add configuration
+                self.birdconf.protocols.bgp.route_policy_import.connected = import_connected
             # Import kernel routes into the main BGP table
             elif import_type == "kernel":
                 self.birdconf.protocols.bgp.route_policy_import.kernel = import_config
@@ -458,7 +512,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{import_type}' not understood in bgp:import")
 
-    def _config_bgp_peers(self):
+    def _config_bgp_peers(self) -> None:
         """Configure bgp:peers section."""
 
         if "peers" not in self.config["bgp"]:
@@ -468,7 +522,9 @@ class BirdPlan:
         for peer_name, peer_config in self.config["bgp"]["peers"].items():
             self._config_bgp_peers_peer(peer_name, peer_config)
 
-    def _config_bgp_peers_peer(self, peer_name: str, peer_config: Dict[str, Any]):  # pylint: disable=too-many-branches # noqa: C901
+    def _config_bgp_peers_peer(
+        self, peer_name: str, peer_config: Dict[str, Any]
+    ) -> None:  # pylint: disable=too-many-branches # noqa: C901
         """Configure bgp:peers single peer."""
 
         # Start with no peer config
@@ -578,7 +634,7 @@ class BirdPlan:
             raise BirdPlanError(f"Configuration item 'bgp:peers:{peer_name}' must have a 'source_address6'")
 
         # Make sure we have items we need
-        self.birdconf.protocols.bgp.add_peer(peer_name, peer)  # type: ignore
+        self.birdconf.protocols.bgp.add_peer(peer_name, peer)
 
     @property
     def plan_file(self) -> Optional[str]:
@@ -591,7 +647,7 @@ class BirdPlan:
         return self._config
 
     @config.setter
-    def config(self, config: Dict[Any, Any]):
+    def config(self, config: Dict[Any, Any]) -> None:
         """Set our configuration."""
         self._config = config
 

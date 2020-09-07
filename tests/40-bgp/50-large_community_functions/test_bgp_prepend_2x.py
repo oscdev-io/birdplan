@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGP test for prepending 2x."""
+# type: ignore
+# pylint: disable=import-error,no-self-use,too-many-lines,too-many-public-methods
 
-# pylint: disable=too-many-lines,import-error,too-many-public-methods,no-self-use
+"""BGP test for prepending 2x."""
 
 import os
 from nsnetsim.bird_router_node import BirdRouterNode

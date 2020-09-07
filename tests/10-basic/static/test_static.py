@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Basic static route test cases."""
-
+# type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
+
+"""Basic static route test cases."""
 
 import os
 from nsnetsim.bird_router_node import BirdRouterNode

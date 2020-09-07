@@ -40,7 +40,7 @@ def get_argparser() -> argparse.ArgumentParser:
     return argparser
 
 
-def add_arguments(arg_group: argparse.ArgumentParser):
+def add_arguments(arg_group: argparse.ArgumentParser) -> None:
     """Add arguments."""
     arg_group.add_argument(
         "--generate",
@@ -51,7 +51,7 @@ def add_arguments(arg_group: argparse.ArgumentParser):
     )
 
 
-def setup_logging(args: argparse.Namespace):
+def setup_logging(args: argparse.Namespace) -> None:
     """Set up logging."""
 
     # Setup logger and level
@@ -67,7 +67,7 @@ def setup_logging(args: argparse.Namespace):
     logger.addHandler(console_handler)
 
 
-def run_birdplan():
+def run_birdplan() -> None:
     """Run BirdPlan from command line."""
     # Grab our arg parser
     argparser = get_argparser()

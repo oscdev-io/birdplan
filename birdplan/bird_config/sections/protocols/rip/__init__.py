@@ -18,11 +18,15 @@
 
 """BIRD RIP protocol configuration."""
 
-from typing import Dict, Union
+from typing import Dict, List, Union
 from .rip_attributes import RIPAttributes, RIPRoutePolicyAccept, RIPRoutePolicyRedistribute
 from ..direct import ProtocolDirect
 from ..pipe import ProtocolPipe
 from ..base import SectionProtocolBase
+from ...constants import SectionConstants
+from ...functions import SectionFunctions
+from ...tables import SectionTables
+from ....globals import BirdConfigGlobals
 from .....exceptions import BirdPlanError
 
 RIPInterfaceConfig = Union[bool, Dict[str, str]]
@@ -38,16 +42,18 @@ class ProtocolRIP(SectionProtocolBase):
 
     _rip_attributes: RIPAttributes
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
+    ) -> None:
         """Initialize the object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals, constants, functions, tables)
 
         # Interfaces
         self._rip_interfaces = {}
 
         self._rip_attributes = RIPAttributes()
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the RIP protocol."""
         super().configure()
 
@@ -61,28 +67,28 @@ class ProtocolRIP(SectionProtocolBase):
         self.tables.conf.append("")
 
         # RIP export filters
-        self._rip_export_filter(4)
-        self._rip_export_filter(6)
+        self._rip_export_filter("4")
+        self._rip_export_filter("6")
 
         # RIP import filters
-        self._rip_import_filter(4)
-        self._rip_import_filter(6)
+        self._rip_import_filter("4")
+        self._rip_import_filter("6")
 
         # RIP to master export filters
-        self._rip_to_master_export_filter(4)
-        self._rip_to_master_export_filter(6)
+        self._rip_to_master_export_filter("4")
+        self._rip_to_master_export_filter("6")
 
         # RIP to master import filters
-        self._rip_to_master_import_filter(4)
-        self._rip_to_master_import_filter(6)
+        self._rip_to_master_import_filter("4")
+        self._rip_to_master_import_filter("6")
 
         # Setup the protocol
-        self._setup_protocol(4)
-        self._setup_protocol(6)
+        self._setup_protocol("4")
+        self._setup_protocol("6")
 
         # Configure pipe from RIP to the master routing table
         rip_master_pipe = ProtocolPipe(
-            birdconf_globals=self.birdconf_globals,
+            birdconfig_globals=self.birdconfig_globals,
             table_from="rip",
             table_to="master",
             table_export_filtered=True,
@@ -92,23 +98,24 @@ class ProtocolRIP(SectionProtocolBase):
 
         # Check if we're redistributing connected routes, if we are, create the protocol and pipe
         if self.route_policy_redistribute.connected:
-            if "interfaces" not in self.route_policy_redistribute.connected:
-                raise BirdPlanError("RIP redistribute connected requires a list in item 'interfaces' to match interface names")
+            # Create an interface list to feed to our routing table
+            interfaces: List[str] = []
+            if isinstance(self.route_policy_redistribute.connected, list):
+                interfaces = self.route_policy_redistribute.connected
             # Add direct protocol for redistribution of connected routes
             rip_direct_protocol = ProtocolDirect(
                 constants=self.constants,
                 functions=self.functions,
                 tables=self.tables,
-                birdconf_globals=self.birdconf_globals,
+                birdconfig_globals=self.birdconfig_globals,
                 name="rip",
-                interfaces=self.route_policy_redistribute.connected["interfaces"],
+                interfaces=interfaces,
             )
             self.conf.add(rip_direct_protocol)
             # Add pipe
             rip_direct_pipe = ProtocolPipe(
-                birdconf_globals=self.birdconf_globals,
+                birdconfig_globals=self.birdconfig_globals,
                 name="rip",
-                description="RIP",
                 table_from="rip",
                 table_to="direct",
                 table_export="none",
@@ -116,46 +123,57 @@ class ProtocolRIP(SectionProtocolBase):
             )
             self.conf.add(rip_direct_pipe)
 
-    def add_interface(self, interface_name: str, interface_config: RIPInterfaceConfig):
+    def add_interface(self, interface_name: str, interface_config: RIPInterfaceConfig) -> None:
         """Add interface to RIP."""
         # Make sure the interface exists
         if interface_name not in self.interfaces:
-            self._rip_interfaces[interface_name] = {}
+            self.interfaces[interface_name] = {}
         # Grab the config so its easier to work with below
         config = self.interfaces[interface_name]
         # If the interface is just a boolean, we can return...
         if isinstance(interface_config, bool):
+            config = interface_config
             return
+        if not isinstance(config, dict):
+            raise BirdPlanError(f"Conflict RIP config for interface '{interface_name}'")
         # Work through supported configuration
         for key, value in interface_config.items():
-            if key in ("metric", "update-time"):
-                config[key] = value
-            else:
+            # Make sure key is valid
+            if key not in ("metric", "update-time"):
                 raise BirdPlanError(f"The RIP config for interface '{interface_name}' item '{key}' hasnt been added")
+            # Set the config item
+            config[key] = value
 
-    def _interface_config(self):
+    def _interface_config(self) -> List[str]:
         """Generate interface configuration."""
 
         interface_lines = []
         # Loop with interfaces
         for interface_name in sorted(self.interfaces.keys()):
+            # Set "interface" so things are easier to work with below
             interface = self.interfaces[interface_name]
+            # If the config is a boolean and its false, skip
+            if isinstance(interface, bool) and not interface:
+                continue
+            # Output interface
             interface_lines.append(f'  interface "{interface_name}" {{')
-            # Loop with config items
-            for key, value in interface.items():
-                if (key == "update-time") and value:
-                    interface_lines.append(f"    update time {value};")
-                else:
-                    interface_lines.append(f"    {key} {value};")
+            # If its not a bollean we have additional configuration to write out
+            if isinstance(interface, dict):
+                # Loop with config items
+                for key, value in interface.items():
+                    if (key == "update-time") and value:
+                        interface_lines.append(f"    update time {value};")
+                    else:
+                        interface_lines.append(f"    {key} {value};")
             interface_lines.append("  };")
 
         return interface_lines
 
-    def _setup_protocol(self, ipv: int):
+    def _setup_protocol(self, ipv: str) -> None:
         """Set up RIP protocol."""
-        if ipv == 4:
+        if ipv == "4":
             self.conf.add(f"protocol rip rip{ipv} {{")
-        elif ipv == 6:
+        elif ipv == "6":
             self.conf.add(f"protocol rip ng rip{ipv} {{")
         self.conf.add(f'  description "RIP protocol for IPv{ipv}";')
         self.conf.add("")
@@ -170,7 +188,7 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add(self._interface_config())
         self.conf.add("};")
 
-    def _rip_export_filter(self, ipv: int):
+    def _rip_export_filter(self, ipv: str) -> None:
         """RIP export filter setup."""
         self.conf.add(f"filter f_rip_export{ipv} {{")
         # Redistribute the default route
@@ -208,7 +226,7 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _rip_import_filter(self, ipv: int):
+    def _rip_import_filter(self, ipv: str) -> None:
         """RIP import filter setup."""
         # Configure import filter
         self.conf.add(f"filter f_rip_import{ipv} {{")
@@ -218,7 +236,7 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _rip_to_master_export_filter(self, ipv: int):
+    def _rip_to_master_export_filter(self, ipv: str) -> None:
         """RIP to master export filter setup."""
         # Configure export filter to master4
         self.conf.add(f"filter f_rip{ipv}_master{ipv}_export {{")
@@ -239,7 +257,7 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _rip_to_master_import_filter(self, ipv: int):
+    def _rip_to_master_import_filter(self, ipv: str) -> None:
         """RIP to master import filter setup."""
         # Configure import filter to master table
         self.conf.add(f"filter f_rip{ipv}_master{ipv}_import {{")
@@ -273,7 +291,7 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add("")
 
     @property
-    def interfaces(self):
+    def interfaces(self) -> RIPInterfaces:
         """Return RIP interfaces."""
         return self._rip_interfaces
 

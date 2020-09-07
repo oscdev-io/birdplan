@@ -18,7 +18,7 @@
 
 """BGPQ3 support class."""
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 import ipaddress
 import json
 import subprocess  # nosec
@@ -31,25 +31,47 @@ class BGPQ3:
     _port: int
     _sources: str
 
-    def __init__(self, **kwargs):
+    def __init__(self, host: str = "whois.radb.net", port: int = 43, sources: str = "RADB"):
         """Initialize object."""
 
         # Grab items we can set and associated defaults
-        self._host = kwargs.get("host", "whois.radb.net")
-        self._port = kwargs.get("port", 43)
-        self._sources = kwargs.get("sources", "RADB")
+        self._host = host
+        self._port = port
+        self._sources = sources
 
-    def get_asns(self, objects: List[str]) -> List[str]:
+    def get_asns(self, as_sets: Union[str, List[str]]) -> List[str]:
         """Get prefixes."""
+
+        # Build an object list depending on the type of "objects" above
+        objects: List[str] = []
+        if isinstance(as_sets, str):
+            objects.append(as_sets)
+        else:
+            objects.extend(as_sets)
+
         # Grab ASNs
         asns_bgpq3 = {}
         for obj in objects:
             asns_bgpq3.update(self._bgpq3(["-l", "asns", "-t", "-3", obj]))
 
-        return asns_bgpq3["asns"]
+        # Loop with ASN's and generate ASN list
+        asn_list = []
+        if "asns" in asns_bgpq3:
+            for asn in asns_bgpq3:
+                asn_list.append(asn)
 
-    def get_prefixes(self, objects: List[str]) -> Dict[str, List[str]]:
+        return asn_list
+
+    def get_prefixes(self, as_sets: Union[str, List[str]]) -> Dict[str, List[str]]:
         """Get prefixes."""
+
+        # Build an object list depending on the type of "objects" above
+        objects: List[str] = []
+        if isinstance(as_sets, str):
+            objects.append(as_sets)
+        else:
+            objects.extend(as_sets)
+
         # Grab IPv4 and IPv6 prefixes
         prefixes_bgpq3 = {}
         for obj in objects:

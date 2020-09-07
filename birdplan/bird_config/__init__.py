@@ -18,27 +18,30 @@
 
 """Bird configuration package."""
 
-from typing import Optional
+from typing import List, Optional
 
 from .globals import BirdConfigGlobals
-from .sections import Sections, SectionConstants, SectionProtocols, SectionTables
+from .sections import Sections
+from .sections.constants import SectionConstants
+from .sections.protocols import SectionProtocols
+from .sections.tables import SectionTables
 
 
 class BirdConfig:
     """BirdConfig is responsible for configuring Bird."""
 
-    _birdconf_globals: BirdConfigGlobals
+    _birdconfig_globals: BirdConfigGlobals
 
     _sections: Sections
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the object."""
         super().__init__()
 
-        self._birdconf_globals = BirdConfigGlobals()
-        self._sections = Sections(birdconf_globals=self.birdconf_globals)
+        self._birdconfig_globals = BirdConfigGlobals()
+        self._sections = Sections(self.birdconfig_globals)
 
-    def get_config(self):
+    def get_config(self) -> List[str]:
         """Return the Bird configuration."""
 
         self.sections.configure()
@@ -46,41 +49,41 @@ class BirdConfig:
         return self.sections.conf.lines
 
     @property
-    def birdconf_globals(self) -> BirdConfigGlobals:
+    def birdconfig_globals(self) -> BirdConfigGlobals:
         """Return our global configuration options."""
-        return self._birdconf_globals
+        return self._birdconfig_globals
 
     # HELPERS
 
     @property
     def log_file(self) -> Optional[str]:
         """Return the log file to use."""
-        return self.birdconf_globals.log_file
+        return self.birdconfig_globals.log_file
 
     @log_file.setter
-    def log_file(self, log_file: str):
+    def log_file(self, log_file: str) -> None:
         """Set the log file to use."""
-        self.birdconf_globals.log_file = log_file
+        self.birdconfig_globals.log_file = log_file
 
     @property
     def debug(self) -> bool:
         """Return debugging mode."""
-        return self.birdconf_globals.debug
+        return self.birdconfig_globals.debug
 
     @debug.setter
-    def debug(self, debug: bool):
+    def debug(self, debug: bool) -> None:
         """Set debugging mode."""
-        self.birdconf_globals.debug = debug
+        self.birdconfig_globals.debug = debug
 
     @property
     def test_mode(self) -> bool:
         """Return if we're running in test mode."""
-        return self.birdconf_globals.test_mode
+        return self.birdconfig_globals.test_mode
 
     @test_mode.setter
-    def test_mode(self, test_mode: bool):
+    def test_mode(self, test_mode: bool) -> None:
         """Set test mode."""
-        self.birdconf_globals.test_mode = test_mode
+        self.birdconfig_globals.test_mode = test_mode
 
     @property
     def router_id(self) -> str:
@@ -88,7 +91,7 @@ class BirdConfig:
         return self.sections.router_id.router_id
 
     @router_id.setter
-    def router_id(self, router_id: str):
+    def router_id(self, router_id: str) -> None:
         """Set router_id."""
         self.sections.router_id.router_id = router_id
 

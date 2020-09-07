@@ -18,6 +18,7 @@
 
 """BIRD router ID configuration section."""
 
+from birdplan.bird_config.globals import BirdConfigGlobals
 from .base import SectionBase
 
 
@@ -28,12 +29,12 @@ class SectionRouterID(SectionBase):
 
     _router_id: str
 
-    def __init__(self, **kwargs):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals)
         self._router_id = "0.0.0.0"
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure routing id."""
         super().configure()
 
@@ -46,6 +47,6 @@ class SectionRouterID(SectionBase):
         return self._router_id
 
     @router_id.setter
-    def router_id(self, router_id: str):
+    def router_id(self, router_id: str) -> None:
         """Set our router_id."""
         self._router_id = router_id

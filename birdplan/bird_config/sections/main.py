@@ -26,7 +26,7 @@ class SectionMain(SectionBase):
 
     _section = "Main"
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure main part of the config."""
         super().configure()
 

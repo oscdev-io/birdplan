@@ -26,7 +26,7 @@ class ProtocolDevice(SectionProtocolBase):
 
     _section = "Device Protocol"
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the device protocol."""
         super().configure()
 

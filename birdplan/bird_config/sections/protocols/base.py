@@ -22,6 +22,7 @@ from ..base import SectionBase
 from ..constants import SectionConstants
 from ..functions import SectionFunctions
 from ..tables import SectionTables
+from ...globals import BirdConfigGlobals
 
 
 class SectionProtocolBase(SectionBase):
@@ -34,24 +35,19 @@ class SectionProtocolBase(SectionBase):
     _functions: SectionFunctions
     _tables: SectionTables
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        birdconfig_globals: BirdConfigGlobals,
+        constants: SectionConstants,
+        functions: SectionFunctions,
+        tables: SectionTables,
+    ):
         """Initialize the object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals)
 
-        # Make sure we have constants passed to us
-        if "constants" not in kwargs:
-            raise RuntimeError("Protocols require 'constants' to be passed")
-        self._constants = kwargs.get("constants")
-
-        # Make sure we have functions passed to us
-        if "functions" not in kwargs:
-            raise RuntimeError("Protocols require 'functions' to be passed")
-        self._functions = kwargs.get("functions")
-
-        # Make sure we have tables passed to us
-        if "tables" not in kwargs:
-            raise RuntimeError("Protocols require 'tables' to be passed")
-        self._tables = kwargs.get("tables")
+        self._constants = constants
+        self._functions = functions
+        self._tables = tables
 
     @property
     def constants(self) -> SectionConstants:

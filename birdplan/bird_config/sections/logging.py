@@ -24,19 +24,19 @@ from .base import SectionBase
 class SectionLogging(SectionBase):
     """BIRD logging configuration."""
 
-    _section = "Logging"
+    _section: str = "Logging"
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure logging."""
         super().configure()
 
         # Grab logfile if we have one
-        log_file = self.birdconf_globals.log_file
+        log_file = self.birdconfig_globals.log_file
         if log_file:
             self.conf.add(f'log "{log_file}" all;')
         else:
             self.conf.add("log stderr all;")
         # Check if we're in debug mode
-        if self.birdconf_globals.debug:
+        if self.birdconfig_globals.debug:
             self.conf.add("debug protocols { states, routes, filters, interfaces, events };")
         self.conf.add("")

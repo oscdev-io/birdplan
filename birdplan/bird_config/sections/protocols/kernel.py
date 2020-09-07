@@ -26,15 +26,15 @@ class ProtocolKernel(SectionProtocolBase):
 
     _section = "Kernel Protocol"
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the kernel protocol."""
         super().configure()
 
         # Configure the kernel protocol
-        self._configure_protocol_kernel(4)
-        self._configure_protocol_kernel(6)
+        self._configure_protocol_kernel("4")
+        self._configure_protocol_kernel("6")
 
-    def _configure_protocol_kernel(self, ipv: int):
+    def _configure_protocol_kernel(self, ipv: str) -> None:
         """Protocol configuration."""
         self.conf.add(f"protocol kernel kernel{ipv} {{")
         self.conf.add(f'  description "Kernel protocol for IPv{ipv}";')

@@ -40,7 +40,7 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
     debug: bool
     test_mode: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize object."""
 
         # Log file

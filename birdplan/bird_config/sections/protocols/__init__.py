@@ -25,6 +25,10 @@ from .rip import ProtocolRIP
 from .ospf import ProtocolOSPF
 from .bgp import ProtocolBGP
 from ..base import SectionBase
+from ..constants import SectionConstants
+from ..functions import SectionFunctions
+from ..tables import SectionTables
+from ...globals import BirdConfigGlobals
 
 
 class SectionProtocols(SectionBase):
@@ -37,18 +41,20 @@ class SectionProtocols(SectionBase):
     _ospf: ProtocolOSPF
     _bgp: ProtocolBGP
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
+    ):
         """Initialize object."""
-        super().__init__(**kwargs)
+        super().__init__(birdconfig_globals)
 
-        self._device = ProtocolDevice(**kwargs)
-        self._kernel = ProtocolKernel(**kwargs)
-        self._static = ProtocolStatic(**kwargs)
-        self._rip = ProtocolRIP(**kwargs)
-        self._ospf = ProtocolOSPF(**kwargs)
-        self._bgp = ProtocolBGP(**kwargs)
+        self._device = ProtocolDevice(birdconfig_globals, constants, functions, tables)
+        self._kernel = ProtocolKernel(birdconfig_globals, constants, functions, tables)
+        self._static = ProtocolStatic(birdconfig_globals, constants, functions, tables)
+        self._rip = ProtocolRIP(birdconfig_globals, constants, functions, tables)
+        self._ospf = ProtocolOSPF(birdconfig_globals, constants, functions, tables)
+        self._bgp = ProtocolBGP(birdconfig_globals, constants, functions, tables)
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure all protocols."""
         super().configure()
 
