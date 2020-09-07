@@ -19,7 +19,9 @@
 """BIRD protocols section."""
 
 from .device import ProtocolDevice
+from .direct import ProtocolDirect
 from .kernel import ProtocolKernel
+from .pipe import ProtocolPipe
 from .static import ProtocolStatic
 from .rip import ProtocolRIP
 from .ospf import ProtocolOSPF
@@ -35,6 +37,7 @@ class SectionProtocols(SectionBase):
     """BIRD protocols section."""
 
     _device: ProtocolDevice
+    _direct: ProtocolDirect
     _kernel: ProtocolKernel
     _static: ProtocolStatic
     _rip: ProtocolRIP
@@ -48,6 +51,7 @@ class SectionProtocols(SectionBase):
         super().__init__(birdconfig_globals)
 
         self._device = ProtocolDevice(birdconfig_globals, constants, functions, tables)
+        self._direct = ProtocolDirect(birdconfig_globals, constants, functions, tables)
         self._kernel = ProtocolKernel(birdconfig_globals, constants, functions, tables)
         self._static = ProtocolStatic(birdconfig_globals, constants, functions, tables)
         self._rip = ProtocolRIP(birdconfig_globals, constants, functions, tables)
@@ -58,7 +62,21 @@ class SectionProtocols(SectionBase):
         """Configure all protocols."""
         super().configure()
 
+        # Add device protocol
         self.conf.add(self.device)
+
+        # Add direct protocol
+        self.conf.add(self.direct)
+        # Add pipe between direct and master tables
+        bgp_direct_pipe = ProtocolPipe(
+            self.birdconfig_globals,
+            table_from="master",
+            table_to="direct",
+            table_import="all",
+        )
+        self.conf.add(bgp_direct_pipe)
+
+        # Add kernel protocol
         self.conf.add(self.kernel)
 
         # If we have static routes, pull in the static configuration
@@ -81,6 +99,11 @@ class SectionProtocols(SectionBase):
     def device(self) -> ProtocolDevice:
         """Return the device protocol."""
         return self._device
+
+    @property
+    def direct(self) -> ProtocolDirect:
+        """Return the direct protocol."""
+        return self._direct
 
     @property
     def kernel(self) -> ProtocolKernel:
