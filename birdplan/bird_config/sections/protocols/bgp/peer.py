@@ -443,9 +443,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add("  # Redistribute connected routes")
-            self.conf.add("  if (source = RTS_DEVICE) then {")
+            self.conf.add(f'  if (proto = "direct{ipv}_bgp") then {{')
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on RTS_DEVICE '
+                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on direct{ipv}_bgp '
                 '(redistribute connected)";',
                 debug=True,
             )
@@ -454,9 +454,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  }")
         else:
             self.conf.add("  # Do not redistribute connected routes")
-            self.conf.add("  if (source = RTS_DEVICE) then {")
+            self.conf.add(f'  if (proto = "direct{ipv}_bgp") then {{')
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on RTS_DEVICE '
+                f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on direct{ipv}_bgp '
                 '(no redistribute connected)";',
                 debug=True,
             )
