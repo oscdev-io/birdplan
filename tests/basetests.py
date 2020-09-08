@@ -22,6 +22,8 @@
 """Base test classes for our tests."""
 
 from typing import Any, Dict, List, Optional
+import re
+import time
 import pytest
 from simulation import Simulation
 from birdplan import BirdPlan  # pylint: disable=import-error
@@ -81,6 +83,29 @@ class BirdPlanBaseTestCase:
     def _bird_bgp_peer_table(self, sim: Simulation, name: str, peer_name: str, ipv: int) -> str:
         """Get a bird BGP peer table name."""
         return sim.config(name).birdconf.protocols.bgp.peer(peer_name).bgp_table_name(ipv)
+
+    def _bird_log_matches(self, sim: Simulation, name: str, matches: str) -> bool:
+        """Check if the BIRD log file contains a string."""
+
+        logname = f"LOGFILE({name})"
+        # Make sure the log name exists
+        if logname not in sim.logfiles:
+            raise RuntimeError(f"Log name not found: {logname}")
+
+        tries = 0
+        while True:
+            # If we've tried too many times, return false
+            if tries > 10:
+                return False
+            # Open log file and read in the log
+            with open(sim.logfiles[logname], "r") as logfile:
+                log_str = logfile.read()
+            # Check if the log contains what we're looking for
+            if re.search(matches, log_str):
+                return True
+            # Bump tries
+            tries += 1
+            time.sleep(1)
 
     def _exabgpcli(self, sim: Simulation, name: str, args: List[str], report_title: str = "") -> List[str]:
         """Run the ExaBGP cli."""

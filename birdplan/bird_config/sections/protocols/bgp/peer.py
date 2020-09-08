@@ -172,12 +172,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 setattr(self.route_policy_redistribute, redistribute_type, redistribute_config)
 
         # If the peer is a customer or peer, check if we have a prefix limit, if not add it from peeringdb
-        # For routecollector and routeservers we filter, not block
         if self.peer_type in ("customer", "peer"):
             if self.has_ipv4 and ("prefix_limit4" not in peer_config):
                 self.prefix_limit4 = "peeringdb"
             if self.has_ipv6 and ("prefix_limit6" not in peer_config):
                 self.prefix_limit6 = "peeringdb"
+        # Check for peer config, this should override the above
+        if self.has_ipv4 and "prefix_limit4" in peer_config:
+            self.prefix_limit4 = peer_config["prefix_limit4"]
+        if self.has_ipv6 and "prefix_limit6" in peer_config:
+            self.prefix_limit6 = peer_config["prefix_limit6"]
         # Work out the prefix limits...
         if self.has_ipv4 and self.prefix_limit4 and self.prefix_limit4 == "peeringdb":
             self.prefix_limit4 = self.peeringdb["info_prefixes4"]
@@ -893,7 +897,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Setup prefix limit
         prefix_limit = getattr(self, f"prefix_limit{ipv}")
         if prefix_limit:
-            self.conf.add(f"    import limit {prefix_limit};")
+            self.conf.add(f"    import limit {prefix_limit} action restart;")
         # Setup filters
         self.conf.add(f"    import filter {self.filter_name_import(ipv)};")
         self.conf.add(f"    export filter {self.filter_name_export(ipv)};")

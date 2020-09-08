@@ -160,3 +160,8 @@ class Simulation:
             items.append((name, contents))
 
         return items
+
+    @property
+    def logfiles(self) -> Dict[str, str]:
+        """Return our log files."""
+        return self._logfiles
