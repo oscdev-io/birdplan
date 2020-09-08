@@ -216,9 +216,9 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         Indicate if this is a passive peer or not.
     quarantined : bool
         Set if the peer is quarantined.
-    prefix_limit4 : Optional[str]
+    prefix_limit4 : BGPPeerPrefixLimit
         Prefix limit for IPv4.
-    prefix_limit6 : optional[str]
+    prefix_limit6 : BGPPeerPrefixLimit
         Prefix limit for IPv6.
     route_policy_accept : BGPPeerRoutePolicyAccept
         Route policy for acceptance of routes from BGP peers into our main BGP table.
@@ -257,8 +257,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     quarantined: bool = False
 
-    prefix_limit4: Optional[str] = None
-    prefix_limit6: Optional[str] = None
+    prefix_limit4: BGPPeerPrefixLimit = None
+    prefix_limit6: BGPPeerPrefixLimit = None
 
     route_policy_accept: BGPPeerRoutePolicyAccept
     route_policy_redistribute: BGPPeerRoutePolicyRedistribute

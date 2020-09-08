@@ -590,7 +590,7 @@ bgp:
     peer1:
       asn: 65000
       description: Some peer
-      prefix_limit4: "test123"
+      prefix_limit4: 100
 ...
 ```
 
@@ -608,7 +608,7 @@ bgp:
     peer1:
       asn: 65000
       description: Some peer
-      prefix_limit6: "test123"
+      prefix_limit6: 100
 ...
 ```
 

@@ -84,5 +84,9 @@
 
 ## Large Community Functions
 
-[Filtering](40-bgp/50-large_community_functions/README.md)
+[Large Community Functions](40-bgp/50-large_community_functions/README.md)
+
+## Prefix Limits
+
+[Prefix Limits](40-bgp/60-prefix_limits/README.md)
 
