@@ -23,7 +23,9 @@
 
 from typing import Tuple
 import os
+import pytest
 from template_exabgp import BirdplanBaseTestCaseExabgp
+from birdplan.exceptions import BirdPlanError
 
 
 class BGPFilteringQuarantinedBase(BirdplanBaseTestCaseExabgp):
@@ -498,67 +500,12 @@ class TestRoutecollector(BGPFilteringQuarantinedBase):
       quarantine: True
 """
 
-    def test_prefix_announce(self, sim, tmpdir, helpers):
+    def test_prefix_announce(self, sim, tmpdir):
         """Test filtering of quarantined peers for the 'routecollector' peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_prefix(sim)
-
-        # Check peer BGP table
-        correct_result = {
-            "100.64.101.0/24": [
-                {
-                    "asn": "AS65001",
-                    "attributes": {
-                        "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 1101, 17)],
-                        "BGP.local_pref": 100,
-                        "BGP.next_hop": ["100.64.0.2"],
-                        "BGP.origin": "IGP",
-                    },
-                    "bestpath": True,
-                    "bgp_type": "i",
-                    "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
-                    "pref": 100,
-                    "prefix_type": "unicast",
-                    "protocol": "bgp4_AS65001_e1",
-                    "since": helpers.bird_since_field(),
-                    "type": ["BGP", "univ"],
-                }
-            ]
-        }
-        assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
-
-        # Check peer BGP table
-        correct_result = {
-            "fc00:101::/64": [
-                {
-                    "asn": "AS65001",
-                    "attributes": {
-                        "BGP.as_path": [65001],
-                        "BGP.large_community": [(65000, 1101, 17)],
-                        "BGP.local_pref": 100,
-                        "BGP.next_hop": ["fc00:100::2"],
-                        "BGP.origin": "IGP",
-                    },
-                    "bestpath": True,
-                    "bgp_type": "i",
-                    "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-                    "pref": 100,
-                    "prefix_type": "unicast",
-                    "protocol": "bgp6_AS65001_e1",
-                    "since": helpers.bird_since_field(),
-                    "type": ["BGP", "univ"],
-                }
-            ]
-        }
-        assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
-
-        # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        with pytest.raises(BirdPlanError, match=r"makes no sense"):
+            # Setup environment
+            self._setup(sim, tmpdir)
 
 
 class TestRouteserver(BGPFilteringQuarantinedBase):
