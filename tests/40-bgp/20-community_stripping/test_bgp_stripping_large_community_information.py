@@ -79,7 +79,7 @@ class TestCustomer(BGPStrippingLargeCommunitiesBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_strippable_large_community(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -104,7 +104,7 @@ class TestCustomer(BGPStrippingLargeCommunitiesBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -199,7 +199,7 @@ class TestPeer(BGPStrippingLargeCommunitiesBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_strippable_large_community(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -224,7 +224,7 @@ class TestPeer(BGPStrippingLargeCommunitiesBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -319,7 +319,7 @@ class TestTransit(BGPStrippingLargeCommunitiesBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_strippable_large_community(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -344,7 +344,7 @@ class TestTransit(BGPStrippingLargeCommunitiesBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -443,7 +443,7 @@ class TestRrclient(BGPStrippingLargeCommunitiesBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_strippable_large_community(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -467,7 +467,7 @@ class TestRrclient(BGPStrippingLargeCommunitiesBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -563,7 +563,7 @@ class TestRrserver(BGPStrippingLargeCommunitiesBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_strippable_large_community(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -587,7 +587,7 @@ class TestRrserver(BGPStrippingLargeCommunitiesBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -683,7 +683,7 @@ class TestRrserverRrserver(BGPStrippingLargeCommunitiesBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_strippable_large_community(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -707,7 +707,7 @@ class TestRrserverRrserver(BGPStrippingLargeCommunitiesBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -799,7 +799,7 @@ class TestRoutecollector(BGPStrippingLargeCommunitiesBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_strippable_large_community(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -824,7 +824,7 @@ class TestRoutecollector(BGPStrippingLargeCommunitiesBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -868,7 +868,7 @@ class TestRouteserver(BGPStrippingLargeCommunitiesBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_strippable_large_community(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -893,7 +893,7 @@ class TestRouteserver(BGPStrippingLargeCommunitiesBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {

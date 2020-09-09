@@ -71,7 +71,7 @@ class TestCustomer(BGPFilteringWrongNexthopBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_wrong_nexthop(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -97,7 +97,7 @@ class TestCustomer(BGPFilteringWrongNexthopBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -142,7 +142,7 @@ class TestPeer(BGPFilteringWrongNexthopBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_wrong_nexthop(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -168,7 +168,7 @@ class TestPeer(BGPFilteringWrongNexthopBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -213,7 +213,7 @@ class TestTransit(BGPFilteringWrongNexthopBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_wrong_nexthop(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -239,7 +239,7 @@ class TestTransit(BGPFilteringWrongNexthopBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -288,7 +288,7 @@ class TestRrclient(BGPFilteringWrongNexthopBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_wrong_nexthop(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -313,7 +313,7 @@ class TestRrclient(BGPFilteringWrongNexthopBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -412,7 +412,7 @@ class TestRrserver(BGPFilteringWrongNexthopBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_wrong_nexthop(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -437,7 +437,7 @@ class TestRrserver(BGPFilteringWrongNexthopBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -536,7 +536,7 @@ class TestRrserverRrserver(BGPFilteringWrongNexthopBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_wrong_nexthop(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -561,7 +561,7 @@ class TestRrserverRrserver(BGPFilteringWrongNexthopBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -656,7 +656,7 @@ class TestRoutecollector(BGPFilteringWrongNexthopBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_wrong_nexthop(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -682,7 +682,7 @@ class TestRoutecollector(BGPFilteringWrongNexthopBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -727,7 +727,7 @@ class TestRouteserver(BGPFilteringWrongNexthopBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_wrong_nexthop(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -753,7 +753,7 @@ class TestRouteserver(BGPFilteringWrongNexthopBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {

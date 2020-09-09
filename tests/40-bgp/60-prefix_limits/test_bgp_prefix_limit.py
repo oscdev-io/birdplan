@@ -85,11 +85,11 @@ class TestCustomer(BGPPrefixLimitBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
@@ -109,11 +109,11 @@ class TestPeer(BGPPrefixLimitBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
@@ -133,11 +133,11 @@ class TestTransit(BGPPrefixLimitBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
@@ -161,11 +161,11 @@ class TestRrclient(BGPPrefixLimitBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
@@ -189,11 +189,11 @@ class TestRrserver(BGPPrefixLimitBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
@@ -217,11 +217,11 @@ class TestRrserverRrserver(BGPPrefixLimitBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
@@ -241,11 +241,11 @@ class TestRoutecollector(BGPPrefixLimitBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
@@ -265,10 +265,10 @@ class TestRouteserver(BGPPrefixLimitBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {}
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"

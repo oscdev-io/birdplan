@@ -82,7 +82,7 @@ class TestCustomer(BGPFilteringASPathTooLongBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -107,7 +107,7 @@ class TestCustomer(BGPFilteringASPathTooLongBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -151,7 +151,7 @@ class TestPeer(BGPFilteringASPathTooLongBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -176,7 +176,7 @@ class TestPeer(BGPFilteringASPathTooLongBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -220,7 +220,7 @@ class TestTransit(BGPFilteringASPathTooLongBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -245,7 +245,7 @@ class TestTransit(BGPFilteringASPathTooLongBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -293,7 +293,7 @@ class TestRrclient(BGPFilteringASPathTooLongBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -317,7 +317,7 @@ class TestRrclient(BGPFilteringASPathTooLongBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -413,7 +413,7 @@ class TestRrserver(BGPFilteringASPathTooLongBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -437,7 +437,7 @@ class TestRrserver(BGPFilteringASPathTooLongBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -533,7 +533,7 @@ class TestRrserverRrserver(BGPFilteringASPathTooLongBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -557,7 +557,7 @@ class TestRrserverRrserver(BGPFilteringASPathTooLongBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -649,7 +649,7 @@ class TestRoutecollector(BGPFilteringASPathTooLongBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -674,7 +674,7 @@ class TestRoutecollector(BGPFilteringASPathTooLongBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -718,7 +718,7 @@ class TestRouteserver(BGPFilteringASPathTooLongBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_as_path_too_long(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -743,7 +743,7 @@ class TestRouteserver(BGPFilteringASPathTooLongBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
