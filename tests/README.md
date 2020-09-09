@@ -90,3 +90,6 @@
 
 [Prefix Limits](40-bgp/60-prefix_limits/README.md)
 
+## Peer Cost
+
+[Prefix Cost](40-bgp/70-peer_cost/README.md)
