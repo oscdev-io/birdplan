@@ -71,7 +71,7 @@ class TestCustomer(BGPFilteringDefaultNotAllowedBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_default_route(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "0.0.0.0/0": [
                 {
@@ -96,7 +96,7 @@ class TestCustomer(BGPFilteringDefaultNotAllowedBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "::/0": [
                 {
@@ -140,7 +140,7 @@ class TestPeer(BGPFilteringDefaultNotAllowedBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_default_route(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "0.0.0.0/0": [
                 {
@@ -165,7 +165,7 @@ class TestPeer(BGPFilteringDefaultNotAllowedBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "::/0": [
                 {
@@ -209,7 +209,7 @@ class TestTransit(BGPFilteringDefaultNotAllowedBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_default_route(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "0.0.0.0/0": [
                 {
@@ -234,7 +234,7 @@ class TestTransit(BGPFilteringDefaultNotAllowedBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "::/0": [
                 {
@@ -282,7 +282,7 @@ class TestRrclient(BGPFilteringDefaultNotAllowedBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_default_route(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "0.0.0.0/0": [
                 {
@@ -306,7 +306,7 @@ class TestRrclient(BGPFilteringDefaultNotAllowedBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "::/0": [
                 {
@@ -353,7 +353,7 @@ class TestRrserver(BGPFilteringDefaultNotAllowedBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_default_route(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "0.0.0.0/0": [
                 {
@@ -377,7 +377,7 @@ class TestRrserver(BGPFilteringDefaultNotAllowedBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "::/0": [
                 {
@@ -426,7 +426,7 @@ class TestRrserverRrserver(BGPFilteringDefaultNotAllowedBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_default_route(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "0.0.0.0/0": [
                 {
@@ -450,7 +450,7 @@ class TestRrserverRrserver(BGPFilteringDefaultNotAllowedBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "::/0": [
                 {
@@ -493,7 +493,7 @@ class TestRoutecollector(BGPFilteringDefaultNotAllowedBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_default_route(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "0.0.0.0/0": [
                 {
@@ -518,7 +518,7 @@ class TestRoutecollector(BGPFilteringDefaultNotAllowedBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "::/0": [
                 {
@@ -562,7 +562,7 @@ class TestRouteserver(BGPFilteringDefaultNotAllowedBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_default_route(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "0.0.0.0/0": [
                 {
@@ -587,7 +587,7 @@ class TestRouteserver(BGPFilteringDefaultNotAllowedBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "::/0": [
                 {

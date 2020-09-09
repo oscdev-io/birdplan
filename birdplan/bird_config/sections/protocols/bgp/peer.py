@@ -126,6 +126,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.password = peer_config["password"]
 
         if "cost" in peer_config:
+            # Raise an exception if peer cost does not make sense for a specific peer type
+            if self.peer_type in ("rrclient", "rrserver", "rrserver-rrserver", "routecollector"):
+                raise BirdPlanError(f"BGP peer '{self.name}' has 'cost' specified but makes no sense for this peer type")
             self.cost = peer_config["cost"]
 
         # Check if we are adding a large community to outgoing routes

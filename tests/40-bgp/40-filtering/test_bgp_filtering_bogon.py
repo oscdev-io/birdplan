@@ -71,7 +71,7 @@ class TestCustomer(BGPFilteringBogonBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_bogon(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "172.16.0.0/24": [
                 {
@@ -96,7 +96,7 @@ class TestCustomer(BGPFilteringBogonBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "2001:db8::/48": [
                 {
@@ -140,7 +140,7 @@ class TestPeer(BGPFilteringBogonBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_bogon(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "172.16.0.0/24": [
                 {
@@ -165,7 +165,7 @@ class TestPeer(BGPFilteringBogonBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "2001:db8::/48": [
                 {
@@ -209,7 +209,7 @@ class TestTransit(BGPFilteringBogonBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_bogon(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "172.16.0.0/24": [
                 {
@@ -234,7 +234,7 @@ class TestTransit(BGPFilteringBogonBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "2001:db8::/48": [
                 {
@@ -282,7 +282,7 @@ class TestRrclient(BGPFilteringBogonBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_bogon(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "172.16.0.0/24": [
                 {
@@ -300,7 +300,7 @@ class TestRrclient(BGPFilteringBogonBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "2001:db8::/48": [
                 {
@@ -378,7 +378,7 @@ class TestRrserver(BGPFilteringBogonBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_bogon(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "172.16.0.0/24": [
                 {
@@ -396,7 +396,7 @@ class TestRrserver(BGPFilteringBogonBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "2001:db8::/48": [
                 {
@@ -474,7 +474,7 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_bogon(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "172.16.0.0/24": [
                 {
@@ -492,7 +492,7 @@ class TestRrserverRrserver(BGPFilteringBogonBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "2001:db8::/48": [
                 {
@@ -566,7 +566,7 @@ class TestRoutecollector(BGPFilteringBogonBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_bogon(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "172.16.0.0/24": [
                 {
@@ -591,7 +591,7 @@ class TestRoutecollector(BGPFilteringBogonBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "2001:db8::/48": [
                 {
@@ -635,7 +635,7 @@ class TestRouteserver(BGPFilteringBogonBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_bogon(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "172.16.0.0/24": [
                 {
@@ -660,7 +660,7 @@ class TestRouteserver(BGPFilteringBogonBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "2001:db8::/48": [
                 {

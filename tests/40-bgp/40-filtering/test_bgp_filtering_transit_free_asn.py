@@ -75,7 +75,7 @@ class TestCustomer(BGPFilteringTransitFreeASNBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -100,7 +100,7 @@ class TestCustomer(BGPFilteringTransitFreeASNBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -144,7 +144,7 @@ class TestPeer(BGPFilteringTransitFreeASNBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -169,7 +169,7 @@ class TestPeer(BGPFilteringTransitFreeASNBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -213,7 +213,7 @@ class TestTransit(BGPFilteringTransitFreeASNBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -238,7 +238,7 @@ class TestTransit(BGPFilteringTransitFreeASNBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -337,7 +337,7 @@ class TestRrclient(BGPFilteringTransitFreeASNBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -361,7 +361,7 @@ class TestRrclient(BGPFilteringTransitFreeASNBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -457,7 +457,7 @@ class TestRrserver(BGPFilteringTransitFreeASNBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -481,7 +481,7 @@ class TestRrserver(BGPFilteringTransitFreeASNBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -577,7 +577,7 @@ class TestRrserverRrserver(BGPFilteringTransitFreeASNBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -601,7 +601,7 @@ class TestRrserverRrserver(BGPFilteringTransitFreeASNBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -693,7 +693,7 @@ class TestRoutecollector(BGPFilteringTransitFreeASNBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -718,7 +718,7 @@ class TestRoutecollector(BGPFilteringTransitFreeASNBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -762,7 +762,7 @@ class TestRouteserver(BGPFilteringTransitFreeASNBase):
         # Announce prefixes
         ipv4_table, ipv6_table = self._announce_transit_free_asn(sim)
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.64.101.0/24": [
                 {
@@ -787,7 +787,7 @@ class TestRouteserver(BGPFilteringTransitFreeASNBase):
         }
         assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        # Check bgp_originate4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
