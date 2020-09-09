@@ -23,16 +23,20 @@
 
 from typing import Tuple
 import os
-from template_exabgp import BirdplanBaseTestCaseExabgp
+from basetests import BirdPlanBaseTestCase
 
 
-class BGPStrippingLargeCommunitiesBase(BirdplanBaseTestCaseExabgp):
+class BGPStrippingLargeCommunitiesBase(BirdPlanBaseTestCase):
     """Base class for BGP stripping of large communities."""
 
     test_dir = os.path.dirname(__file__)
-    routers = ["r1"]
+    exabgps = ["e1"]
 
-    def _announce_stripped_large_communities(self, sim) -> Tuple:
+    def test_setup(self, sim, tmpdir):
+        """Set up our test."""
+        self._test_setup(sim, tmpdir)
+
+    def test_announce_routes(self, sim):
         """Announce a prefix that has a too many large communities from ExaBGP to BIRD."""
 
         self._exabgpcli(
@@ -46,6 +50,15 @@ class BGPStrippingLargeCommunitiesBase(BirdplanBaseTestCaseExabgp):
             ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 large-community [" + "65000:1101:65535" + "]"],
         )
 
+    def test_results(self, sim, helpers):
+        """Test results from this peer type."""
+        self._test_results(sim, helpers)
+
+    def _test_results(self, sim, helpers):
+        """Test-specific results from this peer type."""
+        raise NotImplementedError
+
+    def _get_tables(self, sim) -> Tuple:
         # Grab IPv4 table name and get entries
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r1", "e1", 4)
         peer_bgp4_table = self._bird_route_table(sim, "r1", peer_bgp_table_name, expect_count=1)
@@ -64,20 +77,17 @@ class TestCustomer(BGPStrippingLargeCommunitiesBase):
     """Test stripping of large communities for the 'customer' peer type."""
 
     # BIRD configuration
-    peer_type = "customer"
-    extra_config = """
+    r1_peer_type = "customer"
+    r1_extra_config = """
       filter:
         asns: [65001]
 """
 
-    def test_stripped_large_communities_announce(self, sim, tmpdir, helpers):
-        """Test stripping of large communities for the 'customer' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_large_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -188,16 +198,13 @@ class TestPeer(BGPStrippingLargeCommunitiesBase):
     """Test stripping of large communities for the 'peer' peer type."""
 
     # BIRD configuration
-    peer_type = "peer"
+    r1_peer_type = "peer"
 
-    def test_stripped_large_communities_announce(self, sim, tmpdir, helpers):
-        """Test stripping of large communities for the 'peer' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_large_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -308,16 +315,13 @@ class TestTransit(BGPStrippingLargeCommunitiesBase):
     """Test stripping of large communities for the 'transit' peer type."""
 
     # BIRD configuration
-    peer_type = "transit"
+    r1_peer_type = "transit"
 
-    def test_stripped_large_communities_announce(self, sim, tmpdir, helpers):
-        """Test stripping of large communities for the 'transit' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_large_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -428,20 +432,18 @@ class TestRrclient(BGPStrippingLargeCommunitiesBase):
     """Test stripping of large communities for the 'rrclient' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrclient"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrclient"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_stripped_large_communities_announce(self, sim, tmpdir, helpers):
-        """Test stripping of large communities for the 'rrclient' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_large_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -492,27 +494,25 @@ class TestRrclient(BGPStrippingLargeCommunitiesBase):
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
         # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        self._check_main_bgp_tables_empty(sim)
 
 
 class TestRrserver(BGPStrippingLargeCommunitiesBase):
     """Test stripping of large communities for the 'rrserver' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrserver"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrserver"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_stripped_large_communities_announce(self, sim, tmpdir, helpers):
-        """Test stripping of large communities for the 'rrserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_large_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -563,27 +563,25 @@ class TestRrserver(BGPStrippingLargeCommunitiesBase):
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
         # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        self._check_main_bgp_tables_empty(sim)
 
 
 class TestRrserverRrserver(BGPStrippingLargeCommunitiesBase):
     """Test stripping of large communities for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrserver-rrserver"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrserver-rrserver"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_stripped_large_communities_announce(self, sim, tmpdir, helpers):
-        """Test stripping of large communities for the 'rrserver-rrserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_large_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -634,23 +632,20 @@ class TestRrserverRrserver(BGPStrippingLargeCommunitiesBase):
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
         # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        self._check_main_bgp_tables_empty(sim)
 
 
 class TestRoutecollector(BGPStrippingLargeCommunitiesBase):
     """Test stripping of large communities for the 'routecollector' peer type."""
 
     # BIRD configuration
-    peer_type = "routecollector"
+    r1_peer_type = "routecollector"
 
-    def test_stripped_large_communities_announce(self, sim, tmpdir, helpers):
-        """Test stripping of large communities for the 'routecollector' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_large_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -703,23 +698,20 @@ class TestRoutecollector(BGPStrippingLargeCommunitiesBase):
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
         # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        self._check_main_bgp_tables_empty(sim)
 
 
 class TestRouteserver(BGPStrippingLargeCommunitiesBase):
     """Test stripping of large communities for the 'routeserver' peer type."""
 
     # BIRD configuration
-    peer_type = "routeserver"
+    r1_peer_type = "routeserver"
 
-    def test_stripped_large_communities_announce(self, sim, tmpdir, helpers):
-        """Test stripping of large communities for the 'routeserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_large_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {

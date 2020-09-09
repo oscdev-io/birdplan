@@ -17,25 +17,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # type: ignore
-# pylint: disable=import-error,too-few-public-methods,no-self-use
+# pylint: disable=import-error,too-few-public-methods,no-self-use,too-many-lines
 
 """BGP stripping of communities."""
 
 from typing import Tuple
 import os
-from template_exabgp import BirdplanBaseTestCaseExabgp
+from basetests import BirdPlanBaseTestCase
 
 
-class BGPStrippingCommunitiesBase(BirdplanBaseTestCaseExabgp):
+class BGPStrippingCommunitiesBase(BirdPlanBaseTestCase):
     """Base class for BGP stripping of communities."""
 
     test_dir = os.path.dirname(__file__)
-    routers = ["r1"]
-    global_config = """
+    exabgps = ["e1"]
+    r1_global_config = """
   community_maxlen: 50
 """
 
-    def _announce_stripped_community(self, sim) -> Tuple:
+    def test_setup(self, sim, tmpdir):
+        """Set up our test."""
+        self._test_setup(sim, tmpdir)
+
+    def test_announce_routes(self, sim):
         """Announce a prefix that has a strippable community from ExaBGP to BIRD."""
 
         self._exabgpcli(
@@ -49,6 +53,15 @@ class BGPStrippingCommunitiesBase(BirdplanBaseTestCaseExabgp):
             ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 community [ 65000:1 ]"],
         )
 
+    def test_results(self, sim, helpers):
+        """Test results from this peer type."""
+        self._test_results(sim, helpers)
+
+    def _test_results(self, sim, helpers):
+        """Test-specific results from this peer type."""
+        raise NotImplementedError
+
+    def _get_tables(self, sim) -> Tuple:
         # Grab IPv4 table name and get entries
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r1", "e1", 4)
         peer_bgp4_table = self._bird_route_table(sim, "r1", peer_bgp_table_name, expect_count=1)
@@ -67,20 +80,17 @@ class TestCustomer(BGPStrippingCommunitiesBase):
     """Test stripping of communities for the 'customer' peer type."""
 
     # BIRD configuration
-    peer_type = "customer"
-    extra_config = """
+    r1_peer_type = "customer"
+    r1_extra_config = """
       filter:
         asns: [65001]
 """
 
-    def test_strippable_community_announce(self, sim, tmpdir, helpers):
-        """Test stripping of communities for the 'customer' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_community(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -195,16 +205,13 @@ class TestPeer(BGPStrippingCommunitiesBase):
     """Test stripping of communities for the 'peer' peer type."""
 
     # BIRD configuration
-    peer_type = "peer"
+    r1_peer_type = "peer"
 
-    def test_strippable_community_announce(self, sim, tmpdir, helpers):
-        """Test stripping of communities for the 'peer' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_community(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -319,16 +326,13 @@ class TestTransit(BGPStrippingCommunitiesBase):
     """Test stripping of communities for the 'transit' peer type."""
 
     # BIRD configuration
-    peer_type = "transit"
+    r1_peer_type = "transit"
 
-    def test_strippable_community_announce(self, sim, tmpdir, helpers):
-        """Test stripping of communities for the 'transit' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_community(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -443,20 +447,18 @@ class TestRrclient(BGPStrippingCommunitiesBase):
     """Test stripping of communities for the 'rrclient' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrclient"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrclient"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_strippable_community_announce(self, sim, tmpdir, helpers):
-        """Test stripping of communities for the 'rrclient' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_community(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -563,20 +565,18 @@ class TestRrserver(BGPStrippingCommunitiesBase):
     """Test stripping of communities for the 'rrserver' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrserver"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrserver"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_strippable_community_announce(self, sim, tmpdir, helpers):
-        """Test stripping of communities for the 'rrserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_community(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -683,20 +683,18 @@ class TestRrserverRrserver(BGPStrippingCommunitiesBase):
     """Test stripping of communities for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrserver-rrserver"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrserver-rrserver"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_strippable_community_announce(self, sim, tmpdir, helpers):
-        """Test stripping of communities for the 'rrserver-rrserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_community(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -803,16 +801,13 @@ class TestRoutecollector(BGPStrippingCommunitiesBase):
     """Test stripping of communities for the 'routecollector' peer type."""
 
     # BIRD configuration
-    peer_type = "routecollector"
+    r1_peer_type = "routecollector"
 
-    def test_strippable_community_announce(self, sim, tmpdir, helpers):
-        """Test stripping of communities for the 'routecollector' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_community(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -867,23 +862,20 @@ class TestRoutecollector(BGPStrippingCommunitiesBase):
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
         # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        self._check_main_bgp_tables_empty(sim)
 
 
 class TestRouteserver(BGPStrippingCommunitiesBase):
     """Test stripping of communities for the 'routeserver' peer type."""
 
     # BIRD configuration
-    peer_type = "routeserver"
+    r1_peer_type = "routeserver"
 
-    def test_strippable_community_announce(self, sim, tmpdir, helpers):
-        """Test stripping of communities for the 'routeserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_stripped_community(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {

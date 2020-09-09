@@ -22,8 +22,6 @@
 """BGP test for redistribution of static default routes."""
 
 import os
-from nsnetsim.bird_router_node import BirdRouterNode
-from nsnetsim.switch_node import SwitchNode
 from basetests import BirdPlanBaseTestCase
 
 
@@ -32,34 +30,12 @@ class TestBGPRedistributeStaticDefault(BirdPlanBaseTestCase):
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1", "r2", "r3"]
+    r1_interfaces = ["eth0", "eth1"]
+    r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["192.168.1.1/24", "fc01::1/64"]}
 
-    def test_configure(self, sim, tmpdir):
-        """Create our configuration files."""
-        self._test_configure(sim, tmpdir)
-
-    def test_create_topology(self, sim, tmpdir):
-        """Test topology creation."""
-
-        print("Adding routers...")
-        sim.add_node(BirdRouterNode(name="r1", configfile=f"{tmpdir}/bird.conf.r1"))
-        sim.add_node(BirdRouterNode(name="r2", configfile=f"{tmpdir}/bird.conf.r2"))
-        sim.add_node(BirdRouterNode(name="r3", configfile=f"{tmpdir}/bird.conf.r3"))
-
-        print("Adding interfaces...")
-        sim.node("r1").add_interface("eth0", mac="02:01:00:00:00:01", ips=["100.64.0.1/24", "fc00:100::1/64"])
-        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["192.168.1.1/24", "fc01::1/64"])
-        sim.node("r2").add_interface("eth0", mac="02:02:00:00:00:01", ips=["100.64.0.2/24", "fc00:100::2/64"])
-        sim.node("r3").add_interface("eth0", mac="02:03:00:00:00:01", ips=["100.64.0.3/24", "fc00:100::3/64"])
-
-        print("Adding switches...")
-        sim.add_node(SwitchNode("s1"))
-        sim.node("s1").add_interface(sim.node("r1").interface("eth0"))
-        sim.node("s1").add_interface(sim.node("r2").interface("eth0"))
-        sim.node("s1").add_interface(sim.node("r3").interface("eth0"))
-
-        # Simulate our topology
-        print("Simulate topology...")
-        sim.run()
+    def test_setup(self, sim, tmpdir):
+        """Setup our test."""
+        self._test_setup(sim, tmpdir)
 
     def test_bird_status(self, sim):
         """Grab data from the simulation."""

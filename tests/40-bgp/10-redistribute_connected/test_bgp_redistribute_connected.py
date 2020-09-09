@@ -22,8 +22,6 @@
 """BGP test for redistribution of connected routes."""
 
 import os
-from nsnetsim.bird_router_node import BirdRouterNode
-from nsnetsim.switch_node import SwitchNode
 from basetests import BirdPlanBaseTestCase
 
 
@@ -32,32 +30,14 @@ class TestBGPRedistributeConnected(BirdPlanBaseTestCase):
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1", "r2"]
+    r1_interfaces = ["eth0", "eth1"]
+    r2_interfaces = ["eth0", "eth1"]
+    r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["100.101.0.1/24", "fc00:101::1/48"]}
+    r2_interface_eth1 = {"mac": "02:02:00:00:00:02", "ips": ["100.102.0.1/24", "fc00:102::1/48"]}
 
-    def test_configure(self, sim, tmpdir):
-        """Create our configuration files."""
-        self._test_configure(sim, tmpdir)
-
-    def test_create_topology(self, sim, tmpdir):
-        """Test topology creation."""
-
-        print("Adding routers...")
-        sim.add_node(BirdRouterNode(name="r1", configfile=f"{tmpdir}/bird.conf.r1"))
-        sim.add_node(BirdRouterNode(name="r2", configfile=f"{tmpdir}/bird.conf.r2"))
-
-        print("Adding interfaces...")
-        sim.node("r1").add_interface("eth0", mac="02:01:00:00:00:01", ips=["100.64.0.1/24", "fc00:100::1/64"])
-        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["100.101.0.0/24", "fc00:101::1/48"])
-        sim.node("r2").add_interface("eth0", mac="02:02:00:00:00:01", ips=["100.64.0.2/24", "fc00:100::2/64"])
-        sim.node("r2").add_interface("eth1", mac="02:02:00:00:00:02", ips=["100.102.0.0/24", "fc00:102::1/48"])
-
-        print("Adding switches...")
-        sim.add_node(SwitchNode("s1"))
-        sim.node("s1").add_interface(sim.node("r1").interface("eth0"))
-        sim.node("s1").add_interface(sim.node("r2").interface("eth0"))
-
-        # Simulate our topology
-        print("Simulate topology...")
-        sim.run()
+    def test_setup(self, sim, tmpdir):
+        """Setup our test."""
+        self._test_setup(sim, tmpdir)
 
     def test_bird_status(self, sim):
         """Grab data from the simulation."""
@@ -543,14 +523,14 @@ class TestBGPRedistributeConnected(BirdPlanBaseTestCase):
         # Check kernel has the correct IPv4 RIB
         correct_result = [
             {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.1", "protocol": "kernel", "scope": "link"},
-            {"dev": "eth1", "dst": "100.101.0.0/24", "flags": [], "prefsrc": "100.101.0.0", "protocol": "kernel", "scope": "link"},
+            {"dev": "eth1", "dst": "100.101.0.0/24", "flags": [], "prefsrc": "100.101.0.1", "protocol": "kernel", "scope": "link"},
         ]
         assert r1_os_rib == correct_result, "R1 kernel IPv4 RIB does not match what it should be"
 
         correct_result = [
             {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.2", "protocol": "kernel", "scope": "link"},
             {"dev": "eth0", "dst": "100.101.0.0/24", "flags": [], "gateway": "100.64.0.1", "metric": 600, "protocol": "bird"},
-            {"dev": "eth1", "dst": "100.102.0.0/24", "flags": [], "prefsrc": "100.102.0.0", "protocol": "kernel", "scope": "link"},
+            {"dev": "eth1", "dst": "100.102.0.0/24", "flags": [], "prefsrc": "100.102.0.1", "protocol": "kernel", "scope": "link"},
         ]
         assert r2_os_rib == correct_result, "R2 kernel IPv4 RIB does not match what it should be"
 

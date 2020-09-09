@@ -24,22 +24,39 @@
 from typing import Tuple
 import os
 import pytest
-from template_exabgp import BirdplanBaseTestCaseExabgp
+from basetests import BirdPlanBaseTestCase
 from birdplan.exceptions import BirdPlanError
 
 
-class BGPFilteringDefaultAllowedBase(BirdplanBaseTestCaseExabgp):
+class BGPFilteringDefaultAllowedBase(BirdPlanBaseTestCase):
     """Base class for BGP filtering of default route allowed."""
 
     test_dir = os.path.dirname(__file__)
-    routers = ["r1"]
+    exabgps = ["e1"]
 
-    def _announce_default_route(self, sim) -> Tuple:
+    def test_setup(self, sim, tmpdir):
+        """Set up our test."""
+        self._test_setup(sim, tmpdir)
+
+    def test_announce_routes(self, sim):
+        """Announce a default route from ExaBGP to BIRD."""
+        self._test_announce_routes(sim)
+
+    def _test_announce_routes(self, sim):
         """Announce a default route from ExaBGP to BIRD."""
 
         self._exabgpcli(sim, "e1", ["neighbor 100.64.0.1 announce route 0.0.0.0/0 next-hop 100.64.0.2"])
         self._exabgpcli(sim, "e1", ["neighbor fc00:100::1 announce route ::/0 next-hop fc00:100::2"])
 
+    def test_results(self, sim, helpers):
+        """Test results from this peer type."""
+        self._test_results(sim, helpers)
+
+    def _test_results(self, sim, helpers):
+        """Test-specific results from this peer type."""
+        raise NotImplementedError
+
+    def _get_tables(self, sim) -> Tuple:
         # Grab IPv4 table name and get entries
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r1", "e1", 4)
         peer_bgp4_table = self._bird_route_table(sim, "r1", peer_bgp_table_name, expect_count=1)
@@ -58,58 +75,67 @@ class TestCustomer(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'customer' peer type."""
 
     # BIRD configuration
-    peer_type = "customer"
-    extra_config = """
+    r1_peer_type = "customer"
+    r1_extra_config = """
       filter:
         asns: [65001]
       accept:
         default: True
 """
 
-    def test_default_route_announce(self, sim, tmpdir):
-        """Test filtering of default route allowed for the 'customer' peer type."""
+    def _test_setup(self, sim, tmpdir):
+        """Set up our test."""
 
         with pytest.raises(BirdPlanError, match=r"'customer' makes no sense"):
             # Setup environment
-            self._setup(sim, tmpdir)
+            super()._test_setup(sim, tmpdir)
+
+    def _test_announce_routes(self, sim):
+        """Don't announce anything as configuration failed."""
+
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
 
 class TestPeer(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'peer' peer type."""
 
     # BIRD configuration
-    peer_type = "peer"
-    extra_config = """
+    r1_peer_type = "peer"
+    r1_extra_config = """
       accept:
         default: True
 """
 
-    def test_default_route_announce(self, sim, tmpdir):
-        """Test filtering of default route allowed for the 'peer' peer type."""
+    def _test_setup(self, sim, tmpdir):
+        """Set up our test."""
 
         with pytest.raises(BirdPlanError, match=r"'peer' makes no sense"):
             # Setup environment
-            self._setup(sim, tmpdir)
+            super()._test_setup(sim, tmpdir)
+
+    def _test_announce_routes(self, sim):
+        """Don't announce anything as configuration failed."""
+
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
 
 class TestTransit(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'transit' peer type."""
 
     # BIRD configuration
-    peer_type = "transit"
-    extra_config = """
+    r1_peer_type = "transit"
+    r1_extra_config = """
       accept:
         default: True
 """
 
-    def test_default_route_announce(self, sim, tmpdir, helpers):
-        """Test filtering of default route allowed for the 'transit' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_default_route(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -219,22 +245,20 @@ class TestRrclient(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'rrclient' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrclient"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrclient"
+    r1_extra_config = """
       accept:
         default: True
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_default_route_announce(self, sim, tmpdir, helpers):
-        """Test filtering of default route allowed for the 'rrclient' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_default_route(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -336,22 +360,20 @@ class TestRrserver(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'rrserver' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrserver"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrserver"
+    r1_extra_config = """
       accept:
         default: True
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_default_route_announce(self, sim, tmpdir, helpers):
-        """Test filtering of default route allowed for the 'rrserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_default_route(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -453,20 +475,18 @@ class TestRrserverRrserver(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrserver-rrserver"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrserver-rrserver"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_default_route_announce(self, sim, tmpdir, helpers):
-        """Test filtering of default route allowed for the 'rrserver-rrserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_default_route(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -568,33 +588,45 @@ class TestRoutecollector(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'routecollector' peer type."""
 
     # BIRD configuration
-    peer_type = "routecollector"
-    extra_config = """
+    r1_peer_type = "routecollector"
+    r1_extra_config = """
       accept:
         default: True
 """
 
-    def test_default_route_announce(self, sim, tmpdir):
-        """Test filtering of default route allowed for the 'routecollector' peer type."""
+    def _test_setup(self, sim, tmpdir):
+        """Set up our test."""
 
         with pytest.raises(BirdPlanError, match=r"'routecollector' makes no sense"):
             # Setup environment
-            self._setup(sim, tmpdir)
+            super()._test_setup(sim, tmpdir)
+
+    def _test_announce_routes(self, sim):
+        """Don't announce anything as configuration failed."""
+
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
 
 class TestRouteserver(BGPFilteringDefaultAllowedBase):
     """Test filtering of default route allowed for the 'routeserver' peer type."""
 
     # BIRD configuration
-    peer_type = "routeserver"
-    extra_config = """
+    r1_peer_type = "routeserver"
+    r1_extra_config = """
       accept:
         default: True
 """
 
-    def test_default_route_announce(self, sim, tmpdir):
-        """Test filtering of default route allowed for the 'routeserver' peer type."""
+    def _test_setup(self, sim, tmpdir):
+        """Set up our test."""
 
         with pytest.raises(BirdPlanError, match=r"'routeserver' makes no sense"):
             # Setup environment
-            self._setup(sim, tmpdir)
+            super()._test_setup(sim, tmpdir)
+
+    def _test_announce_routes(self, sim):
+        """Don't announce anything as configuration failed."""
+
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
