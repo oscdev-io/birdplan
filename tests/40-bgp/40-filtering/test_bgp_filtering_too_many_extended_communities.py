@@ -23,26 +23,26 @@
 
 from typing import List, Tuple
 import os
-from template_exabgp import BirdplanBaseTestCaseExabgp
+from basetests import BirdPlanBaseTestCase
 
 
-class BGPFilteringTooManyExtendedCommunitiesBase(BirdplanBaseTestCaseExabgp):
+class BGPFilteringTooManyExtendedCommunitiesBase(BirdPlanBaseTestCase):
     """Base class for BGP filtering of too many extended communities."""
 
     test_dir = os.path.dirname(__file__)
-    routers = ["r1"]
-    too_many_extended_communities: List[Tuple[str, int, int]] = []
-    global_config = """
+    exabgps = ["e1"]
+    too_many_extended_communities: List[Tuple[str, int, int]] = [("origin", x, x) for x in range(6)]
+    r1_global_config = """
   extended_community_maxlen: 5
 """
 
-    def _announce_too_many_extended_communities(self, sim) -> Tuple:
+    def test_setup(self, sim, tmpdir):
+        """Set up our test."""
+        self._test_setup(sim, tmpdir)
+
+    def test_announce_routes(self, sim):
         """Announce a prefix that has a too many extended communities from ExaBGP to BIRD."""
 
-        # Create tuple (1, x) for each x up to maxlen
-        self.too_many_extended_communities = [
-            ("origin", x, x) for x in range(0, sim.config("r1").birdconf.protocols.bgp.extended_community_maxlen + 1)
-        ]
         # Convert to a 1:x format separated by spaces for exabgp
         too_many_extended_communities_str = " ".join([f"{x[0]}:{x[1]}:{x[2]}" for x in self.too_many_extended_communities])
 
@@ -65,6 +65,15 @@ class BGPFilteringTooManyExtendedCommunitiesBase(BirdplanBaseTestCaseExabgp):
             ],
         )
 
+    def test_results(self, sim, helpers):
+        """Test results from this peer type."""
+        self._test_results(sim, helpers)
+
+    def _test_results(self, sim, helpers):
+        """Test-specific results from this peer type."""
+        raise NotImplementedError
+
+    def _get_tables(self, sim) -> Tuple:
         # Grab IPv4 table name and get entries
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r1", "e1", 4)
         peer_bgp4_table = self._bird_route_table(sim, "r1", peer_bgp_table_name, expect_count=1)
@@ -83,20 +92,17 @@ class TestCustomer(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'customer' peer type."""
 
     # BIRD configuration
-    peer_type = "customer"
-    extra_config = """
+    r1_peer_type = "customer"
+    r1_extra_config = """
       filter:
         asns: [65001]
 """
 
-    def test_too_many_extended_communities_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too many extended communities for the 'customer' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_extended_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -151,23 +157,20 @@ class TestCustomer(BGPFilteringTooManyExtendedCommunitiesBase):
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
         # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        self._check_main_bgp_tables_empty(sim)
 
 
 class TestPeer(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'peer' peer type."""
 
     # BIRD configuration
-    peer_type = "peer"
+    r1_peer_type = "peer"
 
-    def test_too_many_extended_communities_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too many extended communities for the 'peer' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_extended_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -222,23 +225,20 @@ class TestPeer(BGPFilteringTooManyExtendedCommunitiesBase):
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
         # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        self._check_main_bgp_tables_empty(sim)
 
 
 class TestTransit(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'transit' peer type."""
 
     # BIRD configuration
-    peer_type = "transit"
+    r1_peer_type = "transit"
 
-    def test_too_many_extended_communities_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too many extended communities for the 'transit' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_extended_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -293,27 +293,25 @@ class TestTransit(BGPFilteringTooManyExtendedCommunitiesBase):
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
         # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        self._check_main_bgp_tables_empty(sim)
 
 
 class TestRrclient(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'rrclient' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrclient"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrclient"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_too_many_extended_communities_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too many extended communities for the 'rrclient' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_extended_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -420,20 +418,18 @@ class TestRrserver(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'rrserver' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrserver"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrserver"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_too_many_extended_communities_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too many extended communities for the 'rrserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_extended_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -540,20 +536,18 @@ class TestRrserverRrserver(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrserver-rrserver"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrserver-rrserver"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_too_many_extended_communities_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too many extended communities for the 'rrserver-rrserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_extended_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -660,16 +654,13 @@ class TestRoutecollector(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'routecollector' peer type."""
 
     # BIRD configuration
-    peer_type = "routecollector"
+    r1_peer_type = "routecollector"
 
-    def test_too_many_extended_communities_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too many extended communities for the 'routecollector' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_extended_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -724,23 +715,20 @@ class TestRoutecollector(BGPFilteringTooManyExtendedCommunitiesBase):
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
         # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        self._check_main_bgp_tables_empty(sim)
 
 
 class TestRouteserver(BGPFilteringTooManyExtendedCommunitiesBase):
     """Test filtering of too many extended communities for the 'routeserver' peer type."""
 
     # BIRD configuration
-    peer_type = "routeserver"
+    r1_peer_type = "routeserver"
 
-    def test_too_many_extended_communities_announce(self, sim, tmpdir, helpers):
-        """Test filtering of too many extended communities for the 'routeserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_extended_communities(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {
@@ -795,4 +783,4 @@ class TestRouteserver(BGPFilteringTooManyExtendedCommunitiesBase):
         assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
 
         # Check main BGP table
-        self._check_main_bgp_tables(sim)
+        self._check_main_bgp_tables_empty(sim)

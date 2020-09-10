@@ -23,16 +23,20 @@
 
 from typing import Tuple
 import os
-from template_exabgp import BirdplanBaseTestCaseExabgp
+from basetests import BirdPlanBaseTestCase
 
 
-class BGPPrefixLimitBase(BirdplanBaseTestCaseExabgp):
+class BGPPrefixLimitBase(BirdPlanBaseTestCase):
     """BGP prefix limits."""
 
     test_dir = os.path.dirname(__file__)
-    routers = ["r1"]
+    exabgps = ["e1"]
 
-    def _announce_too_many_prefixes(self, sim) -> Tuple:
+    def test_setup(self, sim, tmpdir):
+        """Set up our test."""
+        self._test_setup(sim, tmpdir)
+
+    def test_announce_routes(self, sim):
         """Announce too many prefixes from ExaBGP to BIRD."""
 
         self._exabgpcli(
@@ -46,6 +50,15 @@ class BGPPrefixLimitBase(BirdplanBaseTestCaseExabgp):
             ["neighbor fc00:100::1 announce route fc00:104::/45 next-hop fc00:100::2 split /48"],
         )
 
+    def test_results(self, sim, helpers):
+        """Test results from this peer type."""
+        self._test_results(sim, helpers)
+
+    def _test_results(self, sim, helpers):
+        """Test-specific results from this peer type."""
+        raise NotImplementedError
+
+    def _get_tables(self, sim) -> Tuple:
         route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp4_AS6500[01]_e1: Route limit exceeded, shutting down")
         assert route_limit_exceeded, "Failed to shut down IPv4 connection when route limit exceeded"
 
@@ -70,20 +83,17 @@ class TestCustomer(BGPPrefixLimitBase):
     """Test too many prefixes for the 'customer' peer type."""
 
     # BIRD configuration
-    peer_type = "customer"
-    extra_config = """
+    r1_peer_type = "customer"
+    r1_extra_config = """
       filter:
         asns: [65001]
 """
 
-    def test_too_many_prefixes_announce(self, sim, tmpdir):
-        """Test too many prefixes for the 'customer' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {}
@@ -98,16 +108,13 @@ class TestPeer(BGPPrefixLimitBase):
     """Test too many prefixes for the 'peer' peer type."""
 
     # BIRD configuration
-    peer_type = "peer"
+    r1_peer_type = "peer"
 
-    def test_too_many_prefixes_announce(self, sim, tmpdir):
-        """Test too many prefixes for the 'peer' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {}
@@ -122,16 +129,13 @@ class TestTransit(BGPPrefixLimitBase):
     """Test too many prefixes for the 'transit' peer type."""
 
     # BIRD configuration
-    peer_type = "transit"
+    r1_peer_type = "transit"
 
-    def test_too_many_prefixes_announce(self, sim, tmpdir):
-        """Test too many prefixes for the 'transit' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {}
@@ -146,20 +150,18 @@ class TestRrclient(BGPPrefixLimitBase):
     """Test too many prefixes for the 'rrclient' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrclient"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrclient"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_too_many_prefixes_announce(self, sim, tmpdir):
-        """Test too many prefixes for the 'rrclient' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {}
@@ -174,20 +176,18 @@ class TestRrserver(BGPPrefixLimitBase):
     """Test too many prefixes for the 'rrserver' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrserver"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrserver"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_too_many_prefixes_announce(self, sim, tmpdir):
-        """Test too many prefixes for the 'rrserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {}
@@ -202,20 +202,18 @@ class TestRrserverRrserver(BGPPrefixLimitBase):
     """Test too many prefixes for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
-    peer_asn = "65000"
-    peer_type = "rrserver-rrserver"
-    extra_config = """
+    r1_peer_asn = "65000"
+    e1_asn = "65000"
+    r1_peer_type = "rrserver-rrserver"
+    r1_extra_config = """
   rr_cluster_id: 0.0.0.1
 """
 
-    def test_too_many_prefixes_announce(self, sim, tmpdir):
-        """Test too many prefixes for the 'rrserver-rrserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {}
@@ -230,16 +228,13 @@ class TestRoutecollector(BGPPrefixLimitBase):
     """Test too many prefixes for the 'routecollector' peer type."""
 
     # BIRD configuration
-    peer_type = "routecollector"
+    r1_peer_type = "routecollector"
 
-    def test_too_many_prefixes_announce(self, sim, tmpdir):
-        """Test too many prefixes for the 'routecollector' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {}
@@ -254,16 +249,13 @@ class TestRouteserver(BGPPrefixLimitBase):
     """Test too many prefixes for the 'routeserver' peer type."""
 
     # BIRD configuration
-    peer_type = "routeserver"
+    r1_peer_type = "routeserver"
 
-    def test_too_many_prefixes_announce(self, sim, tmpdir):
-        """Test too many prefixes for the 'routeserver' peer type."""
+    def _test_results(self, sim, helpers):
+        """Test results from this peer type."""
 
-        # Setup environment
-        self._setup(sim, tmpdir)
-
-        # Announce prefixes
-        ipv4_table, ipv6_table = self._announce_too_many_prefixes(sim)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_tables(sim)
 
         # Check peer BGP table
         correct_result = {}
