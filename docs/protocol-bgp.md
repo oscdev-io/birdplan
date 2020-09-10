@@ -461,7 +461,7 @@ bgp:
 ```
 
 
-## incoming-large-communities
+## incoming_large_communities
 
 Large communites to add to incoming prefixes.
 
@@ -474,7 +474,7 @@ bgp:
     peer1:
       asn: 65000
       description: Some peer
-      incoming-large-communities:
+      incoming_large_communities:
         - 65001:5000:1
         - 65001:5000:2
 ...
@@ -539,7 +539,7 @@ bgp:
 ```
 
 
-## outgoing-large-communities
+## outgoing_large_communities
 
 Large communites to add to our outbound prefixes.
 
@@ -552,7 +552,7 @@ bgp:
     peer1:
       asn: 65000
       description: Some peer
-      outgoing-large-communities:
+      outgoing_large_communities:
         - 65000:5000:1
         - 65000:5000:2
 ...
@@ -643,7 +643,7 @@ for peer type `rrserver-rrserver` which defaults to `True`.
 * `originated` will redistribute originated routes. Defaults to `False`.
 
 In addition to setting these as a boolean value, one can also add the following items to a dictionary...
-* `redistribute-large-communities` will add additional large communities when exporting routes of this type
+* `redistribute_large_communities` will add additional large communities when exporting routes of this type
 
 Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
 
