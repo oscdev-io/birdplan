@@ -815,18 +815,25 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 type_lines.append("    # Filter on the allowed prefixes")
                 type_lines.append(f"    bgp_filter_deny_prefixes({self.prefix_list_name(ipv)});")
 
-        # In terms of a routecollector we only get a route collector large community filter, not any others
-        if self.peer_type != "routecollector":
-            # Quarantine mode...
-            if self.quarantined:
-                type_lines.append("    # Quarantine all prefixes received")
-                type_lines.append("    bgp_filter_quarantine();")
+        # Quarantine mode...
+        if self.quarantined:
+            # Quarantining a routecollector makes no sense at all
+            if self.peer_type == "routecollector":
+                raise BirdPlanError(f"Having 'quarantine' as True for a '{self.peer_type}' makes no sense")
+            # Quarantine prefixes
+            type_lines.append("    # Quarantine all prefixes received")
+            type_lines.append("    bgp_filter_quarantine();")
 
         # Check if we are adding a large community to incoming routes
-        for large_community in sorted(self.large_communities.incoming):
-            if self.birdconfig_globals.debug:
-                type_lines.append(f'    print "[{self.filter_name_import(ipv)}] Adding LC {large_community} to ", net;')
-            type_lines.append(f"    bgp_large_community.add({large_community});")
+        if self.large_communities.incoming:
+            # Adding an incoming large community to a routecollector makes no sense at all
+            if self.peer_type == "routecollector":
+                raise BirdPlanError(f"Having 'incoming_large_communities' set for a '{self.peer_type}' makes no sense")
+            # Loop with large communities and add to the prefix
+            for large_community in sorted(self.large_communities.incoming):
+                if self.birdconfig_globals.debug:
+                    type_lines.append(f'    print "[{self.filter_name_import(ipv)}] Adding LC {large_community} to ", net;')
+                type_lines.append(f"    bgp_large_community.add({large_community});")
 
         # If we have lines from the above add them
         if type_lines:
