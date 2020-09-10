@@ -35,7 +35,7 @@ class TestRIPRedistributeOnlyDefault(BirdPlanBaseTestCase):
 
     def test_configure(self, sim, tmpdir):
         """Create our configuration files."""
-        self._test_configure(sim, tmpdir)
+        self._configure_bird_routers(sim, tmpdir)
 
     def test_create_topology(self, sim, tmpdir):
         """Test topology creation."""
