@@ -19,75 +19,92 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP test for incoming large communities."""
+"""BGP incoming large communities."""
 
+from typing import Tuple
 import os
-from nsnetsim.bird_router_node import BirdRouterNode
-from nsnetsim.switch_node import SwitchNode
+import pytest
 from basetests import BirdPlanBaseTestCase
+from birdplan.exceptions import BirdPlanError
 
 
-class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
-    """BGP test for incoming large communities."""
+class BGPIncomingLargeCommunitiesBase(BirdPlanBaseTestCase):
+    """Base class for BGP incoming large communities."""
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1", "r2"]
+    r2_asn = "65001"
+    r2_interfaces = ["eth0", "eth1"]
+    r2_interface_eth1 = {"mac": "02:02:00:00:00:02", "ips": ["192.168.1.1/24", "fc01::1/64"]}
 
-    def test_configure(self, sim, tmpdir):
-        """Create our configuration files."""
-        self._configure_bird_routers(sim, tmpdir)
+    def test_setup(self, sim, tmpdir):
+        """Set up our test."""
+        self._test_setup(sim, tmpdir)
 
-    def test_create_topology(self, sim, tmpdir):
-        """Test topology creation."""
+    # R2 tests
+    def test_results_r2(self, sim, helpers):
+        """Test results from r2."""
+        self._test_results_r2(sim, helpers)
 
-        print("Adding routers...")
-        sim.add_node(BirdRouterNode(name="r1", configfile=f"{tmpdir}/bird.conf.r1"))
-        sim.add_node(BirdRouterNode(name="r2", configfile=f"{tmpdir}/bird.conf.r2"))
+    def _test_results_r2(self, sim, helpers):
+        """Test-specific results from r2."""
+        raise NotImplementedError
 
-        print("Adding interfaces...")
-        sim.node("r1").add_interface("eth0", mac="02:01:00:00:00:01", ips=["100.64.0.1/24", "fc00:100::1/64"])
-        sim.node("r1").add_interface("eth1", mac="02:01:00:00:00:02", ips=["192.168.1.1/24", "fc01::1/64"])
-        sim.node("r2").add_interface("eth0", mac="02:02:00:00:00:01", ips=["100.64.0.2/24", "fc00:100::2/64"])
+    # R1 tests
+    def test_results_r1(self, sim, helpers):
+        """Test results from r1."""
+        self._test_results_r1(sim, helpers)
 
-        print("Adding switches...")
-        sim.add_node(SwitchNode("s1"))
-        sim.node("s1").add_interface(sim.node("r1").interface("eth0"))
-        sim.node("s1").add_interface(sim.node("r2").interface("eth0"))
+    def _test_results_r1(self, sim, helpers):
+        """Test-specific results from r1."""
+        raise NotImplementedError
 
-        # Simulate our topology
-        print("Simulate topology...")
-        sim.run()
+    # Grab bgp tables from R1
+    def _get_r1_bgp_tables(self, sim) -> Tuple:
+        # Grab our main BGP tables
+        bgp4_table = self._bird_route_table(sim, "r1", "t_bgp4", expect_count=1)
+        bgp6_table = self._bird_route_table(sim, "r1", "t_bgp6", expect_count=1)
+        # And return them...
+        return (bgp4_table, bgp6_table)
 
-    def test_bird_status(self, sim):
-        """Grab data from the simulation."""
+    # Grab peer tables from R2
+    def _get_r2_peer_tables(self, sim) -> Tuple:
+        # Grab IPv4 peering table name and get entries
+        peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r2", "r1", 4)
+        peer_bgp4_table = self._bird_route_table(sim, "r2", peer_bgp_table_name, expect_count=1)
+        assert len(peer_bgp4_table) == 1, "Failed to find any routes in r2's BGP peer table"
 
-        r1_status_output = sim.node("r1").birdc_show_status()
-        r2_status_output = sim.node("r2").birdc_show_status()
+        # Grab IPv6 peering table name and get entries
+        peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r2", "r1", 6)
+        peer_bgp6_table = self._bird_route_table(sim, "r2", peer_bgp_table_name, expect_count=1)
+        assert len(peer_bgp6_table) == 1, "Failed to find any routes in r2's BGP peer table"
 
-        sim.add_report_obj("STATUS(r1)", r1_status_output)
-        sim.add_report_obj("STATUS(r2)", r2_status_output)
+        # Return our two routing tables
+        return (peer_bgp4_table, peer_bgp6_table)
 
-        # Check BIRD router ID
-        assert "router_id" in r1_status_output, "The status output should have 'router_id'"
-        assert r1_status_output["router_id"] == "0.0.0.1", "The router ID should be '0.0.0.1'"
 
-        assert "router_id" in r2_status_output, "The status output should have 'router_id'"
-        assert r2_status_output["router_id"] == "0.0.0.2", "The router ID should be '0.0.0.2'"
+class TestCustomer(BGPIncomingLargeCommunitiesBase):
+    """Test incoming large communities for the 'customer' peer type."""
 
-    def test_bird_tables_bgp_peer4(self, sim, helpers):
-        """Test BIRD bgp peer4 table."""
+    # BIRD configuration
+    r1_peer_type = "customer"
+    r1_extra_config = """
+      filter:
+        asns: [65001]
+"""
+    r2_peer_type = "transit"
 
-        r1r2_bgp_table = self._bird_bgp_peer_table(sim, "r1", "r2", 4)
-        r2r1_bgp_table = self._bird_bgp_peer_table(sim, "r2", "r1", 4)
+    def _test_results_r2(self, sim, helpers):
+        """Test results from r2."""
 
-        r1_table = self._bird_route_table(sim, "r1", r1r2_bgp_table, expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", r2r1_bgp_table, expect_count=1)
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_r2_peer_tables(sim)
 
-        # Check bgp peer4 BIRD table
+        # Check peer BGP table
         correct_result = {
             "100.101.0.0/24": [
                 {
-                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+                    "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
                     "pref": 200,
                     "prefix_type": "unicast",
@@ -97,46 +114,13 @@ class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
                 }
             ]
         }
-        assert r1_table == correct_result, f"Result for R1 BIRD {r1r2_bgp_table} routing table does not match what it should be"
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        correct_result = {
-            "100.101.0.0/24": [
-                {
-                    "asn": "AS65000",
-                    "attributes": {
-                        "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3), (65001, 1, 0), (65001, 4, 65414)],
-                        "BGP.local_pref": 470,
-                        "BGP.next_hop": ["100.64.0.1"],
-                        "BGP.origin": "IGP",
-                    },
-                    "bestpath": True,
-                    "bgp_type": "i",
-                    "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
-                    "pref": 100,
-                    "prefix_type": "unicast",
-                    "protocol": "bgp4_AS65000_r1",
-                    "since": helpers.bird_since_field(),
-                    "type": ["BGP", "univ"],
-                }
-            ]
-        }
-        assert r2_table == correct_result, f"Result for R2 BIRD {r2r1_bgp_table} routing table does not match what it should be"
-
-    def test_bird_tables_bgp_peer6(self, sim, helpers):
-        """Test BIRD bgp peer6 table."""
-
-        r1r2_bgp_table = self._bird_bgp_peer_table(sim, "r1", "r2", 6)
-        r2r1_bgp_table = self._bird_bgp_peer_table(sim, "r2", "r1", 6)
-
-        r1_table = self._bird_route_table(sim, "r1", r1r2_bgp_table, expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", r2r1_bgp_table, expect_count=1)
-
-        # Check originate6 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+                    "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
                     "pref": 200,
                     "prefix_type": "unicast",
@@ -146,42 +130,295 @@ class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
                 }
             ]
         }
-        assert r1_table == correct_result, f"Result for R1 BIRD {r1r2_bgp_table} routing table does not match what it should be"
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
 
-        correct_result = {
-            "fc00:101::/48": [
-                {
-                    "asn": "AS65000",
-                    "attributes": {
-                        "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3), (65001, 1, 0), (65001, 4, 65414)],
-                        "BGP.local_pref": 470,
-                        "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
-                        "BGP.origin": "IGP",
-                    },
-                    "bestpath": True,
-                    "bgp_type": "i",
-                    "nexthops": [{"gateway": "fc00:100::1", "interface": "eth0"}],
-                    "pref": 100,
-                    "prefix_type": "unicast",
-                    "protocol": "bgp6_AS65000_r1",
-                    "since": helpers.bird_since_field(),
-                    "type": ["BGP", "univ"],
-                }
-            ]
-        }
-        assert r2_table == correct_result, f"Result for R2 BIRD {r2r1_bgp_table} routing table does not match what it should be"
+    def _test_results_r1(self, sim, helpers):
+        """Test results from r1."""
 
-    def test_bird_tables_bgp4(self, sim, helpers):
-        """Test BIRD t_bgp4 table."""
-
-        r1_table = self._bird_route_table(sim, "r1", "t_bgp4", expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", "t_bgp4", expect_count=1)
+        # Check main BGP table
+        (bgp4_table, bgp6_table) = self._get_r1_bgp_tables(sim)
 
         # Check bgp4 BIRD table
         correct_result = {
             "100.101.0.0/24": [
                 {
+                    "asn": "AS65001",
+                    "attributes": {
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65001, 3, 1), (65000, 3, 2), (65000, 5000, 1)],
+                        "BGP.local_pref": 750,
+                        "BGP.next_hop": ["100.64.0.2"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp4_AS65001_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "asn": "AS65001",
+                    "attributes": {
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65001, 3, 1), (65000, 3, 2), (65000, 5000, 1)],
+                        "BGP.local_pref": 750,
+                        "BGP.next_hop": ["fc00:100::2", "fe80::2:ff:fe00:1"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp6_AS65001_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+
+class TestPeer(BGPIncomingLargeCommunitiesBase):
+    """Test incoming large communities for the 'peer' peer type."""
+
+    # BIRD configuration
+    r1_peer_type = "peer"
+    r2_peer_type = "peer"
+
+    def _test_results_r2(self, sim, helpers):
+        """Test results from r2."""
+
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_r2_peer_tables(sim)
+
+        # Check peer BGP table
+        correct_result = {
+            "100.101.0.0/24": [
+                {
+                    "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
+                    "pref": 200,
+                    "prefix_type": "unicast",
+                    "protocol": "static4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["static", "univ"],
+                }
+            ]
+        }
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
+
+        # Check peer BGP table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
+                    "pref": 200,
+                    "prefix_type": "unicast",
+                    "protocol": "static6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["static", "univ"],
+                }
+            ]
+        }
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
+
+    def _test_results_r1(self, sim, helpers):
+        """Test results from r1."""
+
+        # Check main BGP table
+        (bgp4_table, bgp6_table) = self._get_r1_bgp_tables(sim)
+
+        # Check bgp4 BIRD table
+        correct_result = {
+            "100.101.0.0/24": [
+                {
+                    "asn": "AS65001",
+                    "attributes": {
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65001, 3, 1), (65000, 3, 3), (65000, 5000, 1)],
+                        "BGP.local_pref": 470,
+                        "BGP.next_hop": ["100.64.0.2"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp4_AS65001_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "asn": "AS65001",
+                    "attributes": {
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65001, 3, 1), (65000, 3, 3), (65000, 5000, 1)],
+                        "BGP.local_pref": 470,
+                        "BGP.next_hop": ["fc00:100::2", "fe80::2:ff:fe00:1"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp6_AS65001_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+
+class TestTransit(BGPIncomingLargeCommunitiesBase):
+    """Test incoming large communities for the 'transit' peer type."""
+
+    # BIRD configuration
+    r1_peer_type = "transit"
+    r2_peer_type = "customer"
+    r2_extra_config = """
+      filter:
+        asns: [65000]
+"""
+
+    def _test_results_r2(self, sim, helpers):
+        """Test results from r2."""
+
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_r2_peer_tables(sim)
+
+        # Check peer BGP table
+        correct_result = {
+            "100.101.0.0/24": [
+                {
+                    "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
+                    "pref": 200,
+                    "prefix_type": "unicast",
+                    "protocol": "static4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["static", "univ"],
+                }
+            ]
+        }
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
+
+        # Check peer BGP table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
+                    "pref": 200,
+                    "prefix_type": "unicast",
+                    "protocol": "static6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["static", "univ"],
+                }
+            ]
+        }
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
+
+    def _test_results_r1(self, sim, helpers):
+        """Test results from r1."""
+
+        # Check main BGP table
+        (bgp4_table, bgp6_table) = self._get_r1_bgp_tables(sim)
+
+        # Check bgp4 BIRD table
+        correct_result = {
+            "100.101.0.0/24": [
+                {
+                    "asn": "AS65001",
+                    "attributes": {
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65001, 3, 1), (65000, 3, 4), (65000, 5000, 1)],
+                        "BGP.local_pref": 150,
+                        "BGP.next_hop": ["100.64.0.2"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp4_AS65001_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "asn": "AS65001",
+                    "attributes": {
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65001, 3, 1), (65000, 3, 4), (65000, 5000, 1)],
+                        "BGP.local_pref": 150,
+                        "BGP.next_hop": ["fc00:100::2", "fe80::2:ff:fe00:1"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp6_AS65001_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+
+class TestRrclient(BGPIncomingLargeCommunitiesBase):
+    """Test incoming large communities for the 'rrclient' peer type."""
+
+    # BIRD configuration
+    r1_peer_asn = "65000"
+    r1_peer_type = "rrclient"
+    r1_extra_config = """
+  rr_cluster_id: 0.0.0.1
+"""
+    r2_asn = "65000"
+    r2_peer_type = "rrserver"
+
+    def _test_results_r2(self, sim, helpers):
+        """Test results from r2."""
+
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_r2_peer_tables(sim)
+
+        # Check peer BGP table
+        correct_result = {
+            "100.101.0.0/24": [
+                {
                     "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
                     "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
                     "pref": 200,
@@ -192,39 +429,9 @@ class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
                 }
             ]
         }
-        assert r1_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
 
-        correct_result = {
-            "100.101.0.0/24": [
-                {
-                    "asn": "AS65000",
-                    "attributes": {
-                        "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3), (65001, 1, 0), (65001, 4, 65414)],
-                        "BGP.local_pref": 470,
-                        "BGP.next_hop": ["100.64.0.1"],
-                        "BGP.origin": "IGP",
-                    },
-                    "bestpath": True,
-                    "bgp_type": "i",
-                    "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
-                    "pref": 100,
-                    "prefix_type": "unicast",
-                    "protocol": "bgp4_AS65000_r1",
-                    "since": helpers.bird_since_field(),
-                    "type": ["BGP", "univ"],
-                }
-            ]
-        }
-        assert r2_table == correct_result, "Result for R2 BIRD t_bgp4 routing table does not match what it should be"
-
-    def test_bird_tables_bgp6(self, sim, helpers):
-        """Test BIRD t_bgp6 table."""
-
-        r1_table = self._bird_route_table(sim, "r1", "t_bgp6", expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", "t_bgp6", expect_count=1)
-
-        # Check t_bgp6 BIRD table
+        # Check peer BGP table
         correct_result = {
             "fc00:101::/48": [
                 {
@@ -238,28 +445,396 @@ class TestBGPIncomingLargeCommunities(BirdPlanBaseTestCase):
                 }
             ]
         }
-        assert r1_table == correct_result, "Result for R1 BIRD t_bgp6 routing table does not match what it should be"
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
 
+    def _test_results_r1(self, sim, helpers):
+        """Test results from r1."""
+
+        # Check main BGP table
+        (bgp4_table, bgp6_table) = self._get_r1_bgp_tables(sim)
+
+        # Check bgp4 BIRD table
         correct_result = {
-            "fc00:101::/48": [
+            "100.101.0.0/24": [
                 {
-                    "asn": "AS65000",
                     "attributes": {
-                        "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3), (65001, 1, 0), (65001, 4, 65414)],
-                        "BGP.local_pref": 470,
-                        "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
+                        "BGP.as_path": [],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                        "BGP.local_pref": 940,
+                        "BGP.next_hop": ["192.168.1.2"],
                         "BGP.origin": "IGP",
                     },
                     "bestpath": True,
                     "bgp_type": "i",
-                    "nexthops": [{"gateway": "fc00:100::1", "interface": "eth0"}],
+                    "from": "100.64.0.2",
                     "pref": 100,
-                    "prefix_type": "unicast",
-                    "protocol": "bgp6_AS65000_r1",
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp4_AS65000_r2",
                     "since": helpers.bird_since_field(),
                     "type": ["BGP", "univ"],
                 }
             ]
         }
-        assert r2_table == correct_result, "Result for R2 BIRD t_bgp6 routing table does not match what it should be"
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                        "BGP.local_pref": 940,
+                        "BGP.next_hop": ["fc01::2"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "from": "fc00:100::2",
+                    "pref": 100,
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp6_AS65000_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+
+class TestRrserver(BGPIncomingLargeCommunitiesBase):
+    """Test incoming large communities for the 'rrserver' peer type."""
+
+    # BIRD configuration
+    r1_peer_asn = "65000"
+    r1_peer_type = "rrserver"
+
+    r2_asn = "65000"
+    r2_peer_type = "rrclient"
+    r2_extra_config = """
+  rr_cluster_id: 0.0.0.1
+"""
+
+    def _test_results_r2(self, sim, helpers):
+        """Test results from r2."""
+
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_r2_peer_tables(sim)
+
+        # Check peer BGP table
+        correct_result = {
+            "100.101.0.0/24": [
+                {
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
+                    "pref": 200,
+                    "prefix_type": "unicast",
+                    "protocol": "static4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["static", "univ"],
+                }
+            ]
+        }
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
+
+        # Check peer BGP table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
+                    "pref": 200,
+                    "prefix_type": "unicast",
+                    "protocol": "static6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["static", "univ"],
+                }
+            ]
+        }
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
+
+    def _test_results_r1(self, sim, helpers):
+        """Test results from r1."""
+
+        # Check main BGP table
+        (bgp4_table, bgp6_table) = self._get_r1_bgp_tables(sim)
+
+        # Check bgp4 BIRD table
+        correct_result = {
+            "100.101.0.0/24": [
+                {
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                        "BGP.local_pref": 940,
+                        "BGP.next_hop": ["192.168.1.2"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "from": "100.64.0.2",
+                    "pref": 100,
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp4_AS65000_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                        "BGP.local_pref": 940,
+                        "BGP.next_hop": ["fc01::2"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "from": "fc00:100::2",
+                    "pref": 100,
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp6_AS65000_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+
+class TestRrserverRrserver(BGPIncomingLargeCommunitiesBase):
+    """Test incoming large communities for the 'rrserver-rrserver' peer type."""
+
+    # BIRD configuration
+    r1_peer_asn = "65000"
+    r1_peer_type = "rrserver-rrserver"
+    r1_extra_config = """
+  rr_cluster_id: 0.0.0.1
+"""
+
+    r2_asn = "65000"
+    r2_peer_type = "rrserver-rrserver"
+    r2_extra_config = """
+  rr_cluster_id: 0.0.0.1
+"""
+
+    def _test_results_r2(self, sim, helpers):
+        """Test results from r2."""
+
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_r2_peer_tables(sim)
+
+        # Check peer BGP table
+        correct_result = {
+            "100.101.0.0/24": [
+                {
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
+                    "pref": 200,
+                    "prefix_type": "unicast",
+                    "protocol": "static4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["static", "univ"],
+                }
+            ]
+        }
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
+
+        # Check peer BGP table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
+                    "pref": 200,
+                    "prefix_type": "unicast",
+                    "protocol": "static6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["static", "univ"],
+                }
+            ]
+        }
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
+
+    def _test_results_r1(self, sim, helpers):
+        """Test results from r1."""
+
+        # Check main BGP table
+        (bgp4_table, bgp6_table) = self._get_r1_bgp_tables(sim)
+
+        # Check bgp4 BIRD table
+        correct_result = {
+            "100.101.0.0/24": [
+                {
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                        "BGP.local_pref": 940,
+                        "BGP.next_hop": ["192.168.1.2"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "from": "100.64.0.2",
+                    "pref": 100,
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp4_AS65000_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "attributes": {
+                        "BGP.as_path": [],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                        "BGP.local_pref": 940,
+                        "BGP.next_hop": ["fc01::2"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "from": "fc00:100::2",
+                    "pref": 100,
+                    "prefix_type": "unreachable",
+                    "protocol": "bgp6_AS65000_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+
+class TestRoutecollector(BGPIncomingLargeCommunitiesBase):
+    """Test incoming large communities for the 'routecollector' peer type."""
+
+    # BIRD configuration
+    r1_peer_type = "routecollector"
+    r2_peer_type = "peer"
+
+    def _test_setup(self, sim, tmpdir):
+        """Set up our test environment."""
+
+        with pytest.raises(BirdPlanError, match=r"makes no sense"):
+            # Setup environment
+            super()._test_setup(sim, tmpdir)
+
+    def _test_results_r2(self, sim, helpers):
+        """Test results from r2."""
+
+    def _test_results_r1(self, sim, helpers):
+        """Test results from r1."""
+
+
+class TestRouteserver(BGPIncomingLargeCommunitiesBase):
+    """Test incoming large communities for the 'routeserver' peer type."""
+
+    # BIRD configuration
+    r1_peer_type = "routeserver"
+    r2_peer_type = "peer"
+
+    def _test_results_r2(self, sim, helpers):
+        """Test results from r2."""
+
+        # Get routing tables
+        ipv4_table, ipv6_table = self._get_r2_peer_tables(sim)
+
+        # Check peer BGP table
+        correct_result = {
+            "100.101.0.0/24": [
+                {
+                    "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
+                    "pref": 200,
+                    "prefix_type": "unicast",
+                    "protocol": "static4",
+                    "since": helpers.bird_since_field(),
+                    "type": ["static", "univ"],
+                }
+            ]
+        }
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
+
+        # Check peer BGP table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
+                    "pref": 200,
+                    "prefix_type": "unicast",
+                    "protocol": "static6",
+                    "since": helpers.bird_since_field(),
+                    "type": ["static", "univ"],
+                }
+            ]
+        }
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
+
+    def _test_results_r1(self, sim, helpers):
+        """Test results from r1."""
+
+        # Check main BGP table
+        (bgp4_table, bgp6_table) = self._get_r1_bgp_tables(sim)
+
+        # Check bgp4 BIRD table
+        correct_result = {
+            "100.101.0.0/24": [
+                {
+                    "asn": "AS65001",
+                    "attributes": {
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65001, 3, 1), (65000, 3, 5), (65000, 5000, 1)],
+                        "BGP.local_pref": 450,
+                        "BGP.next_hop": ["100.64.0.2"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp4_AS65001_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
+
+        # Check bgp6 BIRD table
+        correct_result = {
+            "fc00:101::/48": [
+                {
+                    "asn": "AS65001",
+                    "attributes": {
+                        "BGP.as_path": [65001],
+                        "BGP.large_community": [(65001, 3, 1), (65000, 3, 5), (65000, 5000, 1)],
+                        "BGP.local_pref": 450,
+                        "BGP.next_hop": ["fc00:100::2", "fe80::2:ff:fe00:1"],
+                        "BGP.origin": "IGP",
+                    },
+                    "bestpath": True,
+                    "bgp_type": "i",
+                    "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
+                    "pref": 100,
+                    "prefix_type": "unicast",
+                    "protocol": "bgp6_AS65001_r2",
+                    "since": helpers.bird_since_field(),
+                    "type": ["BGP", "univ"],
+                }
+            ]
+        }
+        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"

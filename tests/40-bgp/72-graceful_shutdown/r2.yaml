@@ -24,6 +24,4 @@ bgp:
       error_wait_time: 2,5
       redistribute:
         static: True
-      outgoing_large_communities:
-        - 65001:5000:1
 @EXTRA_CONFIG@

@@ -403,8 +403,7 @@ class BirdPlan:
                 "community_maxlen",
                 "extended_community_maxlen",
                 "large_community_maxlen",
-                # Origination
-                "originate",
+                "originate",  # Origination
                 "accept",
                 "import",
                 "rr_cluster_id",
@@ -551,6 +550,7 @@ class BirdPlan:
                 "incoming_large_communities",
                 "outgoing_large_communities",
                 "cost",
+                "graceful_shutdown",
             ):
                 peer[config_item] = config_value
             # Work out redistribution

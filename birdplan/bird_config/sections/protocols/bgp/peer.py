@@ -131,6 +131,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 raise BirdPlanError(f"BGP peer '{self.name}' has 'cost' specified but makes no sense for this peer type")
             self.cost = peer_config["cost"]
 
+        # Check if we're in graceful_shutdown mode
+        if "graceful_shutdown" in peer_config:
+            self.graceful_shutdown = peer_config["graceful_shutdown"]
+
         # Check if we are adding a large community to outgoing routes
         if "incoming_large_communities" in peer_config:
             for large_community in sorted(peer_config["incoming_large_communities"]):
@@ -665,17 +669,21 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Check if we're accepting the route...
         self.conf.add("  if (accept_route > 0) then {")
+        # Check if we are adding a large community to outgoing routes
+        for large_community in sorted(self.large_communities.outgoing):
+            self.conf.add(f'    print "[{self.filter_name_import_bgp((ipv))}] Adding LC {large_community} to ", net;', debug=True)
+            self.conf.add(f"    bgp_large_community.add({large_community});")
         # Do large community prepending if the peer is a customer, peer, routeserver or transit
         if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
-            # Check if we are adding a large community to outgoing routes
-            for large_community in sorted(self.large_communities.outgoing):
-                self.conf.add(
-                    f'    print "[{self.filter_name_import_bgp((ipv))}] Adding LC {large_community} to ", net;', debug=True
-                )
-                self.conf.add(f"    bgp_large_community.add({large_community});")
             # Check if we're doing prepending
             self.conf.add("    # Do prepend if we have any LCs set")
             self.conf.add(f"    bgp_export_prepend({self.asn});")
+        # If we have graceful_shutdown set, add the community
+        if self.graceful_shutdown:
+            self.conf.add(
+                f'    print "[{self.filter_name_import_bgp((ipv))}] Adding GRACEFUL_SHUTDOWN community to ", net;', debug=True
+            )
+            self.conf.add("    bgp_community.add(BGP_COMMUNITY_GRACEFUL_SHUTDOWN);")
         # Finally accept
         self.conf.add("    # Finally accept")
         self.conf.add(f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " to peer";', debug=True)
@@ -834,6 +842,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 if self.birdconfig_globals.debug:
                     type_lines.append(f'    print "[{self.filter_name_import(ipv)}] Adding LC {large_community} to ", net;')
                 type_lines.append(f"    bgp_large_community.add({large_community});")
+
+        # Enable graceful_shutdown for this prefix
+        if self.graceful_shutdown:
+            type_lines.append("    bgp_graceful_shutdown_enable();")
+        # Set local_pref to 0 (GRACEFUL_SHUTDOWN) for the peer in graceful_shutdown
+        type_lines.append("    bgp_graceful_shutdown();")
 
         # If we have lines from the above add them
         if type_lines:
@@ -1098,6 +1112,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def cost(self, cost: int) -> None:
         """Set our prefix cost."""
         self.peer_attributes.cost = cost
+
+    @property
+    def graceful_shutdown(self) -> bool:
+        """Return the value of graceful_shutdown."""
+        return self.peer_attributes.graceful_shutdown
+
+    @graceful_shutdown.setter
+    def graceful_shutdown(self, graceful_shutdown: bool) -> None:
+        """Set the value of graceful_shutdown."""
+        self.peer_attributes.graceful_shutdown = graceful_shutdown
 
     @property
     def large_communities(self) -> BGPPeerLargeCommunities:

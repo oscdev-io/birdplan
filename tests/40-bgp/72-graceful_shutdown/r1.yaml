@@ -17,6 +17,4 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
-      outgoing_large_communities:
-        - 65000:5000:1
 @EXTRA_CONFIG@

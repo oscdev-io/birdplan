@@ -1,15 +1,21 @@
-# BGP incoming large community tests
+# BGP graceful shutdown tests
 
-Router r1 should be receiving routes from r2 and add an incoming large community.
+Router r1 should be receiving routes from r2.
+
+For the inbound test the routes should have local_pref set to 0 automatically.
+
+For the outbound test the routes should include the graceful shutdown community.
 
 Tests done include:
-  * Incoming large communities
+  * Graceful shutdown on inbound path
+    * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
+  * Graceful shutdown on outbound path
     * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
 
 ```plantuml
 @startuml
 hide circle
-title Test BGP incoming large communities from r2 to r1
+title Test BGP graceful shutdown from r2 to r1
 left to right direction
 
 
@@ -21,7 +27,7 @@ class "Router: r1" {
   .. BGP ..
 * AS65000
 }
-note top: Should receive routes from r2 and \n add an incoming large community
+note top: Should receive routes from r2 and end up with local_pref = 0
 
 
 class "Router: r2" {

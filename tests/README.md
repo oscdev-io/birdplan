@@ -93,3 +93,7 @@
 ## Peer Cost
 
 [Prefix Cost](40-bgp/70-peer_cost/README.md)
+
+## Graceful Shutdown
+
+[Graceful Shutdown](40-bgp/72-graceful_shutdown/README.md)
