@@ -461,6 +461,26 @@ bgp:
 ```
 
 
+## graceful_shutdown
+
+Add the graceful_shutdown community to all outgoing prefixes for this peer.
+
+This in essence should result in the peer setting its local_pref to 0.
+
+An example is however below...
+
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      graceful_shutdown: True
+...
+```
+
+
 ## incoming_large_communities
 
 Large communites to add to incoming prefixes.
