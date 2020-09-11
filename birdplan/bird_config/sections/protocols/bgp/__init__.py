@@ -690,8 +690,14 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# Graceful shutdown")
+        self.functions.conf.append("function bgp_graceful_shutdown_enable() {")
+        self.functions.conf.append(
+            '  print "[bgp_graceful_shutdown_enable] Explicitly enabling graceful shutdown for ", net;', debug=True
+        )
+        self.functions.conf.append("  bgp_community.add(BGP_COMMUNITY_GRACEFUL_SHUTDOWN);")
+        self.functions.conf.append("}")
         self.functions.conf.append("function bgp_graceful_shutdown() {")
-        self.functions.conf.append('  if (BGP_COMMUNITY_GRACEFUL_SHUTDOWN ~ bgp_community) then {')
+        self.functions.conf.append("  if (BGP_COMMUNITY_GRACEFUL_SHUTDOWN ~ bgp_community) then {")
         self.functions.conf.append('    print "[bgp_graceful_shutdown] Setting LOCAL_PREF to 0 for ", net;', debug=True)
         self.functions.conf.append("    bgp_local_pref = 0;")
         self.functions.conf.append("  }")
