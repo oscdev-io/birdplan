@@ -665,14 +665,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Check if we're accepting the route...
         self.conf.add("  if (accept_route > 0) then {")
+        # Check if we are adding a large community to outgoing routes
+        for large_community in sorted(self.large_communities.outgoing):
+            self.conf.add(
+                f'    print "[{self.filter_name_import_bgp((ipv))}] Adding LC {large_community} to ", net;', debug=True
+            )
+            self.conf.add(f"    bgp_large_community.add({large_community});")
         # Do large community prepending if the peer is a customer, peer, routeserver or transit
         if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
-            # Check if we are adding a large community to outgoing routes
-            for large_community in sorted(self.large_communities.outgoing):
-                self.conf.add(
-                    f'    print "[{self.filter_name_import_bgp((ipv))}] Adding LC {large_community} to ", net;', debug=True
-                )
-                self.conf.add(f"    bgp_large_community.add({large_community});")
             # Check if we're doing prepending
             self.conf.add("    # Do prepend if we have any LCs set")
             self.conf.add(f"    bgp_export_prepend({self.asn});")
