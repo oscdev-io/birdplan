@@ -61,11 +61,14 @@ class BirdPlanBaseTestCase:
     # rX_extra_config
 
     # Default ASN to use for r1's peer
+    r1_asn = "65000"
     r1_peer_asn = "65001"
     r1_interfaces = ["eth0"]
     r1_interface_eth0 = {"mac": "02:01:00:00:00:01", "ips": ["100.64.0.1/24", "fc00:100::1/64"]}
     r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["100.101.0.1/24", "fc00:101::1/64"]}
 
+    r2_asn = "65001"
+    r2_peer_asn = "65000"
     r2_interfaces = ["eth0"]
     r2_interface_eth0 = {"mac": "02:02:00:00:00:01", "ips": ["100.64.0.2/24", "fc00:100::2/64"]}
     r2_interface_eth1 = {"mac": "02:02:00:00:00:02", "ips": ["100.102.0.1/24", "fc00:102::1/64"]}
@@ -113,7 +116,7 @@ class BirdPlanBaseTestCase:
         # Loop with routers and build our extra_macros
         for router in self.routers:
             # Loop with supported attributes that translate into macros
-            for attr in ["peer_asn", "peer_type", "global_config", "extra_config"]:
+            for attr in ["asn", "peer_asn", "peer_type", "global_config", "extra_config"]:
                 # Router specific lookup for an attribute to add a macro for
                 router_attr = f"{router}_{attr}"
                 if hasattr(self, router_attr):
