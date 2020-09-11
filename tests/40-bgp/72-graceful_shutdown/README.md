@@ -1,9 +1,15 @@
 # BGP graceful shutdown tests
 
-Router r1 should be receiving routes from r2 that include the graceful shutdown community.
+Router r1 should be receiving routes from r2.
+
+For the inbound test the routes should have local_pref set to 0 automatically.
+
+For the outbound test the routes should include the graceful shutdown community.
 
 Tests done include:
-  * Graceful shutdown
+  * Graceful shutdown on inbound path
+    * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
+  * Graceful shutdown on outbound path
     * Peer types: customer, peer, transit, rrclient, rrserver, rrserver-rrserver, routecollector, routeserver
 
 ```plantuml
@@ -21,7 +27,7 @@ class "Router: r1" {
   .. BGP ..
 * AS65000
 }
-note top: Should receive routes from r2 with the graceful shutdown \n community and set them with local_pref 0
+note top: Should receive routes from r2 and end up with local_pref = 0
 
 
 class "Router: r2" {
@@ -36,7 +42,7 @@ class "Router: r2" {
   .. BGP ..
 * AS65001
 }
-note top: Should be announcing test routes to r1 with \n the graceful shutdown community included
+note top: Should be announcing test routes to r1
 
 
 class "Switch: s1" {}
