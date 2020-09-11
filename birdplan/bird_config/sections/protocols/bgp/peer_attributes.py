@@ -212,6 +212,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         BGP password.
     cost : int
         Cost of this peer, this is the number minused from the local_pref.
+    graceful_shutdown : bool
+        Set peer in GRACEFUL_SHUTDOWN mode if set to True.
     passive : bool
         Indicate if this is a passive peer or not.
     quarantined : bool
@@ -249,6 +251,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     password: Optional[str] = None
 
     cost: int = 0
+
+    graceful_shutdown: bool = False
 
     large_communities: BGPPeerLargeCommunities
 

@@ -240,6 +240,10 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_PREF_TRANSIT = 150;")
         self.constants.conf.append("")
 
+        self.constants.conf.append("# Well known communities")
+        self.constants.conf.append("define BGP_COMMUNITY_GRACEFUL_SHUTDOWN = (65535, 0);")
+        self.constants.conf.append("")
+
         self.constants.conf.append("# Large community functions")
         # NK: IMPORTANT IF YOU CHANGE THE BELOW, UPDATE BGP_LC_STRIP
         self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_ISO = 1;")
@@ -682,6 +686,15 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("function bgp_filter_quarantine() {")
         self.functions.conf.append('  print "[bgp_filter_quarantine] Adding BGP_LC_FILTERED_QUARANTINED to ", net;', debug=True)
         self.functions.conf.append("  bgp_large_community.add(BGP_LC_FILTERED_QUARANTINED);")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Graceful shutdown")
+        self.functions.conf.append("function bgp_graceful_shutdown() {")
+        self.functions.conf.append('  if (BGP_COMMUNITY_GRACEFUL_SHUTDOWN ~ bgp_community) then {')
+        self.functions.conf.append('    print "[bgp_graceful_shutdown] Setting LOCAL_PREF to 0 for ", net;', debug=True)
+        self.functions.conf.append("    bgp_local_pref = 0;")
+        self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
 

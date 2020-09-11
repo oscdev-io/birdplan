@@ -47,11 +47,14 @@ class SectionBaseConfig:  # pylint: disable=too-few-public-methods
         ----------
         item : SectionConfigItem
             Configuration to add, either a string, list of strings or another section.
+
         order : int
             Ordering of the item to add. Defaults to `10`.
+
         deferred : bool
             If the config item is a SectionBase, then rendering can be deferred until after configuration.
             This is needed for instance for the constants section, which other protocols may add to.
+
         debug : bool
             The configuration provided should only be output when we are in debug mode.
 
