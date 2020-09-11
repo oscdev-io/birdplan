@@ -112,7 +112,7 @@ class TestCustomer(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
 
         # Check peer BGP table
         correct_result = {
@@ -128,7 +128,7 @@ class TestCustomer(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
 
     def _test_results_r1(self, sim, helpers):
         """Test results from r1."""
@@ -214,7 +214,7 @@ class TestPeer(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
 
         # Check peer BGP table
         correct_result = {
@@ -230,7 +230,7 @@ class TestPeer(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
 
     def _test_results_r1(self, sim, helpers):
         """Test results from r1."""
@@ -320,7 +320,7 @@ class TestTransit(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
 
         # Check peer BGP table
         correct_result = {
@@ -336,7 +336,7 @@ class TestTransit(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
 
     def _test_results_r1(self, sim, helpers):
         """Test results from r1."""
@@ -428,7 +428,7 @@ class TestRrclient(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
 
         # Check peer BGP table
         correct_result = {
@@ -444,7 +444,7 @@ class TestRrclient(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
 
     def _test_results_r1(self, sim, helpers):
         """Test results from r1."""
@@ -534,7 +534,7 @@ class TestRrserver(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
 
         # Check peer BGP table
         correct_result = {
@@ -550,7 +550,7 @@ class TestRrserver(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
 
     def _test_results_r1(self, sim, helpers):
         """Test results from r1."""
@@ -643,7 +643,7 @@ class TestRrserverRrserver(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
 
         # Check peer BGP table
         correct_result = {
@@ -659,7 +659,7 @@ class TestRrserverRrserver(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
 
     def _test_results_r1(self, sim, helpers):
         """Test results from r1."""
@@ -743,7 +743,7 @@ class TestRoutecollector(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
 
         # Check peer BGP table
         correct_result = {
@@ -759,7 +759,7 @@ class TestRoutecollector(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
 
     def _test_results_r1(self, sim, helpers):
         """Test results from r1."""
@@ -845,7 +845,7 @@ class TestRouteserver(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv4_table == correct_result, "Result for R1 BIRD IPv4 BGP peer routing table does not match what it should be"
+        assert ipv4_table == correct_result, "Result for R2 BIRD IPv4 BGP peer routing table does not match what it should be"
 
         # Check peer BGP table
         correct_result = {
@@ -861,7 +861,7 @@ class TestRouteserver(BGPOutgoingLargeCommunitiesBase):
                 }
             ]
         }
-        assert ipv6_table == correct_result, "Result for R1 BIRD IPv6 BGP peer routing table does not match what it should be"
+        assert ipv6_table == correct_result, "Result for R2 BIRD IPv6 BGP peer routing table does not match what it should be"
 
     def _test_results_r1(self, sim, helpers):
         """Test results from r1."""
