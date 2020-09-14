@@ -8,6 +8,7 @@ static:
 
 bgp:
   asn: @ASN@
+@GLOBAL_CONFIG@
   import:
     static: True
   peers:
