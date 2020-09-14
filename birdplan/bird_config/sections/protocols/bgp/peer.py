@@ -132,6 +132,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.cost = peer_config["cost"]
 
         # Check if we're in graceful_shutdown mode
+        if self.bgp_attributes.graceful_shutdown:
+            self.graceful_shutdown = True
         if "graceful_shutdown" in peer_config:
             self.graceful_shutdown = peer_config["graceful_shutdown"]
 

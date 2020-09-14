@@ -942,6 +942,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.need_functions = True
 
     @property
+    def graceful_shutdown(self) -> bool:
+        """Return our the value of graceful_shutdown."""
+        return self.bgp_attributes.graceful_shutdown
+
+    @graceful_shutdown.setter
+    def graceful_shutdown(self, graceful_shutdown: bool) -> None:
+        """Set the value of graceful_shutdown."""
+        self.bgp_attributes.graceful_shutdown = graceful_shutdown
+
+    @property
     def rr_cluster_id(self) -> Optional[str]:
         """Return route reflector cluster ID."""
         return self.bgp_attributes.rr_cluster_id

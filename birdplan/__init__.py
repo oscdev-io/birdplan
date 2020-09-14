@@ -390,6 +390,7 @@ class BirdPlan:
             if config_item not in [
                 # Globals
                 "asn",
+                "graceful_shutdown",
                 "prefix_import_maxlen4",
                 "prefix_export_maxlen4",
                 "prefix_import_minlen4",
@@ -439,6 +440,7 @@ class BirdPlan:
 
         # Setup prefix lengths
         for item in [
+            "graceful_shutdown",
             "prefix_import_maxlen4",
             "prefix_export_maxlen4",
             "prefix_import_minlen4",
