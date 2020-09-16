@@ -19,6 +19,7 @@
 """BirdPlan package."""
 
 from typing import Any, Dict, List, Optional, Union
+import os
 import yaml
 from .bird_config import BirdConfig
 from .exceptions import BirdPlanError
@@ -28,28 +29,22 @@ __VERSION__ = "0.0.1"
 
 
 class BirdPlan:
-    """
-    Main BirdPlan class.
+    """Main BirdPlan class."""
 
-    Attributes
-    ----------
-    plan_file : str
-        Plan file we'll be working on.
-
-    """
-
-    _plan_file: Optional[str]
-    _config: Dict[Any, Any]
     _birdconf: BirdConfig
+    _config: Dict[str, Any]
+    _state: Dict[str, Any]
+    _state_file: Optional[str]
 
     def __init__(self) -> None:
         """Initialize object."""
 
-        self._plan_file = None
-        self._config = {}
         self._birdconf = BirdConfig()
+        self._config = {}
+        self._state = {}
+        self._state_file = None
 
-    def load(self, plan_file: str, macros: Optional[Dict[str, str]] = None) -> None:
+    def load(self, plan_file: str, state_file: Optional[str] = None) -> None:
         """
         Initialize object.
 
@@ -57,38 +52,58 @@ class BirdPlan:
         ----------
         plan_file : str
             Source plan file to generate configuration from.
-        macros : Dict[str, str]
-            Optional list of macros and their replacment values.
+        state_file : Optional[str]
+            Optional state file, used for commands like BGP graceful shutdown
 
         """
 
+        # Read in configuration file
         try:
             with open(plan_file, "r") as file:
                 raw_config = file.read()
         except OSError as err:
-            raise BirdPlanError(f"Failed to read plan file '{plan_file}': {err}") from None
+            raise BirdPlanError(f"Failed to read BirdPlan file '{plan_file}': {err}") from None
 
-        # Check if we're replacing macros
-        if macros:
-            for macro, value in macros.items():
-                raw_config = raw_config.replace(macro, value)
-
+        # Load configuration using YAML
         try:
             self.config = yaml.safe_load(raw_config)
         except ImportError as err:  # pragma: no cover
-            raise BirdPlanError(f" Failed to import plan file '{plan_file}': {err}") from None
+            raise BirdPlanError(f" Failed to import BirdPlan file '{plan_file}': {err}") from None
 
-    def generate(self, output_filename: Optional[str] = None) -> str:
+        # Load state using YAML
+        if state_file:
+            # Set our state file
+            self.state_file = state_file
+
+            # Check if the state file exists...
+            if os.path.isfile(self.state_file):
+                # Read in state file
+                try:
+                    with open(self.state_file, "r") as file:
+                        raw_state = file.read()
+                except OSError as err:
+                    raise BirdPlanError(f"Failed to read BirdPlan state file '{state_file}': {err}") from None
+                # Load state using YAML
+                try:
+                    self.state = yaml.safe_load(raw_state)
+                except ImportError as err:  # pragma: no cover
+                    raise BirdPlanError(f" Failed to load BirdPlan state '{state_file}': {err}") from None
+
+    def configure(self, output_filename: Optional[str] = None) -> str:
         """
-        Generate Bird configuration.
+        Create configuration for BIRD.
 
         Parameters
         ----------
         output_filename : Optional[str]
-            Optional filename to write the generated configuration to. If this is not specified we'll just return the
+            Optional filename to write the configuration to. If this is not specified we'll just return the
             configuration.
 
         """
+
+        # Make sure we have configuration...
+        if not self.config:
+            raise BirdPlanError("No configuration found")
 
         # Check configuration options are supported
         for config_item in self.config:
@@ -104,17 +119,111 @@ class BirdPlan:
         self._config_bgp()
 
         # Generate the configuration
-        config_lines = self.birdconf.get_config()
+        config_str = "\n".join(self.birdconf.get_config())
 
         # If we have a filename, write out
         if output_filename:
-            try:
-                with open(output_filename, "w") as config_file:
-                    config_file.write("\n".join(config_lines))
-            except OSError as err:  # pragma: no cover
-                raise BirdPlanError(f"Failed to open '{output_filename}' for writing: {err}") from None
+            if output_filename == "-":
+                print(config_str)
+            else:
+                try:
+                    with open(output_filename, "w") as config_file:
+                        config_file.write(config_str)
+                except OSError as err:  # pragma: no cover
+                    raise BirdPlanError(f"Failed to open '{output_filename}' for writing: {err}") from None
 
-        return "\n".join(config_lines)
+        return config_str
+
+    def commit_state(self) -> None:
+        """Commit our current state."""
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("Commit of BirdPlan state requires a state file, none loaded")
+
+        # Dump the state in pretty YAML
+        raw_state = yaml.dump(self.state, default_flow_style=False)
+
+        # Write out state file
+        try:
+            with open(self.state_file, "w") as file:
+                file.write(raw_state)
+        except OSError as err:  # pragma: no cover
+            raise BirdPlanError(f"Failed to open '{self.state_file}' for writing: {err}") from None
+
+    def bgp_graceful_shutdown_add_peer(self, peer: str) -> None:
+        """
+        Add a peer to the BGP graceful shutdown list.
+
+        Parameters
+        ----------
+        peer : str
+            Peer name to add to BGP graceful shutdown list.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("Using of BGP graceful shutdown requires a state file, none loaded")
+
+        # Prepare the state structure if its not got what we need
+        if "bgp" not in self.state:
+            self.state["bgp"] = {}
+        if "graceful_shutdown" not in self.state["bgp"]:
+            self.state["bgp"]["graceful_shutdown"] = []
+
+        # If the peer is not in the list, then add it
+        if peer not in self.state["bgp"]["graceful_shutdown"]:
+            self.state["bgp"]["graceful_shutdown"].append(peer)
+        else:
+            raise BirdPlanError("BGP peer already in graceful_shutdown list")
+
+    def bgp_graceful_shutdown_remove_peer(self, peer: str) -> None:
+        """
+        Remove a peer from the BGP graceful shutdown list.
+
+        Parameters
+        ----------
+        peer : str
+            Peer name to remove from BGP graceful shutdown list.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("Using of BGP graceful shutdown requires a state file, none loaded")
+
+        # Prepare the state structure if its not got what we need
+        if (
+            "bgp" not in self.state
+            or "graceful_shutdown" not in self.state["bgp"]
+            or peer not in self.state["bgp"]["graceful_shutdown"]
+        ):
+            raise BirdPlanError("BGP peer not in graceful_shutdown list")
+
+        # Remove peer from graceful_shutdown list
+        self.state["bgp"]["graceful_shutdown"].remove(peer)
+
+    def bgp_graceful_shutdown_peer_list(self) -> List[str]:
+        """
+        Return the list of peers that are currently set for graceful shutdown.
+
+        Returns
+        -------
+        List[str]
+            List of BGP peers set for graceful shutdown.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("Using of BGP graceful shutdown requires a state file, none loaded")
+
+        # Prepare the state structure if its not got what we need
+        if "bgp" not in self.state or "graceful_shutdown" not in self.state["bgp"]:
+            return []
+
+        return [f"{x}" for x in self.state["bgp"]["graceful_shutdown"]]
 
     def _config_global(self) -> None:
         """Configure global options."""
@@ -601,6 +710,12 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{config_item}' not understood in bgp:peers:{peer_name}")
 
+        # Check if we have a graceful shutdown state
+        if "bgp" in self.state and "graceful_shutdown" in self.state["bgp"]:
+            # If we do, then check if this peer is in it
+            if peer_name in self.state["bgp"]["graceful_shutdown"] or "*" in self.state["bgp"]["graceful_shutdown"]:
+                peer["graceful_shutdown"] = self.state["bgp"]["graceful_shutdown"]
+
         # Check items we need
         for required_item in ["asn", "description", "type"]:
             if required_item not in peer:
@@ -639,21 +754,36 @@ class BirdPlan:
         self.birdconf.protocols.bgp.add_peer(peer_name, peer)
 
     @property
-    def plan_file(self) -> Optional[str]:
-        """Plan file we're using."""
-        return self._plan_file
+    def birdconf(self) -> BirdConfig:
+        """Return the BirdConfig object."""
+        return self._birdconf
 
     @property
-    def config(self) -> Dict[Any, Any]:
+    def config(self) -> Dict[str, Any]:
         """Return our config."""
         return self._config
 
     @config.setter
-    def config(self, config: Dict[Any, Any]) -> None:
+    def config(self, config: Dict[str, Any]) -> None:
         """Set our configuration."""
         self._config = config
 
     @property
-    def birdconf(self) -> BirdConfig:
-        """Return the BirdConfig object."""
-        return self._birdconf
+    def state(self) -> Dict[str, Any]:
+        """Return our state."""
+        return self._state
+
+    @state.setter
+    def state(self, state: Dict[str, Any]) -> None:
+        """Set our state."""
+        self._state = state
+
+    @property
+    def state_file(self) -> Optional[str]:
+        """State file we're using."""
+        return self._state_file
+
+    @state_file.setter
+    def state_file(self, state_file: str) -> None:
+        """Set our state file."""
+        self._state_file = state_file
