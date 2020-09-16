@@ -18,7 +18,7 @@
 
 """Entry point into Birdplan from the commandline."""
 
-from typing import List, Optional
+from typing import Any, List, Optional
 import argparse
 import logging
 import logging.handlers
@@ -47,7 +47,7 @@ class BirdPlanCommandLine:
         self._argparser = argparse.ArgumentParser(add_help=False)
         self._birdplan = BirdPlan()
 
-    def run(self, raw_args: Optional[List[str]] = None) -> None:
+    def run(self, raw_args: Optional[List[str]] = None) -> Any:
         """Run BirdPlan from command line."""
 
         # Add main commandline arguments
@@ -161,7 +161,7 @@ class BirdPlanCommandLine:
         elif self.args.action == "bgp_graceful_shutdown_remove":
             self.bgp_graceful_shutdown_remove(parser_bgp_graceful_shutdown_remove)
         elif self.args.action == "bgp_graceful_shutdown_list":
-            self.bgp_graceful_shutdown_list()
+            return self.bgp_graceful_shutdown_list()
 
     def configure(self) -> None:
         """Configure BIRD."""
@@ -172,7 +172,7 @@ class BirdPlanCommandLine:
         # Commit BirdPlan state
         self._birdplan_commit_state()
 
-    def bgp_graceful_shutdown_list(self) -> None:
+    def bgp_graceful_shutdown_list(self) -> List[str]:
         """Gracefully shutdown peers."""
 
         # Load BirdPlan configuration
@@ -180,12 +180,16 @@ class BirdPlanCommandLine:
 
         # Grab peer list
         peer_list = self.birdplan.bgp_graceful_shutdown_peer_list()
-        print("Peers in graceful shutdown:")
-        for peer in peer_list:
-            print(f"  {peer}")
-        if not peer_list:
-            print("--none--")
-        print(f"Total: {len(peer_list)}")
+
+        if __name__ == "main":
+            print("Peers in graceful shutdown:")
+            for peer in peer_list:
+                print(f"  {peer}")
+            if not peer_list:
+                print("--none--")
+            print(f"Total: {len(peer_list)}")
+
+        return peer_list
 
     def bgp_graceful_shutdown_add(self, arg_group: argparse.ArgumentParser) -> None:
         """Add peer(s) to the BirdPlan BGP graceful shutdown list."""
@@ -299,7 +303,8 @@ class BirdPlanCommandLine:
     def _add_main_arguments(self) -> None:
         """Add main commandline arguments."""
 
-        print(f"BirdPlan v{__VERSION__} - Copyright © 2019-2020, AllWorldIT.\n", file=sys.stderr)
+        if __name__ == "main":
+            print(f"BirdPlan v{__VERSION__} - Copyright © 2019-2020, AllWorldIT.\n", file=sys.stderr)
 
         optional_group = self.argparser.add_argument_group("Optional arguments")
         optional_group.add_argument("-h", "--help", action="help", help="Show this help message and exit")
