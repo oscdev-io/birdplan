@@ -695,7 +695,7 @@ for peer type `rrserver-rrserver` which defaults to `True`.
 * `originated` will redistribute originated routes. Defaults to `False`.
 
 In addition to setting these as a boolean value, one can also add the following items to a dictionary...
-* `redistribute_large_communities` will add additional large communities when exporting routes of this type
+* `large_communities` will add additional large communities when exporting routes of this type
 
 Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
 

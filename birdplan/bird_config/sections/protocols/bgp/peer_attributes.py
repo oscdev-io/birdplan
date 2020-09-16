@@ -27,6 +27,8 @@ BGPPeerFilterItem = Union[str, List[str]]
 BGPPeerFilter = Dict[str, BGPPeerFilterItem]
 BGPPeerPeeringDB = Dict[str, Any]
 
+BGPPeerRoutePolicyRedistributeItem = Union[bool, Dict[str, Any]]
+
 
 class BGPPeerLargeCommunities:  # pylint: disable=too-few-public-methods
     """
@@ -130,39 +132,39 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,
 
     Attributes
     ----------
-    connected : bool
+    connected : BGPPeerRoutePolicyRedistributeItem
         Redistribute connected routes to the peer BGP table. Defaults to `False`.
     default: Dict[str, Bool]
         Redistribute the default route to the peer BGP table. Defaults to `False`.
-    originated : bool
+    originated : BGPPeerRoutePolicyRedistributeItem
         Redistribute originated routes to the peer BGP table. Defaults to `False`.
-    kernel : bool
+    kernel : BGPPeerRoutePolicyRedistributeItem
         Redistribute kernel routes to the peer BGP table. Defaults to `False`.
-    static : bool
+    static : BGPPeerRoutePolicyRedistributeItem
         Redistribute static routes to the peer BGP table. Defaults to `False`.
-    bgp: bool
+    bgp: BGPPeerRoutePolicyRedistributeItem
         Redistribute all BGP routes to the peer BGP table. Defaults to `False`.
-    bgp_own: bool
+    bgp_own: BGPPeerRoutePolicyRedistributeItem
         Redistribute our own originated BGP routes to the peer BGP table. Defaults to `False`.
-    bgp_customer: bool
+    bgp_customer: BGPPeerRoutePolicyRedistributeItem
         Redistribute customer BGP routes to the peer BGP table. Defaults to `False`.
-    bgp_peering: bool
+    bgp_peering: BGPPeerRoutePolicyRedistributeItem
         Redistribute peering BGP routes to the peer BGP table. Defaults to `False`.
-    bgp_transit: bool
+    bgp_transit: BGPPeerRoutePolicyRedistributeItem
         Redistribute transit BGP routes to the peer BGP table. Defaults to `False`.
 
     """
 
-    connected: bool
+    connected: BGPPeerRoutePolicyRedistributeItem
     default: bool
-    kernel: bool
-    originated: bool
-    static: bool
-    bgp: bool
-    bgp_own: bool
-    bgp_customer: bool
-    bgp_peering: bool
-    bgp_transit: bool
+    kernel: BGPPeerRoutePolicyRedistributeItem
+    originated: BGPPeerRoutePolicyRedistributeItem
+    static: BGPPeerRoutePolicyRedistributeItem
+    bgp: BGPPeerRoutePolicyRedistributeItem
+    bgp_own: BGPPeerRoutePolicyRedistributeItem
+    bgp_customer: BGPPeerRoutePolicyRedistributeItem
+    bgp_peering: BGPPeerRoutePolicyRedistributeItem
+    bgp_transit: BGPPeerRoutePolicyRedistributeItem
 
     def __init__(self) -> None:
         """Initialize object."""

@@ -20,7 +20,7 @@
 
 # pylint: disable=too-many-lines
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 from .bgp_attributes import BGPAttributes
 from .peer_attributes import (
@@ -31,6 +31,7 @@ from .peer_attributes import (
     BGPPeerPrefixLimit,
     BGPPeerRoutePolicyAccept,
     BGPPeerRoutePolicyRedistribute,
+    BGPPeerRoutePolicyRedistributeItem,
     BGPPeerLargeCommunities,
 )
 from .typing import BGPPeerConfig
@@ -43,9 +44,6 @@ from .... import util
 from ....globals import BirdConfigGlobals
 from .....bgpq3 import BGPQ3
 from .....exceptions import BirdPlanError
-
-
-BGPPeerRedistributeItem = Union[bool, Dict[str, Any]]
 
 
 class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
@@ -374,13 +372,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("];")
             self.conf.add("")
 
-    def _add_redistribute_properties(self, redistribute: BGPPeerRedistributeItem) -> None:
+    def _add_redistribute_properties(self, redistribute: BGPPeerRoutePolicyRedistributeItem) -> None:
         """Redistribution properties to add to the route."""
         if isinstance(redistribute, dict):
-            if "redistribute-large-communities" in redistribute:
-                for large_community in sorted(redistribute["redistribute-large-communities"]):
+            if "large_communities" in redistribute:
+                for large_community in sorted(redistribute["large_communities"]):
                     bird_lc = util.sanitize_large_community(large_community)
-                    self.conf.add(f'    print "[redistribute-large-communities] Adding {bird_lc} to ", net;', debug=True)
+                    self.conf.add(f'    print "[redistribute:large_communities] Adding {bird_lc} to ", net;', debug=True)
                     self.conf.add(f"    bgp_large_community.add({bird_lc});")
 
     def _peer_to_bgp_export_filter(self, ipv: str) -> None:
