@@ -19,4 +19,4 @@ bgp:
       error_wait_time: 2,5
       type: peer
       redistribute:
-        kernel: True
+@EXTRA_CONFIG@

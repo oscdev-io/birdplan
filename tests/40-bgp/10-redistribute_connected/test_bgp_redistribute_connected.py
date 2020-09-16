@@ -30,6 +30,9 @@ class TestBGPRedistributeConnected(BirdPlanBaseTestCase):
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1", "r2"]
+    r1_extra_config = """
+        connected: True
+"""
     r1_interfaces = ["eth0", "eth1"]
     r2_interfaces = ["eth0", "eth1"]
     r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["100.101.0.1/24", "fc00:101::1/48"]}

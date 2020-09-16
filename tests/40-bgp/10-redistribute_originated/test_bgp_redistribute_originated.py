@@ -30,6 +30,9 @@ class TestBGPRedistributeOriginated(BirdPlanBaseTestCase):
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1", "r2"]
+    r1_extra_config = """
+        originated: True
+"""
 
     def test_setup(self, sim, tmpdir):
         """Setup our test."""

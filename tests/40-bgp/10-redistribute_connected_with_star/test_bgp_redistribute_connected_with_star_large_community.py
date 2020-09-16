@@ -19,24 +19,26 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP test for redistribution of static routes."""
+"""BGP test for redistributed connected routes using a star with large communities."""
 
 import os
 from basetests import BirdPlanBaseTestCase
 
 
-class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
-    """BGP test for redistribution of static routes."""
+class TestBGPRedistributeConnectedWithStarLargeCommunity(BirdPlanBaseTestCase):
+    """BGP test for redistributed connected routes using a star with large communities."""
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1", "r2"]
     r1_extra_config = """
-        static: True
+        connected:
+          large_communities:
+            - 65000:5000:1
 """
-    r1_interfaces = ["eth0", "eth1"]
+    r1_interfaces = ["eth0", "eth10"]
     r2_interfaces = ["eth0", "eth1"]
-    r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["192.168.1.1/24", "fc01::1/64"]}
-    r2_interface_eth1 = {"mac": "02:02:00:00:00:02", "ips": ["192.168.2.1/24", "fc02::1/64"]}
+    r1_interface_eth10 = {"mac": "02:01:00:00:00:02", "ips": ["100.101.0.1/24", "fc00:101::1/48"]}
+    r2_interface_eth1 = {"mac": "02:02:00:00:00:02", "ips": ["100.102.0.1/24", "fc00:102::1/48"]}
 
     def test_setup(self, sim, tmpdir):
         """Setup our test."""
@@ -84,76 +86,6 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
         correct_result = {}
         assert r2_table == correct_result, "Result for R2 BIRD t_bgp_originate6 routing table does not match what it should be"
 
-    def test_bird_tables_static4(self, sim, helpers):
-        """Test BIRD static4 table."""
-
-        r1_table = self._bird_route_table(sim, "r1", "t_static4", expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", "t_static4", expect_count=1)
-
-        # Check static4 BIRD table
-        correct_result = {
-            "100.101.0.0/24": [
-                {
-                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static4",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
-        assert r1_table == correct_result, "Result for R1 BIRD t_static4 routing table does not match what it should be"
-
-        correct_result = {
-            "100.102.0.0/24": [
-                {
-                    "nexthops": [{"gateway": "192.168.2.2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static4",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
-        assert r2_table == correct_result, "Result for R2 BIRD t_static4 routing table does not match what it should be"
-
-    def test_bird_tables_static6(self, sim, helpers):
-        """Test BIRD static6 table."""
-
-        r1_table = self._bird_route_table(sim, "r1", "t_static6", expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", "t_static6", expect_count=1)
-
-        # Check static6 BIRD table
-        correct_result = {
-            "fc00:101::/48": [
-                {
-                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static6",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
-        assert r1_table == correct_result, "Result for R1 BIRD t_static6 routing table does not match what it should be"
-
-        correct_result = {
-            "fc00:102::/48": [
-                {
-                    "nexthops": [{"gateway": "fc02::2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static6",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
-        assert r2_table == correct_result, "Result for R2 BIRD t_static6 routing table does not match what it should be"
-
     def test_bird_tables_bgp_peer4(self, sim, helpers):
         """Test BIRD bgp peer4 table."""
 
@@ -167,13 +99,13 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
         correct_result = {
             "100.101.0.0/24": [
                 {
-                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
-                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": 200,
+                    "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"interface": "eth10"}],
+                    "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "static4",
+                    "protocol": "direct4_bgp",
                     "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
+                    "type": ["device", "univ"],
                 }
             ]
         }
@@ -185,7 +117,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -216,13 +148,13 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
         correct_result = {
             "fc00:101::/48": [
                 {
-                    "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
-                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": 200,
+                    "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 940},
+                    "nexthops": [{"interface": "eth10"}],
+                    "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "static6",
+                    "protocol": "direct6_bgp",
                     "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
+                    "type": ["device", "univ"],
                 }
             ]
         }
@@ -234,7 +166,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -263,12 +195,12 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
             "100.101.0.0/24": [
                 {
                     "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
-                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": 200,
+                    "nexthops": [{"interface": "eth10"}],
+                    "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "static4",
+                    "protocol": "direct4_bgp",
                     "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
+                    "type": ["device", "univ"],
                 }
             ]
         }
@@ -280,7 +212,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -298,12 +230,12 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
             "100.102.0.0/24": [
                 {
                     "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
-                    "nexthops": [{"gateway": "192.168.2.2", "interface": "eth1"}],
-                    "pref": 200,
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "static4",
+                    "protocol": "direct4_bgp",
                     "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
+                    "type": ["device", "univ"],
                 }
             ],
         }
@@ -320,12 +252,12 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
             "fc00:101::/48": [
                 {
                     "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
-                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": 200,
+                    "nexthops": [{"interface": "eth10"}],
+                    "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "static6",
+                    "protocol": "direct6_bgp",
                     "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
+                    "type": ["device", "univ"],
                 }
             ]
         }
@@ -337,7 +269,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -355,12 +287,12 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
             "fc00:102::/48": [
                 {
                     "attributes": {"BGP.large_community": [(65001, 3, 1)], "BGP.local_pref": 940},
-                    "nexthops": [{"gateway": "fc02::2", "interface": "eth1"}],
-                    "pref": 200,
+                    "nexthops": [{"interface": "eth1"}],
+                    "pref": 240,
                     "prefix_type": "unicast",
-                    "protocol": "static6",
+                    "protocol": "direct6_bgp",
                     "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
+                    "type": ["device", "univ"],
                 }
             ],
         }
@@ -369,24 +301,14 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
     def test_bird_tables_master4(self, sim, helpers):
         """Test BIRD master4 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master4", expect_count=3)
-        r2_table = self._bird_route_table(sim, "r2", "master4", expect_count=4)
+        r1_table = self._bird_route_table(sim, "r1", "master4", expect_count=2)
+        r2_table = self._bird_route_table(sim, "r2", "master4", expect_count=3)
 
         # Check master4 BIRD table
         correct_result = {
             "100.101.0.0/24": [
                 {
-                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static4",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ],
-            "100.64.0.0/24": [
-                {
-                    "nexthops": [{"interface": "eth0"}],
+                    "nexthops": [{"interface": "eth10"}],
                     "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct4",
@@ -394,9 +316,9 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "type": ["device", "univ"],
                 }
             ],
-            "192.168.1.0/24": [
+            "100.64.0.0/24": [
                 {
-                    "nexthops": [{"interface": "eth1"}],
+                    "nexthops": [{"interface": "eth0"}],
                     "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct4",
@@ -413,7 +335,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -430,17 +352,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
             ],
             "100.102.0.0/24": [
                 {
-                    "nexthops": [{"gateway": "192.168.2.2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static4",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ],
-            "100.64.0.0/24": [
-                {
-                    "nexthops": [{"interface": "eth0"}],
+                    "nexthops": [{"interface": "eth1"}],
                     "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct4",
@@ -448,9 +360,9 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "type": ["device", "univ"],
                 }
             ],
-            "192.168.2.0/24": [
+            "100.64.0.0/24": [
                 {
-                    "nexthops": [{"interface": "eth1"}],
+                    "nexthops": [{"interface": "eth0"}],
                     "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct4",
@@ -464,8 +376,8 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
     def test_bird_tables_master6(self, sim, helpers):
         """Test BIRD master6 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "master6", expect_count=3)
-        r2_table = self._bird_route_table(sim, "r2", "master6", expect_count=4)
+        r1_table = self._bird_route_table(sim, "r1", "master6", expect_count=2)
+        r2_table = self._bird_route_table(sim, "r2", "master6", expect_count=3)
 
         # Check master6 BIRD table
         correct_result = {
@@ -481,17 +393,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
             ],
             "fc00:101::/48": [
                 {
-                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static6",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ],
-            "fc01::/64": [
-                {
-                    "nexthops": [{"interface": "eth1"}],
+                    "nexthops": [{"interface": "eth10"}],
                     "pref": 240,
                     "prefix_type": "unicast",
                     "protocol": "direct6",
@@ -518,7 +420,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -534,16 +436,6 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                 }
             ],
             "fc00:102::/48": [
-                {
-                    "nexthops": [{"gateway": "fc02::2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static6",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ],
-            "fc02::/64": [
                 {
                     "nexthops": [{"interface": "eth1"}],
                     "pref": 240,
@@ -559,22 +451,11 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
     def test_bird_tables_kernel4(self, sim, helpers):
         """Test BIRD kernel4 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "t_kernel4", expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", "t_kernel4", expect_count=2)
+        r1_table = self._bird_route_table(sim, "r1", "t_kernel4")
+        r2_table = self._bird_route_table(sim, "r2", "t_kernel4", expect_count=1)
 
         # Check kernel4 BIRD table
-        correct_result = {
-            "100.101.0.0/24": [
-                {
-                    "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static4",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
+        correct_result = {}
         assert r1_table == correct_result, "Result for R1 BIRD t_kernel4 routing table does not match what it should be"
 
         correct_result = {
@@ -583,7 +464,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -597,39 +478,18 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "since": helpers.bird_since_field(),
                     "type": ["BGP", "univ"],
                 }
-            ],
-            "100.102.0.0/24": [
-                {
-                    "nexthops": [{"gateway": "192.168.2.2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static4",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ],
+            ]
         }
         assert r2_table == correct_result, "Result for R2 BIRD t_kernel4 routing table does not match what it should be"
 
     def test_bird_tables_kernel6(self, sim, helpers):
         """Test BIRD kernel6 table."""
 
-        r1_table = self._bird_route_table(sim, "r1", "t_kernel6", expect_count=1)
-        r2_table = self._bird_route_table(sim, "r2", "t_kernel6", expect_count=2)
+        r1_table = self._bird_route_table(sim, "r1", "t_kernel6")
+        r2_table = self._bird_route_table(sim, "r2", "t_kernel6", expect_count=1)
 
         # Check kernel6 BIRD table
-        correct_result = {
-            "fc00:101::/48": [
-                {
-                    "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static6",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ]
-        }
+        correct_result = {}
         assert r1_table == correct_result, "Result for R1 BIRD t_kernel6 routing table does not match what it should be"
 
         correct_result = {
@@ -638,7 +498,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "asn": "AS65000",
                     "attributes": {
                         "BGP.as_path": [65000],
-                        "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -652,17 +512,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                     "since": helpers.bird_since_field(),
                     "type": ["BGP", "univ"],
                 }
-            ],
-            "fc00:102::/48": [
-                {
-                    "nexthops": [{"gateway": "fc02::2", "interface": "eth1"}],
-                    "pref": 200,
-                    "prefix_type": "unicast",
-                    "protocol": "static6",
-                    "since": helpers.bird_since_field(),
-                    "type": ["static", "univ"],
-                }
-            ],
+            ]
         }
         assert r2_table == correct_result, "Result for R2 BIRD t_kernel6 routing table does not match what it should be"
 
@@ -678,16 +528,14 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
         # Check kernel has the correct IPv4 RIB
         correct_result = [
             {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.1", "protocol": "kernel", "scope": "link"},
-            {"dev": "eth1", "dst": "100.101.0.0/24", "flags": [], "gateway": "192.168.1.2", "metric": 600, "protocol": "bird"},
-            {"dev": "eth1", "dst": "192.168.1.0/24", "flags": [], "prefsrc": "192.168.1.1", "protocol": "kernel", "scope": "link"},
+            {"dev": "eth10", "dst": "100.101.0.0/24", "flags": [], "prefsrc": "100.101.0.1", "protocol": "kernel", "scope": "link"},
         ]
         assert r1_os_rib == correct_result, "R1 kernel IPv4 RIB does not match what it should be"
 
         correct_result = [
             {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.2", "protocol": "kernel", "scope": "link"},
             {"dev": "eth0", "dst": "100.101.0.0/24", "flags": [], "gateway": "100.64.0.1", "metric": 600, "protocol": "bird"},
-            {"dev": "eth1", "dst": "100.102.0.0/24", "flags": [], "gateway": "192.168.2.2", "metric": 600, "protocol": "bird"},
-            {"dev": "eth1", "dst": "192.168.2.0/24", "flags": [], "prefsrc": "192.168.2.1", "protocol": "kernel", "scope": "link"},
+            {"dev": "eth1", "dst": "100.102.0.0/24", "flags": [], "prefsrc": "100.102.0.1", "protocol": "kernel", "scope": "link"},
         ]
         assert r2_os_rib == correct_result, "R2 kernel IPv4 RIB does not match what it should be"
 
@@ -703,18 +551,9 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
         # Check kernel has the correct IPv6 RIB
         correct_result = [
             {"dev": "eth0", "dst": "fc00:100::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-            {
-                "dev": "eth1",
-                "dst": "fc00:101::/48",
-                "flags": [],
-                "gateway": "fc01::2",
-                "metric": 600,
-                "pref": "medium",
-                "protocol": "bird",
-            },
-            {"dev": "eth1", "dst": "fc01::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+            {"dev": "eth10", "dst": "fc00:101::/48", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-            {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+            {"dev": "eth10", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
         ]
         assert r1_os_rib == correct_result, "R1 Kernel IPv6 RIB does not match what it should be"
 
@@ -729,16 +568,7 @@ class TestBGPRedistributeStatic(BirdPlanBaseTestCase):
                 "pref": "medium",
                 "protocol": "bird",
             },
-            {
-                "dev": "eth1",
-                "dst": "fc00:102::/48",
-                "flags": [],
-                "gateway": "fc02::2",
-                "metric": 600,
-                "pref": "medium",
-                "protocol": "bird",
-            },
-            {"dev": "eth1", "dst": "fc02::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+            {"dev": "eth1", "dst": "fc00:102::/48", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
             {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
         ]

@@ -30,6 +30,9 @@ class TestBGPRedistributeStaticWithoutDefault(BirdPlanBaseTestCase):
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1", "r2"]
+    r1_extra_config = """
+        static: True
+"""
     r1_interfaces = ["eth0", "eth1"]
     r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["192.168.1.1/24", "fc01::1/64"]}
 
