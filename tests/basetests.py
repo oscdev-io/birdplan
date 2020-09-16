@@ -81,77 +81,11 @@ class BirdPlanBaseTestCase:
     e1_interfaces = ["eth0"]
     e1_interface_eth0 = {"mac": "02:e1:00:00:00:01", "ips": ["100.64.0.2/24", "fc00:100::2/64"]}
 
-    def _configure_bird_routers(self, sim: Simulation, tmpdir: str, extra_macros: BirdConfigMacros = None):
-        """Create our configuration files."""
-        # Generate config files
-        for router in self.routers:
-            birdplan_file = f"{tmpdir}/birdplan.yaml.{router}"
-            bird_conffile = f"{tmpdir}/bird.conf.{router}"
-            bird_statefile = f"{tmpdir}/bird.state.{router}"
-            bird_logfile = f"{tmpdir}/bird.log.{router}"
-
-            # Work out the macro's we'll be using
-            macros = {"@LOGFILE@": bird_logfile}
-            if extra_macros and (router in extra_macros):
-                macros.update(extra_macros[router])
-
-            # Read in configuration file
-            with open(f"{self.test_dir}/{router}.yaml", "r") as file:
-                raw_config = file.read()
-            # Check if we're replacing macros in our configuration file
-            for macro, value in macros.items():
-                raw_config = raw_config.replace(macro, value)
-            # Write out new BirdPlan file with macros replaced
-            with open(birdplan_file, "w") as file:
-                file.write(raw_config)
-
-            # Invoke by simulating the commandline...
-            birdplan_cmdline = BirdPlanCommandLine()
-            # Disable logging for filelog
-            logging.getLogger("filelock").setLevel(logging.ERROR)
-            # Set test mode
-            birdplan_cmdline.birdplan.birdconf.test_mode = True
-            # Run BirdPlan as if it was from the commandline
-            birdplan_cmdline.run(
-                [
-                    "--birdplan-file",
-                    birdplan_file,
-                    "--bird-config-file",
-                    bird_conffile,
-                    "--birdplan-state-file",
-                    bird_statefile,
-                    "configure"
-                ]
-            )
-
-            # Add test report sections
-            sim.add_conffile(f"CONFFILE({router})", bird_conffile)
-            sim.add_logfile(f"LOGFILE({router})", bird_logfile)
-
-            # Add the birdplan configuration object to the simulation
-            sim.add_config(router, birdplan_cmdline.birdplan)
-
     def _test_setup(self, sim, tmpdir):
         """Set up a BIRD test scenario using our attributes."""
 
-        extra_macros = {}
-        # Loop with routers and build our extra_macros
-        for router in self.routers:
-            # Loop with supported attributes that translate into macros
-            for attr in ["asn", "peer_asn", "peer_type", "global_config", "extra_config"]:
-                # Router specific lookup for an attribute to add a macro for
-                router_attr = f"{router}_{attr}"
-                if hasattr(self, router_attr):
-                    value = getattr(self, router_attr)
-                else:
-                    value = ""
-                # Check if we have config for this router, if we don't initialize it
-                if router not in extra_macros:
-                    extra_macros[router] = {}
-                # Add our macro
-                extra_macros[router][f"@{attr.upper()}@"] = value
         # Configure our simulator with the BIRD routers
-        self._configure_bird_routers(sim, tmpdir, extra_macros)
+        self._configure_bird_routers(sim, tmpdir)
         print("Adding routers...")
         for router in self.routers:
             sim.add_node(BirdRouterNode(name=router, configfile=f"{tmpdir}/bird.conf.{router}"))
@@ -206,23 +140,103 @@ class BirdPlanBaseTestCase:
         print("Simulate topology...")
         sim.run()
 
-    def _bird_route_table(self, sim: Simulation, name: str, route_table_name: str, **kwargs) -> Any:
+    def _configure_bird_routers(self, sim: Simulation, tmpdir: str):
+        """Create our configuration files."""
+        # Generate config files
+        for router in self.routers:
+            self._birdplan_run(sim, tmpdir, router, ["configure"])
+
+    def _birdplan_run(self, sim: Simulation, tmpdir: str, router: str, args: List[str]) -> Any:
+        """Run BirdPlan for a given router."""
+
+        # Work out file names
+        birdplan_file = f"{tmpdir}/birdplan.yaml.{router}"
+        bird_conffile = f"{tmpdir}/bird.conf.{router}"
+        bird_statefile = f"{tmpdir}/bird.state.{router}"
+        bird_logfile = f"{tmpdir}/bird.log.{router}"
+
+        # Loop with supported attributes that translate into macros
+        internal_macros = {}
+        for attr in ["asn", "peer_asn", "peer_type", "global_config", "extra_config"]:
+            # Router specific lookup for an attribute to add a macro for
+            router_attr = f"{router}_{attr}"
+            if hasattr(self, router_attr):
+                value = getattr(self, router_attr)
+            else:
+                value = ""
+            # Add our macro
+            internal_macros[f"@{attr.upper()}@"] = value
+
+        # Work out the macro's we'll be using
+        macros = {"@LOGFILE@": bird_logfile}
+        if internal_macros:
+            macros.update(internal_macros)
+
+        # Read in configuration file
+        with open(f"{self.test_dir}/{router}.yaml", "r") as file:
+            raw_config = file.read()
+        # Check if we're replacing macros in our configuration file
+        for macro, value in macros.items():
+            raw_config = raw_config.replace(macro, value)
+        # Write out new BirdPlan file with macros replaced
+        with open(birdplan_file, "w") as file:
+            file.write(raw_config)
+
+        # Invoke by simulating the commandline...
+        birdplan_cmdline = BirdPlanCommandLine()
+        # Disable logging for filelog
+        logging.getLogger("filelock").setLevel(logging.ERROR)
+        # Set test mode
+        birdplan_cmdline.birdplan.birdconf.test_mode = True
+        # Run BirdPlan as if it was from the commandline
+        result = birdplan_cmdline.run(
+            [
+                "--birdplan-file",
+                birdplan_file,
+                "--bird-config-file",
+                bird_conffile,
+                "--birdplan-state-file",
+                bird_statefile,
+                *args,
+            ]
+        )
+
+        # Add test report sections
+        sim.add_conffile(f"CONFFILE({router})", bird_conffile)
+        sim.add_logfile(f"LOGFILE({router})", bird_logfile)
+
+        # Add the birdplan configuration object to the simulation
+        if args[0] == "configure":
+            sim.add_config(router, birdplan_cmdline.birdplan)
+
+        return result
+
+    def _birdc(self, sim: Simulation, router: str, query: str) -> Any:
+        """Birdc helper."""
+        # Grab the output from birdc
+        birdc_output = sim.node(router).birdc(query)
+        # Add report
+        sim.add_report_obj(f"BIRDC({router})[{query}]", birdc_output)
+        # Return the output from birdc
+        return birdc_output
+
+    def _bird_route_table(self, sim: Simulation, router: str, route_table_name: str, **kwargs) -> Any:
         """Routing table retrieval helper."""
         # Grab the route table
-        route_table = sim.node(name).birdc_show_route_table(route_table_name, **kwargs)
+        route_table = sim.node(router).birdc_show_route_table(route_table_name, **kwargs)
         # Add report
-        sim.add_report_obj(f"BIRD({name})[{route_table_name}]", route_table)
+        sim.add_report_obj(f"BIRD({router})[{route_table_name}]", route_table)
         # Return route table
         return route_table
 
-    def _bird_bgp_peer_table(self, sim: Simulation, name: str, peer_name: str, ipv: int) -> str:
+    def _bird_bgp_peer_table(self, sim: Simulation, router: str, peer_name: str, ipv: int) -> str:
         """Get a bird BGP peer table name."""
-        return sim.config(name).birdconf.protocols.bgp.peer(peer_name).bgp_table_name(ipv)
+        return sim.config(router).birdconf.protocols.bgp.peer(peer_name).bgp_table_name(ipv)
 
-    def _bird_log_matches(self, sim: Simulation, name: str, matches: str) -> bool:
+    def _bird_log_matches(self, sim: Simulation, router: str, matches: str) -> bool:
         """Check if the BIRD log file contains a string."""
 
-        logname = f"LOGFILE({name})"
+        logname = f"LOGFILE({router})"
         # Make sure the log name exists
         if logname not in sim.logfiles:
             raise RuntimeError(f"Log name not found: {logname}")
@@ -242,13 +256,13 @@ class BirdPlanBaseTestCase:
             tries += 1
             time.sleep(1)
 
-    def _exabgpcli(self, sim: Simulation, name: str, args: List[str], report_title: str = "") -> List[str]:
+    def _exabgpcli(self, sim: Simulation, exabgp_name: str, args: List[str], report_title: str = "") -> List[str]:
         """Run the ExaBGP cli."""
         # Grab the route table
-        output = sim.node(name).exabgpcli(args)
+        output = sim.node(exabgp_name).exabgpcli(args)
         # Add report
-        sim.add_report_obj(f"EXABGP({name})[command{report_title}]", args)
-        sim.add_report_obj(f"EXABGP({name})[output{report_title}]", output)
+        sim.add_report_obj(f"EXABGP({exabgp_name})[command{report_title}]", args)
+        sim.add_report_obj(f"EXABGP({exabgp_name})[output{report_title}]", output)
         # Return route table
         return output
 
