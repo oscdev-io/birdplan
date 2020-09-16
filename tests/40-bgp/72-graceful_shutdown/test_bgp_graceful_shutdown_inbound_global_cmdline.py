@@ -119,7 +119,7 @@ class BGPGracefulShutdownInboundGlobalCmdlineBase(BirdPlanBaseTestCase):
 
         # Check r2 was removed
         graceful_shutdown_list = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "graceful_shutdown", "list"])
-        assert graceful_shutdown_list == [], "Router match '*' is not in the graceful shutdown list"
+        assert graceful_shutdown_list == [], "Router r1 graceful shutdown list should be empty"
 
         # Rewrite configuration file
         self._birdplan_run(sim, tmpdir, "r1", ["configure"])
