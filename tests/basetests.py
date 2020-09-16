@@ -22,6 +22,7 @@
 """Base test classes for our tests."""
 
 from typing import Any, Dict, List, Optional
+import logging
 import os
 import re
 import time
@@ -30,7 +31,7 @@ from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.exabgp_router_node import ExaBGPRouterNode
 from nsnetsim.switch_node import SwitchNode
 from simulation import Simulation
-from birdplan import BirdPlan  # pylint: disable=import-error
+from birdplan.cmdline import BirdPlanCommandLine  # pylint: disable=import-error
 
 
 BirdConfigMacros = Optional[Dict[str, Dict[str, str]]]
@@ -84,30 +85,51 @@ class BirdPlanBaseTestCase:
         """Create our configuration files."""
         # Generate config files
         for router in self.routers:
+            birdplan_file = f"{tmpdir}/birdplan.yaml.{router}"
             bird_conffile = f"{tmpdir}/bird.conf.{router}"
+            bird_statefile = f"{tmpdir}/bird.state.{router}"
             bird_logfile = f"{tmpdir}/bird.log.{router}"
-
-            # Lets start configuring...
-            birdplan = BirdPlan()
-
-            # Set test mode
-            birdplan.birdconf.test_mode = True
 
             # Work out the macro's we'll be using
             macros = {"@LOGFILE@": bird_logfile}
             if extra_macros and (router in extra_macros):
                 macros.update(extra_macros[router])
 
-            # Load yaml config
-            birdplan.load(f"{self.test_dir}/{router}.yaml", macros)
+            # Read in configuration file
+            with open(f"{self.test_dir}/{router}.yaml", "r") as file:
+                raw_config = file.read()
+            # Check if we're replacing macros in our configuration file
+            for macro, value in macros.items():
+                raw_config = raw_config.replace(macro, value)
+            # Write out new BirdPlan file with macros replaced
+            with open(birdplan_file, "w") as file:
+                file.write(raw_config)
 
-            # Generate BIRD config
-            birdplan.generate(bird_conffile)
+            # Invoke by simulating the commandline...
+            birdplan_cmdline = BirdPlanCommandLine()
+            # Disable logging for filelog
+            logging.getLogger("filelock").setLevel(logging.ERROR)
+            # Set test mode
+            birdplan_cmdline.birdplan.birdconf.test_mode = True
+            # Run BirdPlan as if it was from the commandline
+            birdplan_cmdline.run(
+                [
+                    "--birdplan-file",
+                    birdplan_file,
+                    "--bird-config-file",
+                    bird_conffile,
+                    "--birdplan-state-file",
+                    bird_statefile,
+                    "configure"
+                ]
+            )
+
+            # Add test report sections
             sim.add_conffile(f"CONFFILE({router})", bird_conffile)
             sim.add_logfile(f"LOGFILE({router})", bird_logfile)
 
             # Add the birdplan configuration object to the simulation
-            sim.add_config(router, birdplan)
+            sim.add_config(router, birdplan_cmdline.birdplan)
 
     def _test_setup(self, sim, tmpdir):
         """Set up a BIRD test scenario using our attributes."""
