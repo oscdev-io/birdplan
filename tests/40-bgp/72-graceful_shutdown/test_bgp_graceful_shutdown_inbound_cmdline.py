@@ -27,7 +27,7 @@ import time
 from basetests import BirdPlanBaseTestCase
 
 
-class BGPGracefulShutdownInboundBase(BirdPlanBaseTestCase):
+class BGPGracefulShutdownInboundCmdlineBase(BirdPlanBaseTestCase):
     """Base class for BGP graceful shutdown inbound from commandline."""
 
     test_dir = os.path.dirname(__file__)
@@ -174,7 +174,7 @@ class BGPGracefulShutdownInboundBase(BirdPlanBaseTestCase):
         return (peer_bgp4_table, peer_bgp6_table)
 
 
-class TestCustomer(BGPGracefulShutdownInboundBase):
+class TestCustomer(BGPGracefulShutdownInboundCmdlineBase):
     """Test graceful shutdown inbound for the 'customer' peer type."""
 
     # BIRD configuration
@@ -376,7 +376,7 @@ class TestCustomer(BGPGracefulShutdownInboundBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestPeer(BGPGracefulShutdownInboundBase):
+class TestPeer(BGPGracefulShutdownInboundCmdlineBase):
     """Test graceful shutdown inbound for the 'peer' peer type."""
 
     # BIRD configuration
@@ -574,7 +574,7 @@ class TestPeer(BGPGracefulShutdownInboundBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestTransit(BGPGracefulShutdownInboundBase):
+class TestTransit(BGPGracefulShutdownInboundCmdlineBase):
     """Test graceful shutdown inbound for the 'transit' peer type."""
 
     # BIRD configuration
@@ -776,7 +776,7 @@ class TestTransit(BGPGracefulShutdownInboundBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRrclient(BGPGracefulShutdownInboundBase):
+class TestRrclient(BGPGracefulShutdownInboundCmdlineBase):
     """Test graceful shutdown inbound for the 'rrclient' peer type."""
 
     # BIRD configuration
@@ -975,7 +975,7 @@ class TestRrclient(BGPGracefulShutdownInboundBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRrserver(BGPGracefulShutdownInboundBase):
+class TestRrserver(BGPGracefulShutdownInboundCmdlineBase):
     """Test graceful shutdown inbound for the 'rrserver' peer type."""
 
     # BIRD configuration
@@ -1175,7 +1175,7 @@ class TestRrserver(BGPGracefulShutdownInboundBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRrserverRrserver(BGPGracefulShutdownInboundBase):
+class TestRrserverRrserver(BGPGracefulShutdownInboundCmdlineBase):
     """Test graceful shutdown inbound for the 'rrserver-rrserver' peer type."""
 
     # BIRD configuration
@@ -1378,7 +1378,7 @@ class TestRrserverRrserver(BGPGracefulShutdownInboundBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRoutecollector(BGPGracefulShutdownInboundBase):
+class TestRoutecollector(BGPGracefulShutdownInboundCmdlineBase):
     """Test graceful shutdown inbound for the 'routecollector' peer type."""
 
     # BIRD configuration
@@ -1490,7 +1490,7 @@ class TestRoutecollector(BGPGracefulShutdownInboundBase):
         assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
 
 
-class TestRouteserver(BGPGracefulShutdownInboundBase):
+class TestRouteserver(BGPGracefulShutdownInboundCmdlineBase):
     """Test graceful shutdown inbound for the 'routeserver' peer type."""
 
     # BIRD configuration
