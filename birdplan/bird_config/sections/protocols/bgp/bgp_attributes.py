@@ -74,6 +74,8 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
     ----------
     asn : int
         BGP ASN.
+    graceful_shutdown ; boolean
+        Set graceful_shutdown mode for all peers.
     rr_cluster_id : Optional[str]
         Route relfector cluster ID in the case of us being a route reflector.
     route_policy_accept : BGPRoutePolicyAccept
@@ -84,6 +86,7 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
     """
 
     asn: Optional[int]
+    graceful_shutdown: bool = False
     rr_cluster_id: Optional[str]
     route_policy_accept: BGPRoutePolicyAccept
     route_policy_import: BGPRoutePolicyImport

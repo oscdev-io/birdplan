@@ -19,7 +19,7 @@
 # type: ignore
 # pylint: disable=import-error,no-self-use,too-many-lines,too-many-public-methods
 
-"""BGP test for prepending 2x."""
+"""BGP test for prepending 1x."""
 
 import os
 from nsnetsim.bird_router_node import BirdRouterNode
@@ -28,8 +28,8 @@ from nsnetsim.switch_node import SwitchNode
 from basetests import BirdPlanBaseTestCase
 
 
-class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
-    """BGP test for prepending 2x."""
+class TestBGPLCPrepend1x(BirdPlanBaseTestCase):
+    """BGP test for prepending 1x."""
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9"]
@@ -74,12 +74,12 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
         self._exabgpcli(
             sim,
             "e1",
-            ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.10 large-community [ 65000:62:65003 ]"],
+            ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.10 large-community [ 65000:6:65003 ]"],
         )
         self._exabgpcli(
             sim,
             "e1",
-            ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::10 large-community [ 65000:62:65003 ]"],
+            ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::10 large-community [ 65000:6:65003 ]"],
         )
 
     def test_bird_status(self, sim):
@@ -126,7 +126,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -150,7 +150,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -183,7 +183,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -207,7 +207,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -239,8 +239,8 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65010",
                     "attributes": {
-                        "BGP.as_path": [65010, 65010, 65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.as_path": [65010, 65010],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -263,8 +263,8 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65010",
                     "attributes": {
-                        "BGP.as_path": [65010, 65010, 65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.as_path": [65010, 65010],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -297,7 +297,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -321,7 +321,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -354,7 +354,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -378,7 +378,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -411,7 +411,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -435,7 +435,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -468,7 +468,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -492,7 +492,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -525,7 +525,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -549,7 +549,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -582,7 +582,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -606,7 +606,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -639,7 +639,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65002, 3, 4)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65002, 3, 4)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -663,7 +663,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65002, 3, 4)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65002, 3, 4)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -695,8 +695,8 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65010",
                     "attributes": {
-                        "BGP.as_path": [65000, 65010, 65010, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65003, 3, 3)],
+                        "BGP.as_path": [65000, 65010, 65010],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65003, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -719,8 +719,8 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65010",
                     "attributes": {
-                        "BGP.as_path": [65000, 65010, 65010, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65003, 3, 3)],
+                        "BGP.as_path": [65000, 65010, 65010],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65003, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -742,10 +742,10 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
         """Test r4's r1 BGP peer table."""
 
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r4", "r1", 4)
-        peer_bgp4_table = self._bird_route_table(sim, "r4", peer_bgp_table_name)
+        peer_bgp4_table = self._bird_route_table(sim, "r4", peer_bgp_table_name, expect_count=1)
 
         peer_bgp_table_name = self._bird_bgp_peer_table(sim, "r4", "r1", 6)
-        peer_bgp6_table = self._bird_route_table(sim, "r4", peer_bgp_table_name)
+        peer_bgp6_table = self._bird_route_table(sim, "r4", peer_bgp_table_name, expect_count=1)
 
         correct_result = {
             "100.64.101.0/24": [
@@ -753,7 +753,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65004, 3, 2)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65004, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -777,7 +777,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65004, 3, 2)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65004, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -810,7 +810,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -835,7 +835,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -869,7 +869,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -894,7 +894,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -928,7 +928,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -953,7 +953,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -987,7 +987,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65008, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65008, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -1011,7 +1011,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65008, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65008, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -1044,7 +1044,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65009, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65009, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -1068,7 +1068,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65009, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65009, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -1098,7 +1098,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -1122,7 +1122,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 62, 65003), (65000, 3, 2)],
+                        "BGP.large_community": [(65000, 6, 65003), (65000, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -1152,7 +1152,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65002, 3, 4)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65002, 3, 4)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -1176,7 +1176,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65002, 3, 4)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65002, 3, 4)],
                         "BGP.local_pref": 150,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -1205,8 +1205,8 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65010",
                     "attributes": {
-                        "BGP.as_path": [65000, 65010, 65010, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65003, 3, 3)],
+                        "BGP.as_path": [65000, 65010, 65010],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65003, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -1229,8 +1229,8 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                 {
                     "asn": "AS65010",
                     "attributes": {
-                        "BGP.as_path": [65000, 65010, 65010, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65003, 3, 3)],
+                        "BGP.as_path": [65000, 65010, 65010],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65003, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -1260,7 +1260,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65004, 3, 2)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65004, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -1284,7 +1284,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65004, 3, 2)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65004, 3, 2)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -1314,7 +1314,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -1339,7 +1339,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -1370,7 +1370,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -1395,7 +1395,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -1426,7 +1426,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["100.64.0.10"],
                         "BGP.origin": "IGP",
@@ -1451,7 +1451,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003)],
                         "BGP.local_pref": 750,
                         "BGP.next_hop": ["fc00:100::10"],
                         "BGP.origin": "IGP",
@@ -1473,8 +1473,8 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
     def test_bird_table_bgp_r8(self, sim, helpers):
         """Test BIRD main bgp routing tables."""
 
-        r8_table4 = self._bird_route_table(sim, "r8", "t_bgp4")
-        r8_table6 = self._bird_route_table(sim, "r8", "t_bgp6")
+        r8_table4 = self._bird_route_table(sim, "r8", "t_bgp4", expect_count=1)
+        r8_table6 = self._bird_route_table(sim, "r8", "t_bgp6", expect_count=1)
 
         correct_result = {
             "100.64.101.0/24": [
@@ -1482,7 +1482,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65008, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65008, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -1506,7 +1506,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65008, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65008, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",
@@ -1527,8 +1527,8 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
     def test_bird_table_bgp_r9(self, sim, helpers):
         """Test BIRD main bgp routing tables."""
 
-        r8_table4 = self._bird_route_table(sim, "r9", "t_bgp4")
-        r8_table6 = self._bird_route_table(sim, "r9", "t_bgp6")
+        r8_table4 = self._bird_route_table(sim, "r9", "t_bgp4", expect_count=1)
+        r8_table6 = self._bird_route_table(sim, "r9", "t_bgp6", expect_count=1)
 
         correct_result = {
             "100.64.101.0/24": [
@@ -1536,7 +1536,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65009, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65009, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["100.64.0.1"],
                         "BGP.origin": "IGP",
@@ -1560,7 +1560,7 @@ class TestBGPLCPrepend2x(BirdPlanBaseTestCase):
                     "asn": "AS65010",
                     "attributes": {
                         "BGP.as_path": [65000, 65010],
-                        "BGP.large_community": [(65000, 3, 2), (65000, 62, 65003), (65009, 3, 3)],
+                        "BGP.large_community": [(65000, 3, 2), (65000, 6, 65003), (65009, 3, 3)],
                         "BGP.local_pref": 470,
                         "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                         "BGP.origin": "IGP",

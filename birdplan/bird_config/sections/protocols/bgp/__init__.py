@@ -228,7 +228,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (2..65534, *) ];  # TESTING: Start changed from 1 to 2")
         else:
             self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (1..65534, *) ];")
-        self.constants.conf.append("define BGP_LC_STRIP = [ (BGP_ASN, 5, *), (BGP_ASN, 7..61, *), (BGP_ASN, 64..65535, *) ];")
+        self.constants.conf.append("define BGP_LC_STRIP = [ ")
+        self.constants.conf.append("  (BGP_ASN, 5, *), (BGP_ASN, 7, *), (BGP_ASN, 9..61, *), (BGP_ASN, 64..65535, *)")
+        self.constants.conf.append("];")
         self.constants.conf.append("define BGP_COMMUNITY_STRIP_ALL = BGP_COMMUNITY_STRIP;")
         self.constants.conf.append("define BGP_LC_STRIP_ALL = [ (BGP_ASN, *, *) ];")
 
@@ -250,9 +252,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_UN = 2;")
         self.constants.conf.append("define BGP_LC_FUNCTION_RELATION = 3;")
         self.constants.conf.append("define BGP_LC_FUNCTION_NOEXPORT = 4;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_NOEXPORT_LOCATION = 5;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_ONE = 6;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_TWO = 62;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_THREE = 63;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_ONE = 7;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_TWO = 72;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_THREE = 73;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF_MINUS_ONE = 8;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF_MINUS_TWO = 82;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF_MINUS_THREE = 83;")
         self.constants.conf.append("define BGP_LC_FUNCTION_INFORMATION = 1000;")
         self.constants.conf.append("define BGP_LC_FUNCTION_FILTERED = 1101;")
         self.constants.conf.append("")
@@ -269,6 +278,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_RELATION_PEER = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 3);")
         self.constants.conf.append("define BGP_LC_RELATION_TRANSIT = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 4);")
         self.constants.conf.append("define BGP_LC_RELATION_ROUTESERVER = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 5);")
+        self.constants.conf.append("")
+
+        self.constants.conf.append("# Large communities for LOCAL_PREF attribute manipulation")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_ONE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF_MINUS_ONE, 1);")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_TWO = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF_MINUS_TWO, 2);")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_THREE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF_MINUS_THREE, 3);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community information")
@@ -793,6 +808,24 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
+        self.functions.conf.append("# BGP import local_pref manipulation")
+        self.functions.conf.append("function bgp_import_localpref() {")
+        self.functions.conf.append("  # If we are reducing local_pref by three")
+        self.functions.conf.append("  if (BGP_LC_LOCALPREF_MINUS_THREE ~ bgp_large_community) then {")
+        self.functions.conf.append('    print "[bgp_import_localpref] Matched BGP_LC_LOCALPREF_MINUS_THREE for ", net;', debug=True)
+        self.functions.conf.append("    bgp_local_pref = bgp_local_pref - 3;")
+        self.functions.conf.append("  # If we are reducing local_pref by two")
+        self.functions.conf.append("  } else if (BGP_LC_LOCALPREF_MINUS_TWO ~ bgp_large_community) then {")
+        self.functions.conf.append('    print "[bgp_import_localpref] Matched BGP_LC_LOCALPREF_MINUS_TWO for ", net;', debug=True)
+        self.functions.conf.append("    bgp_local_pref = bgp_local_pref - 2;")
+        self.functions.conf.append("  # If we are reducing local_pref by one")
+        self.functions.conf.append("  } else if (BGP_LC_LOCALPREF_MINUS_ONE ~ bgp_large_community) then {")
+        self.functions.conf.append('    print "[bgp_import_localpref] Matched BGP_LC_LOCALPREF_MINUS_ONE for ", net;', debug=True)
+        self.functions.conf.append("    bgp_local_pref = bgp_local_pref - 1;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
     def _configure_originated_routes(self) -> None:
         # Work out static v4 and v6 routes
         routes: Dict[str, List[str]] = {"4": [], "6": []}
@@ -940,6 +973,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Enable bogon constants
         self.constants.need_bogons = True
         self.functions.need_functions = True
+
+    @property
+    def graceful_shutdown(self) -> bool:
+        """Return our the value of graceful_shutdown."""
+        return self.bgp_attributes.graceful_shutdown
+
+    @graceful_shutdown.setter
+    def graceful_shutdown(self, graceful_shutdown: bool) -> None:
+        """Set the value of graceful_shutdown."""
+        self.bgp_attributes.graceful_shutdown = graceful_shutdown
 
     @property
     def rr_cluster_id(self) -> Optional[str]:

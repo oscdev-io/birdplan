@@ -23,8 +23,7 @@ bgp:
       error_wait_time: 2,5
       type: customer
       redistribute:
-        default: True
-        static: True
+@EXTRA_CONFIG@
       filter:
         asns:
           - 65001
@@ -40,8 +39,7 @@ bgp:
       error_wait_time: 2,5
       type: customer
       redistribute:
-        default: True
-        static: True
+@EXTRA_CONFIG@
       filter:
         asns:
           - 65002

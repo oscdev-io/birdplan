@@ -49,9 +49,9 @@ Brief overview of FUNCTION assignments...
 | 62 | ENHANCED: ASN-Based Selective AS Path Prepending (two) [^lc-function-6] |
 | 63 | ENHANCED: ASN-Based Selective AS Path Prepending (three) [^lc-function-6] |
 | 7 | TODO: Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
-| 71 | TODO ENHANCED: Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
-| 72 | TODO ENHANCED: Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
-| 8 | TODO ENHANCED: Manipulation of the LOCAL_PREF Attribute (set to 1, 2, 3) [^lc-function-8] |
+| 72 | TODO ENHANCED: Location-Based Selective AS Path Prepending (two) [^lc-function-7] |
+| 73 | TODO ENHANCED: Location-Based Selective AS Path Prepending (three) [^lc-function-7] |
+| 8 | TODO ENHANCED: Manipulation of the LOCAL_PREF Attribute [^lc-function-8] |
 | 1000 | Route information |
 | 1101 | Route filtered |
 
@@ -94,6 +94,19 @@ Allowable internally and by `customer`.
 | (OWN_ASN, 4, 65413) | Do not export to peers |
 | (OWN_ASN, 4, 65414) | Do not export to customers |
 
+## Location-based selective NOEXPORT Communities
+
+TODO
+
+Location based selective NOEXPORT using an ISO-3166-1 country identifier.
+
+Allowable internally and by `customer`.
+
+| Community | Description |
+| --- | --- |
+| (OWN_ASN, 5, COUNTRY) | Do not export to peer in ISO-3166-1 country (https://www.iso.org/iso-3166-country-codes.html) |
+
+
 ## Prepending Communities
 
 Allowable internally and by `customer`.
@@ -103,6 +116,33 @@ Allowable internally and by `customer`.
 | (OWN_ASN, 6, PEER_ASN) | Prepend 1x to PEER_ASN |
 | (OWN_ASN, 62, PEER_ASN) | Prepend 2x to PEER_ASN |
 | (OWN_ASN, 63, PEER_ASN) | Prepend 3x to PEER_ASN |
+
+
+## Location-Based Selective AS Path Prepending Communities
+
+TODO
+
+Allowable internally and by `customer`.
+
+| Community | Description |
+| --- | --- |
+| (OWN_ASN, 7, COUNTRY) | Prepend 1x to ISO-3166-1 country (https://www.iso.org/iso-3166-country-codes.html) |
+| (OWN_ASN, 72, COUNTRY) | Prepend 2x to ISO-3166-1 country (https://www.iso.org/iso-3166-country-codes.html) |
+| (OWN_ASN, 73, COUNTRY) | Prepend 3x to ISO-3166-1 country (https://www.iso.org/iso-3166-country-codes.html) |
+
+
+## LOCAL_PREF Attribute Manipulation Communities
+
+TODO
+
+Allowable internally and by `customer`.
+
+| Community | Description |
+| --- | --- |
+| (OWN_ASN, 8, 1) | Decrease local_pref by 1 |
+| (OWN_ASN, 8, 2) | Decrease local_pref by 2 |
+| (OWN_ASN, 8, 3) | Decrease local_pref by 3 |
+
 
 ## Route Information Communities
 

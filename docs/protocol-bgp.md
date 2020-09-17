@@ -39,6 +39,32 @@ bgp:
 ```
 
 
+## graceful_shutdown
+
+Add the graceful_shutdown community to all outgoing prefixes for all peers.
+
+This in essence should result in all peers setting their local_pref to 0 for routes we advertise.
+
+We will also ensure that all received routes have a local_pref of 0.
+
+This will result hopefully in traffic being drained from this router.
+
+This is also a peer-specific option (below), which will activate global_shutdown on a single peer.
+
+An example is however below...
+
+```yaml
+...
+
+bgp:
+  graceful_shutdown: True
+  peers:
+    peer1:
+      asn: 65000
+...
+```
+
+
 # import
 
 The `import` key contains a dictionary of the routes to import into the main BGP table.
@@ -465,7 +491,13 @@ bgp:
 
 Add the graceful_shutdown community to all outgoing prefixes for this peer.
 
-This in essence should result in the peer setting its local_pref to 0.
+This in essence should result in the peer setting its local_pref to 0 for routes we advertise.
+
+We will also ensure that all received routes have a local_pref of 0.
+
+This will result hopefully in traffic being drained from this peer.
+
+This is also a global option (above), which will activate global_shutdown on all peers.
 
 An example is however below...
 
@@ -663,7 +695,7 @@ for peer type `rrserver-rrserver` which defaults to `True`.
 * `originated` will redistribute originated routes. Defaults to `False`.
 
 In addition to setting these as a boolean value, one can also add the following items to a dictionary...
-* `redistribute_large_communities` will add additional large communities when exporting routes of this type
+* `large_communities` will add additional large communities when exporting routes of this type
 
 Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
 

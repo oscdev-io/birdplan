@@ -22,4 +22,4 @@ bgp:
       error_wait_time: 2,5
       type: peer
       redistribute:
-        originated: True
+@EXTRA_CONFIG@

@@ -19,25 +19,27 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP test for redistributed static routes without default."""
+"""BGP test for redistributed static routes without default with large communities."""
 
 import os
 from basetests import BirdPlanBaseTestCase
 
 
-class TestBGPRedistributeOnlyDefault(BirdPlanBaseTestCase):
-    """BGP test for redistributed static routes without default."""
+class TestBGPRedistributeStaticWithoutDefaultLargeCommunity(BirdPlanBaseTestCase):
+    """BGP test for redistributed static routes without default with large communities."""
 
     test_dir = os.path.dirname(__file__)
     routers = ["r1", "r2"]
     r1_extra_config = """
-        default: True
+        static:
+          large_communities:
+            - 65000:5000:1
 """
     r1_interfaces = ["eth0", "eth1"]
     r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["192.168.1.1/24", "fc01::1/64"]}
 
     def test_setup(self, sim, tmpdir):
-        """Setup our test."""
+        """Set up our test."""
         self._test_setup(sim, tmpdir)
 
     def test_bird_status(self, sim):
