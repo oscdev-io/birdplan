@@ -843,6 +843,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     type_lines.append(f'    print "[{self.filter_name_import(ipv)}] Adding LC {large_community} to ", net;')
                 type_lines.append(f"    bgp_large_community.add({large_community});")
 
+        # Support for changing incoming local_pref
+        if self.peer_type == "customer":
+            type_lines.append("    bgp_import_localpref();")
+
         # Enable graceful_shutdown for this prefix
         if self.graceful_shutdown:
             type_lines.append("    bgp_graceful_shutdown_enable();")
