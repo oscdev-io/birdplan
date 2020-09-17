@@ -1,6 +1,6 @@
-# BGP filtering tests
+# BGP large community function tests (outbound)
 
-Router r1 should be receiving routes from e1 test cases. As we are dealing with filtering r1's main BGP routing table should be blank and the routes in the BGP peer routing table should all be marked filtered.
+Router r1 should be receiving routes from e1 test cases and advertising to r2-r9.
 
 Tests done include:
   * NOEXPORT for PEER_ASN
@@ -21,7 +21,7 @@ Tests done include:
 ```plantuml
 @startuml
 hide circle
-title Test BGP large community functions from e1 to r1 to r2
+title Test BGP large community functions from e1 to r1 to r2-r9
 left to right direction
 
 
@@ -33,7 +33,7 @@ class "Router: r1" {
   .. BGP ..
 * AS65000
 }
-note top: r1 should get the NOEXPORT route from e1 \n and advertise to the peers on the right
+note top: r1 should get a test route from e1 \n and advertise it to r2-r9
 
 
 class "Router: r2" {
@@ -132,7 +132,7 @@ class "ExaBGP: e1" {
   .. BGP ..
 * AS65001
 }
-note top: Advertise a NOEXPORT LC function from e1 to r1
+note top: Advertise a test case from e1 to r1
 
 
 class "Switch: s1" {}
