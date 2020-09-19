@@ -22,16 +22,18 @@
 """Base test classes for our tests."""
 
 from typing import Any, Dict, List, Optional
+import importlib
 import logging
 import os
 import re
 import time
+import pathlib
 import pprint
 import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.exabgp_router_node import ExaBGPRouterNode
 from nsnetsim.switch_node import SwitchNode
-from simulation import Simulation
+from .simulation import Simulation
 from birdplan.cmdline import BirdPlanCommandLine  # pylint: disable=import-error
 
 
@@ -54,6 +56,9 @@ class BirdPlanBaseTestCase:
     # List of bird routers to configure, eg. ["r1", "r2"]
     routers = ["r1"]
 
+    # List of switches to create
+    switches = ["s1"]
+
     # Supported attributes include
     # rX_peer_asn
     # rX_peer_type
@@ -66,21 +71,25 @@ class BirdPlanBaseTestCase:
     r1_interfaces = ["eth0"]
     r1_interface_eth0 = {"mac": "02:01:00:00:00:01", "ips": ["100.64.0.1/24", "fc00:100::1/64"]}
     r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["100.101.0.1/24", "fc00:101::1/64"]}
+    r1_switch_eth0 = "s1"
 
     r2_asn = "65001"
     r2_peer_asn = "65000"
     r2_interfaces = ["eth0"]
     r2_interface_eth0 = {"mac": "02:02:00:00:00:01", "ips": ["100.64.0.2/24", "fc00:100::2/64"]}
     r2_interface_eth1 = {"mac": "02:02:00:00:00:02", "ips": ["100.102.0.1/24", "fc00:102::1/64"]}
+    r2_switch_eth0 = "s1"
 
     r3_asn = "65002"
     r3_peer_asn = "65000"
     r3_interfaces = ["eth0"]
     r3_interface_eth0 = {"mac": "02:03:00:00:00:01", "ips": ["100.64.0.3/24", "fc00:100::3/64"]}
+    r3_switch_eth0 = "s1"
 
     e1_asn = "65001"
     e1_interfaces = ["eth0"]
     e1_interface_eth0 = {"mac": "02:e1:00:00:00:01", "ips": ["100.64.0.2/24", "fc00:100::2/64"]}
+    e1_switch_eth0 = "s1"
 
     def _test_setup(self, sim, testpath, tmpdir):
         """Set up a BIRD test scenario using our attributes."""
@@ -106,6 +115,10 @@ class BirdPlanBaseTestCase:
             exalogfile = sim.node(exabgp).logfile
             sim.add_logfile(f"LOGFILE({exabgp}) => {exalogfile}", sim.node(exabgp).logfile)
 
+        # Loop with switches to create
+        for switch in self.switches:
+            sim.add_node(SwitchNode(switch))
+
         # Loop with routers
         for router in self.routers:
             # Get configuration for this router
@@ -116,6 +129,11 @@ class BirdPlanBaseTestCase:
                 config = getattr(self, f"{router}_interface_{interface}")
                 # Add each interface
                 sim.node(router).add_interface(interface, config["mac"], config["ips"])
+                # Check if this interface should be connected to a switch
+                switch_attr = f"{router}_switch_{interface}"
+                if hasattr(self, switch_attr):
+                    switch = getattr(self, switch_attr)
+                    sim.node(switch).add_interface(sim.node(router).interface(interface))
         # Loop with ExaBGP's
         for exabgp in self.exabgps:
             # Get configuration for this ExaBGP instance
@@ -125,16 +143,11 @@ class BirdPlanBaseTestCase:
                 # Grab interface config
                 config = getattr(self, f"{exabgp}_interface_{interface}")
                 sim.node(exabgp).add_interface(interface, config["mac"], config["ips"])
-
-        sim.add_node(SwitchNode("s1"))
-        # Loop with BIRD routers
-        for router in self.routers:
-            # Add eth0 to the switch
-            sim.node("s1").add_interface(sim.node(router).interface("eth0"))
-        # Loop with ExaBGP instances
-        for exabgp in self.exabgps:
-            # Add eth0 to the switch
-            sim.node("s1").add_interface(sim.node(exabgp).interface("eth0"))
+                # Check if this interface should be connected to a switch
+                switch_attr = f"{exabgp}_switch_{interface}"
+                if hasattr(self, switch_attr):
+                    switch = getattr(self, switch_attr)
+                    sim.node(switch).add_interface(sim.node(exabgp).interface(interface))
 
         # Simulate our topology
         sim.run()
@@ -205,18 +218,33 @@ class BirdPlanBaseTestCase:
     def _get_table_data(self, router: str, table_name: str, testpath):
         """Grab data for a specific BIRD router table."""
 
-        # Get data module name, remove ".py" at end of test file and add "_data.py"
-        data_file = "data_" + os.path.basename(testpath)[5:-3]
+        # Grab this files directory name
+        my_path = os.path.dirname(__file__)
+
+        # Grab relative path of our test file
+        test_relpath = pathlib.Path(testpath).relative_to(my_path)
+
+        # Grab test directory name
+        test_dirname = os.path.dirname(test_relpath)
+        # Grab test file name
+        test_basename = os.path.basename(test_relpath)
+
+        # Grab test package name
+        test_pkgname = test_dirname.replace("/", ".")
+
+        # Grab the module name and the module anchor
+        test_data_module_name = f".data_" + test_basename[5:-3]
+        test_data_anchor_name = f"tests.{test_pkgname}"
 
         # Import data module
-        data_module = __import__(data_file)
+        test_data_module = importlib.import_module(test_data_module_name, test_data_anchor_name)
 
         # Default to using an empty table
-        data = {}
+        data = None
         variable_name = f"{router}_{table_name}"
         # But if we have a variable set for this router and table, use it instead
-        if hasattr(data_module, variable_name):
-            data = getattr(data_module, variable_name)
+        if hasattr(test_data_module, variable_name):
+            data = getattr(test_data_module, variable_name)
 
         return (data, variable_name)
 

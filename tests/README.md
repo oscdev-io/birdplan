@@ -8,23 +8,20 @@
 
 # RIP
 
-[Basic RIP Routing](20-rip/basic/README.md) (including no kernel export)
+[Basic RIP Routing](20-rip/10-basic/README.md) (including no kernel export)
 
-[No Redistribute RIP](20-rip/no_redistribute_20-rip/README.md)
+[No Redistribute RIP](20-rip/20-no_redistribute/README.md)
 
-[Redistribute Connected](20-rip/redistribute_connected/README.md)
+[Redistribute Connected](20-rip/30-redistribute_connected/README.md)
 
-[Redistribute Connected (with star)](20-rip/redistribute_connected_with_star/README.md)
+[Redistribute Connected (with star)](20-rip/32-redistribute_connected_with_star/README.md)
 
-[Redistribute Kernel](20-rip/redistribute_kernel/README.md)
+[Redistribute Kernel](20-rip/40-redistribute_kernel/README.md)
 
-[Redistribute Only Default](20-rip/redistribute_only_default/README.md)
+[Redistribute Static](20-rip/50-redistribute_static/README.md)
 
-[Redistribute Static](20-rip/redistribute_static/README.md)
+[Redistribute Default](20-rip/60-redistribute_default/README.md)
 
-[Redistribute Static Default](20-rip/redistribute_static_default/README.md)
-
-[Redistribute Static Without Default](20-rip/redistribute_static_without_default/README.md)
 
 
 # OSPF

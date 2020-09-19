@@ -22,7 +22,7 @@
 
 import re
 import pytest
-from simulation import Simulation
+from .simulation import Simulation
 
 
 #
