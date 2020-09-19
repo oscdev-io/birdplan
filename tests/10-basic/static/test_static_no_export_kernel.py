@@ -19,10 +19,15 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Basic static route test cases."""
+"""Basic static route test cases without exporting to kernel FIB."""
 
 from template import Template
 
 
 class Test(Template):
-    """Basic set of tests for static routing."""
+    """Basic static route test cases without exporting to kernel FIB."""
+
+    r1_extra_config = """
+export_kernel:
+  static: False
+"""
