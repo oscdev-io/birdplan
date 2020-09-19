@@ -131,7 +131,8 @@ class BirdPlanCommandLine:
         self._args = self.argparser.parse_args(raw_args)
 
         # Setup logging
-        self._setup_logging()
+        if __name__ == "main":
+            self._setup_logging()
 
         # Make sure we have an action
         if "action" not in self.args:
