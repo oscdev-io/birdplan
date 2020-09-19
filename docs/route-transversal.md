@@ -15,6 +15,13 @@ class "Table: static" {
 + All routes to master
 }
 
+class "Table: direct" {
+  .. Imports ..
+- All connected routes
+  .. Exports ..
++ All routes to master
+}
+
 Package OSPF <<Folder>> {
     class "Table: ospf" {
     .. Imports ..
@@ -115,6 +122,7 @@ class "OS: RIB" {
 "Table: master" <-up-> "Table: bgp"
 
 "Table: static" -> "Table: master"
+"Table: master" <- "Table: direct"
 
 "Table: ospf_direct" -> "Table: ospf"
 "Table: rip_direct" -> "Table: rip"
