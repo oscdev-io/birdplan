@@ -19,15 +19,10 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Basic RIP test case without exporting to kernel FIB."""
+"""Basic RIP test case."""
 
 from template import Template
 
 
 class Test(Template):
-    """Basic RIP test case without exporting to kernel FIB."""
-
-    r2_extra_config = """
-export_kernel:
-  rip: False
-"""
+    """Basic RIP test case."""
