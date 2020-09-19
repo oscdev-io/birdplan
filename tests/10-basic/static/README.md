@@ -15,17 +15,22 @@ left to right direction
 
 class "Router: r1" {
   .. Interface: eth0 ..
-- 192.168.0.1/24
-+ fc00::1/64
+- 100.64.0.1/24
+- fc00:100::1/64
+
+  .. Interface: eth1 ..
+- 100.101.0.1/24
++ fc00:101::1/64
 
   .. BIRD static routes ..
-- 10.0.0.0/24 via 192.168.0.2 (eth0)
-+ fc10::/64 via fc00::2 (eth0)
+- 10.0.0.0/24 via 100.101.0.2 (eth1)
+- fc10::/64 via fc00:101::2 (eth1)
 }
 
 class "Switch: s1" {}
 
-"Router: r1" -- "Switch: s1": r1 eth0
+"Switch: s1" -- "Router: r1": r1 eth0
+"Router: r1" --() NC: r1 eth1
 
 
 @enduml
