@@ -87,7 +87,12 @@ class Simulation:
 
         This info is output on test failure.
         """
-        self._report[name] = pprint.pformat(obj)
+
+        # If the object is a string, use it as is
+        if isinstance(obj, str):
+            self._report[name] = obj
+        else:
+            self._report[name] = pprint.pformat(obj)
 
     def clear_report(self):
         """Clear all reports we currently have."""

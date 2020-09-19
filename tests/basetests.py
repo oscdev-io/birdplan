@@ -26,6 +26,7 @@ import logging
 import os
 import re
 import time
+import pprint
 import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.exabgp_router_node import ExaBGPRouterNode
@@ -44,8 +45,6 @@ BirdConfigMacros = Optional[Dict[str, Dict[str, str]]]
 @pytest.mark.incremental
 class BirdPlanBaseTestCase:
     """Base test case for our tests."""
-
-    test_dir = os.path.dirname(__file__)
 
     sim: Simulation
 
@@ -74,6 +73,8 @@ class BirdPlanBaseTestCase:
     r2_interface_eth0 = {"mac": "02:02:00:00:00:01", "ips": ["100.64.0.2/24", "fc00:100::2/64"]}
     r2_interface_eth1 = {"mac": "02:02:00:00:00:02", "ips": ["100.102.0.1/24", "fc00:102::1/64"]}
 
+    r3_asn = "65002"
+    r3_peer_asn = "65000"
     r3_interfaces = ["eth0"]
     r3_interface_eth0 = {"mac": "02:03:00:00:00:01", "ips": ["100.64.0.3/24", "fc00:100::3/64"]}
 
@@ -81,12 +82,13 @@ class BirdPlanBaseTestCase:
     e1_interfaces = ["eth0"]
     e1_interface_eth0 = {"mac": "02:e1:00:00:00:01", "ips": ["100.64.0.2/24", "fc00:100::2/64"]}
 
-    def _test_setup(self, sim, tmpdir):
+    def _test_setup(self, sim, testpath, tmpdir):
         """Set up a BIRD test scenario using our attributes."""
 
+        test_dir = os.path.dirname(testpath)
+
         # Configure our simulator with the BIRD routers
-        self._configure_bird_routers(sim, tmpdir)
-        print("Adding routers...")
+        self._configure_bird_routers(sim, test_dir, tmpdir)
         for router in self.routers:
             sim.add_node(BirdRouterNode(name=router, configfile=f"{tmpdir}/bird.conf.{router}"))
 
@@ -95,7 +97,7 @@ class BirdPlanBaseTestCase:
             # Grab ExaBGP's ASN
             exabgp_asn = getattr(self, f"{exabgp}_asn")
             # Work out config file name
-            exabgp_conffile = f"{self.test_dir}/exabgp.conf.{exabgp}.as{exabgp_asn}"
+            exabgp_conffile = f"{test_dir}/exabgp.conf.{exabgp}.as{exabgp_asn}"
             # Add ExaBGP node
             sim.add_node(ExaBGPRouterNode(name=exabgp, configfile=exabgp_conffile))
             # Add config file to our simulation so we get a report for it
@@ -104,7 +106,6 @@ class BirdPlanBaseTestCase:
             exalogfile = sim.node(exabgp).logfile
             sim.add_logfile(f"LOGFILE({exabgp}) => {exalogfile}", sim.node(exabgp).logfile)
 
-        print("Adding interfaces...")
         # Loop with routers
         for router in self.routers:
             # Get configuration for this router
@@ -125,7 +126,6 @@ class BirdPlanBaseTestCase:
                 config = getattr(self, f"{exabgp}_interface_{interface}")
                 sim.node(exabgp).add_interface(interface, config["mac"], config["ips"])
 
-        print("Adding switches...")
         sim.add_node(SwitchNode("s1"))
         # Loop with BIRD routers
         for router in self.routers:
@@ -137,16 +137,96 @@ class BirdPlanBaseTestCase:
             sim.node("s1").add_interface(sim.node(exabgp).interface("eth0"))
 
         # Simulate our topology
-        print("Simulate topology...")
         sim.run()
 
-    def _configure_bird_routers(self, sim: Simulation, tmpdir: str):
+    def _test_bird_status(self, sim):
+        """Test all bird instances are up and responding."""
+
+        # Loop with BIRD routers
+        for router in self.routers:
+            # Grab BIRD status
+            status_output = sim.node(router).birdc_show_status()
+            # Add status to the reprot
+            sim.add_report_obj(f"STATUS({router})", status_output)
+
+            # Grab router ID
+            router_id = router[1:]
+
+            # Check BIRD router ID
+            assert "router_id" in status_output, f"The status output should have 'router_id' for BIRD router '{router}'"
+            assert status_output["router_id"] == f"0.0.0.{router_id}", f"The router ID should be '0.0.0.{router_id}'"
+
+    def _test_bird_table(self, table_name: str, sim, testpath, routers: Optional[List[str]] = None):
+        """Test BIRD routing table."""
+
+        # Check if we didn't get a router list override, if we didn't, then use all routers
+        if not routers:
+            routers = self.routers
+
+        # Loop with our BIRD routers
+        for router in routers:
+            # Grab the table contents from the data module
+            correct_table, variable_name = self._get_table_data(router, table_name, testpath)
+
+            # If we have entries in our routing table, we set expect_count to that number, else we don't use expect_count by
+            # setting it to None
+            expect_count = None
+            if isinstance(correct_table, dict):
+                expect_count = len(correct_table) or None
+
+            # Grab the routers table from BIRD
+            route_table = self._bird_route_table(sim, router, table_name, expect_count=expect_count)
+
+            # Add report
+            report = f"{variable_name} = " + pprint.pformat(route_table)
+            sim.add_report_obj(f"BIRD({router})[{table_name}]", report)
+
+            # Make sure table matches
+            assert route_table == correct_table, f"BIRD router '{router}' table '{table_name}' does not match what it should be"
+
+    def _test_os_fib(self, table_name: str, sim, testpath):
+        """Test OS routing table."""
+
+        # Loop with our BIRD routers
+        for router in self.routers:
+            # Grab the table contents from the data module
+            correct_table, variable_name = self._get_table_data(router, table_name, testpath)
+
+            # Grab the FIB table from the OS
+            route_table = sim.node(router).run_ip(["--family", table_name, "route", "list"])
+
+            # Add report
+            report = f"{variable_name} = " + pprint.pformat(route_table, width=132, compact=True)
+            sim.add_report_obj(f"OS_FIB({router})[{table_name}]", report)
+
+            # Make sure table matches
+            assert route_table == correct_table, f"BIRD router '{router}' FIB '{table_name}' does not match what it should be"
+
+    def _get_table_data(self, router: str, table_name: str, testpath):
+        """Grab data for a specific BIRD router table."""
+
+        # Get data module name, remove ".py" at end of test file and add "_data.py"
+        data_file = "data_" + os.path.basename(testpath)[5:-3]
+
+        # Import data module
+        data_module = __import__(data_file)
+
+        # Default to using an empty table
+        data = {}
+        variable_name = f"{router}_{table_name}"
+        # But if we have a variable set for this router and table, use it instead
+        if hasattr(data_module, variable_name):
+            data = getattr(data_module, variable_name)
+
+        return (data, variable_name)
+
+    def _configure_bird_routers(self, sim: Simulation, test_dir: str, tmpdir: str):
         """Create our configuration files."""
         # Generate config files
         for router in self.routers:
-            self._birdplan_run(sim, tmpdir, router, ["configure"])
+            self._birdplan_run(sim, test_dir, tmpdir, router, ["configure"])
 
-    def _birdplan_run(self, sim: Simulation, tmpdir: str, router: str, args: List[str]) -> Any:
+    def _birdplan_run(self, sim: Simulation, test_dir: str, tmpdir: str, router: str, args: List[str]) -> Any:
         """Run BirdPlan for a given router."""
 
         # Work out file names
@@ -173,7 +253,7 @@ class BirdPlanBaseTestCase:
             macros.update(internal_macros)
 
         # Read in configuration file
-        with open(f"{self.test_dir}/{router}.yaml", "r") as file:
+        with open(f"{test_dir}/{router}.yaml", "r") as file:
             raw_config = file.read()
         # Check if we're replacing macros in our configuration file
         for macro, value in macros.items():
@@ -224,8 +304,12 @@ class BirdPlanBaseTestCase:
         """Routing table retrieval helper."""
         # Grab the route table
         route_table = sim.node(router).birdc_show_route_table(route_table_name, **kwargs)
-        # Add report
-        sim.add_report_obj(f"BIRD({router})[{route_table_name}]", route_table)
+
+        # Loop with routes and remove since fields
+        for route in route_table:
+            for dest in route_table[route]:
+                del dest["since"]
+
         # Return route table
         return route_table
 
@@ -268,6 +352,8 @@ class BirdPlanBaseTestCase:
 
     def _check_main_bgp_tables_empty(self, sim):
         """Test BIRD t_bgp4 table."""
+
+        raise DeprecationWarning("This shouldn't be used")
 
         bgp4_table = self._bird_route_table(sim, "r1", "t_bgp4")
         bgp6_table = self._bird_route_table(sim, "r1", "t_bgp6")

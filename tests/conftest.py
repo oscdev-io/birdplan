@@ -72,6 +72,12 @@ def fixture_tmpdir(tmpdir_factory):
     return tmpdir_factory.mktemp("config")
 
 
+@pytest.fixture(name="testpath")
+def fixture_testpath(request):
+    """Test file path."""
+    return str(request.node.fspath)
+
+
 #
 # Incremental marker, fail subsequent tests if one fails
 #
@@ -145,5 +151,4 @@ def fixture_sim():
 
     yield simulation
 
-    print("Destroying simulation...")
     simulation.destroy()
