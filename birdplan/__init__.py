@@ -724,13 +724,14 @@ class BirdPlan:
         # Check the peer type is valid
         if peer["type"] not in (
             "customer",
+            "internal",
             "peer",
-            "transit",
+            "routecollector",
+            "routeserver",
             "rrclient",
             "rrserver",
             "rrserver-rrserver",
-            "routecollector",
-            "routeserver",
+            "transit",
         ):
             raise BirdPlanError(f"Configuration item 'type' is invalid for bgp:peers:{peer_name}")
 

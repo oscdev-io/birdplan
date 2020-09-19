@@ -465,7 +465,7 @@ In the context of peer types `customer` and `peer` the above forms the ALLOW lis
 
 In the context of peer types `transit` and `routeserver` the above forms the DENY list. Everything specified will be filtered.
 
-In the context of peer t ypes `rrclient`, `rrserver`, `rrserver-rrserver` and `routecollector` the above makes no sense. But will form a DENY list.
+In the context of peer types `rrclient`, `rrserver`, `rrserver-rrserver` and `routecollector` the above makes no sense. But will form a DENY list.
 
 An example is however below...
 ```yaml
@@ -762,10 +762,11 @@ bgp:
 The peer type, options are detailed below...
 
 * `customer` this is a customer peering session.
+* `internal` this is an internal peering session between routers.
 * `peer` this is a peering partner peering session.
-* `transit` this is a transit provider peering session.
+* `routecollector` this is a route collector session.
+* `routeserver` this is a route server session.
 * `rrclient` this is a route reflector client peering session.
 * `rrserver` this is a route reflector server peering session.
 * `rrserver-rrserver` this is a peering session between two route reflectors or route reflector mirrors.
-* `routecollector` this is a route collector session.
-* `routeserver` this is a route server session.
+* `transit` this is a transit provider peering session.

@@ -125,7 +125,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         if "cost" in peer_config:
             # Raise an exception if peer cost does not make sense for a specific peer type
-            if self.peer_type in ("rrclient", "rrserver", "rrserver-rrserver", "routecollector"):
+            if self.peer_type in ("internal", "routecollector", "rrclient", "rrserver", "rrserver-rrserver"):
                 raise BirdPlanError(f"BGP peer '{self.name}' has 'cost' specified but makes no sense for this peer type")
             self.cost = peer_config["cost"]
 
@@ -148,8 +148,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.peer_type in ("customer", "rrclient"):
             self.passive = True
 
-        # If this is a rrserver, send our entire BGP table
-        if self.peer_type in ("rrclient", "rrserver", "rrserver-rrserver"):
+        # If this involves an internal peer, send our entire BGP table
+        if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             self.route_policy_redistribute.bgp = True
         # If this is an transit, peer, customer, routecollector or routeserver, we need to redistribute our own routes and
         # customer routes
@@ -543,7 +543,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Do not redistribute the default route, no matter where we get it from
         if self.route_policy_redistribute.default:
             # Make sure this is an allowed peer type for the default route to be exported
-            if self.peer_type not in ["customer", "rrclient", "rrserver", "rrserver-rrserver"]:
+            if self.peer_type not in ["customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"]:
                 raise BirdPlanError(f"Having 'redistribute[default]' as True for a '{self.peer_type}' makes no sense")
             # Proceed with exporting...
             self.conf.add("  # Accept the default route as we're redistributing, but only if, its been accepted above")
@@ -727,7 +727,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         type_lines = []
 
         # Check accept default is valid
-        if self.route_policy_accept.default and self.peer_type not in ("rrclient", "rrserver", "rrserver-rrserver", "transit"):
+        if self.route_policy_accept.default and self.peer_type not in (
+            "internal",
+            "rrclient",
+            "rrserver",
+            "rrserver-rrserver",
+            "transit",
+        ):
             raise BirdPlanError(f"Having 'accept[default]' as True for a '{self.peer_type}' makes no sense")
 
         # Clients
@@ -774,8 +780,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append("    bgp_filter_asn_short();")
             type_lines.append("    bgp_filter_asn_transit();")
             type_lines.append("    bgp_filter_community_length();")
-        # Route reflector peer types
-        elif self.peer_type in ("rrclient", "rrserver", "rrserver-rrserver"):
+        # Internal router peer types
+        elif self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             if not self.route_policy_accept.default:
                 type_lines.append(f"    bgp_filter_default_v{ipv}();")
         # Transit providers
