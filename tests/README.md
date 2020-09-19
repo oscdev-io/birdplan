@@ -8,7 +8,7 @@
 
 # RIP
 
-[No Export Kernel](20-rip/no_export_kernel/README.md)
+[Basic RIP Routing](20-rip/basic/README.md) (including no kernel export)
 
 [No Redistribute RIP](20-rip/no_redistribute_20-rip/README.md)
 
