@@ -178,45 +178,65 @@ class BirdPlanBaseTestCase:
 
         # Loop with our BIRD routers
         for router in routers:
-            # Grab the table contents from the data module
-            correct_table, variable_name = self._get_table_data(router, table_name, testpath)
+            # Grab the the test data module
+            test_data_module = self._get_test_data_module(testpath)
+
+            # Default to using an empty table
+            table_data = None
+            table_variable_name = f"{router}_{table_name}"
+            # But if we have a variable set for this router and table, use it instead
+            if hasattr(test_data_module, table_variable_name):
+                table_data = getattr(test_data_module, table_variable_name)
+
+            expect_content = None
+            expect_content_variable_name = f"{table_variable_name}_expect_content"
+            # Check if we have any expectation on content of the table
+            if hasattr(test_data_module, expect_content_variable_name):
+                expect_content = getattr(test_data_module, expect_content_variable_name)
 
             # If we have entries in our routing table, we set expect_count to that number, else we don't use expect_count by
             # setting it to None
             expect_count = None
-            if isinstance(correct_table, dict):
-                expect_count = len(correct_table) or None
+            if isinstance(table_data, dict):
+                expect_count = len(table_data) or None
 
             # Grab the routers table from BIRD
-            route_table = self._bird_route_table(sim, router, table_name, expect_count=expect_count)
+            route_table = self._bird_route_table(sim, router, table_name, expect_count=expect_count, expect_content=expect_content)
 
             # Add report
-            report = f"{variable_name} = " + pprint.pformat(route_table)
+            report = f"{table_variable_name} = " + pprint.pformat(route_table)
             sim.add_report_obj(f"BIRD({router})[{table_name}]", report)
 
             # Make sure table matches
-            assert route_table == correct_table, f"BIRD router '{router}' table '{table_name}' does not match what it should be"
+            assert route_table == table_data, f"BIRD router '{router}' table '{table_name}' does not match what it should be"
 
     def _test_os_fib(self, table_name: str, sim, testpath):
         """Test OS routing table."""
 
         # Loop with our BIRD routers
         for router in self.routers:
-            # Grab the table contents from the data module
-            correct_table, variable_name = self._get_table_data(router, table_name, testpath)
+            # Grab the the test data module
+            test_data_module = self._get_test_data_module(testpath)
+
+            # Default to using an empty table
+            table_data = None
+            table_variable_name = f"{router}_{table_name}"
+            # But if we have a variable set for this router and table, use it instead
+            if hasattr(test_data_module, table_variable_name):
+                table_data = getattr(test_data_module, table_variable_name)
 
             # Grab the FIB table from the OS
             route_table = sim.node(router).run_ip(["--family", table_name, "route", "list"])
 
             # Add report
-            report = f"{variable_name} = " + pprint.pformat(route_table, width=132, compact=True)
+            report = f"{table_variable_name} = " + pprint.pformat(route_table, width=132, compact=True)
             sim.add_report_obj(f"OS_FIB({router})[{table_name}]", report)
 
             # Make sure table matches
-            assert route_table == correct_table, f"BIRD router '{router}' FIB '{table_name}' does not match what it should be"
+            assert route_table == table_data, f"BIRD router '{router}' FIB '{table_name}' does not match what it should be"
 
-    def _get_table_data(self, router: str, table_name: str, testpath):
-        """Grab data for a specific BIRD router table."""
+    def _get_test_data_module(self, testpath):
+        """Grab the test data module."""
 
         # Grab this files directory name
         my_path = os.path.dirname(__file__)
@@ -233,20 +253,13 @@ class BirdPlanBaseTestCase:
         test_pkgname = test_dirname.replace("/", ".")
 
         # Grab the module name and the module anchor
-        test_data_module_name = f".data_" + test_basename[5:-3]
+        test_data_module_name = ".data_" + test_basename[5:-3]
         test_data_anchor_name = f"tests.{test_pkgname}"
 
         # Import data module
         test_data_module = importlib.import_module(test_data_module_name, test_data_anchor_name)
 
-        # Default to using an empty table
-        data = None
-        variable_name = f"{router}_{table_name}"
-        # But if we have a variable set for this router and table, use it instead
-        if hasattr(test_data_module, variable_name):
-            data = getattr(test_data_module, variable_name)
-
-        return (data, variable_name)
+        return test_data_module
 
     def _configure_bird_routers(self, sim: Simulation, test_dir: str, tmpdir: str):
         """Create our configuration files."""

@@ -1,1 +1,1 @@
-"""RIP Tests."""
+"""RIP tests."""

@@ -19,13 +19,13 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""RIP basic test case template."""
+"""OSPF test case for redistribution of only the default route."""
 
 from ...basetests import BirdPlanBaseTestCase
 
 
 class Template(BirdPlanBaseTestCase):
-    """RIP basic test case template."""
+    """OSPF test case for redistribution of only the default route."""
 
     routers = ["r1", "r2"]
     r1_interfaces = ["eth0", "eth1"]
@@ -33,6 +33,10 @@ class Template(BirdPlanBaseTestCase):
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
+        self._test_setup_specific(sim, tmpdir)
+
+    def _test_setup_specific(self, sim, tmpdir):
+        """Set up our test - specific additions."""
 
     def test_bird_status(self, sim):
         """Test BIRD status."""
@@ -40,19 +44,25 @@ class Template(BirdPlanBaseTestCase):
 
     def test_bird_tables_static4(self, sim, testpath):
         """Test BIRD t_static4 table."""
-        self._test_bird_table("t_static4", sim, testpath, routers=["r1"])
+        self._test_bird_tables_static4(sim, testpath)
+
+    def _test_bird_tables_static4(self, sim, testpath):
+        """Test BIRD t_static4 table stub."""
 
     def test_bird_tables_static6(self, sim, testpath):
         """Test BIRD t_static6 table."""
-        self._test_bird_table("t_static6", sim, testpath, routers=["r1"])
+        self._test_bird_tables_static6(sim, testpath)
 
-    def test_bird_tables_rip4(self, sim, testpath):
-        """Test BIRD t_rip4 table."""
-        self._test_bird_table("t_rip4", sim, testpath)
+    def _test_bird_tables_static6(self, sim, testpath):
+        """Test BIRD t_static6 table stub."""
 
-    def test_bird_tables_rip6(self, sim, testpath):
-        """Test BIRD t_rip6 table."""
-        self._test_bird_table("t_rip6", sim, testpath)
+    def test_bird_tables_ospf4(self, sim, testpath):
+        """Test BIRD t_ospf4 table."""
+        self._test_bird_table("t_ospf4", sim, testpath)
+
+    def test_bird_tables_ospf6(self, sim, testpath):
+        """Test BIRD t_ospf6 table."""
+        self._test_bird_table("t_ospf6", sim, testpath)
 
     def test_bird_tables_master4(self, sim, testpath):
         """Test BIRD master4 table."""

@@ -19,13 +19,13 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""RIP basic test case template."""
+"""OSPF test case for redistribution of static routes."""
 
 from ...basetests import BirdPlanBaseTestCase
 
 
 class Template(BirdPlanBaseTestCase):
-    """RIP basic test case template."""
+    """OSPF test case for redistribution of static routes."""
 
     routers = ["r1", "r2"]
     r1_interfaces = ["eth0", "eth1"]
@@ -38,21 +38,13 @@ class Template(BirdPlanBaseTestCase):
         """Test BIRD status."""
         self._test_bird_status(sim)
 
-    def test_bird_tables_static4(self, sim, testpath):
-        """Test BIRD t_static4 table."""
-        self._test_bird_table("t_static4", sim, testpath, routers=["r1"])
+    def test_bird_tables_ospf4(self, sim, testpath):
+        """Test BIRD t_ospf4 table."""
+        self._test_bird_table("t_ospf4", sim, testpath)
 
-    def test_bird_tables_static6(self, sim, testpath):
-        """Test BIRD t_static6 table."""
-        self._test_bird_table("t_static6", sim, testpath, routers=["r1"])
-
-    def test_bird_tables_rip4(self, sim, testpath):
-        """Test BIRD t_rip4 table."""
-        self._test_bird_table("t_rip4", sim, testpath)
-
-    def test_bird_tables_rip6(self, sim, testpath):
-        """Test BIRD t_rip6 table."""
-        self._test_bird_table("t_rip6", sim, testpath)
+    def test_bird_tables_ospf6(self, sim, testpath):
+        """Test BIRD t_ospf6 table."""
+        self._test_bird_table("t_ospf6", sim, testpath)
 
     def test_bird_tables_master4(self, sim, testpath):
         """Test BIRD master4 table."""
