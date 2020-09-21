@@ -47,27 +47,27 @@ class Template(BirdPlanBaseTestCase):
 
     def test_bird_tables_rip4(self, sim, testpath):
         """Test BIRD t_rip4 table."""
-        self._test_bird_table("t_rip4", sim, testpath)
+        self._test_bird_routers_table("t_rip4", sim, testpath)
 
     def test_bird_tables_rip6(self, sim, testpath):
         """Test BIRD t_rip6 table."""
-        self._test_bird_table("t_rip6", sim, testpath)
+        self._test_bird_routers_table("t_rip6", sim, testpath)
 
     def test_bird_tables_master4(self, sim, testpath):
         """Test BIRD master4 table."""
-        self._test_bird_table("master4", sim, testpath)
+        self._test_bird_routers_table("master4", sim, testpath)
 
     def test_bird_tables_master6(self, sim, testpath):
         """Test BIRD master6 table."""
-        self._test_bird_table("master6", sim, testpath)
+        self._test_bird_routers_table("master6", sim, testpath)
 
     def test_bird_tables_kernel4(self, sim, testpath):
         """Test BIRD kernel4 table."""
-        self._test_bird_table("t_kernel4", sim, testpath)
+        self._test_bird_routers_table("t_kernel4", sim, testpath)
 
     def test_bird_tables_kernel6(self, sim, testpath):
         """Test BIRD kernel6 table."""
-        self._test_bird_table("t_kernel6", sim, testpath)
+        self._test_bird_routers_table("t_kernel6", sim, testpath)
 
     def test_os_fib_inet(self, sim, testpath):
         """Test OS FIB for inet."""
