@@ -3,8 +3,11 @@
 In terms of test "static":
   - Router r1 should install static routes into OS FIB.
 
-In terms of test "static_no_export_kernel":
+In terms of test "static_export_kernel_static_false":
   - Router r1 should not install static routes into OS FIB.
+
+In terms of test "static_export_kernel_static_true":
+  - Router r1 should install static routes into OS FIB.
 
 
 ```plantuml
