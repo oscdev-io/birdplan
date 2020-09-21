@@ -169,8 +169,24 @@ class BirdPlanBaseTestCase:
             assert "router_id" in status_output, f"The status output should have 'router_id' for BIRD router '{router}'"
             assert status_output["router_id"] == f"0.0.0.{router_id}", f"The router ID should be '0.0.0.{router_id}'"
 
-    def _test_bird_table(self, table_name: str, sim, testpath, routers: Optional[List[str]] = None):
-        """Test BIRD routing table."""
+    def _test_bird_routers_table_bgp_peers(self, ipv: int, sim, testpath, routers: Optional[List[str]] = None):
+        """Test BIRD BGP peer routing table."""
+
+        # Check if we didn't get a router list override, if we didn't, then use all routers
+        if not routers:
+            routers = self.routers
+
+        # Loop with routers...
+        for router in routers:
+            # Loop with all our peers...
+            for peer in sim.config(router).birdconf.protocols.bgp.peers:
+                # Grab the peer table name
+                table_name = self._bird_bgp_peer_table(sim, router, peer, ipv)
+                # Test the table
+                self._test_bird_table(router, table_name, sim, testpath)
+
+    def _test_bird_routers_table(self, table_name: str, sim, testpath, routers: Optional[List[str]] = None):
+        """Test BIRD routing table for all routers, or those specified."""
 
         # Check if we didn't get a router list override, if we didn't, then use all routers
         if not routers:
@@ -178,37 +194,42 @@ class BirdPlanBaseTestCase:
 
         # Loop with our BIRD routers
         for router in routers:
-            # Grab the the test data module
-            test_data_module = self._get_test_data_module(testpath)
+            self._test_bird_table(router, table_name, sim, testpath)
 
-            # Default to using an empty table
-            table_data = None
-            table_variable_name = f"{router}_{table_name}"
-            # But if we have a variable set for this router and table, use it instead
-            if hasattr(test_data_module, table_variable_name):
-                table_data = getattr(test_data_module, table_variable_name)
+    def _test_bird_table(self, router: str, table_name: str, sim, testpath):
+        """Test BIRD routing table for a single router."""
 
-            expect_content = None
-            expect_content_variable_name = f"{table_variable_name}_expect_content"
-            # Check if we have any expectation on content of the table
-            if hasattr(test_data_module, expect_content_variable_name):
-                expect_content = getattr(test_data_module, expect_content_variable_name)
+        # Grab the the test data module
+        test_data_module = self._get_test_data_module(testpath)
 
-            # If we have entries in our routing table, we set expect_count to that number, else we don't use expect_count by
-            # setting it to None
-            expect_count = None
-            if isinstance(table_data, dict):
-                expect_count = len(table_data) or None
+        # Default to using an empty table
+        table_data = None
+        table_variable_name = f"{router}_{table_name}"
+        # But if we have a variable set for this router and table, use it instead
+        if hasattr(test_data_module, table_variable_name):
+            table_data = getattr(test_data_module, table_variable_name)
 
-            # Grab the routers table from BIRD
-            route_table = self._bird_route_table(sim, router, table_name, expect_count=expect_count, expect_content=expect_content)
+        expect_content = None
+        expect_content_variable_name = f"{table_variable_name}_expect_content"
+        # Check if we have any expectation on content of the table
+        if hasattr(test_data_module, expect_content_variable_name):
+            expect_content = getattr(test_data_module, expect_content_variable_name)
 
-            # Add report
-            report = f"{table_variable_name} = " + pprint.pformat(route_table)
-            sim.add_report_obj(f"BIRD({router})[{table_name}]", report)
+        # If we have entries in our routing table, we set expect_count to that number, else we don't use expect_count by
+        # setting it to None
+        expect_count = None
+        if isinstance(table_data, dict):
+            expect_count = len(table_data) or None
 
-            # Make sure table matches
-            assert route_table == table_data, f"BIRD router '{router}' table '{table_name}' does not match what it should be"
+        # Grab the routers table from BIRD
+        route_table = self._bird_route_table(sim, router, table_name, expect_count=expect_count, expect_content=expect_content)
+
+        # Add report
+        report = f"{table_variable_name} = " + pprint.pformat(route_table)
+        sim.add_report_obj(f"BIRD({router})[{table_name}]", report)
+
+        # Make sure table matches
+        assert route_table == table_data, f"BIRD router '{router}' table '{table_name}' does not match what it should be"
 
     def _test_os_fib(self, table_name: str, sim, testpath):
         """Test OS routing table."""
