@@ -1,0 +1,314 @@
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Copyright (c) 2019-2020, AllWorldIT
+#
+# This program is free software: you can redistfibute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distfibuted in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# type: ignore
+# pylint: disable=invalid-name
+
+"""Data for test case."""
+
+
+#
+# BIRD t_static*
+#
+
+r1_t_static4 = {
+    "100.127.0.0/24": [
+        {
+            "nexthops": [{"gateway": "100.101.0.2", "interface": "eth1"}],
+            "pref": 200,
+            "prefix_type": "unicast",
+            "protocol": "static4",
+            "type": ["static", "univ"],
+        }
+    ]
+}
+r1_t_static6 = {
+    "fc00:127::/48": [
+        {
+            "nexthops": [{"gateway": "fc00:101::2", "interface": "eth1"}],
+            "pref": 200,
+            "prefix_type": "unicast",
+            "protocol": "static6",
+            "type": ["static", "univ"],
+        }
+    ]
+}
+
+
+#
+# BIRD t_bgp*_peer
+#
+
+r1_t_bgp4_AS65001_r2_peer = {
+    "100.127.0.0/24": [
+        {
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "nexthops": [{"gateway": "100.101.0.2", "interface": "eth1"}],
+            "pref": 200,
+            "prefix_type": "unicast",
+            "protocol": "static4",
+            "type": ["static", "univ"],
+        }
+    ]
+}
+r2_t_bgp4_AS65000_r1_peer = {
+    "100.127.0.0/24": [
+        {
+            "asn": "AS65000",
+            "attributes": {
+                "BGP.as_path": [65000],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                "BGP.local_pref": 470,
+                "BGP.next_hop": ["100.64.0.1"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": True,
+            "bgp_type": "i",
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "pref": 100,
+            "prefix_type": "unicast",
+            "protocol": "bgp4_AS65000_r1",
+            "type": ["BGP", "univ"],
+        }
+    ]
+}
+
+r1_t_bgp6_AS65001_r2_peer = {
+    "fc00:127::/48": [
+        {
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "nexthops": [{"gateway": "fc00:101::2", "interface": "eth1"}],
+            "pref": 200,
+            "prefix_type": "unicast",
+            "protocol": "static6",
+            "type": ["static", "univ"],
+        }
+    ]
+}
+r2_t_bgp6_AS65000_r1_peer = {
+    "fc00:127::/48": [
+        {
+            "asn": "AS65000",
+            "attributes": {
+                "BGP.as_path": [65000],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                "BGP.local_pref": 470,
+                "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": True,
+            "bgp_type": "i",
+            "nexthops": [{"gateway": "fc00:100::1", "interface": "eth0"}],
+            "pref": 100,
+            "prefix_type": "unicast",
+            "protocol": "bgp6_AS65000_r1",
+            "type": ["BGP", "univ"],
+        }
+    ]
+}
+
+
+#
+# BIRD t_bgp*
+#
+
+r1_t_bgp4 = r1_t_bgp4_AS65001_r2_peer
+r2_t_bgp4 = r2_t_bgp4_AS65000_r1_peer
+
+r1_t_bgp6 = r1_t_bgp6_AS65001_r2_peer
+r2_t_bgp6 = r2_t_bgp6_AS65000_r1_peer
+
+
+#
+# BIRD t_master*
+#
+
+r1_master4 = {
+    "100.101.0.0/24": [
+        {
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        }
+    ],
+    "100.127.0.0/24": [
+        {
+            "nexthops": [{"gateway": "100.101.0.2", "interface": "eth1"}],
+            "pref": 200,
+            "prefix_type": "unicast",
+            "protocol": "static4",
+            "type": ["static", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        }
+    ],
+}
+r2_master4 = {
+    "100.127.0.0/24": [
+        {
+            "asn": "AS65000",
+            "attributes": {
+                "BGP.as_path": [65000],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                "BGP.local_pref": 470,
+                "BGP.next_hop": ["100.64.0.1"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": True,
+            "bgp_type": "i",
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "pref": 100,
+            "prefix_type": "unicast",
+            "protocol": "bgp4_AS65000_r1",
+            "type": ["BGP", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        }
+    ],
+}
+
+r1_master6 = {
+    "fc00:100::/64": [
+        {
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        }
+    ],
+    "fc00:101::/64": [
+        {
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        }
+    ],
+    "fc00:127::/48": [
+        {
+            "nexthops": [{"gateway": "fc00:101::2", "interface": "eth1"}],
+            "pref": 200,
+            "prefix_type": "unicast",
+            "protocol": "static6",
+            "type": ["static", "univ"],
+        }
+    ],
+}
+r2_master6 = {
+    "fc00:100::/64": [
+        {
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        }
+    ],
+    "fc00:127::/48": [
+        {
+            "asn": "AS65000",
+            "attributes": {
+                "BGP.as_path": [65000],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 3)],
+                "BGP.local_pref": 470,
+                "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": True,
+            "bgp_type": "i",
+            "nexthops": [{"gateway": "fc00:100::1", "interface": "eth0"}],
+            "pref": 100,
+            "prefix_type": "unicast",
+            "protocol": "bgp6_AS65000_r1",
+            "type": ["BGP", "univ"],
+        }
+    ],
+}
+
+
+#
+# BIRD t_kernel*
+#
+
+r1_t_kernel4 = r1_t_static4
+r2_t_kernel4 = r2_t_bgp4
+
+r1_t_kernel6 = r1_t_static6
+r2_t_kernel6 = r2_t_bgp6
+
+
+#
+# FIB inet*
+#
+
+r1_inet = [
+    {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.1", "protocol": "kernel", "scope": "link"},
+    {"dev": "eth1", "dst": "100.101.0.0/24", "flags": [], "prefsrc": "100.101.0.1", "protocol": "kernel", "scope": "link"},
+    {"dev": "eth1", "dst": "100.127.0.0/24", "flags": [], "gateway": "100.101.0.2", "metric": 600, "protocol": "bird"},
+]
+r2_inet = [
+    {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.2", "protocol": "kernel", "scope": "link"},
+    {"dev": "eth0", "dst": "100.127.0.0/24", "flags": [], "gateway": "100.64.0.1", "metric": 600, "protocol": "bird"},
+]
+
+r1_inet6 = [
+    {"dev": "eth0", "dst": "fc00:100::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+    {"dev": "eth1", "dst": "fc00:101::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+    {
+        "dev": "eth1",
+        "dst": "fc00:127::/48",
+        "flags": [],
+        "gateway": "fc00:101::2",
+        "metric": 600,
+        "pref": "medium",
+        "protocol": "bird",
+    },
+    {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+    {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+]
+r2_inet6 = [
+    {"dev": "eth0", "dst": "fc00:100::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+    {
+        "dev": "eth0",
+        "dst": "fc00:127::/48",
+        "flags": [],
+        "gateway": "fc00:100::1",
+        "metric": 600,
+        "pref": "medium",
+        "protocol": "bird",
+    },
+    {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+]
