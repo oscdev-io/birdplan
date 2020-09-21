@@ -19,10 +19,10 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""RIP test case for redistribution of kernel routes."""
+"""Test case for redistribution of kernel routes via RIP, with default settings."""
 
 from .template import Template
 
 
 class Test(Template):
-    """RIP test case for redistribution of kernel routes."""
+    """Test case for redistribution of kernel routes via RIP, with default settings."""

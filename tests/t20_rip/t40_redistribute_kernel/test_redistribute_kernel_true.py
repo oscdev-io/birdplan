@@ -19,10 +19,15 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Test case for redistribution of kernel routes via OSPF, with default settings."""
+"""Test case for redistribution of kernel routes via RIP, with rip:redistribute:kernel set to True."""
 
 from .template import Template
 
 
 class Test(Template):
-    """Test case for redistribution of kernel routes via OSPF, with default settings."""
+    """Test case for redistribution of kernel routes via RIP, with rip:redistribute:kernel set to True."""
+
+    r1_extra_config = """
+  redistribute:
+    kernel: True
+"""

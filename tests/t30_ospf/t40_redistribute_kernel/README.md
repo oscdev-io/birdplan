@@ -1,6 +1,13 @@
 # OSPF test for redistribution of kernel routes
 
-Router r1 should export its kernel routes on eth1 to r2.
+In the case of "redistribute_kernel":
+  - Router r1 should not be exporting its kernel routes to r2
+
+In the case of "redistribute_kernel_false"
+  - Router r1 should not be exporting its kernel routes to r2
+
+In the case of "redistribute_kernel_true"
+  - Router r1 should be exporting its kernel routes to r2
 
 
 ```plantuml
