@@ -38,6 +38,14 @@ class Template(BirdPlanBaseTestCase):
         """Test BIRD status."""
         self._test_bird_status(sim)
 
+    def test_bird_tables_static4(self, sim, testpath):
+        """Test BIRD t_static4 table."""
+        self._test_bird_routers_table("t_static4", sim, testpath, routers=["r1"])
+
+    def test_bird_tables_static6(self, sim, testpath):
+        """Test BIRD t_static6 table."""
+        self._test_bird_routers_table("t_static6", sim, testpath, routers=["r1"])
+
     def test_bird_tables_rip4(self, sim, testpath):
         """Test BIRD t_rip4 table."""
         self._test_bird_routers_table("t_rip4", sim, testpath)

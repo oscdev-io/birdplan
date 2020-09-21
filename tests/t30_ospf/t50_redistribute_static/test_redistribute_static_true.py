@@ -19,10 +19,15 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Test case for redistribution of static routes via RIP, with default settings."""
+"""Test case for redistribution of static routes via OSPF, with ospf:redistribute:static set to True."""
 
 from .template import Template
 
 
 class Test(Template):
-    """Test case for redistribution of static routes via RIP, with default settings."""
+    """Test case for redistribution of static routes via OSPF, with ospf:redistribute:static set to True."""
+
+    r1_extra_config = """
+  redistribute:
+    static: True
+"""

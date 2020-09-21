@@ -19,10 +19,15 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""OSPF test case for redistribution of static routes."""
+"""Test case for redistribution of static routes via OSPF, with default settings."""
 
 from .template import Template
 
 
 class Test(Template):
-    """OSPF test case for redistribution of static routes."""
+    """Test case for redistribution of static routes via OSPF, with default settings."""
+
+    r1_extra_config = """
+  redistribute:
+    static: False
+"""

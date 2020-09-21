@@ -1,6 +1,14 @@
 # OSPF test for redistribution of static routes
 
-Router r1 should export its static routes on eth1 to r2.
+
+In the case of "redistribute_static":
+  - Router r1 should not be exporting its static routes to r2
+
+In the case of "redistribute_static_false"
+  - Router r1 should not be exporting its static routes to r2
+
+In the case of "redistribute_static_true"
+  - Router r1 should be exporting its static routes to r2
 
 
 ```plantuml
