@@ -21,41 +21,27 @@
 
 """Data for test case."""
 
-from .data_basic import (  # noqa: F401 pylint: disable=unused-import
+from .data_export_kernel_bgp_true import (  # noqa: F401 pylint: disable=unused-import
     r1_t_static4,
     r1_t_static6,
-    r1_t_ospf4,
-    r1_t_ospf4_expect_content,
-    r1_t_ospf6,
-    r1_t_ospf6_expect_content,
-    r2_t_ospf4,
-    r2_t_ospf6,
+    r1_t_bgp4_AS65001_r2_peer,
+    r1_t_bgp6_AS65001_r2_peer,
+    r2_t_bgp4_AS65000_r1_peer,
+    r2_t_bgp6_AS65000_r1_peer,
+    r1_t_bgp4,
+    r1_t_bgp6,
+    r2_t_bgp4,
+    r2_t_bgp6,
     r1_master4,
     r1_master6,
     r2_master4,
     r2_master6,
     r1_t_kernel4,
+    r2_t_kernel4,
     r1_t_kernel6,
+    r2_t_kernel6,
     r1_inet,
+    r2_inet,
     r1_inet6,
+    r2_inet6,
 )
-
-
-#
-# FIB inet*
-#
-
-r2_inet = [{"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.2", "protocol": "kernel", "scope": "link"}]
-
-r2_inet6 = [
-    {"dev": "eth0", "dst": "fc00:100::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-    {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-]
-
-
-#
-# BIRD t_kernel*
-#
-
-r2_t_kernel4 = {}
-r2_t_kernel6 = {}

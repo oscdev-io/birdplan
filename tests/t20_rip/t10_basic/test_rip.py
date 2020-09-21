@@ -19,15 +19,10 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Basic OSPF test case without exporting to kernel FIB."""
+"""Basic RIP route test cases, default settings."""
 
 from .template import Template
 
 
 class Test(Template):
-    """Basic OSPF test case without exporting to kernel FIB."""
-
-    r2_extra_config = """
-export_kernel:
-  ospf: False
-"""
+    """Basic RIP route test cases, default settings."""

@@ -19,15 +19,15 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Basic static route test cases, with export_kernel:static set to True."""
+"""Basic OSPF route test cases, with export_kernel:rip set to False."""
 
 from .template import Template
 
 
 class Test(Template):
-    """Basic static route test cases, with export_kernel:static set to True."""
+    """Basic OSPF route test cases, with export_kernel:rip set to False."""
 
-    r1_extra_config = """
+    r2_extra_config = """
 export_kernel:
-  static: True
+  ospf: False
 """

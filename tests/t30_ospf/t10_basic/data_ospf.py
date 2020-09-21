@@ -21,13 +21,25 @@
 
 """Data for test case."""
 
-from .data_export_kernel_static_true import (  # noqa: F401 pylint: disable=unused-import
+from .data_export_kernel_ospf_true import (  # noqa: F401 pylint: disable=unused-import
     r1_t_static4,
     r1_t_static6,
+    r1_t_ospf4,
+    r1_t_ospf4_expect_content,
+    r1_t_ospf6,
+    r1_t_ospf6_expect_content,
+    r2_t_ospf4,
+    r2_t_ospf6,
     r1_master4,
     r1_master6,
+    r2_master4,
+    r2_master6,
     r1_t_kernel4,
+    r2_t_kernel4,
     r1_t_kernel6,
+    r2_t_kernel6,
     r1_inet,
+    r2_inet,
     r1_inet6,
+    r2_inet6,
 )

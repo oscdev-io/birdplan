@@ -19,10 +19,15 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Basic RIP test case."""
+"""Basic RIP route test cases, with export_kernel:rip set to False."""
 
 from .template import Template
 
 
 class Test(Template):
-    """Basic RIP test case."""
+    """Basic RIP route test cases, with export_kernel:rip set to False."""
+
+    r2_extra_config = """
+export_kernel:
+  rip: False
+"""

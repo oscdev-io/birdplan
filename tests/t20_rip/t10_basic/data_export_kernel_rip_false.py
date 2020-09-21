@@ -21,17 +21,13 @@
 
 """Data for test case."""
 
-from .data_basic import (  # noqa: F401 pylint: disable=unused-import
+from .data_export_kernel_rip_true import (  # noqa: F401 pylint: disable=unused-import
     r1_t_static4,
     r1_t_static6,
-    r1_t_bgp4_AS65001_r2_peer,
-    r1_t_bgp6_AS65001_r2_peer,
-    r2_t_bgp4_AS65000_r1_peer,
-    r2_t_bgp6_AS65000_r1_peer,
-    r1_t_bgp4,
-    r1_t_bgp6,
-    r2_t_bgp4,
-    r2_t_bgp6,
+    r1_t_rip4,
+    r1_t_rip6,
+    r2_t_rip4,
+    r2_t_rip6,
     r1_master4,
     r1_master6,
     r2_master4,

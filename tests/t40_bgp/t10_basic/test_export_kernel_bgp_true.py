@@ -19,15 +19,15 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Basic BGP test case without exporting to kernel FIB."""
+"""Basic BGP route test cases, with export_kernel:rip set to True."""
 
 from .template import Template
 
 
 class Test(Template):
-    """Basic BGP test case without exporting to kernel FIB."""
+    """Basic BGP route test cases, with export_kernel:rip set to True."""
 
     r2_extra_config = """
 export_kernel:
-  bgp: False
+  bgp: True
 """

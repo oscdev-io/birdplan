@@ -2,10 +2,13 @@
 
 
 In terms of test "rip":
-  - Router r1 should export routes to r2 and r2 should insert routes into its FIB.
+  - Router r1 should install RIP routes into OS FIB. (default)
 
-In terms of test "rip_no_export_kernel":
-  - Router r1 should export routes to r2 and r2 should NOT insert routes into its FIB.
+In terms of test "export_kernel_rip_false":
+  - Router r1 should not install RIP routes into OS FIB.
+
+In terms of test "export_kernel_rip_true":
+  - Router r1 should install RIP routes into OS FIB.
 
 
 ```plantuml

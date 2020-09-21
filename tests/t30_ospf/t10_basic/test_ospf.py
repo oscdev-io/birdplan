@@ -19,10 +19,10 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Basic OSPF test case."""
+"""Basic OSPF route test cases, default settings."""
 
 from .template import Template
 
 
 class Test(Template):
-    """Basic OSPF test case."""
+    """Basic OSPF route test cases, default settings."""
