@@ -19,13 +19,13 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Test case for disabled redistribution of RIP routes."""
+"""Test case for redistribution of RIP routes, with rip:redistribute:rip set to False."""
 
 from .template import Template
 
 
 class Test(Template):
-    """Test case for disabled redistribution of RIP routes."""
+    """Test case for redistribution of RIP routes, with rip:redistribute:rip set to False."""
 
     r2_extra_config = """
   redistribute:

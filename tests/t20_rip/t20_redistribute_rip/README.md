@@ -5,9 +5,11 @@ Router r1 should be exporting the BIRD static routes to r2.
 In the case of "redistribute_rip":
   - r2 should be exporting its RIP routes to r3
 
-In the case of "redistribute_rip_disabled"
+In the case of "redistribute_rip_false"
   - r2 should not be exporting its RIP routes to r3
 
+In the case of "redistribute_rip_true"
+  - r2 should be exporting its RIP routes to r3
 
 ```plantuml
 @startuml
