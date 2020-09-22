@@ -36,6 +36,7 @@ from .inc_with_accept import (  # noqa: F401 pylint: disable=unused-import
 #
 # BIRD t_rip*
 #
+
 r1_t_rip4 = {
     "0.0.0.0/0": [
         {
