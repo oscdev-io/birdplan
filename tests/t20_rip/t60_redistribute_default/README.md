@@ -1,29 +1,34 @@
 # RIP test for redistribution of the default route
 
 
-In terms of test "redistribute_only_default_with_kernel":
-  - Router r1 should not export the kernel default route to r2 as we don't have redistribute kernel routes.
+*Kernel default route tests:*
 
-In terms of test "redistribute_only_default_with_static":
-  - Router r1 should not export the static default route to r2 as we don't have redistribute static routes.
-
-In terms of test "redistribute_kernel_without_default":
-  - Router r1 should not export the kernel default route to r2 as we don't have redistribute default routes.
-
-In terms of test "redistribute_static_without_default":
-  - Router r1 should not export the static default route to r2 as we don't have redistribute default routes.
-
-In terms of test "redistribute_kernel_default_without_accept":
-  - Router r1 should export the kernel default route to r2, but r2 should not accept it as it does not accept default routes.
-
-In terms of test "redistribute_static_default_without_accept":
-  - Router r1 should export the static default route to r2, but r2 should not accept it as it does not accept default routes.
-
-In terms of test "redistribute_kernel":
+In terms of test "t10_kernel/default":
   - Router r1 should export the kernel default route to r2, r2 should accept the default route as it accepts default routes.
 
-In terms of test "redistribute_static":
+In terms of test "t10_kernel/test_default_only":
+  - Router r1 should not export the kernel default route to r2 as we don't have redistribute kernel routes.
+
+In terms of test "t10_kernel/test_without_accept":
+  - Router r1 should export the kernel default route to r2, but r2 should not accept it as it does not accept default routes.
+
+In terms of test "t10_kernel/test_without_default":
+  - Router r1 should not export the kernel default route to r2 as we don't have redistribute default routes.
+
+*Static default route tests:*
+
+In terms of test "t20_static/default":
   - Router r1 should export the static default route to r2, r2 should accept the default route as it accepts default routes.
+
+In terms of test "t20_static/test_default_only":
+  - Router r1 should not export the static default route to r2 as we don't have redistribute static routes.
+
+In terms of test "t20_static/test_without_accept":
+  - Router r1 should export the static default route to r2, but r2 should not accept it as it does not accept default routes.
+
+In terms of test "t20_static/test_without_default":
+  - Router r1 should not export the static default route to r2 as we don't have redistribute default routes.
+
 
 
 ```plantuml
