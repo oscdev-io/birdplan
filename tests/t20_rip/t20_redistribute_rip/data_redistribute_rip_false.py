@@ -86,7 +86,7 @@ r3_t_kernel6 = {}
 
 
 #
-# FIB inet*
+# RIB inet*
 #
 r3_inet = [{"dev": "eth0", "dst": "100.102.0.0/24", "flags": [], "prefsrc": "100.102.0.2", "protocol": "kernel", "scope": "link"}]
 r3_inet6 = [

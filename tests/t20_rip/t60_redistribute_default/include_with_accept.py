@@ -139,7 +139,7 @@ r2_t_kernel6 = {
 
 
 #
-# FIB inet*
+# RIB inet*
 #
 
 r2_inet = [

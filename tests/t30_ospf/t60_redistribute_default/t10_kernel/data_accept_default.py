@@ -190,7 +190,7 @@ r1_t_kernel6 = r1_t_ospf6
 
 
 #
-# FIB inet*
+# RIB inet*
 #
 
 r1_inet = [

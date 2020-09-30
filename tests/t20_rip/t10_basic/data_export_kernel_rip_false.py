@@ -40,7 +40,7 @@ from .data_export_kernel_rip_true import (  # noqa: F401 pylint: disable=unused-
 
 
 #
-# FIB inet*
+# RIB inet*
 #
 
 r2_inet = [{"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.2", "protocol": "kernel", "scope": "link"}]

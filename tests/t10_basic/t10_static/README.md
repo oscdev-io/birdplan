@@ -1,13 +1,13 @@
 # Basic static routing
 
 In terms of test "static":
-  - Router r1 should install static routes into OS FIB. (default)
+  - Router r1 should install static routes into OS RIB. (default)
 
 In terms of test "export_kernel_static_false":
-  - Router r1 should not install static routes into OS FIB.
+  - Router r1 should not install static routes into OS RIB.
 
 In terms of test "export_kernel_static_true":
-  - Router r1 should install static routes into OS FIB.
+  - Router r1 should install static routes into OS RIB.
 
 
 ```plantuml

@@ -296,7 +296,7 @@ r3_t_kernel6 = r3_t_rip6
 
 
 #
-# FIB inet*
+# RIB inet*
 #
 
 r1_inet = [

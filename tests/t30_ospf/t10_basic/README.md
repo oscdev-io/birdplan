@@ -2,10 +2,10 @@
 
 
 In terms of test "ospf":
-  - Router r1 should export routes to r2 and r2 should insert routes into its FIB.
+  - Router r1 should export routes to r2 and r2 should insert routes into its RIB.
 
 In terms of test "ospf_no_export_kernel":
-  - Router r1 should export routes to r2 and r2 should NOT insert routes into its FIB.
+  - Router r1 should export routes to r2 and r2 should NOT insert routes into its RIB.
 
 
 ```plantuml

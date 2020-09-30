@@ -38,7 +38,7 @@ r1_t_kernel6 = {}
 
 
 #
-# FIB inet*
+# RIB inet*
 #
 
 r1_inet = [

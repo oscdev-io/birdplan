@@ -69,10 +69,10 @@ class Template(BirdPlanBaseTestCase):
         """Test BIRD kernel6 table."""
         self._test_bird_routers_table("t_kernel6", sim, testpath)
 
-    def test_os_fib_inet(self, sim, testpath):
-        """Test OS FIB for inet."""
-        self._test_os_fib("inet", sim, testpath)
+    def test_os_rib_inet(self, sim, testpath):
+        """Test OS RIB for inet."""
+        self._test_os_rib("inet", sim, testpath)
 
-    def test_os_fib_inet6(self, sim, testpath):
-        """Test OS FIB for inet6."""
-        self._test_os_fib("inet6", sim, testpath)
+    def test_os_rib_inet6(self, sim, testpath):
+        """Test OS RIB for inet6."""
+        self._test_os_rib("inet6", sim, testpath)
