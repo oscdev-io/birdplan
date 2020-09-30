@@ -202,18 +202,13 @@ class BirdPlanBaseTestCase:
         # Grab the the test data module
         test_data_module = self._get_test_data_module(testpath)
 
-        # Default to using an empty table
-        table_data = None
+        # Work out variable names
         table_variable_name = f"{router}_{table_name}"
-        # But if we have a variable set for this router and table, use it instead
-        if hasattr(test_data_module, table_variable_name):
-            table_data = getattr(test_data_module, table_variable_name)
-
-        expect_content = None
         expect_content_variable_name = f"{table_variable_name}_expect_content"
-        # Check if we have any expectation on content of the table
-        if hasattr(test_data_module, expect_content_variable_name):
-            expect_content = getattr(test_data_module, expect_content_variable_name)
+
+        # Grab table data
+        table_data = self._get_test_data_module_item(test_data_module, table_variable_name)
+        expect_content = self._get_test_data_module_item(test_data_module, expect_content_variable_name)
 
         # If we have entries in our routing table, we set expect_count to that number, else we don't use expect_count by
         # setting it to None
@@ -231,7 +226,7 @@ class BirdPlanBaseTestCase:
         # Make sure table matches
         assert route_table == table_data, f"BIRD router '{router}' table '{table_name}' does not match what it should be"
 
-    def _test_os_fib(self, table_name: str, sim, testpath):
+    def _test_os_rib(self, table_name: str, sim, testpath):
         """Test OS routing table."""
 
         # Loop with our BIRD routers
@@ -239,22 +234,21 @@ class BirdPlanBaseTestCase:
             # Grab the the test data module
             test_data_module = self._get_test_data_module(testpath)
 
-            # Default to using an empty table
-            table_data = None
+            # Work out variable names
             table_variable_name = f"{router}_{table_name}"
-            # But if we have a variable set for this router and table, use it instead
-            if hasattr(test_data_module, table_variable_name):
-                table_data = getattr(test_data_module, table_variable_name)
 
-            # Grab the FIB table from the OS
+            # Grab table data
+            table_data = self._get_test_data_module_item(test_data_module, table_variable_name)
+
+            # Grab the RIB table from the OS
             route_table = sim.node(router).run_ip(["--family", table_name, "route", "list"])
 
             # Add report
             report = f"{table_variable_name} = " + pprint.pformat(route_table, width=132, compact=True)
-            sim.add_report_obj(f"OS_FIB({router})[{table_name}]", report)
+            sim.add_report_obj(f"OS_RIB({router})[{table_name}]", report)
 
             # Make sure table matches
-            assert route_table == table_data, f"BIRD router '{router}' FIB '{table_name}' does not match what it should be"
+            assert route_table == table_data, f"BIRD router '{router}' RIB '{table_name}' does not match what it should be"
 
     def _get_test_data_module(self, testpath):
         """Grab the test data module."""
@@ -265,22 +259,45 @@ class BirdPlanBaseTestCase:
         # Grab relative path of our test file
         test_relpath = pathlib.Path(testpath).relative_to(my_path)
 
-        # Grab test directory name
-        test_dirname = os.path.dirname(test_relpath)
         # Grab test file name
         test_basename = os.path.basename(test_relpath)
 
-        # Grab test package name
-        test_pkgname = test_dirname.replace("/", ".")
+        # Work out data module filename
+        data_module_filename = f"data_{test_basename[5:]}"
 
-        # Grab the module name and the module anchor
-        test_data_module_name = ".data_" + test_basename[5:-3]
-        test_data_anchor_name = f"tests.{test_pkgname}"
+        # Check if the data doesn't exist in the test directory
+        data_module_dirname = f"tests/{os.path.dirname(test_relpath)}"
+        if not os.path.exists(f"{data_module_dirname}/{data_module_filename}"):
+            # If not, try the upper directory
+            data_module_dirname_upper = os.path.dirname(data_module_dirname)
+            if os.path.exists(f"{data_module_dirname_upper}/{data_module_filename}"):
+                # If it exists, adjust...
+                data_module_dirname = data_module_dirname_upper
 
-        # Import data module
-        test_data_module = importlib.import_module(test_data_module_name, test_data_anchor_name)
+        # Grab test package name, which is the directory name with / replaced with .
+        data_module_pkgname = data_module_dirname.replace("/", ".")
+
+        # Remove the .py from the data module
+        data_module_name = f".{data_module_filename[:-3]}"
+
+        # Import data module, remove .py from the data_module_filename
+        test_data_module = importlib.import_module(data_module_name, data_module_pkgname)
 
         return test_data_module
+
+    def _get_test_data_module_item(self, data_module, symbol_name: str) -> Any:
+        """Get an item from our data module."""
+        data = None
+        # But if we have a variable set for this router and table, use it instead
+        if hasattr(data_module, symbol_name):
+            symbol = getattr(data_module, symbol_name)
+            # If the symbol is a callable, then call it with self
+            if callable(symbol):
+                data = symbol(self)
+            else:
+                data = symbol
+
+        return data
 
     def _configure_bird_routers(self, sim: Simulation, test_dir: str, tmpdir: str):
         """Create our configuration files."""
@@ -314,11 +331,18 @@ class BirdPlanBaseTestCase:
         if internal_macros:
             macros.update(internal_macros)
 
+        router_config_file = f"{test_dir}/{router}.yaml"
+        # If the router config file does not exist in the test dir, look one directory upwards
+        if not os.path.exists(router_config_file):
+            router_config_file = f"{os.path.dirname(test_dir)}/{router}.yaml"
+
         # Read in configuration file
-        with open(f"{test_dir}/{router}.yaml", "r") as file:
+        with open(router_config_file, "r") as file:
             raw_config = file.read()
         # Check if we're replacing macros in our configuration file
         for macro, value in macros.items():
+            if isinstance(value, int):
+                value = f"{value}"
             raw_config = raw_config.replace(macro, value)
         # Write out new BirdPlan file with macros replaced
         with open(birdplan_file, "w") as file:
