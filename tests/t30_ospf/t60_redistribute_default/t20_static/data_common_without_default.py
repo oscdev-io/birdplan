@@ -19,7 +19,7 @@
 # type: ignore
 # pylint: disable=invalid-name
 
-"""Data for test case."""
+"""Common data for test cases."""
 
 
 from .data_common_static_tables import (  # noqa: F401 pylint: disable=unused-import

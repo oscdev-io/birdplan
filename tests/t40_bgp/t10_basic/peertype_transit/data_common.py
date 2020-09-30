@@ -19,7 +19,7 @@
 # type: ignore
 # pylint: disable=invalid-name,missing-function-docstring
 
-"""Data for test case."""
+"""Common data for test cases."""
 
 #
 # BIRD t_bgp*_peer
