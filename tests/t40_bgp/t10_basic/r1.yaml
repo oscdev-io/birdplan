@@ -1,17 +1,14 @@
 router_id: 0.0.0.1
 log_file: "@LOGFILE@"
 debug: True
-static:
-  - '100.127.0.0/24 via 100.101.0.2'
-  - 'fc00:127::/48 via fc00:101::2'
+
 bgp:
-  asn: 65000
-  import:
-    static: True
+  asn: @ASN@
   peers:
-    r2:
-      asn: 65001
-      description: BGP session to r2
+    e1:
+      asn: @PEER_ASN@
+      type: @PEER_TYPE@
+      description: BGP session to e1
       source_address4: 100.64.0.1
       source_address6: fc00:100::1
       neighbor4: 100.64.0.2
@@ -19,6 +16,4 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
-      type: peer
-      redistribute:
-        static: True
+@EXTRA_CONFIG@

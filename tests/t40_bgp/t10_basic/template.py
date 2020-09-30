@@ -27,24 +27,31 @@ from ...basetests import BirdPlanBaseTestCase
 class Template(BirdPlanBaseTestCase):
     """BGP basic test case template."""
 
-    routers = ["r1", "r2"]
-    r1_interfaces = ["eth0", "eth1"]
+    routers = ["r1"]
+    exabgps = ["e1"]
+    r1_interfaces = ["eth0"]
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
+    def test_announce_routes(self, sim):
+        """Announce a prefix from ExaBGP to BIRD."""
+
+        self._exabgpcli(
+            sim,
+            "e1",
+            ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2"],
+        )
+        self._exabgpcli(
+            sim,
+            "e1",
+            ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2"],
+        )
+
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)
-
-    def test_bird_tables_static4(self, sim, testpath):
-        """Test BIRD t_static4 table."""
-        self._test_bird_routers_table("t_static4", sim, testpath, routers=["r1"])
-
-    def test_bird_tables_static6(self, sim, testpath):
-        """Test BIRD t_static6 table."""
-        self._test_bird_routers_table("t_static6", sim, testpath, routers=["r1"])
 
     def test_bird_tables_bgp4_peer(self, sim, testpath):
         """Test BIRD BGP4 peer table."""
@@ -78,10 +85,10 @@ class Template(BirdPlanBaseTestCase):
         """Test BIRD kernel6 table."""
         self._test_bird_routers_table("t_kernel6", sim, testpath)
 
-    def test_os_fib_inet(self, sim, testpath):
-        """Test OS FIB for inet."""
-        self._test_os_fib("inet", sim, testpath)
+    def test_os_rib_inet(self, sim, testpath):
+        """Test OS RIB for inet."""
+        self._test_os_rib("inet", sim, testpath)
 
-    def test_os_fib_inet6(self, sim, testpath):
-        """Test OS FIB for inet6."""
-        self._test_os_fib("inet6", sim, testpath)
+    def test_os_rib_inet6(self, sim, testpath):
+        """Test OS RIB for inet6."""
+        self._test_os_rib("inet6", sim, testpath)

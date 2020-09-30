@@ -19,15 +19,16 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Basic BGP route test cases, with export_kernel:rip set to True."""
+"""Basic BGP test case."""
 
-from .template import Template
+from ..template import Template
 
 
 class Test(Template):
-    """Basic BGP route test cases, with export_kernel:rip set to True."""
+    """Basic BGP test case."""
 
-    r2_extra_config = """
-export_kernel:
-  bgp: True
+    r1_peer_type = "customer"
+    r1_extra_config = """
+      filter:
+        asns: [65001]
 """

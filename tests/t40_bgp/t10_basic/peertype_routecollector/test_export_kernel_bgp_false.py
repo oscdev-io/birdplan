@@ -19,10 +19,16 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""Basic BGP test case."""
+"""Basic BGP route test cases, with export_kernel:bgp set to False."""
 
-from .template import Template
+from ..template import Template
 
 
 class Test(Template):
-    """Basic BGP test case."""
+    """Basic BGP route test cases, with export_kernel:bgp set to False."""
+
+    r1_peer_type = "routecollector"
+    r1_extra_config = """
+export_kernel:
+  bgp: False
+"""
