@@ -148,9 +148,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             for large_community in sorted(peer_config["outgoing_large_communities"]):
                 self.large_communities.outgoing.append(util.sanitize_large_community(large_community))
 
-        # Turn on passive mode for route reflectors
+        # Turn on passive mode for route reflectors and customers
         if self.peer_type in ("customer", "rrclient"):
             self.passive = True
+        # But allow it to be set manually
+        if "passive" in peer_config:
+            self.passive = peer_config["passive"]
 
         # If this involves an internal peer, send our entire BGP table
         if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):

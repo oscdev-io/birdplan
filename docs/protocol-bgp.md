@@ -611,6 +611,25 @@ bgp:
 ```
 
 
+# passive
+
+Set the BGP session to passive or non-passive.
+
+This defaults to `True` for `customer` and `rrclient` peer types and `False` for all other peer types.
+
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      passive: True
+...
+```
+
+
 ## password
 
 BGP session password. You probably want to add quotes around any non-alphanumeric characters.

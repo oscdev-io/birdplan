@@ -654,6 +654,7 @@ class BirdPlan:
                 "connect_delay_time",
                 "error_wait_time",
                 "multihop",
+                "passive",
                 "password",
                 "prefix_limit4",
                 "prefix_limit6",
