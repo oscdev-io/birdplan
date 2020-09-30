@@ -66,27 +66,27 @@ class BirdPlanBaseTestCase:
     # rX_extra_config
 
     # Default ASN to use for r1's peer
-    r1_asn = "65000"
-    r1_peer_asn = "65001"
+    r1_asn = 65000
+    r1_peer_asn = 65001
     r1_interfaces = ["eth0"]
     r1_interface_eth0 = {"mac": "02:01:00:00:00:01", "ips": ["100.64.0.1/24", "fc00:100::1/64"]}
     r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["100.101.0.1/24", "fc00:101::1/64"]}
     r1_switch_eth0 = "s1"
 
-    r2_asn = "65001"
-    r2_peer_asn = "65000"
+    r2_asn = 65001
+    r2_peer_asn = 65000
     r2_interfaces = ["eth0"]
     r2_interface_eth0 = {"mac": "02:02:00:00:00:01", "ips": ["100.64.0.2/24", "fc00:100::2/64"]}
     r2_interface_eth1 = {"mac": "02:02:00:00:00:02", "ips": ["100.102.0.1/24", "fc00:102::1/64"]}
     r2_switch_eth0 = "s1"
 
-    r3_asn = "65002"
-    r3_peer_asn = "65000"
+    r3_asn = 65002
+    r3_peer_asn = 65000
     r3_interfaces = ["eth0"]
     r3_interface_eth0 = {"mac": "02:03:00:00:00:01", "ips": ["100.64.0.3/24", "fc00:100::3/64"]}
     r3_switch_eth0 = "s1"
 
-    e1_asn = "65001"
+    e1_asn = 65001
     e1_interfaces = ["eth0"]
     e1_interface_eth0 = {"mac": "02:e1:00:00:00:01", "ips": ["100.64.0.2/24", "fc00:100::2/64"]}
     e1_switch_eth0 = "s1"
