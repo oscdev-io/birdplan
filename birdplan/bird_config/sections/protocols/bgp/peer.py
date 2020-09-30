@@ -66,28 +66,28 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         super().__init__(birdconfig_globals, constants, functions, tables)
 
         # Initialize our attributes
+        self._bgp_attributes = bgp_attributes
         self._peer_attributes = BGPPeerAttributes()
+
+        # Save our name and configuration
+        self.name = peer_name
 
         # Check if we have a peer description
         if "description" not in peer_config:
-            raise BirdPlanError("BGP peers need a 'description' field")
+            raise BirdPlanError(f"BGP peer '{self.name}' need a 'description' field")
         self.description = peer_config["description"]
 
         # Check if we have a peer type
         if "type" not in peer_config:
-            raise BirdPlanError("BGP peers need a 'type' field")
+            raise BirdPlanError(f"BGP peer '{self.name}' need a 'type' field")
         self.peer_type = peer_config["type"]
 
         # Check if we have a peer asn
         if "asn" not in peer_config:
-            raise BirdPlanError("BGP peers need a 'asn' field")
+            raise BirdPlanError(f"BGP peer '{self.name}' need a 'asn' field")
         self.asn = peer_config["asn"]
 
-        # Save the BGP protocol attributes
-        self._bgp_attributes = bgp_attributes
 
-        # Save our name and configuration
-        self.name = peer_name
         # INTERNAL: Dynamically set the section
         self._section = f"BGP Peer: {self.asn} - {self.name}"
 
