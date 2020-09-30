@@ -25,6 +25,10 @@ import pytest
 from .simulation import Simulation
 
 
+# Make sure basetests has its asserts rewritten
+pytest.register_assert_rewrite("tests.basetests")
+
+
 #
 # Helpers
 #
