@@ -87,6 +87,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             raise BirdPlanError(f"BGP peer '{self.name}' need a 'asn' field")
         self.asn = peer_config["asn"]
 
+        # If the peer type is of internal nature, but doesn't match our peer type, throw an exception
+        if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            if self.asn != self.bgp_attributes.asn:
+                raise BirdPlanError(f"BGP peer '{self.name}' is of internal nature, but has a different ASN")
 
         # INTERNAL: Dynamically set the section
         self._section = f"BGP Peer: {self.asn} - {self.name}"
