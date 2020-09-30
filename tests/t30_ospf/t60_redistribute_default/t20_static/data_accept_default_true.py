@@ -22,12 +22,12 @@
 """Data for test case."""
 
 
-from .include_static_tables import (  # noqa: F401 pylint: disable=unused-import
+from .data_common_static_tables import (  # noqa: F401 pylint: disable=unused-import
     r1_t_static4,
     r1_t_static6,
 )
 
-from ..include_with_accept import (  # noqa: F401 pylint: disable=unused-import
+from ..data_common_with_accept import (  # noqa: F401 pylint: disable=unused-import
     r2_t_ospf4,
     r2_t_ospf6,
     r2_master4,

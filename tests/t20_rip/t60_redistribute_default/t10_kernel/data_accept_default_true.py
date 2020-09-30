@@ -22,7 +22,7 @@
 """Data for test case."""
 
 
-from ..include_with_accept import (  # noqa: F401 pylint: disable=unused-import
+from ..data_common_with_accept import (  # noqa: F401 pylint: disable=unused-import
     r2_t_rip4,
     r2_t_rip6,
     r2_master4,

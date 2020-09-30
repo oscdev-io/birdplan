@@ -22,7 +22,7 @@
 """Data for test case."""
 
 
-from .data_redistribute_kernel_true import (  # noqa: F401 pylint: disable=unused-import
+from .data_common import (  # noqa: F401 pylint: disable=unused-import
     r1_master4,
     r1_master6,
     r1_t_kernel4,
@@ -30,6 +30,7 @@ from .data_redistribute_kernel_true import (  # noqa: F401 pylint: disable=unuse
     r1_inet,
     r1_inet6,
 )
+
 
 #
 # BIRD t_ospf*

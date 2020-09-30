@@ -21,29 +21,12 @@
 
 """Data for test case."""
 
-
-from .data_common_static_tables import (  # noqa: F401 pylint: disable=unused-import
-    r1_t_static4,
-    r1_t_static6,
-)
-
-from ..data_common_with_accept import (  # noqa: F401 pylint: disable=unused-import
-    r2_t_rip4,
-    r2_t_rip6,
-    r2_master4,
-    r2_master6,
-    r2_t_kernel4,
-    r2_t_kernel6,
-    r2_inet,
-    r2_inet6,
-)
-
-
 #
-# BIRD t_rip*
+# BIRD t_static*
 #
-r1_t_rip4 = {
-    "0.0.0.0/0": [
+
+r1_t_static4 = {
+    "10.0.0.0/24": [
         {
             "nexthops": [{"gateway": "100.101.0.2", "interface": "eth1"}],
             "pref": 200,
@@ -53,9 +36,8 @@ r1_t_rip4 = {
         }
     ]
 }
-
-r1_t_rip6 = {
-    "::/0": [
+r1_t_static6 = {
+    "fc10::/64": [
         {
             "nexthops": [{"gateway": "fc00:101::2", "interface": "eth1"}],
             "pref": 200,
@@ -72,14 +54,14 @@ r1_t_rip6 = {
 #
 
 r1_master4 = {
-    "0.0.0.0/0": [
+    "10.0.0.0/24": [
         {
             "nexthops": [{"gateway": "100.101.0.2", "interface": "eth1"}],
             "pref": 200,
             "prefix_type": "unicast",
             "protocol": "static4",
             "type": ["static", "univ"],
-        },
+        }
     ],
     "100.101.0.0/24": [
         {
@@ -100,17 +82,7 @@ r1_master4 = {
         }
     ],
 }
-
 r1_master6 = {
-    "::/0": [
-        {
-            "nexthops": [{"gateway": "fc00:101::2", "interface": "eth1"}],
-            "pref": 200,
-            "prefix_type": "unicast",
-            "protocol": "static6",
-            "type": ["static", "univ"],
-        },
-    ],
     "fc00:100::/64": [
         {
             "nexthops": [{"interface": "eth0"}],
@@ -129,32 +101,13 @@ r1_master6 = {
             "type": ["device", "univ"],
         }
     ],
+    "fc10::/64": [
+        {
+            "nexthops": [{"gateway": "fc00:101::2", "interface": "eth1"}],
+            "pref": 200,
+            "prefix_type": "unicast",
+            "protocol": "static6",
+            "type": ["static", "univ"],
+        }
+    ],
 }
-
-
-#
-# BIRD t_kernel*
-#
-
-r1_t_kernel4 = r1_t_rip4
-
-r1_t_kernel6 = r1_t_rip6
-
-
-#
-# RIB inet*
-#
-
-r1_inet = [
-    {"dev": "eth1", "dst": "default", "flags": [], "gateway": "100.101.0.2", "metric": 600, "protocol": "bird"},
-    {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.1", "protocol": "kernel", "scope": "link"},
-    {"dev": "eth1", "dst": "100.101.0.0/24", "flags": [], "prefsrc": "100.101.0.1", "protocol": "kernel", "scope": "link"},
-]
-
-r1_inet6 = [
-    {"dev": "eth0", "dst": "fc00:100::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-    {"dev": "eth1", "dst": "fc00:101::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-    {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-    {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-    {"dev": "eth1", "dst": "default", "flags": [], "gateway": "fc00:101::2", "metric": 600, "pref": "medium", "protocol": "bird"},
-]

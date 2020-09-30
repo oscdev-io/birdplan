@@ -21,7 +21,7 @@
 
 """Data for test case."""
 
-from .data_export_kernel_bgp_true import (  # noqa: F401 pylint: disable=unused-import
+from .data_common import (  # noqa: F401 pylint: disable=unused-import
     r1_t_bgp4_AS65000_e1_peer,
     r1_t_bgp6_AS65000_e1_peer,
     r1_t_bgp4,
@@ -30,4 +30,4 @@ from .data_export_kernel_bgp_true import (  # noqa: F401 pylint: disable=unused-
     r1_master6,
 )
 
-from ..include_common_false import r1_t_kernel4, r1_t_kernel6, r1_inet, r1_inet6  # noqa: F401 pylint: disable=unused-import
+from ..data_common import r1_t_kernel4, r1_t_kernel6, r1_inet, r1_inet6  # noqa: F401 pylint: disable=unused-import

@@ -21,7 +21,7 @@
 
 """Data for test case."""
 
-from .include_without_default import (  # noqa: F401 pylint: disable=unused-import
+from .data_common_without_default import (  # noqa: F401 pylint: disable=unused-import
     r1_t_static4,
     r1_t_static6,
     r1_t_ospf4,
