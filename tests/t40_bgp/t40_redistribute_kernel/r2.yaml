@@ -1,14 +1,14 @@
 router_id: 0.0.0.2
 log_file: "@LOGFILE@"
 debug: True
-
 bgp:
-  asn: 65001
+  asn: @ASN@
   import:
     kernel: True
   peers:
     r1:
-      asn: 65000
+      asn: @PEER_ASN@
+      type: @PEER_TYPE@
       description: BGP session to r1
       source_address4: 100.64.0.2
       source_address6: fc00:100::2
@@ -17,4 +17,4 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
-      type: peer
+@EXTRA_CONFIG@
