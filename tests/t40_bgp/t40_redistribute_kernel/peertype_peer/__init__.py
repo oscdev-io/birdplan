@@ -1,1 +1,1 @@
-"""BGP redistribute connected route tests for peer_type "peer"."""
+"""BGP redistribute kernel route tests for peer_type "peer"."""
