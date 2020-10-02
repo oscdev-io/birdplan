@@ -33,9 +33,14 @@ class Simulation:
 
     _configs: Dict[str, BirdPlan]
     _report: Dict[str, str]
+    # All the variables we're testing and their values from the simulation
+    _variables: List[str]
+    # The file containing our expected results
+    _expected_path: str
     _conffiles: Dict[str, str]
     _logfiles: Dict[str, str]
     _topology: Topology
+    _delay: int
 
     def __init__(self):
         """Initialize object."""
@@ -45,9 +50,12 @@ class Simulation:
         """Prepare for simulation of a new topology."""
         self._configs = {}
         self._report = {}
+        self._variables = []
+        self._expected_path = ""
         self._conffiles = {}
         self._logfiles = {}
         self._topology = Topology()
+        self._delay = 0
 
     def config(self, name: str) -> BirdPlan:
         """Return a node by name."""
@@ -114,6 +122,10 @@ class Simulation:
         """
         self._logfiles[name] = filename
 
+    def add_variable(self, name: str, content: str):
+        """Add a variable to our expected content list."""
+        self._variables.append(content)
+
     def report(self) -> List[Tuple[str, str]]:
         """Build a report for the current test."""
 
@@ -170,3 +182,38 @@ class Simulation:
     def logfiles(self) -> Dict[str, str]:
         """Return our log files."""
         return self._logfiles
+
+    @property
+    def variables(self) -> str:
+        """Build the variable list that we should of gotten."""
+
+        result = ""
+        for var in self._variables:
+            result += f"{var}\n\n"
+
+        return result
+
+    @property
+    def expected_path(self) -> str:
+        """
+        Return our expected path.
+
+        This is the file we get our expected results from.
+
+        """
+        return self._expected_path
+
+    @expected_path.setter
+    def expected_path(self, expected_path: str):
+        """Set our expected path."""
+        self._expected_path = expected_path
+
+    @property
+    def delay(self) -> int:
+        """Return our simulation delay."""
+        return self._delay
+
+    @delay.setter
+    def delay(self, delay: int):
+        """Set our simulation delay."""
+        self._delay = delay

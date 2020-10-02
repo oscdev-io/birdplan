@@ -30,6 +30,17 @@ pytest.register_assert_rewrite("tests.basetests")
 
 
 #
+# Commandline options
+#
+
+
+def pytest_addoption(parser):
+    """Add commandline options."""
+
+    parser.addoption("--write-expected", action="store_true", default=False, help="Write out expected test results.")
+
+
+#
 # Helpers
 #
 
@@ -149,10 +160,30 @@ def pytest_runtest_setup(item):
 
 
 @pytest.fixture(name="sim", scope="class")
-def fixture_sim():
+def fixture_sim(request):
     """Python fixture to create our simulation before running tests."""
+
+    # Create the simulation
     simulation = Simulation()
 
+    # Check if we're delaying checking of results
+    if request.config.getoption("--write-expected"):
+        simulation.delay = 10
+
+    # Yield the simulation to the test
     yield simulation
 
+    # Check if we're supposed to be writing out the expected results
+    if request.config.getoption("--write-expected"):
+        # Make sure we do infact have an expected results path set
+        if not simulation.expected_path:
+            raise RuntimeError("No expected_path set and '--write-expected' given on commandline")
+
+        # Write out expected file contents
+        with open(simulation.expected_path, "w") as expected_file:
+            expected_file.write("# type: ignore\n\n")
+            expected_file.write('"""Expected test result data."""\n\n')
+            expected_file.write(simulation.variables)
+
+    # Destroy simulation
     simulation.destroy()

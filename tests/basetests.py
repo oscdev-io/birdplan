@@ -33,8 +33,8 @@ import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.exabgp_router_node import ExaBGPRouterNode
 from nsnetsim.switch_node import SwitchNode
-from .simulation import Simulation
 from birdplan.cmdline import BirdPlanCommandLine  # pylint: disable=import-error
+from .simulation import Simulation
 
 
 BirdConfigMacros = Optional[Dict[str, Dict[str, str]]]
@@ -44,7 +44,8 @@ BirdConfigMacros = Optional[Dict[str, Dict[str, str]]]
 #
 
 
-@pytest.mark.incremental
+# FIXME
+# @pytest.mark.incremental
 class BirdPlanBaseTestCase:
     """Base test case for our tests."""
 
@@ -94,7 +95,14 @@ class BirdPlanBaseTestCase:
     def _test_setup(self, sim, testpath, tmpdir):
         """Set up a BIRD test scenario using our attributes."""
 
+        # Grab the directory the test is running in
         test_dir = os.path.dirname(testpath)
+
+        # Grab the filename of the test
+        test_filename = os.path.basename(testpath)
+
+        # Work out the expected file path
+        sim.expected_path = f"{test_dir}/expected{test_filename[4:]}"
 
         # Configure our simulator with the BIRD routers
         self._configure_bird_routers(sim, test_dir, tmpdir)
@@ -169,7 +177,11 @@ class BirdPlanBaseTestCase:
             assert "router_id" in status_output, f"The status output should have 'router_id' for BIRD router '{router}'"
             assert status_output["router_id"] == f"0.0.0.{router_id}", f"The router ID should be '0.0.0.{router_id}'"
 
-    def _test_bird_routers_table_bgp_peers(self, ipv: int, sim, testpath, routers: Optional[List[str]] = None):
+        # Check if we're delaying testing (for convergeance)
+        if sim.delay:
+            time.sleep(sim.delay)
+
+    def _test_bird_routers_table_bgp_peers(self, ipv: int, sim, routers: Optional[List[str]] = None):
         """Test BIRD BGP peer routing table."""
 
         # Check if we didn't get a router list override, if we didn't, then use all routers
@@ -183,9 +195,9 @@ class BirdPlanBaseTestCase:
                 # Grab the peer table name
                 table_name = self._bird_bgp_peer_table(sim, router, peer, ipv)
                 # Test the table
-                self._test_bird_table(router, table_name, sim, testpath)
+                self._test_bird_table(router, table_name, sim)
 
-    def _test_bird_routers_table(self, table_name: str, sim, testpath, routers: Optional[List[str]] = None):
+    def _test_bird_routers_table(self, table_name: str, sim, routers: Optional[List[str]] = None):
         """Test BIRD routing table for all routers, or those specified."""
 
         # Check if we didn't get a router list override, if we didn't, then use all routers
@@ -194,21 +206,31 @@ class BirdPlanBaseTestCase:
 
         # Loop with our BIRD routers
         for router in routers:
-            self._test_bird_table(router, table_name, sim, testpath)
+            self._test_bird_table(router, table_name, sim)
 
-    def _test_bird_table(self, router: str, table_name: str, sim, testpath):
+        # TODO -
+        #  Loop with routers
+        #    - Get data and add variables
+        #  Loop with routers
+        #    - Assert table contents
+
+    def _test_bird_table(self, router: str, table_name: str, sim):
         """Test BIRD routing table for a single router."""
 
         # Grab the the test data module
-        test_data_module = self._get_test_data_module(testpath)
+        expected_data = self._get_expected_data(sim)
 
         # Work out variable names
         table_variable_name = f"{router}_{table_name}"
         expect_content_variable_name = f"{table_variable_name}_expect_content"
 
         # Grab table data
-        table_data = self._get_test_data_module_item(test_data_module, table_variable_name)
-        expect_content = self._get_test_data_module_item(test_data_module, expect_content_variable_name)
+        table_data = self._get_expected_data_item(expected_data, table_variable_name)
+        expect_content = self._get_expected_data_item(expected_data, expect_content_variable_name)
+
+        # If we didn't find expect_content in the expected results file, check our test case...
+        if not expect_content and hasattr(self, expect_content_variable_name):
+            expect_content = getattr(self, expect_content_variable_name)
 
         # If we have entries in our routing table, we set expect_count to that number, else we don't use expect_count by
         # setting it to None
@@ -222,23 +244,25 @@ class BirdPlanBaseTestCase:
         # Add report
         report = f"{table_variable_name} = " + pprint.pformat(route_table)
         sim.add_report_obj(f"BIRD({router})[{table_name}]", report)
+        # Add variable so we can keep track of its expected content for later
+        sim.add_variable(table_variable_name, report)
 
         # Make sure table matches
         assert route_table == table_data, f"BIRD router '{router}' table '{table_name}' does not match what it should be"
 
-    def _test_os_rib(self, table_name: str, sim, testpath):
+    def _test_os_rib(self, table_name: str, sim):
         """Test OS routing table."""
 
         # Loop with our BIRD routers
         for router in self.routers:
             # Grab the the test data module
-            test_data_module = self._get_test_data_module(testpath)
+            expected_data = self._get_expected_data(sim)
 
             # Work out variable names
             table_variable_name = f"{router}_{table_name}"
 
             # Grab table data
-            table_data = self._get_test_data_module_item(test_data_module, table_variable_name)
+            table_data = self._get_expected_data_item(expected_data, table_variable_name)
 
             # Grab the RIB table from the OS
             route_table = sim.node(router).run_ip(["--family", table_name, "route", "list"])
@@ -246,51 +270,45 @@ class BirdPlanBaseTestCase:
             # Add report
             report = f"{table_variable_name} = " + pprint.pformat(route_table, width=132, compact=True)
             sim.add_report_obj(f"OS_RIB({router})[{table_name}]", report)
+            # Add variable so we can keep track of its expected content for later
+            sim.add_variable(table_variable_name, report)
 
             # Make sure table matches
             assert route_table == table_data, f"BIRD router '{router}' RIB '{table_name}' does not match what it should be"
 
-    def _get_test_data_module(self, testpath):
+    def _get_expected_data(self, sim):
         """Grab the test data module."""
 
-        # Grab this files directory name
-        my_path = os.path.dirname(__file__)
+        # Grab relative path of our expected results file
+        relpath = pathlib.Path(sim.expected_path).relative_to(os.path.dirname(__file__))
 
-        # Grab relative path of our test file
-        test_relpath = pathlib.Path(testpath).relative_to(my_path)
+        # Grab the expected results filename
+        module_filename = os.path.basename(relpath)
 
-        # Grab test file name
-        test_basename = os.path.basename(test_relpath)
+        # Work out the directory name of the expected results file
+        module_dirname = f"tests/{os.path.dirname(relpath)}"
 
-        # Work out data module filename
-        data_module_filename = f"data_{test_basename[5:]}"
-
-        # Check if the data doesn't exist in the test directory
-        data_module_dirname = f"tests/{os.path.dirname(test_relpath)}"
-        if not os.path.exists(f"{data_module_dirname}/{data_module_filename}"):
-            # If not, try the upper directory
-            data_module_dirname_upper = os.path.dirname(data_module_dirname)
-            if os.path.exists(f"{data_module_dirname_upper}/{data_module_filename}"):
-                # If it exists, adjust...
-                data_module_dirname = data_module_dirname_upper
-
-        # Grab test package name, which is the directory name with / replaced with .
-        data_module_pkgname = data_module_dirname.replace("/", ".")
+        # Grab the expected results module package name, which is the directory name with / replaced with .
+        module_pkgname = module_dirname.replace("/", ".")
 
         # Remove the .py from the data module
-        data_module_name = f".{data_module_filename[:-3]}"
+        module_name = f".{module_filename[:-3]}"
 
         # Import data module, remove .py from the data_module_filename
-        test_data_module = importlib.import_module(data_module_name, data_module_pkgname)
+        try:
+            expected_data = importlib.import_module(module_name, module_pkgname)
+        except ModuleNotFoundError:
+            expected_data = None
 
-        return test_data_module
+        return expected_data
 
-    def _get_test_data_module_item(self, data_module, symbol_name: str) -> Any:
+    def _get_expected_data_item(self, expected_data, symbol_name: str) -> Any:
         """Get an item from our data module."""
+
         data = None
         # But if we have a variable set for this router and table, use it instead
-        if hasattr(data_module, symbol_name):
-            symbol = getattr(data_module, symbol_name)
+        if hasattr(expected_data, symbol_name):
+            symbol = getattr(expected_data, symbol_name)
             # If the symbol is a callable, then call it with self
             if callable(symbol):
                 data = symbol(self)
