@@ -29,7 +29,7 @@ docker-compose run --rm birdplan /root/runtest
 
 To run a single test set use the following command...
 ```bash
-docker-compose run --rm birdplan /root/runtest tests/40-bgp/redistribute_connected
+docker-compose run --rm birdplan /root/runtest tests/t40_bgp/t10_basic/peertype_customer/test_bgp.py
 ```
 
 # Increasing verbosity
@@ -38,11 +38,19 @@ To increase verbosity to get addtional report data you can use the below example
 
 For output of logs...
 ```bash
- docker-compose run --rm birdplan /root/runtest "-v tests/40-bgp/features/quarantine"
+ docker-compose run --rm birdplan /root/runtest "-v tests/t40_bgp/t10_basic"
 ```
 
 For logs and configurations...
 ```bash
-docker-compose run --rm birdplan /root/runtest "-vv tests/40-bgp/features/quarantine"
+docker-compose run --rm birdplan /root/runtest "-vv tests/t40_bgp/t10_basic"
 ```
 
+# Writing out expected results
+
+To write out the expected results files, one can use the below ...
+```bash
+ docker-compose run --rm birdplan /root/runtest "-v tests/t40_bgp/t10_basic --write-expected"
+ chown -R user:group tests/t40_bgp/t10_basic
+ find tests/t40_bgp/t10_basic -name "*.py" | xargs black
+```
