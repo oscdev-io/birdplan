@@ -7,12 +7,13 @@ static:
   - 'fc00:101::/48 via fc01::2'
 
 bgp:
-  asn: 65000
+  asn: @ASN@
   import:
     static: True
   peers:
     r2:
-      asn: 65001
+      asn: @PEER_ASN@
+      type: @PEER_TYPE@
       description: BGP session to r2
       source_address4: 100.64.0.1
       source_address6: fc00:100::1
@@ -21,6 +22,4 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
-      type: peer
-      redistribute:
 @EXTRA_CONFIG@
