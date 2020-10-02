@@ -46,42 +46,42 @@ class Template(BirdPlanBaseTestCase):
         """Test BIRD status."""
         self._test_bird_status(sim)
 
-    def test_bird_tables_static4(self, sim, testpath):
+    def test_bird_tables_static4(self, sim):
         """Test BIRD t_static4 table."""
-        self._test_bird_routers_table("t_static4", sim, testpath, routers=["r1"])
+        self._test_bird_routers_table("t_static4", sim, routers=["r1"])
 
-    def test_bird_tables_static6(self, sim, testpath):
+    def test_bird_tables_static6(self, sim):
         """Test BIRD t_static6 table."""
-        self._test_bird_routers_table("t_static6", sim, testpath, routers=["r1"])
+        self._test_bird_routers_table("t_static6", sim, routers=["r1"])
 
-    def test_bird_tables_rip4(self, sim, testpath):
+    def test_bird_tables_rip4(self, sim):
         """Test BIRD t_rip4 table."""
-        self._test_bird_routers_table("t_rip4", sim, testpath)
+        self._test_bird_routers_table("t_rip4", sim)
 
-    def test_bird_tables_rip6(self, sim, testpath):
+    def test_bird_tables_rip6(self, sim):
         """Test BIRD t_rip6 table."""
-        self._test_bird_routers_table("t_rip6", sim, testpath)
+        self._test_bird_routers_table("t_rip6", sim)
 
-    def test_bird_tables_master4(self, sim, testpath):
+    def test_bird_tables_master4(self, sim):
         """Test BIRD master4 table."""
-        self._test_bird_routers_table("master4", sim, testpath)
+        self._test_bird_routers_table("master4", sim)
 
-    def test_bird_tables_master6(self, sim, testpath):
+    def test_bird_tables_master6(self, sim):
         """Test BIRD master6 table."""
-        self._test_bird_routers_table("master6", sim, testpath)
+        self._test_bird_routers_table("master6", sim)
 
-    def test_bird_tables_kernel4(self, sim, testpath):
+    def test_bird_tables_kernel4(self, sim):
         """Test BIRD kernel4 table."""
-        self._test_bird_routers_table("t_kernel4", sim, testpath)
+        self._test_bird_routers_table("t_kernel4", sim)
 
-    def test_bird_tables_kernel6(self, sim, testpath):
+    def test_bird_tables_kernel6(self, sim):
         """Test BIRD kernel6 table."""
-        self._test_bird_routers_table("t_kernel6", sim, testpath)
+        self._test_bird_routers_table("t_kernel6", sim)
 
-    def test_os_rib_inet(self, sim, testpath):
+    def test_os_rib_inet(self, sim):
         """Test OS RIB for inet."""
-        self._test_os_rib("inet", sim, testpath)
+        self._test_os_rib("inet", sim)
 
-    def test_os_rib_inet6(self, sim, testpath):
+    def test_os_rib_inet6(self, sim):
         """Test OS RIB for inet6."""
-        self._test_os_rib("inet6", sim, testpath)
+        self._test_os_rib("inet6", sim)

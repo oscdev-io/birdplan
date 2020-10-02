@@ -1,1 +1,1 @@
-"""BGP basic tests."""
+"""BGP basic tests for connected routes."""
