@@ -33,7 +33,8 @@ import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.exabgp_router_node import ExaBGPRouterNode
 from nsnetsim.switch_node import SwitchNode
-from birdplan.cmdline import BirdPlanCommandLine  # pylint: disable=import-error
+from birdplan.cmdline import BirdPlanCommandLine
+from birdplan.exceptions import BirdPlanError
 from .simulation import Simulation
 
 
@@ -58,6 +59,9 @@ class BirdPlanBaseTestCase:
 
     # List of switches to create
     switches = ["s1"]
+
+    # Routers configuration exception catching
+    routers_config_exception = {}
 
     # Supported attributes include:
     # rX_asn
@@ -428,9 +432,9 @@ class BirdPlanBaseTestCase:
         logging.getLogger("filelock").setLevel(logging.ERROR)
         # Set test mode
         birdplan_cmdline.birdplan.birdconf.test_mode = True
-        # Run BirdPlan as if it was from the commandline
-        result = birdplan_cmdline.run(
-            [
+
+        # Work out our commandline arguments
+        cmdline_args = [
                 "--birdplan-file",
                 birdplan_file,
                 "--bird-config-file",
@@ -438,8 +442,18 @@ class BirdPlanBaseTestCase:
                 "--birdplan-state-file",
                 bird_statefile,
                 *args,
-            ]
-        )
+        ]
+
+        # Check if we should get an exception or not
+        if router in self.routers_config_exception:
+            with pytest.raises(BirdPlanError, match=self.routers_config_exception[router]):
+                # Run BirdPlan as if it was from the commandline
+                birdplan_cmdline.run(cmdline_args)
+            # Return after we got the exception
+            return None
+
+        # Run BirdPlan as if it was from the commandline
+        result = birdplan_cmdline.run(cmdline_args)
 
         # Add test report sections
         sim.add_conffile(f"CONFFILE({router})", bird_conffile)
