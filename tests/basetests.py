@@ -44,8 +44,7 @@ BirdConfigMacros = Optional[Dict[str, Dict[str, str]]]
 #
 
 
-# FIXME
-# @pytest.mark.incremental
+@pytest.mark.incremental
 class BirdPlanBaseTestCase:
     """Base test case for our tests."""
 

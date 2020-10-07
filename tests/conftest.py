@@ -150,7 +150,8 @@ def pytest_runtest_setup(item):
             sim.clear_report()
 
     previousfailed = getattr(item.parent, "_previousfailed", None)
-    if previousfailed is not None:
+    # Skip the next test if this one failed, but only if we're not writing out expected test results
+    if (previousfailed is not None) and not item.config.getoption("--write-expected"):
         pytest.xfail(f"Previous test failed ({previousfailed.name})")
 
 
