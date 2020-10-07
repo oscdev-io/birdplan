@@ -339,8 +339,8 @@ bgp:
 
 The `accept` key contains a dictionary of routes we will accept. Namely...
 
-* `default` - Allows us to accept a default route from the BGP peer. The default is `False`. An exception will be raised if this is set to `True`
-for peers of type `customer`, `peer` and `routeserver`.
+* `default` - Allows us to accept a default route from the BGP peer. The default is `False` for everything but a `rrserver-rrserver` peer.
+An exception will be raised if this is set to `True` for peers of type `customer`, `peer` and `routeserver`.
 
 Below is a configuration example...
 ```yaml
