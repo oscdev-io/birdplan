@@ -28,7 +28,7 @@ from nsnetsim.topology import Topology
 from birdplan import BirdPlan  # pylint: disable=import-error
 
 
-class Simulation:
+class Simulation:  # pylint: disable=too-many-instance-attributes
     """Simulation class, storing the topology and nodes."""
 
     _configs: Dict[str, BirdPlan]
