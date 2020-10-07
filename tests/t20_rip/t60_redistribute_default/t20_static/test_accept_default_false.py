@@ -31,9 +31,6 @@ class Test(Template):
   redistribute:
     default: True
     static: True
-static:
-  - '0.0.0.0/0 via 100.101.0.2'
-  - '::/0 via fc00:101::2'
 """
     r2_extra_config = """
   accept:

@@ -30,6 +30,7 @@ class Test(Template):
     r1_extra_config = """
   redistribute:
     default: True
+    kernel: True
 """
 
     def _test_setup_specific(self, sim, tmpdir):

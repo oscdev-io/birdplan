@@ -2,13 +2,59 @@
 
 """Expected test result data."""
 
-r1_t_rip4 = {}
+r1_t_rip4 = {
+    "0.0.0.0/0": [
+        {
+            "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
+            "nexthops": [{"gateway": "100.101.0.2", "interface": "eth1"}],
+            "pref": 10,
+            "prefix_type": "unicast",
+            "protocol": "kernel4",
+            "type": ["inherit", "univ"],
+        }
+    ]
+}
 
-r2_t_rip4 = {}
+r2_t_rip4 = {
+    "0.0.0.0/0": [
+        {
+            "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
+            "metric1": 3,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "pref": 120,
+            "prefix_type": "unicast",
+            "protocol": "rip4",
+            "type": ["RIP", "univ"],
+        }
+    ]
+}
 
-r1_t_rip6 = {}
+r1_t_rip6 = {
+    "::/0": [
+        {
+            "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
+            "nexthops": [{"gateway": "fc00:101::2", "interface": "eth1"}],
+            "pref": 10,
+            "prefix_type": "unicast",
+            "protocol": "kernel6",
+            "type": ["inherit", "univ"],
+        }
+    ]
+}
 
-r2_t_rip6 = {}
+r2_t_rip6 = {
+    "::/0": [
+        {
+            "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
+            "metric1": 3,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "pref": 120,
+            "prefix_type": "unicast",
+            "protocol": "rip6",
+            "type": ["RIP", "univ"],
+        }
+    ]
+}
 
 r1_master4 = {
     "0.0.0.0/0": [

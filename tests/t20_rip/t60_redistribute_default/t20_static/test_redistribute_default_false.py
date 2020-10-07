@@ -29,10 +29,8 @@ class Test(Template):
 
     r1_extra_config = """
   redistribute:
+    default: False
     static: True
-static:
-  - '0.0.0.0/0 via 100.101.0.2'
-  - '::/0 via fc00:101::2'
 """
 
     def _test_bird_tables_static4(self, sim):
