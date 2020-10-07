@@ -1,1 +1,1 @@
-"""BGP redistributed originate route tests for peer_type "customer"."""
+"""BGP redistribute originated route tests for peer_type "customer"."""
