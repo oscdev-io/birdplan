@@ -59,11 +59,15 @@ class BirdPlanBaseTestCase:
     # List of switches to create
     switches = ["s1"]
 
-    # Supported attributes include
+    # Supported attributes include:
+    # rX_asn
     # rX_peer_asn
     # rX_peer_type
     # rX_global_config
     # rX_extra_config
+    # rX_interfaces = [...]
+    # rX_interface_ethY = {...}
+    # rX_switch_ethY = "sZ"
 
     # Default ASN to use for r1's peer
     r1_asn = 65000
@@ -104,8 +108,8 @@ class BirdPlanBaseTestCase:
         sim.expected_path = f"{test_dir}/expected{test_filename[4:]}"
 
         # Configure our simulator with the BIRD routers
-        self._configure_bird_routers(sim, test_dir, tmpdir)
-        for router in self.routers:
+        configured_routers = self._configure_bird_routers(sim, test_dir, tmpdir)
+        for router in configured_routers:
             sim.add_node(BirdRouterNode(name=router, configfile=f"{tmpdir}/bird.conf.{router}"))
 
         # Loop with our ExaBGP's and create the nodes
@@ -127,7 +131,7 @@ class BirdPlanBaseTestCase:
             sim.add_node(SwitchNode(switch))
 
         # Loop with routers
-        for router in self.routers:
+        for router in configured_routers:
             # Get configuration for this router
             router_interfaces = getattr(self, f"{router}_interfaces")
             # Loop with its interfaces
@@ -164,6 +168,9 @@ class BirdPlanBaseTestCase:
 
         # Loop with BIRD routers
         for router in self.routers:
+            # If the node does not exist, then go to the next one, this means it was not configured
+            if not sim.node(router):
+                continue
             # Grab BIRD status
             status_output = sim.node(router).birdc_show_status()
             # Add status to the reprot
@@ -195,6 +202,9 @@ class BirdPlanBaseTestCase:
 
         # Loop with routers
         for router in routers:
+            # Skip over routers not configured
+            if not sim.node(router):
+                continue
             # Loop with all the routers peers
             for peer in sim.config(router).birdconf.protocols.bgp.peers:
                 # Grab the peer table name
@@ -230,6 +240,10 @@ class BirdPlanBaseTestCase:
 
         # Loop with our BIRD routers and grab the data for assertion below
         for router in routers:
+            # Skip over routers not configured
+            if not sim.node(router):
+                continue
+            # Grab assert data
             assert_data[router] = self._get_bird_table_data(expected_module, router, table_name, sim)
 
         # Run asserts on the data received
@@ -282,6 +296,9 @@ class BirdPlanBaseTestCase:
 
         # Loop with our BIRD routers
         for router in self.routers:
+            # Skip over routers not configured
+            if not sim.node(router):
+                continue
 
             # Work out variable names
             table_variable_name = f"{router}_{table_name}"
@@ -290,16 +307,16 @@ class BirdPlanBaseTestCase:
             expected_data = self._get_expected_data_item(expected_module, table_variable_name)
 
             # Grab the RIB table from the OS
-            route_table = sim.node(router).run_ip(["--family", table_name, "route", "list"])
+            received_data = sim.node(router).run_ip(["--family", table_name, "route", "list"])
 
             # Add report
-            report = f"{table_variable_name} = " + pprint.pformat(route_table, width=132, compact=True)
+            report = f"{table_variable_name} = " + pprint.pformat(received_data, width=132, compact=True)
             sim.add_report_obj(f"OS_RIB({router})[{table_name}]", report)
             # Add variable so we can keep track of its expected content for later
             sim.add_variable(table_variable_name, report)
 
             # Save both tables for the assert test below
-            assert_data[router] = (route_table, expected_data)
+            assert_data[router] = (received_data, expected_data)
 
         # Loop with the results and assert
         for router, data in assert_data.items():
@@ -349,13 +366,20 @@ class BirdPlanBaseTestCase:
 
         return data
 
-    def _configure_bird_routers(self, sim: Simulation, test_dir: str, tmpdir: str):
+    def _configure_bird_routers(self, sim: Simulation, test_dir: str, tmpdir: str) -> List[str]:
         """Create our configuration files."""
-        # Generate config files
+        # Generate config files and keep track of what we configured in the case of exceptions
+        configured_routers = []
         for router in self.routers:
-            self._birdplan_run(sim, test_dir, tmpdir, router, ["configure"])
+            # If we get a positive result, add the router to the list of configured routers
+            if self._birdplan_run(sim, test_dir, tmpdir, router, ["configure"]):
+                configured_routers.append(router)
 
-    def _birdplan_run(self, sim: Simulation, test_dir: str, tmpdir: str, router: str, args: List[str]) -> Any:
+        return configured_routers
+
+    def _birdplan_run(  # pylint: disable=too-many-arguments,too-many-locals
+        self, sim: Simulation, test_dir: str, tmpdir: str, router: str, args: List[str]
+    ) -> Any:
         """Run BirdPlan for a given router."""
 
         # Work out file names
@@ -485,19 +509,3 @@ class BirdPlanBaseTestCase:
         sim.add_report_obj(f"EXABGP({exabgp_name})[output{report_title}]", output)
         # Return route table
         return output
-
-    def _check_main_bgp_tables_empty(self, sim):
-        """Test BIRD t_bgp4 table."""
-
-        raise DeprecationWarning("This shouldn't be used")
-
-        bgp4_table = self._bird_route_table(sim, "r1", "t_bgp4")
-        bgp6_table = self._bird_route_table(sim, "r1", "t_bgp6")
-
-        # Check bgp4 BIRD table
-        correct_result = {}
-        assert bgp4_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
-
-        # Check bgp6 BIRD table
-        correct_result = {}
-        assert bgp6_table == correct_result, "Result for R1 BIRD t_bgp4 routing table does not match what it should be"
