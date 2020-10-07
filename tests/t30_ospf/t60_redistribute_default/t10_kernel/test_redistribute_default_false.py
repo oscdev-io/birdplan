@@ -29,6 +29,7 @@ class Test(Template):
 
     r1_extra_config = """
   redistribute:
+    default: False
     kernel: True
 """
 

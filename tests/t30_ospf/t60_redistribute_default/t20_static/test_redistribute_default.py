@@ -27,14 +27,6 @@ from ..template import Template
 class Test(Template):
     """OSPF test case for redistribution of static default routes, with default settings for redistribute:default."""
 
-    r1_extra_config = """
-  redistribute:
-    static: True
-static:
-  - '0.0.0.0/0 via 100.101.0.2'
-  - '::/0 via fc00:101::2'
-"""
-
     def _test_bird_tables_static4(self, sim):
         """Test BIRD t_static4 table stub."""
         self._test_bird_routers_table("t_static4", sim, routers=["r1"])

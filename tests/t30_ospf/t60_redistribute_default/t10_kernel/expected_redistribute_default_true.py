@@ -3,6 +3,16 @@
 """Expected test result data."""
 
 r1_t_ospf4 = {
+    "0.0.0.0/0": [
+        {
+            "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
+            "nexthops": [{"gateway": "100.101.0.2", "interface": "eth1"}],
+            "pref": 10,
+            "prefix_type": "unicast",
+            "protocol": "kernel4",
+            "type": ["inherit", "univ"],
+        }
+    ],
     "100.64.0.0/24": [
         {
             "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
@@ -15,10 +25,24 @@ r1_t_ospf4 = {
             "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
-    ]
+    ],
 }
 
 r2_t_ospf4 = {
+    "0.0.0.0/0": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
     "100.64.0.0/24": [
         {
             "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
@@ -31,10 +55,20 @@ r2_t_ospf4 = {
             "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
-    ]
+    ],
 }
 
 r1_t_ospf6 = {
+    "::/0": [
+        {
+            "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
+            "nexthops": [{"gateway": "fc00:101::2", "interface": "eth1"}],
+            "pref": 10,
+            "prefix_type": "unicast",
+            "protocol": "kernel6",
+            "type": ["inherit", "univ"],
+        }
+    ],
     "fc00:100::/64": [
         {
             "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
@@ -47,10 +81,24 @@ r1_t_ospf6 = {
             "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
-    ]
+    ],
 }
 
 r2_t_ospf6 = {
+    "::/0": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
     "fc00:100::/64": [
         {
             "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
@@ -63,7 +111,7 @@ r2_t_ospf6 = {
             "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
-    ]
+    ],
 }
 
 r1_master4 = {

@@ -2,8 +2,6 @@ router_id: 0.0.0.1
 log_file: "@LOGFILE@"
 debug: True
 ospf:
-  redistribute:
-    static: True
   areas:
     0:
       interfaces:
