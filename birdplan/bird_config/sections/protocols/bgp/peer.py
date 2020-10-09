@@ -853,7 +853,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.large_communities.incoming:
             # Adding an incoming large community to a routecollector makes no sense at all
             if self.peer_type == "routecollector":
-                raise BirdPlanError(f"Having 'incoming_large_communities' set for a '{self.peer_type}' makes no sense")
+                raise BirdPlanError(
+                    f"Having 'incoming_large_communities' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
             # Loop with large communities and add to the prefix
             for large_community in sorted(self.large_communities.incoming):
                 if self.birdconfig_globals.debug:
