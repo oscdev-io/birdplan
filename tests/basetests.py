@@ -398,7 +398,11 @@ class BirdPlanBaseTestCase:
             # Router specific lookup for an attribute to add a macro for
             router_attr = f"{router}_{attr}"
             if hasattr(self, router_attr):
-                value = getattr(self, router_attr)
+                symbol = getattr(self, router_attr)
+                if callable(symbol):
+                    value = symbol()
+                else:
+                    value = symbol
             else:
                 value = ""
             # Add our macro
