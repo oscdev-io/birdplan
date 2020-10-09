@@ -1,1 +1,1 @@
-"""BGP basic tests."""
+"""BGP community stripping tests."""

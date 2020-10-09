@@ -1,1 +1,1 @@
-"""OSPF default route redistribution tests."""
+"""BGP default route redistribution tests."""

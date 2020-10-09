@@ -30,9 +30,6 @@ class "Router: r1" {
   .. Interface: eth0 ..
 - 100.64.0.1/24
 + fc00:100::1/64
-
-  .. BGP ..
-* AS65000
 }
 
 
@@ -40,9 +37,6 @@ class "ExaBGP: e1" {
   .. Interface: eth0 ..
 - 100.64.0.2/24
 + fc00:100::2/64
-
-  .. BGP ..
-* AS65001
 }
 
 
