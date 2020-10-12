@@ -130,7 +130,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "cost" in peer_config:
             # Raise an exception if peer cost does not make sense for a specific peer type
             if self.peer_type in ("internal", "routecollector", "rrclient", "rrserver", "rrserver-rrserver"):
-                raise BirdPlanError(f"BGP peer '{self.name}' has 'cost' specified but makes no sense for this peer type")
+                raise BirdPlanError(
+                    f"Having 'cost' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
             self.cost = peer_config["cost"]
 
         # Check if we're in graceful_shutdown mode
@@ -141,10 +143,17 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Check if we are adding a large community to outgoing routes
         if "incoming_large_communities" in peer_config:
+            # Raise an exception if incoming large communities makes no sense for this peer type
+            if self.peer_type == "routecollector":
+                raise BirdPlanError(
+                    f"Having 'incoming_large_communities' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            # Add incoming large communities
             for large_community in sorted(peer_config["incoming_large_communities"]):
                 self.large_communities.incoming.append(util.sanitize_large_community(large_community))
         # Check if we are adding a large community to outgoing routes
         if "outgoing_large_communities" in peer_config:
+            # Add outgoing large communities
             for large_community in sorted(peer_config["outgoing_large_communities"]):
                 self.large_communities.outgoing.append(util.sanitize_large_community(large_community))
 
@@ -209,18 +218,37 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "accept" in peer_config:
             for accept_type, accept_config in peer_config["accept"].items():
                 if accept_type != "default":
-                    raise BirdPlanError(f"The BGP accept type '{accept_type}' is not known")
+                    raise BirdPlanError(
+                        f"BGP peer 'accept' configuration '{accept_type}' for peer '{self.name}' with type '{self.peer_type}' "
+                        " is invalid"
+                    )
+                # Set route policy accept
                 setattr(self.route_policy_accept, accept_type, accept_config)
 
         # Check for filters we need to setup
         if "filter" in peer_config:
+            # Raise an exception if filters makes no sense for this peer type
+            if self.peer_type == "routecollector":
+                raise BirdPlanError(
+                    f"Having 'filter' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            # Add filters
             for filter_type, filter_config in peer_config["filter"].items():
                 if filter_type not in ("prefixes", "asns", "as_sets"):
-                    raise BirdPlanError(f"The BGP filter type '{filter_type}' is not known")
+                    raise BirdPlanError(
+                        f"BGP peer 'filter' configuration '{filter_type}' for peer '{self.name}' with type '{self.peer_type}' "
+                        "is invalid"
+                    )
+                # Set filter policy
                 setattr(self.filter_policy, filter_type, filter_config)
 
         # Check if we're quarantined
         if "quarantine" in peer_config and peer_config["quarantine"]:
+            # Raise an exception if quarantine makes no sense for this peer type
+            if self.peer_type == "routecollector":
+                raise BirdPlanError(
+                    f"Having 'quarantine' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
             self.quarantined = True
 
     def configure(self) -> None:
@@ -842,20 +870,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Quarantine mode...
         if self.quarantined:
-            # Quarantining a routecollector makes no sense at all
-            if self.peer_type == "routecollector":
-                raise BirdPlanError(f"Having 'quarantine' as True for a '{self.peer_type}' makes no sense")
             # Quarantine prefixes
             type_lines.append("    # Quarantine all prefixes received")
             type_lines.append("    bgp_filter_quarantine();")
 
         # Check if we are adding a large community to incoming routes
         if self.large_communities.incoming:
-            # Adding an incoming large community to a routecollector makes no sense at all
-            if self.peer_type == "routecollector":
-                raise BirdPlanError(
-                    f"Having 'incoming_large_communities' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
-                )
             # Loop with large communities and add to the prefix
             for large_community in sorted(self.large_communities.incoming):
                 if self.birdconfig_globals.debug:
