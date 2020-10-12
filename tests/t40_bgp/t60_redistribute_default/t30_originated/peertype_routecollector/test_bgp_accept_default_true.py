@@ -33,16 +33,18 @@ class Test(Template):
     }
 
     r1_peer_type = "routecollector"
-    r1_extra_config = """
+    r1_peer_config = """
       redistribute:
         default: True
         originated: True
 """
 
     r2_peer_type = "routecollector"
-    r2_extra_config = """
-      accept:
-        default: True
+    r2_global_config = """
   accept:
     default: True
+"""
+    r2_peer_config = """
+      accept:
+        default: True
 """

@@ -7,8 +7,8 @@ static:
   - '::/0 via fc00:101::2'
 
 rip:
+@EXTRA_CONFIG@
   interfaces:
     eth0:
       update-time: 5
       metric: 2
-@EXTRA_CONFIG@

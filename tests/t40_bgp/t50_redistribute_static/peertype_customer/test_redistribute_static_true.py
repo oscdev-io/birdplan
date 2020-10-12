@@ -28,7 +28,7 @@ class Test(Template):
     """BGP redistribute static route test cases, with redistribute:static set to True."""
 
     r1_peer_type = "customer"
-    r1_extra_config = """
+    r1_peer_config = """
       passive: False
       filter:
         asns: [65001]
@@ -37,7 +37,7 @@ class Test(Template):
 """
 
     r2_peer_type = "customer"
-    r2_extra_config = """
+    r2_peer_config = """
       passive: False
       filter:
         asns: [65000]

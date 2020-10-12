@@ -28,7 +28,7 @@ class Test(Template):
     """BGP test case for redistribution of static default routes, with redistribute:default set to false."""
 
     r1_peer_type = "routeserver"
-    r1_extra_config = """
+    r1_peer_config = """
       redistribute:
         default: False
         static: True

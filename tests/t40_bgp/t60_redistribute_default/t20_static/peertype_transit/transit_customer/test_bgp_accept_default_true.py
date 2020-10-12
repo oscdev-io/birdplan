@@ -28,7 +28,7 @@ class Test(Template):
     """BGP test case for redistribution of static default routes, with accept:default set to true."""
 
     r1_peer_type = "customer"
-    r1_extra_config = """
+    r1_peer_config = """
       filter:
         asns: [65001]
       redistribute:
@@ -37,9 +37,11 @@ class Test(Template):
 """
 
     r2_peer_type = "transit"
-    r2_extra_config = """
-      accept:
-        default: True
+    r2_global_config = """
   accept:
     default: True
+"""
+    r2_peer_config = """
+      accept:
+        default: True
 """

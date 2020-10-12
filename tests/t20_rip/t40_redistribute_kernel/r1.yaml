@@ -2,8 +2,8 @@ router_id: 0.0.0.1
 log_file: "@LOGFILE@"
 debug: True
 rip:
+@EXTRA_CONFIG@
   interfaces:
     eth0:
       update-time: 5
       metric: 2
-@EXTRA_CONFIG@

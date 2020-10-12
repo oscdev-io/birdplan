@@ -28,7 +28,7 @@ class Test(Template):
     """BGP test case for redistribution of kernel default routes, with accept:default set to false."""
 
     r1_peer_type = "customer"
-    r1_extra_config = """
+    r1_peer_config = """
       passive: False
       filter:
         asns: [65001]
@@ -38,7 +38,7 @@ class Test(Template):
 """
 
     r2_peer_type = "customer"
-    r2_extra_config = """
+    r2_peer_config = """
       passive: False
       filter:
         asns: [65000]

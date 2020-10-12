@@ -7,8 +7,8 @@ static:
   - '192.168.30.0/24 via "eth1"'
   - 'fc30::/64 via "eth1"'
 rip:
+@EXTRA_CONFIG@
   interfaces:
     eth0:
       update-time: 5
       metric: 2
-@EXTRA_CONFIG@

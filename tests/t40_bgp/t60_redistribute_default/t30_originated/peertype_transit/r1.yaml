@@ -9,6 +9,8 @@ bgp:
     - '0.0.0.0/0 via 100.101.0.2'
     - '::/0 via fc00:101::2'
 
+@GLOBAL_CONFIG@
+
   peers:
     r2:
       asn: @PEER_ASN@
@@ -21,4 +23,4 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
-@EXTRA_CONFIG@
+@PEER_CONFIG@

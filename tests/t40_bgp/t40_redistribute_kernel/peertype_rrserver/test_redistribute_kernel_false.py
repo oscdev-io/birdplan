@@ -29,7 +29,7 @@ class Test(Template):
 
     r1_peer_asn = 65000
     r1_peer_type = "rrserver"
-    r1_extra_config = """
+    r1_peer_config = """
       redistribute:
         kernel: False
 """

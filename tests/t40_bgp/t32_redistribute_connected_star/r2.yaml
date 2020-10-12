@@ -7,6 +7,7 @@ bgp:
     connected:
       interfaces:
         - eth1*
+@GLOBAL_CONFIG@
   peers:
     r1:
       asn: @PEER_ASN@
@@ -19,4 +20,4 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
-@EXTRA_CONFIG@
+@PEER_CONFIG@

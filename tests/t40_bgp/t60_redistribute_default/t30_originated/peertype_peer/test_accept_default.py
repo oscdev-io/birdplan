@@ -30,7 +30,7 @@ class Test(Template):
     routers_config_exception = {"r1": r"Having 'redistribute\[default\]' as True for peer 'r2' with type 'peer' makes no sense"}
 
     r1_peer_type = "peer"
-    r1_extra_config = """
+    r1_peer_config = """
       redistribute:
         default: True
         originated: True

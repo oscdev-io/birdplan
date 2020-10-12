@@ -27,7 +27,7 @@ from .template import Template
 class Test(Template):
     """Basic OSPF route test cases, with export_kernel:rip set to True."""
 
-    r2_extra_config = """
+    r2_global_config = """
 export_kernel:
   ospf: True
 """

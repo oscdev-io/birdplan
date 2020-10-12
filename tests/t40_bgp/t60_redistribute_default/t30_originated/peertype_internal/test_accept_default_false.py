@@ -29,7 +29,7 @@ class Test(Template):
 
     r1_peer_asn = 65000
     r1_peer_type = "internal"
-    r1_extra_config = """
+    r1_peer_config = """
       redistribute:
         default: True
         originated: True
@@ -37,7 +37,7 @@ class Test(Template):
 
     r2_asn = 65000
     r2_peer_type = "internal"
-    r2_extra_config = """
+    r2_peer_config = """
       accept:
         default: False
 """

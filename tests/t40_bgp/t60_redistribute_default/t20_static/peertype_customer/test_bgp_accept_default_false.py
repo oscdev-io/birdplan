@@ -30,7 +30,7 @@ class Test(Template):
     routers_config_exception = {"r2": r"Having 'accept\[default\]' as True for peer 'r1' with type 'customer' makes no sense"}
 
     r1_peer_type = "customer"
-    r1_extra_config = """
+    r1_peer_config = """
       passive: False
       filter:
         asns: [65001]
@@ -40,12 +40,14 @@ class Test(Template):
 """
 
     r2_peer_type = "customer"
-    r2_extra_config = """
+    r2_global_config = """
+  accept:
+    default: False
+"""
+    r2_peer_config = """
       passive: False
       filter:
         asns: [65000]
       accept:
         default: True
-  accept:
-    default: False
 """

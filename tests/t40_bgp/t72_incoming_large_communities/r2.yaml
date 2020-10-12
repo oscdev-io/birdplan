@@ -4,6 +4,7 @@ debug: True
 
 bgp:
   asn: @ASN@
+@GLOBAL_CONFIG@
   peers:
     r1:
       asn: @PEER_ASN@
@@ -18,4 +19,4 @@ bgp:
       error_wait_time: 2,5
       incoming_large_communities:
         - @ASN@:5000:1
-@EXTRA_CONFIG@
+@PEER_CONFIG@

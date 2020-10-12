@@ -33,14 +33,14 @@ class Test(Template):
     }
 
     r1_peer_type = "peer"
-    r1_extra_config = """
+    r1_peer_config = """
       redistribute:
         default: True
         static: True
 """
 
     r2_peer_type = "peer"
-    r2_extra_config = """
+    r2_peer_config = """
       accept:
         default: True
 """

@@ -28,7 +28,7 @@ class Test(Template):
     """BGP large community (information function) stripping test case."""
 
     r1_peer_type = "customer"
-    r1_extra_config = """
+    r1_peer_config = """
       filter:
         asns: [65001]
 """

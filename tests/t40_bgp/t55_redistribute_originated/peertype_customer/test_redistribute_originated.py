@@ -28,14 +28,14 @@ class Test(Template):
     """BGP redistribute originated route test case."""
 
     r1_peer_type = "customer"
-    r1_extra_config = """
+    r1_peer_config = """
       passive: False
       filter:
         asns: [65001]
 """
 
     r2_peer_type = "customer"
-    r2_extra_config = """
+    r2_peer_config = """
       passive: False
       filter:
         asns: [65000]

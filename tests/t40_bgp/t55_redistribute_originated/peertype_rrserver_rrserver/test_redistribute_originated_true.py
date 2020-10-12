@@ -29,14 +29,16 @@ class Test(Template):
 
     r1_peer_asn = 65000
     r1_peer_type = "rrserver-rrserver"
-    r1_extra_config = """
+    r1_global_config = """
+  rr_cluster_id: 0.0.0.1
+"""
+    r1_peer_config = """
       redistribute:
         originated: True
-  rr_cluster_id: 0.0.0.1
 """
 
     r2_asn = 65000
     r2_peer_type = "rrserver-rrserver"
-    r2_extra_config = """
+    r2_global_config = """
   rr_cluster_id: 0.0.0.1
 """

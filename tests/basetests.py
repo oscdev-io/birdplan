@@ -394,7 +394,17 @@ class BirdPlanBaseTestCase:
 
         # Loop with supported attributes that translate into macros
         internal_macros = {}
-        for attr in ["asn", "peer_asn", "peer_type", "global_config", "extra_config"]:
+        for attr in [
+            "asn",
+            "peer_asn",
+            "peer_type",
+            "extra_config",
+            "global_config",
+            "peer_config",
+            "template_extra_config",
+            "template_global_config",
+            "template_peer_config",
+        ]:
             # Router specific lookup for an attribute to add a macro for
             router_attr = f"{router}_{attr}"
             if hasattr(self, router_attr):
@@ -439,13 +449,13 @@ class BirdPlanBaseTestCase:
 
         # Work out our commandline arguments
         cmdline_args = [
-                "--birdplan-file",
-                birdplan_file,
-                "--bird-config-file",
-                bird_conffile,
-                "--birdplan-state-file",
-                bird_statefile,
-                *args,
+            "--birdplan-file",
+            birdplan_file,
+            "--bird-config-file",
+            bird_conffile,
+            "--birdplan-state-file",
+            bird_statefile,
+            *args,
         ]
 
         # Check if we should get an exception or not

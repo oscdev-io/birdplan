@@ -28,7 +28,7 @@ class Test(Template):
     """BGP redistribute static route test cases, with redistribute:static set to False."""
 
     r1_peer_type = "transit"
-    r1_extra_config = """
+    r1_peer_config = """
       redistribute:
         static: False
 """

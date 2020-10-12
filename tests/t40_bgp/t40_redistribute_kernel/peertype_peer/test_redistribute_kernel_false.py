@@ -28,7 +28,7 @@ class Test(Template):
     """BGP redistribute kernel route test cases, with redistribute:kernel set to False."""
 
     r1_peer_type = "peer"
-    r1_extra_config = """
+    r1_peer_config = """
       redistribute:
         kernel: False
 """

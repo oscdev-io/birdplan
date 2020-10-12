@@ -29,7 +29,7 @@ class Test(Template):
 
     r1_peer_asn = 65000
     r1_peer_type = "rrserver"
-    r1_extra_config = """
+    r1_peer_config = """
       passive: False
       redistribute:
         default: True
@@ -38,7 +38,7 @@ class Test(Template):
 
     r2_asn = 65000
     r2_peer_type = "rrserver"
-    r2_extra_config = """
+    r2_peer_config = """
       passive: False
       accept:
         default: True

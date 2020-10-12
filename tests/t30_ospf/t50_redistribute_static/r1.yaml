@@ -7,10 +7,11 @@ static:
   - '192.168.30.0/24 via "eth1"'
   - 'fc30::/64 via "eth1"'
 ospf:
+@EXTRA_CONFIG@
   areas:
     0:
       interfaces:
         'eth0':
           hello: 1
           wait: 2
-@EXTRA_CONFIG@
+

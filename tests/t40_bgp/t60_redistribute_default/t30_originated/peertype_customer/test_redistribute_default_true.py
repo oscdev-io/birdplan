@@ -28,7 +28,7 @@ class Test(Template):
     """BGP test case for redistribution of originated default routes, with redistribute:default set to true."""
 
     r1_peer_type = "customer"
-    r1_extra_config = """
+    r1_peer_config = """
       passive: False
       filter:
         asns: [65001]
@@ -37,7 +37,7 @@ class Test(Template):
         originated: True
 """
     r2_peer_type = "customer"
-    r2_extra_config = """
+    r2_peer_config = """
       passive: False
       filter:
         asns: [65000]

@@ -28,7 +28,7 @@ class Test(Template):
     """BGP redistribute originated route test cases, with redistribute:originated set to False."""
 
     r1_peer_type = "transit"
-    r1_extra_config = """
+    r1_peer_config = """
       redistribute:
         originated: False
 """

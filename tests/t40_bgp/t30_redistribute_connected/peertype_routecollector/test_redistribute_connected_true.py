@@ -28,7 +28,7 @@ class Test(Template):
     """BGP redistribute connected route test cases, with redistribute:connected set to True."""
 
     r1_peer_type = "routecollector"
-    r1_extra_config = """
+    r1_peer_config = """
       redistribute:
         connected: True
 """

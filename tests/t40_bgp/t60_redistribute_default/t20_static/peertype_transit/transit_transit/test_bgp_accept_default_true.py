@@ -32,16 +32,18 @@ class Test(Template):
     }
 
     r1_peer_type = "transit"
-    r1_extra_config = """
+    r1_peer_config = """
       redistribute:
         default: True
         static: True
 """
 
     r2_peer_type = "transit"
-    r2_extra_config = """
-      accept:
-        default: True
+    r2_global_config = """
   accept:
     default: True
+"""
+    r2_peer_config = """
+      accept:
+        default: True
 """
