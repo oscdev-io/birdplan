@@ -29,7 +29,6 @@ class Template(BirdPlanBaseTestCase):
 
     routers = ["r1"]
     exabgps = ["e1"]
-    r1_interfaces = ["eth0"]
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
