@@ -259,9 +259,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_ONE = 7;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_TWO = 72;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_THREE = 73;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF_MINUS_ONE = 8;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF_MINUS_TWO = 82;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF_MINUS_THREE = 83;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF = 8;")
         self.constants.conf.append("define BGP_LC_FUNCTION_INFORMATION = 1000;")
         self.constants.conf.append("define BGP_LC_FUNCTION_FILTERED = 1101;")
         self.constants.conf.append("")
@@ -281,9 +279,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large communities for LOCAL_PREF attribute manipulation")
-        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_ONE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF_MINUS_ONE, 1);")
-        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_TWO = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF_MINUS_TWO, 2);")
-        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_THREE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF_MINUS_THREE, 3);")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_ONE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 1);")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_TWO = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 2);")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_THREE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 3);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community information")
