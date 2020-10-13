@@ -120,8 +120,26 @@ class BirdPlanBaseTestCase:
         for exabgp in self.exabgps:
             # Grab ExaBGP's ASN
             exabgp_asn = getattr(self, f"{exabgp}_asn")
+
             # Work out config file name
-            exabgp_conffile = f"{test_dir}/exabgp.conf.{exabgp}.as{exabgp_asn}"
+            exabgp_conffile = None
+            for conffile_path in [
+                # With ASN appended
+                f"{test_dir}/exabgp.conf.{exabgp}.as{exabgp_asn}",
+                # Without ASN appended
+                f"{test_dir}/exabgp.conf.{exabgp}",
+                # Parent directory with ASN appended
+                f"{os.path.dirname(test_dir)}/exabgp.conf.{exabgp}.as{exabgp_asn}",
+                # parent directory without ASN appended
+                f"{os.path.dirname(test_dir)}/exabgp.conf.{exabgp}"
+            ]:
+                if os.path.exists(conffile_path):
+                    exabgp_conffile = conffile_path
+                    break
+            # If we didn't get a configuration file that exists, then raise an exception
+            if not exabgp_conffile:
+                raise RuntimeError("No ExaBGP configuration file found")
+
             # Add ExaBGP node
             sim.add_node(ExaBGPRouterNode(name=exabgp, configfile=exabgp_conffile))
             # Add config file to our simulation so we get a report for it
