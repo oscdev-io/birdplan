@@ -91,7 +91,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # If the peer type is of internal nature, but doesn't match our peer type, throw an exception
         if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             if self.asn != self.bgp_attributes.asn:
-                raise BirdPlanError(f"BGP peer '{self.name}' is of internal nature, but has a different ASN")
+                raise BirdPlanError(
+                    f"BGP peer '{self.name}' ({self.asn}) is of internal nature, "
+                    f"but has a different ASN ({self.bgp_attributes.asn})"
+                )
 
         # Setup the peer location
         if "location" in peer_config:
