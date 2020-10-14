@@ -126,6 +126,28 @@ class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
         self.as_sets = []
 
 
+class BGPPeerLocation:  # pylint: disable=too-few-public-methods
+    """
+    BGP peer location.
+
+    Attributes
+    ----------
+    iso3166 : Optional[int]
+        ISO3166 numeric location of the peer.
+    unm49 : Optional[int]
+        UN.M49 location of the peer.
+
+    """
+
+    unm49: Optional[int]
+    iso3166: Optional[int]
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        self.unm49 = None
+        self.iso3166 = None
+
+
 class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """
     BGP peer route policy for redistributing of routes.
@@ -134,7 +156,7 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,
     ----------
     connected : BGPPeerRoutePolicyRedistributeItem
         Redistribute connected routes to the peer BGP table. Defaults to `False`.
-    default: Dict[str, Bool]
+    default : Dict[str, Bool]
         Redistribute the default route to the peer BGP table. Defaults to `False`.
     originated : BGPPeerRoutePolicyRedistributeItem
         Redistribute originated routes to the peer BGP table. Defaults to `False`.
@@ -190,6 +212,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         Peer name.
     description : str
         Description of the peer.
+    location : BGPPeerLocation
+        Peer location.
     peer_type : str
         Peer type.
     asn : int
@@ -237,6 +261,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     _name: Optional[str]
     _description: Optional[str]
+    _location: BGPPeerLocation
 
     _peer_type: Optional[str]
     _asn: Optional[int]
@@ -278,6 +303,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
         self._name = None
         self._description = None
+        self._location = BGPPeerLocation()
 
         self._peer_type = None
         self._asn = None
@@ -329,6 +355,11 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     def description(self, description: str) -> None:
         """Set our description."""
         self._description = description
+
+    @property
+    def location(self) -> BGPPeerLocation:
+        """Return our location information."""
+        return self._location
 
     @property
     def peer_type(self) -> str:

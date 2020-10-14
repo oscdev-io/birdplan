@@ -533,6 +533,26 @@ bgp:
 ```
 
 
+## location
+
+The location option is used in setting the location-based large communities (route learned), filtering routes to peers in certain locations (location-based selective no-export) and prepending of advertised routes (location-based prepending).
+
+You can specify the peer location using the below configuration...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      location:
+        unm49: 999
+        iso3166: 999
+...
+```
+
+
 ## multihop
 
 Configure multihop for a BGP session to a neighbor that isn't directly connected. This is the number of hops it would take to reach the peer.

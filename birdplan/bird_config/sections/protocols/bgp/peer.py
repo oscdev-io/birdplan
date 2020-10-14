@@ -27,12 +27,13 @@ from .peer_attributes import (
     BGPPeerAttributes,
     BGPPeerFilterPolicy,
     BGPPeerFilterItem,
+    BGPPeerLargeCommunities,
+    BGPPeerLocation,
     BGPPeerPeeringDB,
     BGPPeerPrefixLimit,
     BGPPeerRoutePolicyAccept,
     BGPPeerRoutePolicyRedistribute,
     BGPPeerRoutePolicyRedistributeItem,
-    BGPPeerLargeCommunities,
 )
 from .typing import BGPPeerConfig
 from ..pipe import ProtocolPipe
@@ -92,6 +93,20 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             if self.asn != self.bgp_attributes.asn:
                 raise BirdPlanError(f"BGP peer '{self.name}' is of internal nature, but has a different ASN")
 
+        # Setup the peer location
+        if "location" in peer_config:
+            # Make sure the peer type configuration is valid for the specification of the peer location
+            if self.peer_type not in ("customer", "peer", "routeserver", "routecollector", "transit"):
+                raise BirdPlanError(
+                    f"BGP peer '{self.name}' has 'location' configuration but it makes no sense for peer type '{self.peer_type}'"
+                )
+            # Check for our ISO-3166 location
+            if "iso3166" in peer_config["location"]:
+                self.location.iso3166 = peer_config["location"]["iso3166"]
+            # Check for our UN.M49 location
+            if "unm49" in peer_config["location"]:
+                self.location.unm49 = peer_config["location"]["unm49"]
+
         # INTERNAL: Dynamically set the section
         self._section = f"BGP Peer: {self.asn} - {self.name}"
 
@@ -130,9 +145,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "cost" in peer_config:
             # Raise an exception if peer cost does not make sense for a specific peer type
             if self.peer_type in ("internal", "routecollector", "rrclient", "rrserver", "rrserver-rrserver"):
-                raise BirdPlanError(
-                    f"Having 'cost' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense"
-                )
+                raise BirdPlanError(f"Having 'cost' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
             self.cost = peer_config["cost"]
 
         # Check if we're in graceful_shutdown mode
@@ -229,9 +242,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "filter" in peer_config:
             # Raise an exception if filters makes no sense for this peer type
             if self.peer_type == "routecollector":
-                raise BirdPlanError(
-                    f"Having 'filter' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense"
-                )
+                raise BirdPlanError(f"Having 'filter' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
             # Add filters
             for filter_type, filter_config in peer_config["filter"].items():
                 if filter_type not in ("prefixes", "asns", "as_sets"):
@@ -486,6 +497,22 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("    reject;")
             self.conf.add("  }")
 
+        # Add location-based large communities
+        if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
+            # Check if we have a ISO-3166 country code
+            if self.location.iso3166:
+                self.conf.add("  # Check if we're not exporting this route based on the ISO-3166 location;")
+                self.conf.add(
+                    f"  if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT_LOCATION, {self.location.iso3166}) ~ bgp_large_community) then {{"
+                )
+                self.conf.add(
+                    f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on '
+                    f'BGP_LC_FUNCTION_NOEXPORT_LOCATION location {self.location.iso3166}";',
+                    debug=True,
+                )
+                self.conf.add("    reject;")
+                self.conf.add("  }")
+
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add("  # Redistribute connected routes")
@@ -715,6 +742,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Check if we're doing prepending
             self.conf.add("    # Do prepend if we have any LCs set")
             self.conf.add(f"    bgp_export_prepend({self.asn});")
+            # Check if we have a ISO-3166 country code
+            if self.location.iso3166:
+                self.conf.add("    # Do prepending based on ISO-3166 location;")
+                self.conf.add(f"    bgp_export_location_prepend({self.location.iso3166});")
         # If we have graceful_shutdown set, add the community
         if self.graceful_shutdown:
             self.conf.add(
@@ -872,7 +903,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.quarantined:
             # Quarantine prefixes
             type_lines.append("    # Quarantine all prefixes received")
-            type_lines.append("    bgp_filter_quarantine();")
+            type_lines.append("    bgp_quarantine_peer();")
+
+        # Add location-based large communities
+        if self.peer_type in ("customer", "peer", "routeserver", "transit"):
+            # Check if we have a ISO-3166 country code
+            if self.location.iso3166:
+                type_lines.append(f"    bgp_import_location_iso3166({self.location.iso3166});")
+            # Check if we have a UN.M49 country code
+            if self.location.unm49:
+                type_lines.append(f"    bgp_import_location_unm49({self.location.unm49});")
 
         # Check if we are adding a large community to incoming routes
         if self.large_communities.incoming:
@@ -1035,6 +1075,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def description(self, description: str) -> None:
         """Set our description."""
         self.peer_attributes.description = description
+
+    @property
+    def location(self) -> BGPPeerLocation:
+        """Return our location."""
+        return self.peer_attributes.location
 
     @property
     def peer_type(self) -> str:
