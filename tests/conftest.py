@@ -182,7 +182,8 @@ def fixture_sim(request):
 
         # Write out expected file contents
         with open(simulation.expected_path, "w") as expected_file:
-            expected_file.write("# type: ignore\n\n")
+            expected_file.write("# type: ignore\n")
+            expected_file.write("# pylint: disable=too-many-lines\n\n")
             expected_file.write('"""Expected test result data."""\n\n')
             expected_file.write(simulation.variables)
 
