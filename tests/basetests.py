@@ -121,8 +121,8 @@ class BirdPlanBaseTestCase:
             # Grab ExaBGP's ASN
             exabgp_asn = getattr(self, f"{exabgp}_asn")
 
-            # Work out config file name
-            exabgp_conffile = None
+            # Work out config file name, going 2 levels up in the test directory
+            exabgp_config_file = None
             for conffile_path in [
                 # With ASN appended
                 f"{test_dir}/exabgp.conf.{exabgp}.as{exabgp_asn}",
@@ -130,20 +130,24 @@ class BirdPlanBaseTestCase:
                 f"{test_dir}/exabgp.conf.{exabgp}",
                 # Parent directory with ASN appended
                 f"{os.path.dirname(test_dir)}/exabgp.conf.{exabgp}.as{exabgp_asn}",
-                # parent directory without ASN appended
-                f"{os.path.dirname(test_dir)}/exabgp.conf.{exabgp}"
+                # Parent directory without ASN appended
+                f"{os.path.dirname(test_dir)}/exabgp.conf.{exabgp}",
+                # Parent parent directory with ASN appended
+                f"{os.path.dirname(os.path.dirname(test_dir))}/exabgp.conf.{exabgp}.as{exabgp_asn}",
+                # Parent parent directory without ASN appended
+                f"{os.path.dirname(os.path.dirname(test_dir))}/exabgp.conf.{exabgp}",
             ]:
                 if os.path.exists(conffile_path):
-                    exabgp_conffile = conffile_path
+                    exabgp_config_file = conffile_path
                     break
             # If we didn't get a configuration file that exists, then raise an exception
-            if not exabgp_conffile:
+            if not exabgp_config_file:
                 raise RuntimeError("No ExaBGP configuration file found")
 
             # Add ExaBGP node
-            sim.add_node(ExaBGPRouterNode(name=exabgp, configfile=exabgp_conffile))
+            sim.add_node(ExaBGPRouterNode(name=exabgp, configfile=exabgp_config_file))
             # Add config file to our simulation so we get a report for it
-            sim.add_conffile(f"CONFFILE({exabgp})", exabgp_conffile)
+            sim.add_conffile(f"CONFFILE({exabgp})", exabgp_config_file)
             # Work out the log file name and add it to our simulation so we get a report for it too
             exalogfile = sim.node(exabgp).logfile
             sim.add_logfile(f"LOGFILE({exabgp}) => {exalogfile}", sim.node(exabgp).logfile)
@@ -441,10 +445,20 @@ class BirdPlanBaseTestCase:
         if internal_macros:
             macros.update(internal_macros)
 
-        router_config_file = f"{test_dir}/{router}.yaml"
-        # If the router config file does not exist in the test dir, look one directory upwards
-        if not os.path.exists(router_config_file):
-            router_config_file = f"{os.path.dirname(test_dir)}/{router}.yaml"
+        # Work out config file name, going up 2 directory levels
+        router_config_file = None
+        for conffile_path in [
+            f"{test_dir}/{router}.yaml",
+            # Parent directories
+            f"{os.path.dirname(test_dir)}/{router}.yaml",
+            f"{os.path.dirname(os.path.dirname(test_dir))}/{router}.yaml",
+        ]:
+            if os.path.exists(conffile_path):
+                router_config_file = conffile_path
+                break
+        # If we didn't get a configuration file that exists, then raise an exception
+        if not router_config_file:
+            raise RuntimeError("No router configuration file found")
 
         # Read in configuration file
         with open(router_config_file, "r") as file:
