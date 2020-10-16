@@ -230,10 +230,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (1..65534, *) ];")
         # This is used for stripping large communities from customers mostly
         self.constants.conf.append("define BGP_LC_STRIP = [ ")
-        self.constants.conf.append("  (BGP_ASN, 5, *),")
-        self.constants.conf.append("  (BGP_ASN, 7, *),")
-        self.constants.conf.append("  (BGP_ASN, 9..61, *),")
-        self.constants.conf.append("  (BGP_ASN, 64..65535, *),")
+        self.constants.conf.append("  (BGP_ASN, 1..3, *),")  # Strip route learned functions
+        # Allow client traffic engineering: 4, 5, 6, 7, 8
+        self.constants.conf.append("  (BGP_ASN, 9..61, *),") # Strip unused
+        self.constants.conf.append("  (BGP_ASN, 64..71, *),") # Strip unused
+        self.constants.conf.append("  (BGP_ASN, 74..65535, *),")  # Strip unsed + rest (incl. 1000 - info, 1101 - filter)
         # These functions should never be used on our own ASN
         self.constants.conf.append("  (BGP_ASN, 4, BGP_ASN),")
         self.constants.conf.append("  (BGP_ASN, 6, BGP_ASN),")
