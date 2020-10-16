@@ -846,7 +846,15 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# BGP export location-based prepending")
-        self.functions.conf.append("function bgp_export_location_prepend(int location) {")
+        self.functions.conf.append("function bgp_export_location_prepend(int location)")
+        self.functions.conf.append("int prepend_asn;")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  # Make sure we use the right ASN when prepending, and not 0 if bgp_path is empty")
+        self.functions.conf.append("  if (bgp_path.len = 0) then {")
+        self.functions.conf.append("    prepend_asn = BGP_ASN;")
+        self.functions.conf.append("  } else {")
+        self.functions.conf.append("    prepend_asn = bgp_path.first;")
+        self.functions.conf.append("  }")
         self.functions.conf.append("  # If we are prepending three times")
         self.functions.conf.append(
             "  if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_THREE, location) ~ bgp_large_community) then {"
@@ -854,9 +862,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append(
             '    print "[bgp_export_location_prepend] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_THREE for ", net;', debug=True
         )
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
         self.functions.conf.append("  # If we are prepending two times")
         self.functions.conf.append(
             "  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_TWO, location) ~ bgp_large_community) then {"
@@ -864,8 +872,8 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append(
             '    print "[bgp_export_location_prepend] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_TWO for ", net;', debug=True
         )
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
         self.functions.conf.append("  # If we are prepending one time")
         self.functions.conf.append(
             "  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_ONE, location) ~ bgp_large_community) then {"
@@ -873,7 +881,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append(
             '    print "[bgp_export_location_prepend] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True
         )
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
