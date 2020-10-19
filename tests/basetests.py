@@ -525,10 +525,22 @@ class BirdPlanBaseTestCase:
         # Grab the route table
         route_table = sim.node(router).birdc_show_route_table(route_table_name, **kwargs)
 
-        # Loop with routes and remove since fields
+        # Loop with routes in the table
         for route in route_table:
+            # Loop with each destination
             for dest in route_table[route]:
+                # Remove since field
                 del dest["since"]
+                # If this is OSPF type I, we need to remove the router_id to prevent a race condition depending which router
+                # comes up first.
+                if "ospf_type" in dest and dest["ospf_type"] == "I":
+                    # Remove router_id
+                    if "router_id" not in dest:
+                        raise RuntimeError("OSPF should have a 'router_id', but does not")
+                    del dest["router_id"]
+                    # Check if we have attributes and if the router_id is there
+                    if "attributes" in dest and "OSPF.router_id" in dest["attributes"]:
+                        del dest["attributes"]["OSPF.router_id"]
 
         # Return route table
         return route_table
