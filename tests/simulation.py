@@ -35,6 +35,8 @@ class Simulation:  # pylint: disable=too-many-instance-attributes
     _report: Dict[str, str]
     # All the variables we're testing and their values from the simulation
     _variables: List[str]
+    # Test directory
+    _test_dir: str
     # The file containing our expected results
     _expected_path: str
     _conffiles: Dict[str, str]
@@ -51,6 +53,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes
         self._configs = {}
         self._report = {}
         self._variables = []
+        self._test_dir = ""
         self._expected_path = ""
         self._conffiles = {}
         self._logfiles = {}
@@ -192,6 +195,16 @@ class Simulation:  # pylint: disable=too-many-instance-attributes
             result += f"{var}\n\n"
 
         return result
+
+    @property
+    def test_dir(self) -> str:
+        """Return our test directory."""
+        return self._test_dir
+
+    @test_dir.setter
+    def test_dir(self, test_dir: str):
+        """Set our test directory."""
+        self._test_dir = test_dir
 
     @property
     def expected_path(self) -> str:

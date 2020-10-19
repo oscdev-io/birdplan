@@ -103,16 +103,16 @@ class BirdPlanBaseTestCase:
         """Set up a BIRD test scenario using our attributes."""
 
         # Grab the directory the test is running in
-        test_dir = os.path.dirname(testpath)
+        sim.test_dir = os.path.dirname(testpath)
 
         # Grab the filename of the test
         test_filename = os.path.basename(testpath)
 
         # Work out the expected file path
-        sim.expected_path = f"{test_dir}/expected{test_filename[4:]}"
+        sim.expected_path = f"{sim.test_dir}/expected{test_filename[4:]}"
 
         # Configure our simulator with the BIRD routers
-        configured_routers = self._configure_bird_routers(sim, test_dir, tmpdir)
+        configured_routers = self._configure_bird_routers(sim, tmpdir)
         for router in configured_routers:
             sim.add_node(BirdRouterNode(name=router, configfile=f"{tmpdir}/bird.conf.{router}"))
 
@@ -125,17 +125,17 @@ class BirdPlanBaseTestCase:
             exabgp_config_file = None
             for conffile_path in [
                 # With ASN appended
-                f"{test_dir}/exabgp.conf.{exabgp}.as{exabgp_asn}",
+                f"{sim.test_dir}/exabgp.conf.{exabgp}.as{exabgp_asn}",
                 # Without ASN appended
-                f"{test_dir}/exabgp.conf.{exabgp}",
+                f"{sim.test_dir}/exabgp.conf.{exabgp}",
                 # Parent directory with ASN appended
-                f"{os.path.dirname(test_dir)}/exabgp.conf.{exabgp}.as{exabgp_asn}",
+                f"{os.path.dirname(sim.test_dir)}/exabgp.conf.{exabgp}.as{exabgp_asn}",
                 # Parent directory without ASN appended
-                f"{os.path.dirname(test_dir)}/exabgp.conf.{exabgp}",
+                f"{os.path.dirname(sim.test_dir)}/exabgp.conf.{exabgp}",
                 # Parent parent directory with ASN appended
-                f"{os.path.dirname(os.path.dirname(test_dir))}/exabgp.conf.{exabgp}.as{exabgp_asn}",
+                f"{os.path.dirname(os.path.dirname(sim.test_dir))}/exabgp.conf.{exabgp}.as{exabgp_asn}",
                 # Parent parent directory without ASN appended
-                f"{os.path.dirname(os.path.dirname(test_dir))}/exabgp.conf.{exabgp}",
+                f"{os.path.dirname(os.path.dirname(sim.test_dir))}/exabgp.conf.{exabgp}",
             ]:
                 if os.path.exists(conffile_path):
                     exabgp_config_file = conffile_path
@@ -392,19 +392,19 @@ class BirdPlanBaseTestCase:
 
         return data
 
-    def _configure_bird_routers(self, sim: Simulation, test_dir: str, tmpdir: str) -> List[str]:
+    def _configure_bird_routers(self, sim: Simulation, tmpdir: str) -> List[str]:
         """Create our configuration files."""
         # Generate config files and keep track of what we configured in the case of exceptions
         configured_routers = []
         for router in self.routers:
             # If we get a positive result, add the router to the list of configured routers
-            if self._birdplan_run(sim, test_dir, tmpdir, router, ["configure"]):
+            if self._birdplan_run(sim, tmpdir, router, ["configure"]):
                 configured_routers.append(router)
 
         return configured_routers
 
     def _birdplan_run(  # pylint: disable=too-many-arguments,too-many-locals
-        self, sim: Simulation, test_dir: str, tmpdir: str, router: str, args: List[str]
+        self, sim: Simulation, tmpdir: str, router: str, args: List[str]
     ) -> Any:
         """Run BirdPlan for a given router."""
 
@@ -448,10 +448,10 @@ class BirdPlanBaseTestCase:
         # Work out config file name, going up 2 directory levels
         router_config_file = None
         for conffile_path in [
-            f"{test_dir}/{router}.yaml",
+            f"{sim.test_dir}/{router}.yaml",
             # Parent directories
-            f"{os.path.dirname(test_dir)}/{router}.yaml",
-            f"{os.path.dirname(os.path.dirname(test_dir))}/{router}.yaml",
+            f"{os.path.dirname(sim.test_dir)}/{router}.yaml",
+            f"{os.path.dirname(os.path.dirname(sim.test_dir))}/{router}.yaml",
         ]:
             if os.path.exists(conffile_path):
                 router_config_file = conffile_path
