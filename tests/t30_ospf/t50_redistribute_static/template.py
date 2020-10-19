@@ -30,9 +30,6 @@ class Template(BirdPlanBaseTestCase):
     routers = ["r1", "r2"]
     r1_interfaces = ["eth0", "eth1"]
 
-    r1_t_ospf4_expect_content = "'router_id': '0.0.0.2'"
-    r1_t_ospf6_expect_content = "'router_id': '0.0.0.2'"
-
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)

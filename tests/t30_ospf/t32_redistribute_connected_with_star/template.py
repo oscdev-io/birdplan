@@ -32,9 +32,6 @@ class Template(BirdPlanBaseTestCase):
     r1_interface_eth2 = {"mac": "02:01:02:00:00:01", "ips": ["100.201.0.1/24", "fc00:201::1/64"]}
     r1_interface_eth10 = {"mac": "02:01:10:00:00:01", "ips": ["100.211.0.1/24", "fc00:211::1/64"]}
 
-    r1_t_ospf4_expect_content = "'router_id': '0.0.0.2'"
-    r1_t_ospf6_expect_content = "'router_id': '0.0.0.2'"
-
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
