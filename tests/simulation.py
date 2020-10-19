@@ -125,7 +125,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes
         """
         self._logfiles[name] = filename
 
-    def add_variable(self, name: str, content: str):
+    def add_variable(self, name: str, content: str):  # pylint: disable=unused-argument
         """Add a variable to our expected content list."""
         self._variables.append(content)
 
