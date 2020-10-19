@@ -147,7 +147,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         if "cost" in peer_config:
             # Raise an exception if peer cost does not make sense for a specific peer type
-            if self.peer_type in ("internal", "routecollector", "rrclient", "rrserver", "rrserver-rrserver"):
+            if self.peer_type not in ("customer", "peer", "routeserver", "transit"):
                 raise BirdPlanError(f"Having 'cost' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
             self.cost = peer_config["cost"]
 
