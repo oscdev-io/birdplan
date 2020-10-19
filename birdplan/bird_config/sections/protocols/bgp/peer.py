@@ -218,8 +218,18 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.prefix_limit6 = "peeringdb"
         # Check for peer config, this should override the above
         if self.has_ipv4 and "prefix_limit4" in peer_config:
+            # Having a prefix limit set for anything other than these peer types
+            if self.peer_type not in ("customer", "peer"):
+                raise BirdPlanError(
+                    f"Having 'prefix_limit4' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
             self.prefix_limit4 = peer_config["prefix_limit4"]
         if self.has_ipv6 and "prefix_limit6" in peer_config:
+            # Having a prefix limit set for anything other than these peer types
+            if self.peer_type not in ("customer", "peer"):
+                raise BirdPlanError(
+                    f"Having 'prefix_limit6' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
             self.prefix_limit6 = peer_config["prefix_limit6"]
         # Work out the prefix limits...
         if self.has_ipv4 and self.prefix_limit4 and self.prefix_limit4 == "peeringdb":
