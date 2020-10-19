@@ -60,6 +60,10 @@ class Template(BirdPlanBaseTestCase):
     def test_bird_route_limit_exceeded(self, sim):
         """Check logs to see if we reached the prefix limit."""
 
+        # Skip over configuration exceptions for this test
+        if "r1" in self.routers_config_exception and self.routers_config_exception:
+            return
+
         route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp4_AS6500[01]_e1: Route limit exceeded, shutting down")
         assert route_limit_exceeded, "Failed to shut down IPv4 connection when route limit exceeded"
 

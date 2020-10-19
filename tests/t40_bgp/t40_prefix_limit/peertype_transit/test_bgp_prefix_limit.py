@@ -27,4 +27,8 @@ from ..template import Template
 class Test(Template):
     """BGP prefix limit test case."""
 
+    routers_config_exception = {
+        "r1": r"Having 'prefix_limit4' set for peer 'e1' with type 'transit' makes no sense",
+    }
+
     r1_peer_type = "transit"
