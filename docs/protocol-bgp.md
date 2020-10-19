@@ -403,6 +403,8 @@ This is the value to reduce the LOCAL_PREF by. Refer to [BGP Appendix](protocol-
 
 You need to know exactly what you're doing by setting this, or the result can be disasterous.
 
+This is only supported for peer types of `customer`, `peer`, `routeserver` and `transit`.
+
 An example is however below...
 
 ```yaml
@@ -459,13 +461,14 @@ Filtering of routes received from a peer. Options available are below...
 
 * `prefixes` will filter on a list of allowed prefixes
 * `asns` will filter on a list of allowed origin ASN's
+* `peer_asns` will filter on the peer ASN, but is only valid for a `routeserver`.
 * `as_sets` will filter on a list of as-sets, resolving them at the same time.
 
 In the context of peer types `customer` and `peer` the above forms the ALLOW list. Everything other than what is specified will be filtered.
 
 In the context of peer types `transit` and `routeserver` the above forms the DENY list. Everything specified will be filtered.
 
-In the context of peer types `rrclient`, `rrserver`, `rrserver-rrserver` and `routecollector` the above makes no sense. But will form a DENY list.
+In the context of peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` and `routecollector` the above makes no sense. But will form a DENY list.
 
 An example is however below...
 ```yaml
@@ -536,6 +539,8 @@ bgp:
 ## location
 
 The location option is used in setting the location-based large communities (route learned), filtering routes to peers in certain locations (location-based selective no-export) and prepending of advertised routes (location-based prepending).
+
+This is only supported for peer types `customer`, `peer`, `routecollector`, `routeserver`, `transit`.
 
 You can specify the peer location using the below configuration...
 ```yaml
@@ -670,7 +675,7 @@ bgp:
 
 ## prefix_limit4
 
-IPv4 prefix limit for the peer.
+IPv4 prefix limit for the peer. This is only supported for peer types `customer` and `peer`.
 
 An example of specifying a prefix limit is below...
 ```yaml
@@ -688,7 +693,7 @@ bgp:
 
 ## prefix_limit6
 
-IPv6 prefix limit for the peer.
+IPv6 prefix limit for the peer. This is only supported for peer types `customer` and `peer`.
 
 An example of specifying a prefix limit is below...
 ```yaml
