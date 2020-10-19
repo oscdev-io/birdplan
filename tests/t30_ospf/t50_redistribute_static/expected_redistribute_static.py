@@ -1,4 +1,5 @@
 # type: ignore
+# pylint: disable=too-many-lines
 
 """Expected test result data."""
 
@@ -47,14 +48,13 @@ r1_t_static6 = {
 r1_t_ospf4 = {
     "100.64.0.0/24": [
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf4",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
     ]
@@ -63,14 +63,13 @@ r1_t_ospf4 = {
 r2_t_ospf4 = {
     "100.64.0.0/24": [
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf4",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
     ]
@@ -79,14 +78,13 @@ r2_t_ospf4 = {
 r1_t_ospf6 = {
     "fc00:100::/64": [
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf6",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
     ]
@@ -95,14 +93,13 @@ r1_t_ospf6 = {
 r2_t_ospf6 = {
     "fc00:100::/64": [
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf6",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
     ]
@@ -127,14 +124,13 @@ r1_master4 = {
             "type": ["device", "univ"],
         },
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf4",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         },
     ],
@@ -168,14 +164,13 @@ r2_master4 = {
             "type": ["device", "univ"],
         },
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf4",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         },
     ]
@@ -191,14 +186,13 @@ r1_master6 = {
             "type": ["device", "univ"],
         },
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf6",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         },
     ],
@@ -241,14 +235,13 @@ r2_master6 = {
             "type": ["device", "univ"],
         },
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf6",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         },
     ]
@@ -257,14 +250,13 @@ r2_master6 = {
 r1_t_kernel4 = {
     "100.64.0.0/24": [
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf4",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
     ],
@@ -291,14 +283,13 @@ r1_t_kernel4 = {
 r2_t_kernel4 = {
     "100.64.0.0/24": [
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf4",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
     ]
@@ -307,14 +298,13 @@ r2_t_kernel4 = {
 r1_t_kernel6 = {
     "fc00:100::/64": [
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf6",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
     ],
@@ -341,14 +331,13 @@ r1_t_kernel6 = {
 r2_t_kernel6 = {
     "fc00:100::/64": [
         {
-            "attributes": {"OSPF.metric1": 10, "OSPF.router_id": "0.0.0.2"},
+            "attributes": {"OSPF.metric1": 10},
             "metric1": 10,
             "nexthops": [{"interface": "eth0"}],
             "ospf_type": "I",
             "pref": 150,
             "prefix_type": "unicast",
             "protocol": "ospf6",
-            "router_id": "0.0.0.2",
             "type": ["OSPF", "univ"],
         }
     ]
