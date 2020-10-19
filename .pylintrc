@@ -3,4 +3,7 @@ max-line-length=132
 
 # Disable C0330 as there are currently some false positives:
 # https://github.com/PyCQA/pylint/issues/289
-disable=C0330
+
+# Disable similarity checks as the test directory is huge
+
+disable=C0330,similarities
