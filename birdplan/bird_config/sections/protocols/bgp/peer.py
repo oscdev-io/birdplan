@@ -209,6 +209,25 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 ):
                     raise BirdPlanError(f"The BGP redistribute type '{redistribute_type}' is not known")
                 setattr(self.route_policy_redistribute, redistribute_type, redistribute_config)
+        # Do a sanity check on our redistribution
+        if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):
+            # Check things we are not supposed to be redistributing to external peers
+            if self.route_policy_redistribute.default:
+                raise BirdPlanError(
+                    f"Having 'redistribute:default' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            if self.route_policy_redistribute.bgp:
+                raise BirdPlanError(
+                    f"Having 'redistribute:bgp' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            if self.route_policy_redistribute.bgp_peering:
+                raise BirdPlanError(
+                    f"Having 'redistribute:bgp_peering' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            if self.route_policy_redistribute.bgp_transit:
+                raise BirdPlanError(
+                    f"Having 'redistribute:bgp_transit' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
 
         # If the peer is a customer or peer, check if we have a prefix limit, if not add it from peeringdb
         if self.peer_type in ("customer", "peer"):
