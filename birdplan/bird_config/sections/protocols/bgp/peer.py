@@ -682,7 +682,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("    if (BGP_LC_RELATION_OWN ~ bgp_large_community) then {")
             self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
             self.conf.add(
-                f'        print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on BGP_LC_RELATION_OWN";',
+                f'        print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, '
+                '" with match on BGP_LC_RELATION_OWN";',
                 debug=True,
             )
             self.conf.add("        reject;")
