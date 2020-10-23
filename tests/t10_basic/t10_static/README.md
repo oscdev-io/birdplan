@@ -1,7 +1,8 @@
 # Basic static routing
 
-In terms of test "static":
-  - Router r1 should install static routes into OS RIB. (default)
+
+In terms of test "static":  **(default)**
+  - Router r1 should install static routes into OS RIB.
 
 In terms of test "export_kernel_static_false":
   - Router r1 should not install static routes into OS RIB.
@@ -10,11 +11,12 @@ In terms of test "export_kernel_static_true":
   - Router r1 should install static routes into OS RIB.
 
 
+## Diagram
+
 ```plantuml
 @startuml
 hide circle
 title Test for basic static routing
-left to right direction
 
 class "Router: r1" {
   .. Interface: eth0 ..
@@ -32,7 +34,7 @@ class "Router: r1" {
 
 class "Switch: s1" {}
 
-"Switch: s1" -- "Router: r1": r1 eth0
+"Router: r1" -> "Switch: s1": r1 eth0
 "Router: r1" --() NC: r1 eth1
 
 

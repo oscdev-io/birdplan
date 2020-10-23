@@ -26,3 +26,5 @@ from .template import Template
 
 class Test(Template):
     """OSPF test case for redistribution of connected routes."""
+
+    has_direct_tables = False

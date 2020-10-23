@@ -1,15 +1,20 @@
 # Test for no redistribution of RIP routes
 
+
 Router r1 should be exporting the BIRD static routes to r2.
 
-In the case of "redistribute_rip":
+
+In the case of "redistribute_rip": **(default)**
   - r2 should be exporting its RIP routes to r3
 
-In the case of "redistribute_rip_false"
+In the case of "redistribute_rip_false":
   - r2 should not be exporting its RIP routes to r3
 
-In the case of "redistribute_rip_true"
+In the case of "redistribute_rip_true":
   - r2 should be exporting its RIP routes to r3
+
+
+## Diagram
 
 ```plantuml
 @startuml
@@ -54,11 +59,11 @@ class "Switch: s1" {}
 class "Switch: s2" {}
 
 
-"Router: r1" -- "Switch: s1": r1 eth0
-"Router: r2" -- "Switch: s1": r2 eth0
+"Router: r1" -> "Switch: s1": r1 eth0
+"Switch: s1" -> "Router: r2": r2 eth0
 
-"Router: r2" -- "Switch: s2": r2 eth1
-"Router: r3" -- "Switch: s2": r3 eth0
+"Router: r2" -> "Switch: s2": r2 eth1
+"Switch: s2" -> "Router: r3": r3 eth0
 
 "Router: r1" --() NC: r1 eth1
 

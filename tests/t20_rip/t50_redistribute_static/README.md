@@ -1,20 +1,22 @@
 # RIP test for redistribution of static routes
 
-In the case of "redistribute_static":
+
+In the case of "redistribute_static": **(default)**
   - Router r1 should not be exporting its static routes to r2
 
-In the case of "redistribute_static_false"
+In the case of "redistribute_static_false":
   - Router r1 should not be exporting its static routes to r2
 
-In the case of "redistribute_static_true"
+In the case of "redistribute_static_true":
   - Router r1 should be exporting its static routes to r2
 
+
+## Diagram
 
 ```plantuml
 @startuml
 hide circle
 title RIP test for redistribution of static routes
-left to right direction
 
 
 class "Router: r1" {
@@ -45,8 +47,8 @@ class "Router: r2" {
 class "Switch: s1" {}
 
 
-"Switch: s1" -- "Router: r1": r1 eth0
-"Switch: s1" -- "Router: r2": r2 eth0
+"Router: r1" -> "Switch: s1": r1 eth0
+"Switch: s1" -> "Router: r2": r2 eth0
 "Router: r1" --() NC: r1 eth1
 
 @enduml

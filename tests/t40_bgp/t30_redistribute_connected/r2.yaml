@@ -3,10 +3,6 @@ log_file: "@LOGFILE@"
 debug: True
 bgp:
   asn: @ASN@
-  import:
-    connected:
-      interfaces:
-        - eth1
 @GLOBAL_CONFIG@
   peers:
     r1:

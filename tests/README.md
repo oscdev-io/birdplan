@@ -14,8 +14,6 @@
 
 [Redistribute Connected](t20_rip/t30_redistribute_connected/README.md)
 
-[Redistribute Connected (with star)](t20_rip/t32_redistribute_connected_with_star/README.md)
-
 [Redistribute Kernel](t20_rip/t40_redistribute_kernel/README.md)
 
 [Redistribute Static](t20_rip/t50_redistribute_static/README.md)
@@ -29,8 +27,6 @@
 
 [Redistribute Connected](t30_ospf/t30_redistribute_connected/README.md)
 
-[Redistribute Connected (with star)](t30_ospf/t32_redistribute_connected_with_star/README.md)
-
 [Stub Interface](t30_ospf/t34_stub_interface/README.md)
 
 [Redistribute Kernel](t30_ospf/t40_redistribute_kernel/README.md)
@@ -42,9 +38,16 @@
 
 # BGP
 
+[Basic](t40_bgp/t10_basic/README.md)
+
+[Redistribute Connected](t40_bgp/t30_redistribute_connected/README.md)
+
+
+-- --
+
+
 [No Export Kernel](40-bgp/10-no_export_kernel/README.md)
 
-[Redistribute Connected](40-bgp/10-redistribute_connected/README.md)
 
 [Redistribute Connected (with star)](40-bgp/10-redistribute_connected_with_star/README.md)
 

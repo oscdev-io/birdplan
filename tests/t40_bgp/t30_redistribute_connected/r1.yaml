@@ -4,10 +4,7 @@ debug: True
 
 bgp:
   asn: @ASN@
-  import:
-    connected:
-      interfaces:
-        - eth1
+@TEMPLATE_GLOBAL_CONFIG@
 @GLOBAL_CONFIG@
   peers:
     r2:
@@ -21,4 +18,5 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
+@TEMPLATE_PEER_CONFIG@
 @PEER_CONFIG@

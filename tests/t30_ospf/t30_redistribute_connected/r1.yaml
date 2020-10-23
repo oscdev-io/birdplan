@@ -2,10 +2,7 @@ router_id: 0.0.0.1
 log_file: "@LOGFILE@"
 debug: True
 ospf:
-  redistribute:
-    connected:
-      interfaces:
-        - eth1
+@TEMPLATE_GLOBAL_CONFIG@
   areas:
     0:
       interfaces:

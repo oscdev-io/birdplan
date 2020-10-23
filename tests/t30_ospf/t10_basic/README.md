@@ -1,18 +1,19 @@
 # Basic OSPF test
 
 
-In terms of test "ospf":
+In terms of test "ospf":  **(default)**
   - Router r1 should export routes to r2 and r2 should insert routes into its RIB.
 
 In terms of test "ospf_no_export_kernel":
   - Router r1 should export routes to r2 and r2 should NOT insert routes into its RIB.
 
 
+## Diagram
+
 ```plantuml
 @startuml
 hide circle
 title Test for basic OSPF routing
-left to right direction
 
 
 class "Router: r1" {
@@ -41,8 +42,8 @@ class "Router: r2" {
 class "Switch: s1" {}
 
 
-"Switch: s1" -- "Router: r1": r1 eth0
-"Switch: s1" -- "Router: r2": r2 eth0
+"Router: r1" -> "Switch: s1": r1 eth0
+"Switch: s1" -> "Router: r2": r2 eth0
 "Router: r1" --() NC: r1 eth1
 
 @enduml

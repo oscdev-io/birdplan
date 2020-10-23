@@ -28,7 +28,12 @@ class Template(BirdPlanBaseTestCase):
     """RIP test case for redistribution of connected routes."""
 
     routers = ["r1", "r2"]
-    r1_interfaces = ["eth0", "eth1"]
+
+    r1_interfaces = ["eth0", "eth1", "eth2", "eth10"]
+    r1_interface_eth2 = {"mac": "02:01:02:00:00:01", "ips": ["100.201.0.1/24", "fc00:201::1/64"]}
+    r1_interface_eth10 = {"mac": "02:01:10:00:00:01", "ips": ["100.211.0.1/24", "fc00:211::1/64"]}
+
+    has_direct_tables = True
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
@@ -40,11 +45,13 @@ class Template(BirdPlanBaseTestCase):
 
     def test_bird_tables_direct4_rip(self, sim):
         """Test BIRD t_direct4_rip table."""
-        self._test_bird_routers_table("t_direct4_rip", sim, routers=["r1"])
+        if self.has_direct_tables:
+            self._test_bird_routers_table("t_direct4_rip", sim, routers=["r1"])
 
     def test_bird_tables_direct6_rip(self, sim):
         """Test BIRD t_direct6_rip table."""
-        self._test_bird_routers_table("t_direct6_rip", sim, routers=["r1"])
+        if self.has_direct_tables:
+            self._test_bird_routers_table("t_direct6_rip", sim, routers=["r1"])
 
     def test_bird_tables_rip4(self, sim):
         """Test BIRD t_rip4 table."""

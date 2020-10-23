@@ -1,13 +1,15 @@
 # OSPF test for stub interface routes
 
+
 Router r1 should export its stub interface routes on eth1 to r2.
 
+
+## Diagram
 
 ```plantuml
 @startuml
 hide circle
 title OSPF test for stub interface routes
-left to right direction
 
 
 class "Router: r1" {
@@ -32,8 +34,8 @@ class "Router: r2" {
 class "Switch: s1" {}
 
 
-"Switch: s1" -- "Router: r1": r1 eth0
-"Switch: s1" -- "Router: r2": r2 eth0
+"Router: r1" -> "Switch: s1": r1 eth0
+"Switch: s1" -> "Router: r2": r2 eth0
 "Router: r1" --() NC: r1 eth1
 
 @enduml

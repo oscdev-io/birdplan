@@ -1,54 +1,54 @@
 # RIP test for redistribution of the default route
 
 
-*Kernel default route tests:*
+## t10_kernel - Kernel default route tests
 
-In terms of test "t10_kernel/test_accept_default_false":
-  - Router r1 should export the kernel default route to r2, but r2 should not accept it as it has accept:default set to false.
-
-In terms of test "t10_kernel/test_accept_default_true":
-  - Router r1 should export the kernel default route to r2, r2 should accept the default route as it has accept:default set to true.
-
-In terms of test "t10_kernel/test_accept_default":
+In terms of test "accept_default": **(default)**
   - Router r1 should export the kernel default route to r2, but r2 should not accept it as it does not accept default routes by default.
 
-In terms of test "t10_kernel/test_redistribute_default_false":
-  - Router r1 should not export the kernel default route to r2 as we have redistribute:default set to false.
+In terms of test "accept_default_false":
+  - Router r1 should export the kernel default route to r2, but r2 should not accept it as it has `accept:default` set to false.
 
-In terms of test "t10_kernel/test_redistribute_default_true":
-  - Router r1 should export the kernel default route to r2 as we have redistribute:default set to true.
+In terms of test "accept_default_true":
+  - Router r1 should export the kernel default route to r2, r2 should accept the default route as it has `accept:default` set to true.
 
-In terms of test "t10_kernel/test_redistribute_default":
+In terms of test "redistribute_default": **(default)**
   - Router r1 should not export the kernel default route to r2 as we do not redistribute the default route by default.
 
+In terms of test "redistribute_default_false":
+  - Router r1 should not export the kernel default route to r2 as we have `redistribute:default` set to false.
 
-*Static default route tests:*
+In terms of test "redistribute_default_true":
+  - Router r1 should export the kernel default route to r2 as we have `redistribute:default` set to true.
 
-In terms of test "t10_static/test_accept_default_false":
-  - Router r1 should export the static default route to r2, but r2 should not accept it as it has accept:default set to false.
 
-In terms of test "t10_static/test_accept_default_true":
-  - Router r1 should export the static default route to r2, r2 should accept the default route as it has accept:default set to true.
+## t10_static - Static default route tests
 
-In terms of test "t10_static/test_accept_default":
+In terms of test "accept_default": **(default)**
   - Router r1 should export the static default route to r2, but r2 should not accept it as it does not accept default routes by default.
 
-In terms of test "t10_static/test_redistribute_default_false":
-  - Router r1 should not export the static default route to r2 as we have redistribute:default set to false.
+In terms of test "accept_default_false":
+  - Router r1 should export the static default route to r2, but r2 should not accept it as it has `accept:default` set to false.
 
-In terms of test "t10_static/test_redistribute_default_true":
-  - Router r1 should export the static default route to r2 as we have redistribute:default set to true.
+In terms of test "accept_default_true":
+  - Router r1 should export the static default route to r2, r2 should accept the default route as it has `accept:default` set to true.
 
-In terms of test "t10_static/test_redistribute_default":
+In terms of test "redistribute_default": **(default)**
   - Router r1 should not export the static default route to r2 as we do not redistribute the default route by default.
 
+In terms of test "redistribute_default_false":
+  - Router r1 should not export the static default route to r2 as we have `redistribute:default` set to false.
 
+In terms of test "redistribute_default_true":
+  - Router r1 should export the static default route to r2 as we have `redistribute:default` set to true.
+
+
+## Diagram
 
 ```plantuml
 @startuml
 hide circle
 title RIP test for redistribution of the default route
-left to right direction
 
 
 class "Router: r1" {
@@ -77,8 +77,8 @@ class "Router: r2" {
 class "Switch: s1" {}
 
 
-"Switch: s1" -- "Router: r1": r1 eth0
-"Switch: s1" -- "Router: r2": r2 eth0
+"Router: r1" -> "Switch: s1": r1 eth0
+"Switch: s1" -> "Router: r2": r2 eth0
 "Router: r1" --() NC: r1 eth1
 
 @enduml

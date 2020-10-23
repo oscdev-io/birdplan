@@ -2,10 +2,7 @@ router_id: 0.0.0.1
 log_file: "@LOGFILE@"
 debug: True
 rip:
-  redistribute:
-    connected:
-      interfaces:
-        - eth1
+@GLOBAL_CONFIG@
   interfaces:
     eth0:
       update-time: 5
