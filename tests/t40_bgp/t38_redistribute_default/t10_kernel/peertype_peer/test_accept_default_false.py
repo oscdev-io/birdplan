@@ -27,7 +27,7 @@ from ...template import Template
 class Test(Template):
     """BGP test case for redistribution of kernel default routes, with accept:default set to false."""
 
-    routers_config_exception = {"r1": r"Having 'redistribute\[default\]' as True for peer 'r2' with type 'peer' makes no sense"}
+    routers_config_exception = {"r1": r"Having 'redistribute:default' set for peer 'r2' with type 'peer' makes no sense"}
 
     r1_peer_type = "peer"
     r1_peer_config = """

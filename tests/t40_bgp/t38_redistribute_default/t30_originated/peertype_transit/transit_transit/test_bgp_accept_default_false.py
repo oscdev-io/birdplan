@@ -28,7 +28,7 @@ class Test(Template):
     """BGP test case for redistribution of originated default routes, with accept:default set to false."""
 
     routers_config_exception = {
-        "r1": r"Having 'redistribute\[default\]' as True for peer 'r2' with type 'transit' makes no sense",
+        "r1": r"Having 'redistribute:default' set for peer 'r2' with type 'transit' makes no sense",
     }
 
     r1_peer_type = "transit"
