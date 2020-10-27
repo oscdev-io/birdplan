@@ -228,10 +228,22 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (2..65534, *) ];  # TESTING: Start changed from 1 to 2")
         else:
             self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (1..65534, *) ];")
+        # This is used for stripping large communities from customers mostly
         self.constants.conf.append("define BGP_LC_STRIP = [ ")
-        self.constants.conf.append("  (BGP_ASN, 5, *), (BGP_ASN, 7, *), (BGP_ASN, 9..61, *), (BGP_ASN, 64..65535, *)")
+        self.constants.conf.append("  (BGP_ASN, 1..3, *),")  # Strip route learned functions
+        # Allow client traffic engineering: 4, 5, 6, 7, 8
+        self.constants.conf.append("  (BGP_ASN, 9..61, *),")  # Strip unused
+        self.constants.conf.append("  (BGP_ASN, 64..71, *),")  # Strip unused
+        self.constants.conf.append("  (BGP_ASN, 74..65535, *),")  # Strip unsed + rest (incl. 1000 - info, 1101 - filter)
+        # These functions should never be used on our own ASN
+        self.constants.conf.append("  (BGP_ASN, 4, BGP_ASN),")
+        self.constants.conf.append("  (BGP_ASN, 6, BGP_ASN),")
+        self.constants.conf.append("  (BGP_ASN, 62, BGP_ASN),")
+        self.constants.conf.append("  (BGP_ASN, 63, BGP_ASN)")
         self.constants.conf.append("];")
+        # Strip communities from all peer types
         self.constants.conf.append("define BGP_COMMUNITY_STRIP_ALL = BGP_COMMUNITY_STRIP;")
+        # This is used for stripping large communities from peers and transit providers
         self.constants.conf.append("define BGP_LC_STRIP_ALL = [ (BGP_ASN, *, *) ];")
 
         self.constants.conf.append("# BGP Route Preferences")
@@ -248,8 +260,8 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         self.constants.conf.append("# Large community functions")
         # NK: IMPORTANT IF YOU CHANGE THE BELOW, UPDATE BGP_LC_STRIP
-        self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_ISO = 1;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_UN = 2;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_ISO3166 = 1;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_UNM49 = 2;")
         self.constants.conf.append("define BGP_LC_FUNCTION_RELATION = 3;")
         self.constants.conf.append("define BGP_LC_FUNCTION_NOEXPORT = 4;")
         self.constants.conf.append("define BGP_LC_FUNCTION_NOEXPORT_LOCATION = 5;")
@@ -259,9 +271,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_ONE = 7;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_TWO = 72;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_THREE = 73;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF_MINUS_ONE = 8;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF_MINUS_TWO = 82;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF_MINUS_THREE = 83;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF = 8;")
         self.constants.conf.append("define BGP_LC_FUNCTION_INFORMATION = 1000;")
         self.constants.conf.append("define BGP_LC_FUNCTION_FILTERED = 1101;")
         self.constants.conf.append("")
@@ -281,9 +291,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large communities for LOCAL_PREF attribute manipulation")
-        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_ONE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF_MINUS_ONE, 1);")
-        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_TWO = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF_MINUS_TWO, 2);")
-        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_THREE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF_MINUS_THREE, 3);")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_ONE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 1);")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_TWO = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 2);")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_THREE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 3);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community information")
@@ -697,10 +707,29 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-        self.functions.conf.append("# Filter for QUARANTINE mode")
-        self.functions.conf.append("function bgp_filter_quarantine() {")
-        self.functions.conf.append('  print "[bgp_filter_quarantine] Adding BGP_LC_FILTERED_QUARANTINED to ", net;', debug=True)
+        self.functions.conf.append("# Quarantine peer")
+        self.functions.conf.append("function bgp_quarantine_peer() {")
+        self.functions.conf.append('  print "[bgp_quarantine_peer] Adding BGP_LC_FILTERED_QUARANTINED to ", net;', debug=True)
         self.functions.conf.append("  bgp_large_community.add(BGP_LC_FILTERED_QUARANTINED);")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Location-based prefix importing (ISO-3166 country codes)")
+        self.functions.conf.append("function bgp_import_location_iso3166(int location) {")
+        self.functions.conf.append(
+            '  print "[bgp_import_location_iso3166] Adding BGP_LC_FUNCTION_LOCATION_ISO3166 with ", location, " to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("  bgp_large_community.add((BGP_ASN, BGP_LC_FUNCTION_LOCATION_ISO3166, location));")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Location-based prefix importing (UN.M49 country codes)")
+        self.functions.conf.append("function bgp_import_location_unm49(int location) {")
+        self.functions.conf.append(
+            '  print "[bgp_import_location_unm49] Adding BGP_LC_FUNCTION_LOCATION_UNM49 with ", location, " to ", net;', debug=True
+        )
+        self.functions.conf.append("  bgp_large_community.add((BGP_ASN, BGP_LC_FUNCTION_LOCATION_UNM49, location));")
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
@@ -788,22 +817,71 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# BGP export prepending")
-        self.functions.conf.append("function bgp_export_prepend(int peeras) {")
+        self.functions.conf.append("function bgp_export_prepend(int peeras)")
+        self.functions.conf.append("int prepend_asn;")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  # Make sure we use the right ASN when prepending, and not 0 if bgp_path is empty")
+        self.functions.conf.append("  if (bgp_path.len = 0) then {")
+        self.functions.conf.append("    prepend_asn = BGP_ASN;")
+        self.functions.conf.append("  } else {")
+        self.functions.conf.append("    prepend_asn = bgp_path.first;")
+        self.functions.conf.append("  }")
         self.functions.conf.append("  # If we are prepending three times")
         self.functions.conf.append("  if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_THREE, peeras) ~ bgp_large_community) then {")
         self.functions.conf.append('    print "[bgp_export_prepend] Matched BGP_LC_FUNCTION_PREPEND_THREE for ", net;', debug=True)
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
         self.functions.conf.append("  # If we are prepending two times")
         self.functions.conf.append("  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_TWO, peeras) ~ bgp_large_community) then {")
         self.functions.conf.append('    print "[bgp_export_prepend] Matched BGP_LC_FUNCTION_PREPEND_TWO for ", net;', debug=True)
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
         self.functions.conf.append("  # If we are prepending one time")
         self.functions.conf.append("  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_ONE, peeras) ~ bgp_large_community) then {")
         self.functions.conf.append('    print "[bgp_export_prepend] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True)
-        self.functions.conf.append("    bgp_path.prepend(bgp_path.first);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP export location-based prepending")
+        self.functions.conf.append("function bgp_export_location_prepend(int location)")
+        self.functions.conf.append("int prepend_asn;")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  # Make sure we use the right ASN when prepending, and not 0 if bgp_path is empty")
+        self.functions.conf.append("  if (bgp_path.len = 0) then {")
+        self.functions.conf.append("    prepend_asn = BGP_ASN;")
+        self.functions.conf.append("  } else {")
+        self.functions.conf.append("    prepend_asn = bgp_path.first;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  # If we are prepending three times")
+        self.functions.conf.append(
+            "  if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_THREE, location) ~ bgp_large_community) then {"
+        )
+        self.functions.conf.append(
+            '    print "[bgp_export_location_prepend] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_THREE for ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("  # If we are prepending two times")
+        self.functions.conf.append(
+            "  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_TWO, location) ~ bgp_large_community) then {"
+        )
+        self.functions.conf.append(
+            '    print "[bgp_export_location_prepend] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_TWO for ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("  # If we are prepending one time")
+        self.functions.conf.append(
+            "  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_ONE, location) ~ bgp_large_community) then {"
+        )
+        self.functions.conf.append(
+            '    print "[bgp_export_location_prepend] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")

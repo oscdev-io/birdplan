@@ -3,56 +3,51 @@
 
 # Basic
 
-[Static Routing](10-basic/static/README.md)
+[Static Routing](t10_basic/t10_static/README.md)
 
 
 # RIP
 
-[No Export Kernel](20-rip/no_export_kernel/README.md)
+[Basic](t20_rip/t10_basic/README.md) (including no kernel export)
 
-[No Redistribute RIP](20-rip/no_redistribute_20-rip/README.md)
+[Redistribute RIP](t20_rip/t20_redistribute_rip/README.md)
 
-[Redistribute Connected](20-rip/redistribute_connected/README.md)
+[Redistribute Connected](t20_rip/t30_redistribute_connected/README.md)
 
-[Redistribute Connected (with star)](20-rip/redistribute_connected_with_star/README.md)
+[Redistribute Kernel](t20_rip/t40_redistribute_kernel/README.md)
 
-[Redistribute Kernel](20-rip/redistribute_kernel/README.md)
+[Redistribute Static](t20_rip/t50_redistribute_static/README.md)
 
-[Redistribute Only Default](20-rip/redistribute_only_default/README.md)
-
-[Redistribute Static](20-rip/redistribute_static/README.md)
-
-[Redistribute Static Default](20-rip/redistribute_static_default/README.md)
-
-[Redistribute Static Without Default](20-rip/redistribute_static_without_default/README.md)
+[Redistribute Default](t20_rip/t60_redistribute_default/README.md)
 
 
 # OSPF
 
-[No Export Kernel](30-rip/no_export_kernel/README.md)
+[Basic](t30_ospf/t10_basic/README.md) (including no kernel export)
 
-[Redistribute Connected](30-rip/redistribute_connected/README.md)
+[Redistribute Connected](t30_ospf/t30_redistribute_connected/README.md)
 
-[Redistribute Connected (with star)](30-rip/redistribute_connected_with_star/README.md)
+[Stub Interface](t30_ospf/t34_stub_interface/README.md)
 
-[Redistribute Kernel](30-rip/redistribute_kernel/README.md)
+[Redistribute Kernel](t30_ospf/t40_redistribute_kernel/README.md)
 
-[Redistribute Only Default](30-rip/redistribute_only_default/README.md)
+[Redistribute Static](t30_ospf/t50_redistribute_static/README.md)
 
-[Redistribute Static](30-rip/redistribute_static/README.md)
-
-[Redistribute Static Default](30-rip/redistribute_static_default/README.md)
-
-[Redistribute Static Without Default](30-rip/redistribute_static_without_default/README.md)
-
-[Stub Interface](30-rip/stub_interface/README.md)
+[Redistribute Default](t30_ospf/t60_redistribute_default/README.md)
 
 
 # BGP
 
+[Basic](t40_bgp/t10_basic/README.md)
+
+[Redistribute Connected](t40_bgp/t30_redistribute_connected/README.md)
+
+
+-- --
+
+
 [No Export Kernel](40-bgp/10-no_export_kernel/README.md)
 
-[Redistribute Connected](40-bgp/10-redistribute_connected/README.md)
 
 [Redistribute Connected (with star)](40-bgp/10-redistribute_connected_with_star/README.md)
 

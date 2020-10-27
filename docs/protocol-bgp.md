@@ -339,8 +339,8 @@ bgp:
 
 The `accept` key contains a dictionary of routes we will accept. Namely...
 
-* `default` - Allows us to accept a default route from the BGP peer. The default is `False`. An exception will be raised if this is set to `True`
-for peers of type `customer`, `peer` and `routeserver`.
+* `default` - Allows us to accept a default route from the BGP peer. The default is `False` for everything but a `rrserver-rrserver` peer.
+An exception will be raised if this is set to `True` for peers of type `customer`, `peer` and `routeserver`.
 
 Below is a configuration example...
 ```yaml
@@ -403,6 +403,8 @@ This is the value to reduce the LOCAL_PREF by. Refer to [BGP Appendix](protocol-
 
 You need to know exactly what you're doing by setting this, or the result can be disasterous.
 
+This is only supported for peer types of `customer`, `peer`, `routeserver` and `transit`.
+
 An example is however below...
 
 ```yaml
@@ -459,13 +461,14 @@ Filtering of routes received from a peer. Options available are below...
 
 * `prefixes` will filter on a list of allowed prefixes
 * `asns` will filter on a list of allowed origin ASN's
+* `peer_asns` will filter on the peer ASN, but is only valid for a `routeserver`.
 * `as_sets` will filter on a list of as-sets, resolving them at the same time.
 
 In the context of peer types `customer` and `peer` the above forms the ALLOW list. Everything other than what is specified will be filtered.
 
 In the context of peer types `transit` and `routeserver` the above forms the DENY list. Everything specified will be filtered.
 
-In the context of peer t ypes `rrclient`, `rrserver`, `rrserver-rrserver` and `routecollector` the above makes no sense. But will form a DENY list.
+In the context of peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` and `routecollector` the above makes no sense. But will form a DENY list.
 
 An example is however below...
 ```yaml
@@ -529,6 +532,28 @@ bgp:
       incoming_large_communities:
         - 65001:5000:1
         - 65001:5000:2
+...
+```
+
+
+## location
+
+The location option is used in setting the location-based large communities (route learned), filtering routes to peers in certain locations (location-based selective no-export) and prepending of advertised routes (location-based prepending).
+
+This is only supported for peer types `customer`, `peer`, `routecollector`, `routeserver`, `transit`.
+
+You can specify the peer location using the below configuration...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      location:
+        unm49: 999
+        iso3166: 999
 ...
 ```
 
@@ -611,6 +636,25 @@ bgp:
 ```
 
 
+# passive
+
+Set the BGP session to passive or non-passive.
+
+This defaults to `True` for `customer` and `rrclient` peer types and `False` for all other peer types.
+
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      passive: True
+...
+```
+
+
 ## password
 
 BGP session password. You probably want to add quotes around any non-alphanumeric characters.
@@ -631,7 +675,7 @@ bgp:
 
 ## prefix_limit4
 
-IPv4 prefix limit for the peer.
+IPv4 prefix limit for the peer. This is only supported for peer types `customer` and `peer`.
 
 An example of specifying a prefix limit is below...
 ```yaml
@@ -649,7 +693,7 @@ bgp:
 
 ## prefix_limit6
 
-IPv6 prefix limit for the peer.
+IPv6 prefix limit for the peer. This is only supported for peer types `customer` and `peer`.
 
 An example of specifying a prefix limit is below...
 ```yaml
@@ -762,10 +806,11 @@ bgp:
 The peer type, options are detailed below...
 
 * `customer` this is a customer peering session.
+* `internal` this is an internal peering session between routers.
 * `peer` this is a peering partner peering session.
-* `transit` this is a transit provider peering session.
+* `routecollector` this is a route collector session.
+* `routeserver` this is a route server session.
 * `rrclient` this is a route reflector client peering session.
 * `rrserver` this is a route reflector server peering session.
 * `rrserver-rrserver` this is a peering session between two route reflectors or route reflector mirrors.
-* `routecollector` this is a route collector session.
-* `routeserver` this is a route server session.
+* `transit` this is a transit provider peering session.

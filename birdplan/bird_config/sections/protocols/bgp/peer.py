@@ -27,12 +27,13 @@ from .peer_attributes import (
     BGPPeerAttributes,
     BGPPeerFilterPolicy,
     BGPPeerFilterItem,
+    BGPPeerLargeCommunities,
+    BGPPeerLocation,
     BGPPeerPeeringDB,
     BGPPeerPrefixLimit,
     BGPPeerRoutePolicyAccept,
     BGPPeerRoutePolicyRedistribute,
     BGPPeerRoutePolicyRedistributeItem,
-    BGPPeerLargeCommunities,
 )
 from .typing import BGPPeerConfig
 from ..pipe import ProtocolPipe
@@ -66,28 +67,49 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         super().__init__(birdconfig_globals, constants, functions, tables)
 
         # Initialize our attributes
+        self._bgp_attributes = bgp_attributes
         self._peer_attributes = BGPPeerAttributes()
+
+        # Save our name and configuration
+        self.name = peer_name
 
         # Check if we have a peer description
         if "description" not in peer_config:
-            raise BirdPlanError("BGP peers need a 'description' field")
+            raise BirdPlanError(f"BGP peer '{self.name}' need a 'description' field")
         self.description = peer_config["description"]
 
         # Check if we have a peer type
         if "type" not in peer_config:
-            raise BirdPlanError("BGP peers need a 'type' field")
+            raise BirdPlanError(f"BGP peer '{self.name}' need a 'type' field")
         self.peer_type = peer_config["type"]
 
         # Check if we have a peer asn
         if "asn" not in peer_config:
-            raise BirdPlanError("BGP peers need a 'asn' field")
+            raise BirdPlanError(f"BGP peer '{self.name}' need a 'asn' field")
         self.asn = peer_config["asn"]
 
-        # Save the BGP protocol attributes
-        self._bgp_attributes = bgp_attributes
+        # If the peer type is of internal nature, but doesn't match our peer type, throw an exception
+        if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            if self.asn != self.bgp_attributes.asn:
+                raise BirdPlanError(
+                    f"BGP peer '{self.name}' ({self.asn}) is of internal nature, "
+                    f"but has a different ASN ({self.bgp_attributes.asn})"
+                )
 
-        # Save our name and configuration
-        self.name = peer_name
+        # Setup the peer location
+        if "location" in peer_config:
+            # Make sure the peer type configuration is valid for the specification of the peer location
+            if self.peer_type not in ("customer", "peer", "routeserver", "routecollector", "transit"):
+                raise BirdPlanError(
+                    f"BGP peer '{self.name}' has 'location' configuration but it makes no sense for peer type '{self.peer_type}'"
+                )
+            # Check for our ISO-3166 location
+            if "iso3166" in peer_config["location"]:
+                self.location.iso3166 = peer_config["location"]["iso3166"]
+            # Check for our UN.M49 location
+            if "unm49" in peer_config["location"]:
+                self.location.unm49 = peer_config["location"]["unm49"]
+
         # INTERNAL: Dynamically set the section
         self._section = f"BGP Peer: {self.asn} - {self.name}"
 
@@ -125,8 +147,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         if "cost" in peer_config:
             # Raise an exception if peer cost does not make sense for a specific peer type
-            if self.peer_type in ("rrclient", "rrserver", "rrserver-rrserver", "routecollector"):
-                raise BirdPlanError(f"BGP peer '{self.name}' has 'cost' specified but makes no sense for this peer type")
+            if self.peer_type not in ("customer", "peer", "routeserver", "transit"):
+                raise BirdPlanError(f"Having 'cost' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
             self.cost = peer_config["cost"]
 
         # Check if we're in graceful_shutdown mode
@@ -137,19 +159,29 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Check if we are adding a large community to outgoing routes
         if "incoming_large_communities" in peer_config:
+            # Raise an exception if incoming large communities makes no sense for this peer type
+            if self.peer_type == "routecollector":
+                raise BirdPlanError(
+                    f"Having 'incoming_large_communities' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            # Add incoming large communities
             for large_community in sorted(peer_config["incoming_large_communities"]):
                 self.large_communities.incoming.append(util.sanitize_large_community(large_community))
         # Check if we are adding a large community to outgoing routes
         if "outgoing_large_communities" in peer_config:
+            # Add outgoing large communities
             for large_community in sorted(peer_config["outgoing_large_communities"]):
                 self.large_communities.outgoing.append(util.sanitize_large_community(large_community))
 
-        # Turn on passive mode for route reflectors
+        # Turn on passive mode for route reflectors and customers
         if self.peer_type in ("customer", "rrclient"):
             self.passive = True
+        # But allow it to be set manually
+        if "passive" in peer_config:
+            self.passive = peer_config["passive"]
 
-        # If this is a rrserver, send our entire BGP table
-        if self.peer_type in ("rrclient", "rrserver", "rrserver-rrserver"):
+        # If this involves an internal peer, send our entire BGP table
+        if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             self.route_policy_redistribute.bgp = True
         # If this is an transit, peer, customer, routecollector or routeserver, we need to redistribute our own routes and
         # customer routes
@@ -177,6 +209,25 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 ):
                     raise BirdPlanError(f"The BGP redistribute type '{redistribute_type}' is not known")
                 setattr(self.route_policy_redistribute, redistribute_type, redistribute_config)
+        # Do a sanity check on our redistribution
+        if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):
+            # Check things we are not supposed to be redistributing to external peers
+            if self.route_policy_redistribute.default:
+                raise BirdPlanError(
+                    f"Having 'redistribute:default' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            if self.route_policy_redistribute.bgp:
+                raise BirdPlanError(
+                    f"Having 'redistribute:bgp' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            if self.route_policy_redistribute.bgp_peering:
+                raise BirdPlanError(
+                    f"Having 'redistribute:bgp_peering' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            if self.route_policy_redistribute.bgp_transit:
+                raise BirdPlanError(
+                    f"Having 'redistribute:bgp_transit' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
 
         # If the peer is a customer or peer, check if we have a prefix limit, if not add it from peeringdb
         if self.peer_type in ("customer", "peer"):
@@ -186,8 +237,18 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.prefix_limit6 = "peeringdb"
         # Check for peer config, this should override the above
         if self.has_ipv4 and "prefix_limit4" in peer_config:
+            # Having a prefix limit set for anything other than these peer types
+            if self.peer_type not in ("customer", "peer"):
+                raise BirdPlanError(
+                    f"Having 'prefix_limit4' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
             self.prefix_limit4 = peer_config["prefix_limit4"]
         if self.has_ipv6 and "prefix_limit6" in peer_config:
+            # Having a prefix limit set for anything other than these peer types
+            if self.peer_type not in ("customer", "peer"):
+                raise BirdPlanError(
+                    f"Having 'prefix_limit6' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
             self.prefix_limit6 = peer_config["prefix_limit6"]
         # Work out the prefix limits...
         if self.has_ipv4 and self.prefix_limit4 and self.prefix_limit4 == "peeringdb":
@@ -202,18 +263,35 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "accept" in peer_config:
             for accept_type, accept_config in peer_config["accept"].items():
                 if accept_type != "default":
-                    raise BirdPlanError(f"The BGP accept type '{accept_type}' is not known")
+                    raise BirdPlanError(
+                        f"BGP peer 'accept' configuration '{accept_type}' for peer '{self.name}' with type '{self.peer_type}' "
+                        " is invalid"
+                    )
+                # Set route policy accept
                 setattr(self.route_policy_accept, accept_type, accept_config)
 
         # Check for filters we need to setup
         if "filter" in peer_config:
+            # Raise an exception if filters makes no sense for this peer type
+            if self.peer_type == "routecollector":
+                raise BirdPlanError(f"Having 'filter' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
+            # Add filters
             for filter_type, filter_config in peer_config["filter"].items():
                 if filter_type not in ("prefixes", "asns", "as_sets"):
-                    raise BirdPlanError(f"The BGP filter type '{filter_type}' is not known")
+                    raise BirdPlanError(
+                        f"BGP peer 'filter' configuration '{filter_type}' for peer '{self.name}' with type '{self.peer_type}' "
+                        "is invalid"
+                    )
+                # Set filter policy
                 setattr(self.filter_policy, filter_type, filter_config)
 
         # Check if we're quarantined
         if "quarantine" in peer_config and peer_config["quarantine"]:
+            # Raise an exception if quarantine makes no sense for this peer type
+            if self.peer_type == "routecollector":
+                raise BirdPlanError(
+                    f"Having 'quarantine' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
             self.quarantined = True
 
     def configure(self) -> None:
@@ -404,9 +482,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Configure import filter from our main BGP table
         self.conf.add("# Import filter FROM the main BGP table to the BGP peer table")
         self.conf.add(f"filter {self.filter_name_import_bgp((ipv))}")
-        self.conf.add("int accept_route;")
+        self.conf.add("bool accept_route;")
+        self.conf.add("bool bypass_bgp_redistribution_checks;")
         self.conf.add("{")
-        self.conf.add("  accept_route = 0;")
+        self.conf.add("  accept_route = false;")
+        self.conf.add("  bypass_bgp_redistribution_checks = false;")
 
         # Check that we have static routes imported first
         if self.route_policy_redistribute.connected and not self.bgp_attributes.route_policy_import.connected:
@@ -451,6 +531,22 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("    reject;")
             self.conf.add("  }")
 
+        # Add location-based large communities
+        if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
+            # Check if we have a ISO-3166 country code
+            if self.location.iso3166:
+                self.conf.add("  # Check if we're not exporting this route based on the ISO-3166 location;")
+                self.conf.add(
+                    f"  if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT_LOCATION, {self.location.iso3166}) ~ bgp_large_community) then {{"
+                )
+                self.conf.add(
+                    f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on '
+                    f'BGP_LC_FUNCTION_NOEXPORT_LOCATION location {self.location.iso3166}";',
+                    debug=True,
+                )
+                self.conf.add("    reject;")
+                self.conf.add("  }")
+
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add("  # Redistribute connected routes")
@@ -461,7 +557,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 debug=True,
             )
             self._add_redistribute_properties(self.route_policy_redistribute.connected)
-            self.conf.add("    accept_route = 1;")
+            self.conf.add("    accept_route = true;")
             self.conf.add("  }")
         else:
             self.conf.add("  # Do not redistribute connected routes")
@@ -483,7 +579,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 debug=True,
             )
             self._add_redistribute_properties(self.route_policy_redistribute.static)
-            self.conf.add("    accept_route = 1;")
+            self.conf.add("    accept_route = true;")
             self.conf.add("  }")
         else:
             self.conf.add("  # Do not redistribute static routes")
@@ -505,7 +601,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 debug=True,
             )
             self._add_redistribute_properties(self.route_policy_redistribute.kernel)
-            self.conf.add("    accept_route = 1;")
+            self.conf.add("    accept_route = true;")
             self.conf.add("  }")
         else:
             self.conf.add("  # Do not redistribute kernel routes")
@@ -527,7 +623,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 debug=True,
             )
             self._add_redistribute_properties(self.route_policy_redistribute.originated)
-            self.conf.add("    accept_route = 1;")
+            self.conf.add("    accept_route = true;")
             self.conf.add("  }")
         else:
             self.conf.add("  # Do not redistribute originated routes")
@@ -543,17 +639,20 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Do not redistribute the default route, no matter where we get it from
         if self.route_policy_redistribute.default:
             # Make sure this is an allowed peer type for the default route to be exported
-            if self.peer_type not in ["customer", "rrclient", "rrserver", "rrserver-rrserver"]:
-                raise BirdPlanError(f"Having 'redistribute[default]' as True for a '{self.peer_type}' makes no sense")
+            if self.peer_type not in ["customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"]:
+                raise BirdPlanError(
+                    f"Having 'redistribute[default]' as True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
             # Proceed with exporting...
             self.conf.add("  # Accept the default route as we're redistributing, but only if, its been accepted above")
-            self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv} && accept_route > 0) then {{")
+            self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv} && accept_route) then {{")
             self.conf.add(
                 f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting default route ", net, " due to match on '
-                ' accept_route>0 (redistribute default)";',
+                ' accept_route=true (redistribute default)";',
                 debug=True,
             )
-            self.conf.add("    accept;")
+            self._add_redistribute_properties(self.route_policy_redistribute.default)
+            self.conf.add("    bypass_bgp_redistribution_checks = true;")
         # Else explicitly reject it
         else:
             self.conf.add("  # Reject the default route as we are not redistributing it")
@@ -562,113 +661,120 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("    reject;")
         self.conf.add("  }")
 
+        # Start of BGP type checks ...
+        self.conf.add("  # BGP route type tests...")
+        self.conf.add("  if (!bypass_bgp_redistribution_checks) then {")
+
         # Redistribute BGP routes
         if self.route_policy_redistribute.bgp:
-            self.conf.add("  # Redistribute BGP routes (which is everything in our table)")
-            self.conf.add("  if (source = RTS_BGP) then {")
+            self.conf.add("    # Redistribute BGP routes (which is everything in our table)")
+            self.conf.add("    if (source = RTS_BGP) then {")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on RTS_BGP";', debug=True
+                f'      print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on RTS_BGP";', debug=True
             )
             self._add_redistribute_properties(self.route_policy_redistribute.bgp)
-            self.conf.add("    accept_route = 1;")
-            self.conf.add("  }")
+            self.conf.add("      accept_route = true;")
+            self.conf.add("    }")
 
         # Redistribute our own BGP routes
         if self.route_policy_redistribute.bgp_own:
-            self.conf.add("  # Redistribute our own BGP routes")
-            self.conf.add("  if (BGP_LC_RELATION_OWN ~ bgp_large_community) then {")
-            self.conf.add(f"    if !bgp_can_export_v{ipv}({self.asn}) then {{")
+            self.conf.add("    # Redistribute our own BGP routes")
+            self.conf.add("    if (BGP_LC_RELATION_OWN ~ bgp_large_community) then {")
+            self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
             self.conf.add(
-                f'      print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on BGP_LC_RELATION_OWN";',
+                f'        print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, '
+                '" with match on BGP_LC_RELATION_OWN";',
                 debug=True,
             )
-            self.conf.add("      reject;")
-            self.conf.add("    }")
+            self.conf.add("        reject;")
+            self.conf.add("      }")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on BGP_LC_RELATION_OWN";',
+                f'      print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on BGP_LC_RELATION_OWN";',
                 debug=True,
             )
             self._add_redistribute_properties(self.route_policy_redistribute.bgp_own)
-            self.conf.add("    accept_route = 1;")
-            self.conf.add("  }")
+            self.conf.add("      accept_route = true;")
+            self.conf.add("    }")
         # Redistribute customer BGP routes
         if self.route_policy_redistribute.bgp_customer:
-            self.conf.add("  # Redistribute customer BGP routes")
-            self.conf.add("  if (BGP_LC_RELATION_CUSTOMER ~ bgp_large_community) then {")
-            self.conf.add(f"    if !bgp_can_export_v{ipv}({self.asn}) then {{")
+            self.conf.add("    # Redistribute customer BGP routes")
+            self.conf.add("    if (BGP_LC_RELATION_CUSTOMER ~ bgp_large_community) then {")
+            self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
             self.conf.add(
-                f'      print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on '
+                f'        print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on '
                 'BGP_LC_RELATION_CUSTOMER";',
                 debug=True,
             )
-            self.conf.add("      reject;")
-            self.conf.add("    }")
+            self.conf.add("        reject;")
+            self.conf.add("      }")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on '
+                f'      print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on '
                 'BGP_LC_RELATION_CUSTOMER";',
                 debug=True,
             )
             self._add_redistribute_properties(self.route_policy_redistribute.bgp_customer)
-            self.conf.add("    accept_route = 1;")
-            self.conf.add("  }")
+            self.conf.add("      accept_route = true;")
+            self.conf.add("    }")
         # Redistribute peering BGP routes
         if self.route_policy_redistribute.bgp_peering:
-            self.conf.add("  # Redistribute peering BGP routes")
-            self.conf.add("  if (BGP_LC_RELATION_PEER ~ bgp_large_community) then {")
-            self.conf.add(f"    if !bgp_can_export_v{ipv}({self.asn}) then {{")
+            self.conf.add("    # Redistribute peering BGP routes")
+            self.conf.add("    if (BGP_LC_RELATION_PEER ~ bgp_large_community) then {")
+            self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
             self.conf.add(
                 f'      print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on BGP_LC_RELATION_PEER";',
                 debug=True,
             )
-            self.conf.add("      reject;")
-            self.conf.add("    }")
+            self.conf.add("        reject;")
+            self.conf.add("      }")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on BGP_LC_RELATION_PEER";',
+                f'      print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on BGP_LC_RELATION_PEER";',
                 debug=True,
             )
             self._add_redistribute_properties(self.route_policy_redistribute.bgp_peering)
-            self.conf.add("    accept_route = 1;")
-            self.conf.add("  }")
-            self.conf.add("  if (BGP_LC_RELATION_ROUTESERVER ~ bgp_large_community) then {")
-            self.conf.add(f"    if !bgp_can_export_v{ipv}({self.asn}) then {{")
+            self.conf.add("      accept_route = true;")
+            self.conf.add("    }")
+            self.conf.add("    if (BGP_LC_RELATION_ROUTESERVER ~ bgp_large_community) then {")
+            self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
             self.conf.add(
-                f'      print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on '
+                f'        print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on '
                 'BGP_LC_RELATION_ROUTESERVER";',
                 debug=True,
             )
-            self.conf.add("      reject;")
-            self.conf.add("    }")
+            self.conf.add("        reject;")
+            self.conf.add("      }")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on '
+                f'      print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on '
                 'BGP_LC_RELATION_ROUTESERVER";',
                 debug=True,
             )
             self._add_redistribute_properties(self.route_policy_redistribute.bgp_peering)
-            self.conf.add("    accept_route = 1;")
-            self.conf.add("  }")
+            self.conf.add("      accept_route = true;")
+            self.conf.add("    }")
         # Redistribute transit BGP routes
         if self.route_policy_redistribute.bgp_transit:
-            self.conf.add("  # Redistribute transit BGP routes")
-            self.conf.add("  if (BGP_LC_RELATION_TRANSIT ~ bgp_large_community) then {")
-            self.conf.add(f"    if !bgp_can_export_v{ipv}({self.asn}) then {{")
+            self.conf.add("    # Redistribute transit BGP routes")
+            self.conf.add("    if (BGP_LC_RELATION_TRANSIT ~ bgp_large_community) then {")
+            self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
             self.conf.add(
-                f'      print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on '
+                f'        print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on '
                 'BGP_LC_RELATION_TRANSIT";',
                 debug=True,
             )
-            self.conf.add("      reject;")
-            self.conf.add("    }")
+            self.conf.add("        reject;")
+            self.conf.add("      }")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on '
+                f'      print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on '
                 'BGP_LC_RELATION_TRANSIT";',
                 debug=True,
             )
             self._add_redistribute_properties(self.route_policy_redistribute.bgp_transit)
-            self.conf.add("    accept_route = 1;")
-            self.conf.add("  }")
+            self.conf.add("      accept_route = true;")
+            self.conf.add("    }")
+        # End of BGP type tests
+        self.conf.add("  }")
 
         # Check if we're accepting the route...
-        self.conf.add("  if (accept_route > 0) then {")
+        self.conf.add("  if (accept_route) then {")
         # Check if we are adding a large community to outgoing routes
         for large_community in sorted(self.large_communities.outgoing):
             self.conf.add(f'    print "[{self.filter_name_import_bgp((ipv))}] Adding LC {large_community} to ", net;', debug=True)
@@ -678,6 +784,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Check if we're doing prepending
             self.conf.add("    # Do prepend if we have any LCs set")
             self.conf.add(f"    bgp_export_prepend({self.asn});")
+            # Check if we have a ISO-3166 country code
+            if self.location.iso3166:
+                self.conf.add("    # Do prepending based on ISO-3166 location;")
+                self.conf.add(f"    bgp_export_location_prepend({self.location.iso3166});")
         # If we have graceful_shutdown set, add the community
         if self.graceful_shutdown:
             self.conf.add(
@@ -727,8 +837,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         type_lines = []
 
         # Check accept default is valid
-        if self.route_policy_accept.default and self.peer_type not in ("rrclient", "rrserver", "rrserver-rrserver", "transit"):
-            raise BirdPlanError(f"Having 'accept[default]' as True for a '{self.peer_type}' makes no sense")
+        if self.route_policy_accept.default and self.peer_type not in (
+            "internal",
+            "rrclient",
+            "rrserver",
+            "rrserver-rrserver",
+            "transit",
+        ):
+            raise BirdPlanError(
+                f"Having 'accept[default]' as True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+            )
 
         # Clients
         if self.peer_type == "customer":
@@ -774,8 +892,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append("    bgp_filter_asn_short();")
             type_lines.append("    bgp_filter_asn_transit();")
             type_lines.append("    bgp_filter_community_length();")
-        # Route reflector peer types
-        elif self.peer_type in ("rrclient", "rrserver", "rrserver-rrserver"):
+        # Internal router peer types
+        elif self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             if not self.route_policy_accept.default:
                 type_lines.append(f"    bgp_filter_default_v{ipv}();")
         # Transit providers
@@ -825,18 +943,21 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Quarantine mode...
         if self.quarantined:
-            # Quarantining a routecollector makes no sense at all
-            if self.peer_type == "routecollector":
-                raise BirdPlanError(f"Having 'quarantine' as True for a '{self.peer_type}' makes no sense")
             # Quarantine prefixes
             type_lines.append("    # Quarantine all prefixes received")
-            type_lines.append("    bgp_filter_quarantine();")
+            type_lines.append("    bgp_quarantine_peer();")
+
+        # Add location-based large communities
+        if self.peer_type in ("customer", "peer", "routeserver", "transit"):
+            # Check if we have a ISO-3166 country code
+            if self.location.iso3166:
+                type_lines.append(f"    bgp_import_location_iso3166({self.location.iso3166});")
+            # Check if we have a UN.M49 country code
+            if self.location.unm49:
+                type_lines.append(f"    bgp_import_location_unm49({self.location.unm49});")
 
         # Check if we are adding a large community to incoming routes
         if self.large_communities.incoming:
-            # Adding an incoming large community to a routecollector makes no sense at all
-            if self.peer_type == "routecollector":
-                raise BirdPlanError(f"Having 'incoming_large_communities' set for a '{self.peer_type}' makes no sense")
             # Loop with large communities and add to the prefix
             for large_community in sorted(self.large_communities.incoming):
                 if self.birdconfig_globals.debug:
@@ -996,6 +1117,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def description(self, description: str) -> None:
         """Set our description."""
         self.peer_attributes.description = description
+
+    @property
+    def location(self) -> BGPPeerLocation:
+        """Return our location."""
+        return self.peer_attributes.location
 
     @property
     def peer_type(self) -> str:

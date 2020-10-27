@@ -654,6 +654,7 @@ class BirdPlan:
                 "connect_delay_time",
                 "error_wait_time",
                 "multihop",
+                "passive",
                 "password",
                 "prefix_limit4",
                 "prefix_limit6",
@@ -664,6 +665,18 @@ class BirdPlan:
                 "graceful_shutdown",
             ):
                 peer[config_item] = config_value
+            # Peer location configuration
+            elif config_item == "location":
+                peer["location"] = {}
+                # Loop with location configuration items
+                for location_type, location_config in config_value.items():
+                    if location_type in ["iso3166", "unm49"]:
+                        peer["location"][location_type] = location_config
+                    # If we don't understand this 'location' entry, throw an error
+                    else:
+                        raise BirdPlanError(
+                            f"Configuration item '{location_type}' not understood in bgp:peers:{peer_name}:location"
+                        )
             # Work out redistribution
             elif config_item == "redistribute":
                 peer["redistribute"] = {}
@@ -700,7 +713,7 @@ class BirdPlan:
             # Work out filters
             elif config_item == "filter":
                 peer["filter"] = {}
-                # Loop with filterance items
+                # Loop with filter configuration items
                 for filter_type, filter_config in config_value.items():
                     if filter_type in ["prefixes", "asns", "as-set"]:
                         peer["filter"][filter_type] = filter_config
@@ -724,31 +737,32 @@ class BirdPlan:
         # Check the peer type is valid
         if peer["type"] not in (
             "customer",
+            "internal",
             "peer",
-            "transit",
+            "routecollector",
+            "routeserver",
             "rrclient",
             "rrserver",
             "rrserver-rrserver",
-            "routecollector",
-            "routeserver",
+            "transit",
         ):
-            raise BirdPlanError(f"Configuration item 'type' is invalid for bgp:peers:{peer_name}")
+            raise BirdPlanError(f"Configuration item 'type' for BGP peer '{peer_name}' has invalid value '%s'" % peer["type"])
 
         # Check that if we have a peer type of rrclient, that we have rr_cluster_id too...
         if (peer["type"] == "rrclient") and ("rr_cluster_id" not in self.config["bgp"]):
-            raise BirdPlanError("Configuration item 'bgp:rr_cluster_id' missing when having 'rrclient' peers")
+            raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' is missing 'rr_cluster_id' when having 'rrclient' peers")
         # If we are a customer type, we must have filters defined
         if (peer["type"] == "customer") and ("filter" not in peer):
-            raise BirdPlanError(f"Configuration items 'bgp:peers:{peer_name}' missing 'filter' when type is 'customer'")
+            raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' is missing 'filter' when type is 'customer'")
         # We must have a neighbor4 or neighbor6
         if ("neighbor4" not in peer) and ("neighbor6" not in peer):
-            raise BirdPlanError(f"Configuration item 'bgp:peers:{peer_name}' missing 'neighbor4' or 'neighbor6' config")
+            raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' is missing 'neighbor4' or 'neighbor6' config")
         # We must have a source_address4 for neighbor4
         if ("neighbor4" in peer) and ("source_address4" not in peer):
-            raise BirdPlanError(f"Configuration item 'bgp:peers:{peer_name}' must have a 'source_address4'")
+            raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' must have a 'source_address4'")
         # We must have a source_address6 for neighbor6
         if ("neighbor6" in peer) and ("source_address6" not in peer):
-            raise BirdPlanError(f"Configuration item 'bgp:peers:{peer_name}' must have a 'source_address6'")
+            raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' must have a 'source_address6'")
 
         # Make sure we have items we need
         self.birdconf.protocols.bgp.add_peer(peer_name, peer)

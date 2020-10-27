@@ -45,10 +45,10 @@ class OSPFRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
 
     Attributes
     ----------
-    connected : Dict[str, bool]
+    connected : Union[bool, List[str]]
         Redistribute connected routes to the main OSPF table. This attribute is indexed by interface name with a boolean option.
         The interface name can be an exact interface match, or a wildcard with a *.
-    default: Dict[str, Bool]
+    default: bool
         Redistribute the default to the main OSPF table. Defaults to `False`.
     kernel : bool
         Redistribute kernel routes to the main OSPF table. Defaults to `False`.

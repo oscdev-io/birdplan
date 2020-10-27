@@ -15,6 +15,13 @@ class "Table: static" {
 + All routes to master
 }
 
+class "Table: direct" {
+  .. Imports ..
+- All connected routes
+  .. Exports ..
++ All routes to master
+}
+
 Package OSPF <<Folder>> {
     class "Table: ospf" {
     .. Imports ..
@@ -100,7 +107,7 @@ class "Table: kernel" {
 }
 
 
-class "OS: RIB" {
+class "OS: FIB" {
   .. Imports ..
 - All
   .. Exports ..
@@ -115,6 +122,7 @@ class "OS: RIB" {
 "Table: master" <-up-> "Table: bgp"
 
 "Table: static" -> "Table: master"
+"Table: master" <- "Table: direct"
 
 "Table: ospf_direct" -> "Table: ospf"
 "Table: rip_direct" -> "Table: rip"
@@ -124,7 +132,7 @@ class "OS: RIB" {
 "Table: bgp_XXX_peer" <-down-> "Table: bgp"
 
 "Table: kernel" <-up-> "Table: master"
-"OS: RIB" <-up-> "Table: kernel"
+"OS: FIB" <-up-> "Table: kernel"
 
 
 @enduml

@@ -1,0 +1,13 @@
+router_id: 0.0.0.1
+log_file: "@LOGFILE@"
+debug: True
+static:
+  - '10.0.0.0/24 via 100.101.0.2'
+  - 'fc10::/64 via fc00:101::2'
+rip:
+  redistribute:
+    static: True
+  interfaces:
+    eth0:
+      update-time: 5
+      metric: 2

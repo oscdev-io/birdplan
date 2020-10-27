@@ -1,0 +1,26 @@
+router_id: 0.0.0.1
+log_file: "@LOGFILE@"
+debug: True
+
+static:
+  - '0.0.0.0/0 via 100.101.0.2'
+  - '::/0 via fc00:101::2'
+
+bgp:
+  asn: @ASN@
+  import:
+    static: True
+@GLOBAL_CONFIG@
+  peers:
+    r2:
+      asn: @PEER_ASN@
+      type: @PEER_TYPE@
+      description: BGP session to r2
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.2
+      neighbor6: fc00:100::2
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+@PEER_CONFIG@

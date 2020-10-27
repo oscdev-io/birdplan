@@ -44,14 +44,14 @@ Brief overview of FUNCTION assignments...
 | 2 | Route learned [^lc-function-2] in (https://unstats.un.org/unsd/methodology/m49/) - UN M.49 Region |
 | 3 | Relation [^lc-function-3] |
 | 4 | ASN-based selective NOEXPORT [^lc-function-4] |
-| 5 | TODO: Location-based selective NOEXPORT [^lc-function-5] |
+| 5 | Location-based selective NOEXPORT [^lc-function-5] |
 | 6 | ASN-Based Selective AS Path Prepending (one) [^lc-function-6] |
-| 62 | ENHANCED: ASN-Based Selective AS Path Prepending (two) [^lc-function-6] |
-| 63 | ENHANCED: ASN-Based Selective AS Path Prepending (three) [^lc-function-6] |
-| 7 | TODO: Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
-| 72 | TODO ENHANCED: Location-Based Selective AS Path Prepending (two) [^lc-function-7] |
-| 73 | TODO ENHANCED: Location-Based Selective AS Path Prepending (three) [^lc-function-7] |
-| 8 | TODO ENHANCED: Manipulation of the LOCAL_PREF Attribute [^lc-function-8] |
+| 62 | ASN-Based Selective AS Path Prepending (two) - ENHANCED [^lc-function-6] |
+| 63 | ASN-Based Selective AS Path Prepending (three) - ENHANCED [^lc-function-6] |
+| 7 | Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
+| 72 | Location-Based Selective AS Path Prepending (two) - ENHANCED [^lc-function-7] |
+| 73 | Location-Based Selective AS Path Prepending (three) - ENHANCED [^lc-function-7] |
+| 8 | Manipulation of the LOCAL_PREF Attribute - ENHANCED [^lc-function-8] |
 | 1000 | Route information |
 | 1101 | Route filtered |
 
@@ -96,8 +96,6 @@ Allowable internally and by `customer`.
 
 ## Location-based selective NOEXPORT Communities
 
-TODO
-
 Location based selective NOEXPORT using an ISO-3166-1 country identifier.
 
 Allowable internally and by `customer`.
@@ -120,8 +118,6 @@ Allowable internally and by `customer`.
 
 ## Location-Based Selective AS Path Prepending Communities
 
-TODO
-
 Allowable internally and by `customer`.
 
 | Community | Description |
@@ -132,8 +128,6 @@ Allowable internally and by `customer`.
 
 
 ## LOCAL_PREF Attribute Manipulation Communities
-
-TODO
 
 Allowable internally and by `customer`.
 

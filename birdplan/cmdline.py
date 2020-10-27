@@ -47,7 +47,7 @@ class BirdPlanCommandLine:
         self._argparser = argparse.ArgumentParser(add_help=False)
         self._birdplan = BirdPlan()
 
-    def run(self, raw_args: Optional[List[str]] = None) -> Any:
+    def run(self, raw_args: Optional[List[str]] = None) -> Any:  # pylint: disable=too-many-branches
         """Run BirdPlan from command line."""
 
         # Add main commandline arguments
@@ -131,7 +131,8 @@ class BirdPlanCommandLine:
         self._args = self.argparser.parse_args(raw_args)
 
         # Setup logging
-        self._setup_logging()
+        if __name__ == "main":
+            self._setup_logging()
 
         # Make sure we have an action
         if "action" not in self.args:
@@ -143,8 +144,9 @@ class BirdPlanCommandLine:
                 raise BirdPlanError("No action specified")
 
         if self.args.action == "configure":
-            self.configure()
-        elif self.args.action == "bgp":
+            return self.configure()
+
+        if self.args.action == "bgp":
             if __name__ == "main":
                 parser_bgp.print_help()
                 sys.exit(1)
@@ -163,7 +165,7 @@ class BirdPlanCommandLine:
         elif self.args.action == "bgp_graceful_shutdown_list":
             return self.bgp_graceful_shutdown_list()
 
-    def configure(self) -> None:
+    def configure(self) -> bool:
         """Configure BIRD."""
         # Load BirdPlan configuration
         self._birdplan_load_config()
@@ -171,6 +173,8 @@ class BirdPlanCommandLine:
         self._birdplan_configure()
         # Commit BirdPlan state
         self._birdplan_commit_state()
+
+        return True
 
     def bgp_graceful_shutdown_list(self) -> List[str]:
         """Gracefully shutdown peers."""
