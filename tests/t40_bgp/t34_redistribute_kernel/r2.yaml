@@ -3,8 +3,6 @@ log_file: "@LOGFILE@"
 debug: True
 bgp:
   asn: @ASN@
-  import:
-    kernel: True
 @GLOBAL_CONFIG@
   peers:
     r1:

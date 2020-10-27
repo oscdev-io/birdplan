@@ -22,13 +22,8 @@
 """BGP large community (filtered function) stripping test case."""
 
 from ..template_stripping_large_community_filtered import Template
+from ...config.peertype_customer.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP large community (filtered function) stripping test case."""
-
-    r1_peer_type = "customer"
-    r1_peer_config = """
-      filter:
-        asns: [65001]
-"""

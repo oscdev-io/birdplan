@@ -2,7 +2,35 @@
 
 Router r1 should be receiving routes from e1 test cases and advertising to r2-r9.
 
-TODO
+In terms of test set "t10_noexport_asn":
+  - ExaBGP e1 should be advertising a route with a large community to prevent exporting based on ASN to each peer type.
+
+In terms of test set "t12_noexport_location":
+  - ExaBGP e1 should be advertising a route with a large community to prevent exporting based on location to each peer type.
+
+In terms of test set "t20_noexport":
+  - ExaBGP e1 should be advertising a route with a large community to prevent exporting based on peer type to each peer type.
+
+In terms of test set "t30_prepend_1x":
+  - ExaBGP e1 should be advertising a route with a large community that should result in prepending 1x.
+
+In terms of test set "t31_prepend_2x":
+  - ExaBGP e1 should be advertising a route with a large community that should result in prepending 2x.
+
+In terms of test set "t32_prepend_3x":
+  - ExaBGP e1 should be advertising a route with a large community that should result in prepending 3x.
+
+In terms of test set "t40_prepend_location_1x":
+  - ExaBGP e1 should be advertising a route with a large community that should result in prepending 1x to the specified location.
+
+In terms of test set "t40_prepend_location_2x":
+  - ExaBGP e1 should be advertising a route with a large community that should result in prepending 2x to the specified location.
+
+In terms of test set "t40_prepend_location_3x":
+  - ExaBGP e1 should be advertising a route with a large community that should result in prepending 3x to the specified location.
+
+
+## Diagram
 
 ```plantuml
 @startuml
@@ -131,9 +159,8 @@ class "ExaBGP: e1" {
 
 class "Switch: s1" {}
 
-"ExaBGP: e1" - "Switch: s1": e1 eth0
-"ExaBGP: e1" -> "Router: r1"
-"Router: r1" -down-> "Switch: s1": r1 eth0
+"ExaBGP: e1" -> "Switch: s1": e1 eth0
+"Router: r1" <-down-> "Switch: s1": r1 eth0
 "Switch: s1" -down-> "Router: r2": r2 eth0
 "Switch: s1" -down-> "Router: r3": r3 eth0
 "Switch: s1" -down-> "Router: r4": r4 eth0

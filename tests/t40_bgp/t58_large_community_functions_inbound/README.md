@@ -2,10 +2,18 @@
 
 Router r1 should be receiving routes from e1 test cases.
 
-**Tests for large community functions (inbound):**
 
-In terms of test "test_bgp_as_path_too_long":
-  - ExaBGP e1 should export a prefix with too many ASNs in the AS-PATH to router to r2, router r2 should filter the prefix and add a large community indicating the reason.
+In terms of test "test_bgp_large_community_localpref_minus_1":
+  - Router r1 should receive a route from e1 with the local pref adjustment large community and -1 from the local_pref.
+
+In terms of test "test_bgp_large_community_localpref_minus_2":
+  - Router r1 should receive a route from e1 with the local pref adjustment large community and -2 from the local_pref.
+
+In terms of test "test_bgp_large_community_localpref_minus_3":
+  - Router r1 should receive a route from e1 with the local pref adjustment large community and -3 from the local_pref.
+
+
+## Diagram
 
 ```plantuml
 @startuml

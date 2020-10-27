@@ -22,13 +22,8 @@
 """BGP redistribute connected route test case."""
 
 from ..template_redistribute_connected_import_connected_true import Template
+from ...config.peertype_internal.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP redistribute connected route test case."""
-
-    r1_peer_asn = 65000
-    r1_peer_type = "internal"
-
-    r2_asn = 65000
-    r2_peer_type = "internal"

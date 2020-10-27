@@ -22,9 +22,8 @@
 """BGP large community functions (inbound) test case."""
 
 from ..template_large_community_localpref_minus_2 import Template
+from ...config.peertype_routeserver.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP large community functions (inbound) test case."""
-
-    r1_peer_type = "routeserver"

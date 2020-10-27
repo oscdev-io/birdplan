@@ -22,9 +22,8 @@
 """BGP prefix limit test case."""
 
 from ..template import Template
+from ...config.peertype_peer.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP prefix limit test case."""
-
-    r1_peer_type = "peer"

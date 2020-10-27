@@ -21,19 +21,15 @@
 
 """BGP test case for redistribution of static default routes, with default settings for accept:default."""
 
-from ..template import Template
+from ..template_accept_default import Template
+from ....config.peertype_peer.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP test case for redistribution of static default routes, with default settings for accept:default."""
 
     routers_config_exception = {"r1": r"Having 'redistribute:default' set for peer 'r2' with type 'peer' makes no sense"}
 
-    r1_peer_type = "peer"
-    r1_peer_config = """
-      redistribute:
-        default: True
-        static: True
-"""
-
-    r2_peer_type = "peer"
+    def _test_setup_specific(self, sim, tmpdir):
+        """Set up our test - specific additions."""
+        # We cannot add a route to r1 due to invalid configuration

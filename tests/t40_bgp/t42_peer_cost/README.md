@@ -2,6 +2,7 @@
 
 Router r1 should be receiving routes from e1 test cases with a local pref -5 (cost = 5).
 
+# Diagram
 
 ```plantuml
 @startuml

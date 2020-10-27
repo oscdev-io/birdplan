@@ -22,11 +22,8 @@
 """BGP outgoing large community test case."""
 
 from ..template import Template
+from ...config.peertype_transit.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP outgoing large community test case."""
-
-    r1_peer_type = "transit"
-
-    r2_peer_type = "transit"

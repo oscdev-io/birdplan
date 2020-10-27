@@ -22,9 +22,8 @@
 """BGP filtering test case."""
 
 from ..template_as_path_too_long import Template
+from ...config.peertype_transit.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
-
-    r1_peer_type = "transit"

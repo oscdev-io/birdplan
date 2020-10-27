@@ -22,9 +22,10 @@
 """BGP redistribute large community test case."""
 
 from ..template_redistribute_bgp_customer_large_communities import Template
+from ...config.peertype_customer.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP redistribute large community test case."""
 
     r1_peer_type = "customer"

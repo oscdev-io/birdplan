@@ -7,6 +7,7 @@ bgp:
   import:
     kernel: True
 @GLOBAL_CONFIG@
+@TEMPLATE_GLOBAL_CONFIG@
   peers:
     r2:
       asn: @PEER_ASN@
@@ -20,3 +21,4 @@ bgp:
       connect_retry_time: 2
       error_wait_time: 2,5
 @PEER_CONFIG@
+@TEMPLATE_PEER_CONFIG@

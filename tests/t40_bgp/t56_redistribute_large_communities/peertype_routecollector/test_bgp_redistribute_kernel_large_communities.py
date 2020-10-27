@@ -22,11 +22,8 @@
 """BGP outgoing large community test case."""
 
 from ..template_redistribute_kernel_large_communities import Template
+from ...config.peertype_routecollector.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP outgoing large community test case."""
-
-    r1_peer_type = "routecollector"
-
-    r2_peer_type = "routecollector"

@@ -22,13 +22,8 @@
 """BGP outgoing large community test case."""
 
 from ..template_redistribute_bgp_peering_large_communities import Template
+from ...config.peertype_rrserver.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP outgoing large community test case."""
-
-    r1_peer_asn = 65000
-    r1_peer_type = "rrserver"
-
-    r2_asn = 65000
-    r2_peer_type = "rrserver"

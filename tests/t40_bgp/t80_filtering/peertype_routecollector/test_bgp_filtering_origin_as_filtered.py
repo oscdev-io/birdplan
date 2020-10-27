@@ -22,11 +22,10 @@
 """BGP filtering test case."""
 
 from ..template_origin_as_filtered import Template
+from ...config.peertype_routecollector.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
 
     routers_config_exception = {"r1": r"Having 'filter' specified for peer 'e1' with type 'routecollector' makes no sense"}
-
-    r1_peer_type = "routecollector"

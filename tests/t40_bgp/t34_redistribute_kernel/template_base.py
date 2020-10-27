@@ -19,34 +19,35 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP basic test case template."""
+"""BGP redistribute kernel route test case template."""
 
 from ...basetests import BirdPlanBaseTestCase
 
 
-class Template(BirdPlanBaseTestCase):
-    """BGP basic test case template."""
+class TemplateBase(BirdPlanBaseTestCase):
+    """BGP redistribute kernel route test case template."""
 
-    routers = ["r1"]
-    exabgps = ["e1"]
+    routers = ["r1", "r2"]
+
+    r1_interfaces = ["eth0", "eth1"]
+    r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["192.168.1.1/24", "fc01::1/64"]}
+
+    r2_interfaces = ["eth0"]
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
-    def test_announce_routes(self, sim):
-        """Announce a prefix from ExaBGP to BIRD."""
+    def test_add_kernel_routes(self, sim):
+        """Add kernel routes to BIRD instances."""
 
-        self._exabgpcli(
-            sim,
-            "e1",
-            ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2"],
-        )
-        self._exabgpcli(
-            sim,
-            "e1",
-            ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2"],
-        )
+        # Add gateway'd kernel routes
+        sim.node("r1").run_ip(["route", "add", "100.101.0.0/24", "via", "192.168.1.2"])
+        sim.node("r1").run_ip(["route", "add", "fc00:101::/48", "via", "fc01::2"])
+
+        # Add link kernel routes
+        sim.node("r1").run_ip(["route", "add", "100.103.0.0/24", "dev", "eth1"])
+        sim.node("r1").run_ip(["route", "add", "fc00:103::/48", "dev", "eth1"])
 
     def test_bird_status(self, sim):
         """Test BIRD status."""

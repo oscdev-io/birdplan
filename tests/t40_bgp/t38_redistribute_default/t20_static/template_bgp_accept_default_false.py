@@ -19,18 +19,25 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""OSPF test case for redistribution of only the default route."""
+"""BGP redistribute default route test case template."""
 
-from ..template import Template as TemplateBase
+from .template_base import TemplateBase
 
 
 class Template(TemplateBase):
-    """BGP test case for redistribution of only the default route."""
+    """BGP redistribute default route test case template."""
 
-    def _test_bird_tables_originate4(self, sim):
-        """Test BIRD t_originate4 tables actual."""
-        self._test_bird_routers_table("t_bgp_originate4", sim, routers=["r1"])
+    r1_template_peer_config = """
+      redistribute:
+        default: True
+        static: True
+"""
 
-    def _test_bird_tables_originate6(self, sim):
-        """Test BIRD t_originate6 tables actual."""
-        self._test_bird_routers_table("t_bgp_originate6", sim, routers=["r1"])
+    r2_template_global_config = """
+  accept:
+    default: False
+"""
+    r2_template_peer_config = """
+      accept:
+        default: True
+"""

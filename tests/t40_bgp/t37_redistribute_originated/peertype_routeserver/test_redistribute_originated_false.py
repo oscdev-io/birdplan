@@ -21,16 +21,9 @@
 
 """BGP redistribute originated route test cases, with redistribute:originated set to False."""
 
-from ..template import Template
+from ..template_redistribute_originated_false import Template
+from ...config.peertype_routeserver.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP redistribute originated route test cases, with redistribute:originated set to False."""
-
-    r1_peer_type = "routeserver"
-    r1_peer_config = """
-      redistribute:
-        originated: False
-"""
-
-    r2_peer_type = "routeserver"

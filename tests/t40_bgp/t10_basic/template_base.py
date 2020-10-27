@@ -19,59 +19,38 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""OSPF test case for redistribution of only the default route."""
+"""BGP basic test case template."""
 
 from ...basetests import BirdPlanBaseTestCase
 
 
-class Template(BirdPlanBaseTestCase):
-    """BGP test case for redistribution of only the default route."""
+class TemplateBase(BirdPlanBaseTestCase):
+    """BGP basic test case template."""
 
-    routers = ["r1", "r2"]
-    r1_interfaces = ["eth0", "eth1"]
-
-    r1_t_ospf4_expect_content = "'router_id': '0.0.0.2'"
-    r1_t_ospf6_expect_content = "'router_id': '0.0.0.2'"
+    routers = ["r1"]
+    exabgps = ["e1"]
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
-        self._test_setup_specific(sim, tmpdir)
 
-    def _test_setup_specific(self, sim, tmpdir):
-        """Set up our test - specific additions."""
+    def test_announce_routes(self, sim):
+        """Announce a prefix from ExaBGP to BIRD."""
+
+        self._exabgpcli(
+            sim,
+            "e1",
+            ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2"],
+        )
+        self._exabgpcli(
+            sim,
+            "e1",
+            ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2"],
+        )
 
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)
-
-    def test_bird_tables_static4(self, sim):
-        """Test BIRD t_static4 table."""
-        self._test_bird_tables_static4(sim)
-
-    def _test_bird_tables_static4(self, sim):
-        """Test BIRD t_static4 tables actual."""
-
-    def test_bird_tables_static6(self, sim):
-        """Test BIRD t_static6 table."""
-        self._test_bird_tables_static6(sim)
-
-    def _test_bird_tables_static6(self, sim):
-        """Test BIRD t_static6 tables actual."""
-
-    def test_bird_tables_originate4(self, sim):
-        """Test BIRD t_originate4 table."""
-        self._test_bird_tables_originate4(sim)
-
-    def _test_bird_tables_originate4(self, sim):
-        """Test BIRD t_originate4 tables actual."""
-
-    def test_bird_tables_originate6(self, sim):
-        """Test BIRD t_originate6 table."""
-        self._test_bird_tables_originate6(sim)
-
-    def _test_bird_tables_originate6(self, sim):
-        """Test BIRD t_originate6 tables actual."""
 
     def test_bird_tables_bgp4_peer(self, sim):
         """Test BIRD BGP4 peer table."""

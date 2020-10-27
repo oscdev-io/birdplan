@@ -22,16 +22,12 @@
 """BGP prefix limit test case."""
 
 from ..template import Template
+from ...config.peertype_internal.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP prefix limit test case."""
 
     routers_config_exception = {
         "r1": r"Having 'prefix_limit4' set for peer 'e1' with type 'internal' makes no sense",
     }
-
-    r1_peer_asn = 65000
-    r1_peer_type = "internal"
-
-    e1_asn = 65000

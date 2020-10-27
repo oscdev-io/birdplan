@@ -22,19 +22,12 @@
 """BGP peer cost test case."""
 
 from ..template import Template
+from ...config.peertype_rrserver_rrserver.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP peer cost test case."""
 
     routers_config_exception = {
         "r1": r"Having 'cost' specified for peer 'e1' with type 'rrserver-rrserver' makes no sense",
     }
-
-    r1_peer_asn = 65000
-    r1_peer_type = "rrserver-rrserver"
-    r1_global_config = """
-  rr_cluster_id: 0.0.0.1
-"""
-
-    e1_asn = 65000

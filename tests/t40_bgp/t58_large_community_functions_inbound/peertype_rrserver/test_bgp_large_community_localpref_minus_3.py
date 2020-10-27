@@ -22,15 +22,8 @@
 """BGP large community functions (inbound) test case."""
 
 from ..template_large_community_localpref_minus_3 import Template
+from ...config.peertype_rrserver.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP large community functions (inbound) test case."""
-
-    r1_peer_asn = 65000
-    r1_peer_type = "rrserver"
-    r1_global_config = """
-  rr_cluster_id: 0.0.0.1
-"""
-
-    e1_asn = 65000

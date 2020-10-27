@@ -22,25 +22,8 @@
 """BGP graceful shutdown test case."""
 
 from ..template_graceful_shutdown_inbound_configfile_global import Template
+from ...config.peertype_rrclient.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP graceful shutdown test case."""
-
-    r1_peer_asn = 65000
-    r1_peer_type = "rrclient"
-    r1_global_config = """
-  rr_cluster_id: 0.0.0.1
-"""
-    r1_peer_config = """
-      passive: False
-"""
-
-    r2_asn = 65000
-    r2_peer_type = "rrclient"
-    r2_global_config = """
-  rr_cluster_id: 0.0.0.1
-"""
-    r2_peer_config = """
-      passive: False
-"""

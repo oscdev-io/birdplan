@@ -22,13 +22,10 @@
 """BGP outgoing large community test case."""
 
 from ..template_redistribute_default_large_communities import Template
+from ...config.peertype_transit.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP outgoing large community test case."""
 
     routers_config_exception = {"r1": r"Having 'redistribute:default' set for peer 'r2' with type 'transit' makes no sense"}
-
-    r1_peer_type = "transit"
-
-    r2_peer_type = "transit"

@@ -22,14 +22,10 @@
 """BGP large community functions (outbound) test case."""
 
 from ..template_large_community_noexport_location_to_customer import Template
+from ....config.peertype_internal.r1_to_r10 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP large community functions (outbound) test case."""
 
     e1_extra_communities = "65000:3:1"
-
-    r1_peer_asn = 65000
-    r1_peer_type = "internal"
-
-    e1_asn = 65000

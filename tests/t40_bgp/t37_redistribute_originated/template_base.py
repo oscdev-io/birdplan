@@ -19,21 +19,20 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP basic test case template."""
+"""BGP redistribute originated route test case template."""
 
 from ...basetests import BirdPlanBaseTestCase
 
 
-class Template(BirdPlanBaseTestCase):
-    """BGP basic test case template."""
+class TemplateBase(BirdPlanBaseTestCase):
+    """BGP redistribute originated route test case template."""
 
     routers = ["r1", "r2"]
 
     r1_interfaces = ["eth0", "eth1"]
     r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["192.168.1.1/24", "fc01::1/64"]}
 
-    r2_interfaces = ["eth0", "eth1"]
-    r2_interface_eth1 = {"mac": "02:02:00:00:00:02", "ips": ["192.168.2.1/24", "fc02::1/64"]}
+    r2_interfaces = ["eth0"]
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
@@ -45,11 +44,11 @@ class Template(BirdPlanBaseTestCase):
 
     def test_bird_tables_originate4(self, sim):
         """Test BIRD originate4 table."""
-        self._test_bird_routers_table("t_bgp_originate4", sim)
+        self._test_bird_routers_table("t_bgp_originate4", sim, routers=["r1"])
 
     def test_bird_tables_originate6(self, sim):
         """Test BIRD originate6 table."""
-        self._test_bird_routers_table("t_bgp_originate6", sim)
+        self._test_bird_routers_table("t_bgp_originate6", sim, routers=["r1"])
 
     def test_bird_tables_bgp4_peer(self, sim):
         """Test BIRD BGP4 peer table."""

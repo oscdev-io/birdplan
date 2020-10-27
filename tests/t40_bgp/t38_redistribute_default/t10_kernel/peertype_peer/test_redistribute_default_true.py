@@ -21,27 +21,17 @@
 
 """BGP test case for redistribution of kernel default routes, with redistribute:default set to true."""
 
-from ...template import Template
+from ..template_redistribute_default_true import Template
+from ....config.peertype_peer.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP test case for redistribution of kernel default routes, with redistribute:default set to true."""
 
     routers_config_exception = {
         "r1": r"Having 'redistribute:default' set for peer 'r2' with type 'peer' makes no sense",
     }
 
-    r1_peer_type = "peer"
-    r1_peer_config = """
-      redistribute:
-        default: True
-        kernel: True
-"""
-
-    r2_peer_type = "peer"
-
     def _test_setup_specific(self, sim, tmpdir):
         """Set up our test - specific additions."""
         # We cannot add a route to r1 due to invalid configuration
-        # sim.node("r1").run_ip(["route", "add", "0.0.0.0/0", "via", "100.101.0.2"])
-        # sim.node("r1").run_ip(["route", "add", "::/0", "via", "fc00:101::2"])

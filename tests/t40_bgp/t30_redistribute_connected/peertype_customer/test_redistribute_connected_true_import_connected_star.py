@@ -22,21 +22,8 @@
 """BGP redistribute connected route test case."""
 
 from ..template_redistribute_connected_true_import_connected_star import Template
+from ...config.peertype_customer.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP redistribute connected route test case."""
-
-    r1_peer_type = "customer"
-    r1_peer_config = """
-      passive: False
-      filter:
-        asns: [65001]
-"""
-
-    r2_peer_type = "customer"
-    r2_peer_config = """
-      passive: False
-      filter:
-        asns: [65000]
-"""

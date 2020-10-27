@@ -22,9 +22,8 @@
 """BGP filtering test case."""
 
 from ..template_next_hop_not_peer_ip import Template
+from ...config.peertype_peer.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
-
-    r1_peer_type = "peer"

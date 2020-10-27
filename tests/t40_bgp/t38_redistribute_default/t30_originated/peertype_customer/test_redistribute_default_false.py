@@ -19,26 +19,11 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP test case for redistribution of originated default routes, with redistribute:default set to false."""
+"""BGP test case for redistribution of static default routes, with redistribute:default set to false."""
 
-from ..template import Template
+from ..template_redistribute_default_false import Template
+from ....config.peertype_customer.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
-    """BGP test case for redistribution of originated default routes, with redistribute:default set to false."""
-
-    r1_peer_type = "customer"
-    r1_peer_config = """
-      passive: False
-      filter:
-        asns: [65001]
-      redistribute:
-        default: False
-        originated: True
-"""
-    r2_peer_type = "customer"
-    r2_peer_config = """
-      passive: False
-      filter:
-        asns: [65000]
-"""
+class Test(PeerTypeConfig, Template):
+    """BGP test case for redistribution of static default routes, with redistribute:default set to false."""
