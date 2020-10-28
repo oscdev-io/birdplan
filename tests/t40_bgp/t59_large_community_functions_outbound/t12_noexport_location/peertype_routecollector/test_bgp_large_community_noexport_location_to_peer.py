@@ -22,9 +22,8 @@
 """BGP large community functions (outbound) test case."""
 
 from ..template_large_community_noexport_location_to_peer import Template
+from ....config.peertype_routecollector.r1_to_r10 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP large community functions (outbound) test case."""
-
-    r1_peer_type = "routecollector"

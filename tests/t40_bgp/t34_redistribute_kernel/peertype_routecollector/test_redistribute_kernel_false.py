@@ -21,16 +21,9 @@
 
 """BGP redistribute kernel route test cases, with redistribute:kernel set to False."""
 
-from ..template import Template
+from ..template_redistribute_kernel_false import Template
+from ...config.peertype_routecollector.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP redistribute kernel route test cases, with redistribute:kernel set to False."""
-
-    r1_peer_type = "routecollector"
-    r1_peer_config = """
-      redistribute:
-        kernel: False
-"""
-
-    r2_peer_type = "routecollector"

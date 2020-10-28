@@ -21,17 +21,9 @@
 
 """Basic BGP route test cases, with export_kernel:bgp set to True."""
 
-from ..template import Template
+from ..template_export_kernel_bgp_true import Template
+from ...config.peertype_internal.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """Basic BGP route test cases, with export_kernel:bgp set to True."""
-
-    r1_peer_asn = 65000
-    r1_peer_type = "internal"
-    r1_extra_config = """
-export_kernel:
-  bgp: True
-"""
-
-    e1_asn = 65000

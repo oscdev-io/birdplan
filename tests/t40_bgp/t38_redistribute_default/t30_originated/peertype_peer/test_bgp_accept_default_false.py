@@ -19,32 +19,20 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP test case for redistribution of originated default routes, with accept:default set to false."""
+"""BGP test case for redistribution of static default routes, with accept:default set to false."""
 
-from ..template import Template
+from ..template_bgp_accept_default_false import Template
+from ....config.peertype_peer.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
-    """BGP test case for redistribution of originated default routes, with accept:default set to false."""
+class Test(PeerTypeConfig, Template):
+    """BGP test case for redistribution of static default routes, with accept:default set to false."""
 
     routers_config_exception = {
         "r1": r"Having 'redistribute:default' set for peer 'r2' with type 'peer' makes no sense",
         "r2": r"Having 'accept\[default\]' as True for peer 'r1' with type 'peer' makes no sense",
     }
 
-    r1_peer_type = "peer"
-    r1_peer_config = """
-      redistribute:
-        default: True
-        originated: True
-"""
-
-    r2_peer_type = "peer"
-    r2_global_config = """
-  accept:
-    default: False
-"""
-    r2_peer_config = """
-      accept:
-        default: True
-"""
+    def _test_setup_specific(self, sim, tmpdir):
+        """Set up our test - specific additions."""
+        # We cannot add a route to r1 due to invalid configuration

@@ -22,15 +22,8 @@
 """BGP filtering test case."""
 
 from ..template_origin_as_filtered_allowed import Template
+from ...config.peertype_rrserver.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
-
-    r1_peer_asn = 65000
-    r1_peer_type = "rrserver"
-    r1_global_config = """
-  rr_cluster_id: 0.0.0.1
-"""
-
-    e1_asn = 65000

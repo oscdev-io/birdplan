@@ -22,9 +22,8 @@
 """BGP location-based UN.M49 large community test case."""
 
 from ..template_large_community_location_unm49 import Template
+from ...config.peertype_transit.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP location-based UN.M49 large community test case."""
-
-    r1_peer_type = "transit"

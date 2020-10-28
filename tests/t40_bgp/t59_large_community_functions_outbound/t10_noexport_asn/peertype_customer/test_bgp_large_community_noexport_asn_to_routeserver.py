@@ -22,15 +22,8 @@
 """BGP large community functions (outbound) test case."""
 
 from ..template_large_community_noexport_asn_to_routeserver import Template
+from ....config.peertype_customer.r1_to_r10 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP large community functions (outbound) test case."""
-
-    r1_peer_type = "customer"
-
-    r1_peer_config = """
-      filter:
-        asns:
-          - 65100
-"""

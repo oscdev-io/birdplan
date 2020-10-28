@@ -5,10 +5,6 @@ debug: True
 bgp:
   asn: @ASN@
 
-  originate:
-    - '100.102.0.0/24 blackhole'
-    - 'fc00:102::/48 blackhole'
-
 @GLOBAL_CONFIG@
 
   peers:

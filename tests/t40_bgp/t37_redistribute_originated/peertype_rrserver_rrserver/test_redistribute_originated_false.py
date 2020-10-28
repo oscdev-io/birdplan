@@ -21,24 +21,9 @@
 
 """BGP redistribute originated route test cases, with redistribute:originated set to False."""
 
-from ..template import Template
+from ..template_redistribute_originated_false import Template
+from ...config.peertype_rrserver_rrserver.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP redistribute originated route test cases, with redistribute:originated set to False."""
-
-    r1_peer_asn = 65000
-    r1_peer_type = "rrserver-rrserver"
-    r1_global_config = """
-  rr_cluster_id: 0.0.0.1
-"""
-    r1_peer_config = """
-      redistribute:
-        originated: False
-"""
-
-    r2_asn = 65000
-    r2_peer_type = "rrserver-rrserver"
-    r2_global_config = """
-  rr_cluster_id: 0.0.0.1
-"""

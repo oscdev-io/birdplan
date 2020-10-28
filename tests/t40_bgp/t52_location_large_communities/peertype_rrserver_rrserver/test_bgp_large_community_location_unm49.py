@@ -22,19 +22,12 @@
 """BGP location-based UN.M49 large community test case."""
 
 from ..template_large_community_location_unm49 import Template
+from ...config.peertype_rrserver_rrserver.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP location-based UN.M49 large community test case."""
 
     routers_config_exception = {
         "r1": r"BGP peer 'e1' has 'location' configuration but it makes no sense for peer type 'rrserver-rrserver'"
     }
-
-    r1_peer_asn = 65000
-    r1_peer_type = "rrserver-rrserver"
-    r1_global_config = """
-  rr_cluster_id: 0.0.0.1
-"""
-
-    e1_asn = 65000

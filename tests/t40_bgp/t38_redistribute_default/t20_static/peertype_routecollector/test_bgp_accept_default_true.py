@@ -21,10 +21,11 @@
 
 """BGP test case for redistribution of static default routes, with accept:default set to true."""
 
-from ..template import Template
+from ..template_bgp_accept_default_true import Template
+from ....config.peertype_routecollector.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP test case for redistribution of static default routes, with accept:default set to true."""
 
     routers_config_exception = {
@@ -32,19 +33,6 @@ class Test(Template):
         "r2": r"Having 'accept\[default\]' as True for peer 'r1' with type 'routecollector' makes no sense",
     }
 
-    r1_peer_type = "routecollector"
-    r1_peer_config = """
-      redistribute:
-        default: True
-        static: True
-"""
-
-    r2_peer_type = "routecollector"
-    r2_global_config = """
-  accept:
-    default: True
-"""
-    r2_peer_config = """
-      accept:
-        default: True
-"""
+    def _test_setup_specific(self, sim, tmpdir):
+        """Set up our test - specific additions."""
+        # We cannot add a route to r1 due to invalid configuration

@@ -21,29 +21,9 @@
 
 """BGP test case for redistribution of kernel default routes, with default settings for redistribute:default."""
 
-from ...template import Template
+from ..template_redistribute_default import Template
+from ....config.peertype_customer.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP test case for redistribution of kernel default routes, with default settings for redistribute:default."""
-
-    r1_peer_type = "customer"
-    r1_peer_config = """
-      passive: False
-      filter:
-        asns: [65001]
-      redistribute:
-        kernel: True
-"""
-    r2_peer_type = "customer"
-    r2_peer_config = """
-      passive: False
-      filter:
-        asns: [65000]
-"""
-
-    def _test_setup_specific(self, sim, tmpdir):
-        """Set up our test - specific additions."""
-        # Add gateway'd kernel default routes
-        sim.node("r1").run_ip(["route", "add", "0.0.0.0/0", "via", "100.101.0.2"])
-        sim.node("r1").run_ip(["route", "add", "::/0", "via", "fc00:101::2"])

@@ -22,11 +22,10 @@
 """BGP filtering test case."""
 
 from ..template_default_allowed import Template
+from ...config.peertype_peer.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
 
     routers_config_exception = {"r1": r"Having 'accept\[default\]' as True for peer 'e1' with type 'peer' makes no sense"}
-
-    r1_peer_type = "peer"

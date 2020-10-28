@@ -1,4 +1,5 @@
 # type: ignore
+# pylint: disable=too-many-lines
 
 """Expected test result data."""
 
@@ -205,21 +206,6 @@ r2_t_bgp4 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.102.0.0/24": [
-        {
-            "attributes": {
-                "BGP.large_community": [(65001, 3, 1)],
-                "BGP.local_pref": 945,
-                "Kernel.metric": "0",
-                "Kernel.source": "3",
-            },
-            "nexthops": [{"gateway": "192.168.2.2", "interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel4",
-            "type": ["inherit", "univ"],
-        }
-    ],
     "100.103.0.0/24": [
         {
             "asn": "AS65000",
@@ -237,22 +223,6 @@ r2_t_bgp4 = {
             "prefix_type": "unicast",
             "protocol": "bgp4_AS65000_r1",
             "type": ["BGP", "univ"],
-        }
-    ],
-    "100.104.0.0/24": [
-        {
-            "attributes": {
-                "BGP.large_community": [(65001, 3, 1)],
-                "BGP.local_pref": 945,
-                "Kernel.metric": "0",
-                "Kernel.scope": "253",
-                "Kernel.source": "3",
-            },
-            "nexthops": [{"interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel4",
-            "type": ["inherit", "univ"],
         }
     ],
 }
@@ -310,21 +280,6 @@ r2_t_bgp6 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:102::/48": [
-        {
-            "attributes": {
-                "BGP.large_community": [(65001, 3, 1)],
-                "BGP.local_pref": 945,
-                "Kernel.metric": "1024",
-                "Kernel.source": "3",
-            },
-            "nexthops": [{"gateway": "fc02::2", "interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel6",
-            "type": ["inherit", "univ"],
-        }
-    ],
     "fc00:103::/48": [
         {
             "asn": "AS65000",
@@ -342,21 +297,6 @@ r2_t_bgp6 = {
             "prefix_type": "unicast",
             "protocol": "bgp6_AS65000_r1",
             "type": ["BGP", "univ"],
-        }
-    ],
-    "fc00:104::/48": [
-        {
-            "attributes": {
-                "BGP.large_community": [(65001, 3, 1)],
-                "BGP.local_pref": 945,
-                "Kernel.metric": "1024",
-                "Kernel.source": "3",
-            },
-            "nexthops": [{"interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel6",
-            "type": ["inherit", "univ"],
         }
     ],
 }
@@ -422,16 +362,6 @@ r2_master4 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.102.0.0/24": [
-        {
-            "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
-            "nexthops": [{"gateway": "192.168.2.2", "interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel4",
-            "type": ["inherit", "univ"],
-        }
-    ],
     "100.103.0.0/24": [
         {
             "asn": "AS65000",
@@ -451,28 +381,9 @@ r2_master4 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.104.0.0/24": [
-        {
-            "attributes": {"Kernel.metric": "0", "Kernel.scope": "253", "Kernel.source": "3"},
-            "nexthops": [{"interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel4",
-            "type": ["inherit", "univ"],
-        }
-    ],
     "100.64.0.0/24": [
         {
             "nexthops": [{"interface": "eth0"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct4",
-            "type": ["device", "univ"],
-        }
-    ],
-    "192.168.2.0/24": [
-        {
-            "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
             "protocol": "direct4",
@@ -551,16 +462,6 @@ r2_master6 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:102::/48": [
-        {
-            "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
-            "nexthops": [{"gateway": "fc02::2", "interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel6",
-            "type": ["inherit", "univ"],
-        }
-    ],
     "fc00:103::/48": [
         {
             "asn": "AS65000",
@@ -578,25 +479,6 @@ r2_master6 = {
             "prefix_type": "unicast",
             "protocol": "bgp6_AS65000_r1",
             "type": ["BGP", "univ"],
-        }
-    ],
-    "fc00:104::/48": [
-        {
-            "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
-            "nexthops": [{"interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel6",
-            "type": ["inherit", "univ"],
-        }
-    ],
-    "fc02::/64": [
-        {
-            "nexthops": [{"interface": "eth1"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct6",
-            "type": ["device", "univ"],
         }
     ],
 }
@@ -644,16 +526,6 @@ r2_t_kernel4 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.102.0.0/24": [
-        {
-            "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
-            "nexthops": [{"gateway": "192.168.2.2", "interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel4",
-            "type": ["inherit", "univ"],
-        }
-    ],
     "100.103.0.0/24": [
         {
             "asn": "AS65000",
@@ -671,16 +543,6 @@ r2_t_kernel4 = {
             "prefix_type": "unicast",
             "protocol": "bgp4_AS65000_r1",
             "type": ["BGP", "univ"],
-        }
-    ],
-    "100.104.0.0/24": [
-        {
-            "attributes": {"Kernel.metric": "0", "Kernel.scope": "253", "Kernel.source": "3"},
-            "nexthops": [{"interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel4",
-            "type": ["inherit", "univ"],
         }
     ],
 }
@@ -728,16 +590,6 @@ r2_t_kernel6 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:102::/48": [
-        {
-            "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
-            "nexthops": [{"gateway": "fc02::2", "interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel6",
-            "type": ["inherit", "univ"],
-        }
-    ],
     "fc00:103::/48": [
         {
             "asn": "AS65000",
@@ -757,16 +609,6 @@ r2_t_kernel6 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:104::/48": [
-        {
-            "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
-            "nexthops": [{"interface": "eth1"}],
-            "pref": 10,
-            "prefix_type": "unicast",
-            "protocol": "kernel6",
-            "type": ["inherit", "univ"],
-        }
-    ],
 }
 
 r1_inet = [
@@ -779,10 +621,7 @@ r1_inet = [
 r2_inet = [
     {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.2", "protocol": "kernel", "scope": "link"},
     {"dev": "eth0", "dst": "100.101.0.0/24", "flags": [], "gateway": "100.64.0.1", "metric": 600, "protocol": "bird"},
-    {"dev": "eth1", "dst": "100.102.0.0/24", "flags": [], "gateway": "192.168.2.2"},
     {"dev": "eth0", "dst": "100.103.0.0/24", "flags": [], "gateway": "100.64.0.1", "metric": 600, "protocol": "bird"},
-    {"dev": "eth1", "dst": "100.104.0.0/24", "flags": [], "scope": "link"},
-    {"dev": "eth1", "dst": "192.168.2.0/24", "flags": [], "prefsrc": "192.168.2.1", "protocol": "kernel", "scope": "link"},
 ]
 
 r1_inet6 = [
@@ -805,7 +644,6 @@ r2_inet6 = [
         "pref": "medium",
         "protocol": "bird",
     },
-    {"dev": "eth1", "dst": "fc00:102::/48", "flags": [], "gateway": "fc02::2", "metric": 1024, "pref": "medium"},
     {
         "dev": "eth0",
         "dst": "fc00:103::/48",
@@ -815,8 +653,5 @@ r2_inet6 = [
         "pref": "medium",
         "protocol": "bird",
     },
-    {"dev": "eth1", "dst": "fc00:104::/48", "flags": [], "metric": 1024, "pref": "medium"},
-    {"dev": "eth1", "dst": "fc02::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
     {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
-    {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
 ]

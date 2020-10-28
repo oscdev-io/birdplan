@@ -22,15 +22,8 @@
 """BGP community stripping test case."""
 
 from ..template_stripping_community import Template
+from ...config.peertype_rrserver_rrserver.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP community stripping test case."""
-
-    r1_peer_asn = 65000
-    r1_peer_type = "rrserver-rrserver"
-    r1_global_config = """
-  rr_cluster_id: 0.0.0.1
-"""
-
-    e1_asn = 65000

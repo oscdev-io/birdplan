@@ -2,11 +2,13 @@
 
 Router r1 should be advertising a prefix to router r2.
 
-**Tests for BGP outgoing large communities:**
+## Tests for BGP outgoing large communities
 
 In terms of test "test_outgoing_large_communities":
   - Router r1 should be advertising a prefix to router to r2, router r1 should be adding a outgoing large community to the prefix it advertises.
 
+
+## Diagram
 
 ```plantuml
 @startuml

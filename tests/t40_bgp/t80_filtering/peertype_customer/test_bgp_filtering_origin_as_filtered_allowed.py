@@ -22,9 +22,11 @@
 """BGP filtering test case."""
 
 from ..template_origin_as_filtered_allowed import Template
+from ...config.peertype_customer.e1r1 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
 
-    r1_peer_type = "customer"
+    # Remove default ASN filter
+    r1_peer_config = ""

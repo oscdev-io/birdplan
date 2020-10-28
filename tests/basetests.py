@@ -502,7 +502,8 @@ class BirdPlanBaseTestCase:
         result = birdplan_cmdline.run(cmdline_args)
 
         # Add test report sections
-        sim.add_conffile(f"CONFFILE({router})", bird_conffile)
+        sim.add_conffile(f"BIRDPLAN_CONFFILE({router})", birdplan_file)
+        sim.add_conffile(f"BIRD_CONFFILE({router})", bird_conffile)
         sim.add_logfile(f"LOGFILE({router})", bird_logfile)
 
         # Add the birdplan configuration object to the simulation

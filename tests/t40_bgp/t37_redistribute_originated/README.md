@@ -27,11 +27,6 @@ class "Router: r2" {
   .. Interface: eth0 ..
 - 100.64.0.2/24
 + fc00:100::2/64
-
-  .. BGP Originated (no redistribute)..
-- 100.102.0.0/24 (blackhole)
-+ fc00:102::/48 (blackhole)
-
 }
 
 

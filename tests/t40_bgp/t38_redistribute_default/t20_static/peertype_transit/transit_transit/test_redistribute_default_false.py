@@ -21,17 +21,9 @@
 
 """BGP test case for redistribution of static default routes, with redistribute:default set to false."""
 
-from ...template import Template
+from ...template_redistribute_default_false import Template
+from .....config.peertype_transit.transit.r1r2 import PeerTypeConfig
 
 
-class Test(Template):
+class Test(PeerTypeConfig, Template):
     """BGP test case for redistribution of static default routes, with redistribute:default set to false."""
-
-    r1_peer_type = "transit"
-    r1_peer_config = """
-      redistribute:
-        default: False
-        static: True
-"""
-
-    r2_peer_type = "transit"

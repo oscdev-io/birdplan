@@ -42,53 +42,32 @@
 
 [Redistribute Connected](t40_bgp/t30_redistribute_connected/README.md)
 
+[Redistribute Kernel](t40_bgp/t34_redistribute_kernel/README.md)
 
--- --
+[Redistribute Static](t40_bgp/t36_redistribute_static/README.md)
 
+[Redistribute Originated](t40_bgp/t37_redistribute_originated/README.md)
 
-[No Export Kernel](40-bgp/10-no_export_kernel/README.md)
+[Redistribute Default](t40_bgp/t38_redistribute_default/README.md)
 
+[Prefix Limit](t40_bgp/t40_prefix_limit/README.md)
 
-[Redistribute Connected (with star)](40-bgp/10-redistribute_connected_with_star/README.md)
+[Peer Cost](t40_bgp/t42_peer_cost/README.md)
 
-[Redistribute Kernel](40-bgp/10-redistribute_kernel/README.md)
+[Community Stripping](t40_bgp/t50_community_stripping/README.md)
 
-[Redistribute Only Default](40-bgp/10-redistribute_only_default/README.md)
+[Location-based Large Communities](t40_bgp/t52_location_large_communities/README.md)
 
-[Redistribute Originated](40-bgp/10-redistribute_originated/README.md)
+[Incoming Large Communities](t40_bgp/t54_incoming_large_communities/README.md)
 
-[Redistribute Static](40-bgp/10-redistribute_static/README.md)
+[Outgoing Large Communities](t40_bgp/t55_outgoing_large_communities/README.md)
 
-[Redistribute Static Default](40-bgp/10-redistribute_static_default/README.md)
+[Redistribute Large Communities](t40_bgp/t56_redistribute_large_communities/README.md)
 
-[Redistribute Static Without Default](40-bgp/10-redistribute_static_without_default/README.md)
+[Large Community Functions (inbound)](t40_bgp/t58_large_community_functions_inbound/README.md)
 
-## Community stripping
+[Large Community Functions (outbound)](t40_bgp/t59_large_community_functions_outbound/README.md)
 
-[Community Stripping](40-bgp/20-community_stripping/README.md)
+[Filtering](t40_bgp/t80_filtering/README.md)
 
-## Filtering
-
-[Filtering](40-bgp/40-filtering/README.md)
-
-## Incoming/Outgoing Large Communities
-
-[Incoming Large Communities](40-bgp/30-incoming_large_communities/README.md)
-
-[Outgoing Large Communities](40-bgp/30-outgoing_large_communities/README.md)
-
-## Large Community Functions
-
-[Large Community Functions](40-bgp/50-large_community_functions/README.md)
-
-## Prefix Limits
-
-[Prefix Limits](40-bgp/60-prefix_limits/README.md)
-
-## Peer Cost
-
-[Prefix Cost](40-bgp/70-peer_cost/README.md)
-
-## Graceful Shutdown
-
-[Graceful Shutdown](40-bgp/72-graceful_shutdown/README.md)
+[Filtering](t40_bgp/t90_graceful_shutdown/README.md)
