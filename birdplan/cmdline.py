@@ -494,7 +494,7 @@ class BirdPlanCommandLine:
             help=f"BirdPlan state file to use (default: {BIRDPLAN_STATE_FILE})",
         )
 
-    def _add_bgp_graceful_shutdown_peers_argument(self, arg_group: argparse.ArgumentParser) -> None:
+    def _add_bgp_graceful_shutdown_peers_argument(self, arg_group: argparse.ArgumentParser) -> None:  # pylint: disable=no-self-use
         """Add BGP graceful shutdown arguments for a command that takes peers."""
         arg_group.add_argument(
             "peers",
