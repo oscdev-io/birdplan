@@ -178,29 +178,31 @@ class BirdPlanCommandLine:
         self._args = self.argparser.parse_args(raw_args)
 
         # Setup logging
-        if __name__ == "main":
+        if __name__ == "__main__":
             self._setup_logging()
 
         # Make sure we have an action
         if "action" not in self.args:
-            if __name__ == "main":
+            if __name__ == "__main__":
                 print("ERROR: No action specified!")
                 self.argparser.print_help()
                 sys.exit(1)
             else:
-                raise BirdPlanError("No action specified")
+                raise BirdPlanError(f"No action specified")
 
         if self.args.action == "configure":
             return self.configure()
 
         if self.args.action == "bgp":
-            if __name__ == "main":
+            if __name__ == "__main__":
                 parser_bgp.print_help()
                 sys.exit(1)
             else:
                 raise BirdPlanError("No options specified to 'bgp' action")
+
+        # Graceful shutdown
         elif self.args.action == "bgp_graceful_shutdown":
-            if __name__ == "main":
+            if __name__ == "__main__":
                 parser_bgp_graceful_shutdown.print_help()
                 sys.exit(1)
             else:
@@ -248,7 +250,7 @@ class BirdPlanCommandLine:
         # Grab peer list
         peer_list = self.birdplan.bgp_graceful_shutdown_peer_list()
 
-        if __name__ == "main":
+        if __name__ == "__main__":
             print("Peers in graceful shutdown:")
             for peer in peer_list:
                 print(f"  {peer}")
@@ -263,7 +265,7 @@ class BirdPlanCommandLine:
 
         # Make sure we have peers specified
         if not self.args.peers:
-            if __name__ == "main":
+            if __name__ == "__main__":
                 print("ERROR: No peer(s) specified to add")
                 arg_group.print_help()
                 sys.exit(1)
@@ -280,7 +282,7 @@ class BirdPlanCommandLine:
                 print(f"BGP peer '{peer}' already added to graceful shutdown list")
                 continue
             # Try add peer
-            if __name__ == "main":
+            if __name__ == "__main__":
                 try:
                     self.birdplan.bgp_graceful_shutdown_add_peer(peer)
                 except BirdPlanError as err:
@@ -298,7 +300,7 @@ class BirdPlanCommandLine:
 
         # Make sure we have peers specified
         if not self.args.peers:
-            if __name__ == "main":
+            if __name__ == "__main__":
                 print("ERROR: No peer(s) specified to add")
                 arg_group.print_help()
                 sys.exit(1)
@@ -315,7 +317,7 @@ class BirdPlanCommandLine:
                 print(f"BGP peer '{peer}' not in graceful shutdown list")
                 continue
             # Try add peer
-            if __name__ == "main":
+            if __name__ == "__main__":
                 try:
                     self.birdplan.bgp_graceful_shutdown_remove_peer(peer)
                 except BirdPlanError as err:
@@ -420,7 +422,7 @@ class BirdPlanCommandLine:
     def _birdplan_load_config(self) -> None:
         """Load BirdPlan configuration."""
         # Try load configuration
-        if __name__ == "main":
+        if __name__ == "__main__":
             try:
                 self.birdplan.load(plan_file=self.args.birdplan_file[0], state_file=self.args.birdplan_state_file[0])
             except BirdPlanError as err:
@@ -432,7 +434,7 @@ class BirdPlanCommandLine:
     def _birdplan_configure(self) -> None:
         """Configure BirdPlan."""
         # Try load configuration
-        if __name__ == "main":
+        if __name__ == "__main__":
             try:
                 self.birdplan.configure(self.args.bird_config_file[0])
             except BirdPlanError as err:
@@ -444,7 +446,7 @@ class BirdPlanCommandLine:
     def _birdplan_commit_state(self) -> None:
         """Commit BirdPlan state."""
         # Try commit our state
-        if __name__ == "main":
+        if __name__ == "__main__":
             try:
                 self.birdplan.commit_state()
             except BirdPlanError as err:
@@ -459,7 +461,7 @@ class BirdPlanCommandLine:
     def _add_main_arguments(self) -> None:
         """Add main commandline arguments."""
 
-        if __name__ == "main":
+        if __name__ == "__main__":
             print(f"BirdPlan v{__VERSION__} - Copyright © 2019-2020, AllWorldIT.\n", file=sys.stderr)
 
         optional_group = self.argparser.add_argument_group("Optional arguments")
