@@ -31,7 +31,7 @@ class Template(TemplateBase):
     def _test_graceful_shutdown(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
-        # Add r2 to graceful shutdown list
+        # Add all peers to graceful shutdown list
         self._birdplan_run(sim, tmpdir, "r1", ["bgp", "graceful_shutdown", "add", "*"])
 
         # Check r2 was added
