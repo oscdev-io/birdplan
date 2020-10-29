@@ -17,7 +17,7 @@ bgp:
       error_wait_time: 2,5
       type: customer
       filter:
-        asns:
+        origin_asns:
           - 65000
           - 65100
       passive: False

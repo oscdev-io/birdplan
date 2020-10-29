@@ -108,21 +108,25 @@ class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
     ----------
     prefixes : BGPPeerFilterItem
         List of prefixes to filter on.
-    asns : BGPPeerFilterItem
-        List of ASNs to filter on.
+    origin_asns : BGPPeerFilterItem
+        List of origin ASNs to filter on.
+    peer_asns : BGPPeerFilterItem
+        List of peer ASNs to filter on.
     as_sets : BGPPeerFilterItem
         List of AS-SET's to filter on.
 
     """
 
     prefixes: BGPPeerFilterItem
-    asns: BGPPeerFilterItem
+    origin_asns: BGPPeerFilterItem
+    peer_asns: BGPPeerFilterItem
     as_sets: BGPPeerFilterItem
 
     def __init__(self) -> None:
         """Initialize object."""
         self.prefixes = []
-        self.asns = []
+        self.origin_asns = []
+        self.peer_asns = []
         self.as_sets = []
 
 

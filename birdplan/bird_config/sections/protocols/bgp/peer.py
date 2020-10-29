@@ -277,7 +277,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 raise BirdPlanError(f"Having 'filter' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
             # Add filters
             for filter_type, filter_config in peer_config["filter"].items():
-                if filter_type not in ("prefixes", "asns", "as_sets"):
+                if filter_type not in ("prefixes", "origin_asns", "peer_asns", "as_sets"):
                     raise BirdPlanError(
                         f"BGP peer 'filter' configuration '{filter_type}' for peer '{self.name}' with type '{self.peer_type}' "
                         "is invalid"
@@ -296,7 +296,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Setup routing tables
         self._setup_peer_tables()
 
-        # Setup allowed ASNs
+        # Setup ASN lists
+        self._setup_origin_asns()
         self._setup_peer_asns()
 
         # Setup allowed prefixes
@@ -363,11 +364,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.tables.conf.append(f"ipv6 table {self.bgp_table_name('6')};")
         self.tables.conf.append("")
 
-    def _setup_peer_asns(self) -> None:
-        """ASN list setup."""
+    def _setup_origin_asns(self) -> None:
+        """Origin ASN list setup."""
 
         # Short circuit and exit if we have none
-        if not self.has_asn_filter:
+        if not self.has_origin_asn_filter:
             return
 
         # Grab IRR prefixes
@@ -376,16 +377,42 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             bgpq3 = BGPQ3()
             irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
 
-        self.conf.add(f"define {self.asn_list_name} = [")
+        self.conf.add(f"define {self.origin_asn_list_name} = [")
         asns = []
         # Add ASN list with comments
-        if self.filter_policy.asns:
-            asns.append(f"# {len(self.filter_policy.asns)} statically defined")
-            for asn in self.filter_policy.asns:
+        if self.filter_policy.origin_asns:
+            asns.append(f"# {len(self.filter_policy.origin_asns)} statically defined")
+            for asn in self.filter_policy.origin_asns:
                 asns.append(f"{asn}")
         if irr_asns:
             asns.append(f"# {len(irr_asns)} from IRR with object '{self.filter_policy.as_sets}'")
             for asn in irr_asns:
+                asns.append(f"{asn}")
+        # Join into one string, so we get the commas
+        asns_str = ",\n".join(asns)
+        # Loop with each line
+        for line in asns_str.splitlines():
+            # Remove comma from the comments
+            if "#" in line:
+                line = line[:-1]
+            # Add line to our output
+            self.conf.add("  " + line)
+        self.conf.add("];")
+        self.conf.add("")
+
+    def _setup_peer_asns(self) -> None:
+        """Peer ASN list setup."""
+
+        # Short circuit and exit if we have none
+        if not self.has_peer_asn_filter:
+            return
+
+        self.conf.add(f"define {self.peer_asn_list_name} = [")
+        asns = []
+        # Add ASN list with comments
+        if self.filter_policy.peer_asns:
+            asns.append(f"# {len(self.filter_policy.peer_asns)} statically defined")
+            for asn in self.filter_policy.peer_asns:
                 asns.append(f"{asn}")
         # Join into one string, so we get the commas
         asns_str = ",\n".join(asns)
@@ -917,20 +944,28 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Flip around the meaning of filters depending on peer type
         # For customer and peer, it is an ALLOW list
         if self.peer_type in ("customer", "peer"):
-            # Check if we're filtering allowed ASNs
-            if self.filter_policy.asns:
-                type_lines.append("    # Filter on the allowed ASNs")
-                type_lines.append(f"    bgp_filter_allow_asns({self.asn_list_name});")
+            # Check if we're filtering allowed origin ASNs
+            if self.filter_policy.origin_asns:
+                type_lines.append("    # Filter on the allowed origin ASNs")
+                type_lines.append(f"    bgp_filter_allow_origin_asns({self.origin_asn_list_name});")
+            # Check if we're filtering allowed peer ASNs
+            if self.filter_policy.peer_asns:
+                type_lines.append("    # Filter on the allowed peer ASNs")
+                type_lines.append(f"    bgp_filter_allow_peer_asns({self.peer_asn_list_name});")
             # Check if we're filtering allowed prefixes
             if self.filter_policy.prefixes:
                 type_lines.append("    # Filter on the allowed prefixes")
                 type_lines.append(f"    bgp_filter_allow_prefixes({self.prefix_list_name(ipv)});")
         # For everything else it is a DENY list
         elif self.peer_type != "routecollector":
-            # Check if we're filtering allowed ASNs
-            if self.filter_policy.asns:
-                type_lines.append("    # Filter on the allowed ASNs")
-                type_lines.append(f"    bgp_filter_deny_asns({self.asn_list_name});")
+            # Check if we're filtering denied origin ASNs
+            if self.filter_policy.origin_asns:
+                type_lines.append("    # Filter on the denied origin ASNs")
+                type_lines.append(f"    bgp_filter_deny_origin_asns({self.origin_asn_list_name});")
+            # Check if we're filtering denied peer ASNs
+            if self.filter_policy.peer_asns:
+                type_lines.append("    # Filter on the denied peer ASNs")
+                type_lines.append(f"    bgp_filter_deny_peer_asns({self.peer_asn_list_name});")
             # Check if we're filtering allowed prefixes
             if self.filter_policy.prefixes:
                 type_lines.append("    # Filter on the allowed prefixes")
@@ -1309,14 +1344,24 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     #
 
     @property
-    def asn_list_name(self) -> str:
-        """Return our ASN list name."""
-        return f"bgp_AS{self.asn}_{self.name}_asns"
+    def origin_asn_list_name(self) -> str:
+        """Return our origin ASN list name."""
+        return f"bgp_AS{self.asn}_{self.name}_origin_asns"
 
     @property
-    def has_asn_filter(self) -> BGPPeerFilterItem:
-        """Return if we filter on ASNs."""
-        return self.filter_policy.asns or self.filter_policy.as_sets
+    def peer_asn_list_name(self) -> str:
+        """Return our peer ASN list name."""
+        return f"bgp_AS{self.asn}_{self.name}_peer_asns"
+
+    @property
+    def has_origin_asn_filter(self) -> BGPPeerFilterItem:
+        """Return if we filter on origin ASNs."""
+        return self.filter_policy.origin_asns or self.filter_policy.as_sets
+
+    @property
+    def has_peer_asn_filter(self) -> BGPPeerFilterItem:
+        """Return if we filter on peer ASNs."""
+        return self.filter_policy.peer_asns
 
     @property
     def has_ipv4(self) -> bool:

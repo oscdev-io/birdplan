@@ -324,6 +324,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             "define BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 19);"
         )
         self.constants.conf.append("define BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 20);")
+        self.constants.conf.append("define BGP_LC_FILTERED_PEER_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 21);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Ref http://bgpfilterguide.nlnog.net/guides/no_transit_leaks")
@@ -597,18 +598,38 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-        self.functions.conf.append("# Filter ASNs (ALLOW list)")
-        self.functions.conf.append("function bgp_filter_allow_asns(int set asns) {")
+        self.functions.conf.append("# Filter origin ASNs (ALLOW list)")
+        self.functions.conf.append("function bgp_filter_allow_origin_asns(int set asns) {")
         self.functions.conf.append("  if (bgp_path.last_nonaggregated !~ asns) then {")
-        self.functions.conf.append('    print "[bgp_filter_allow_asns] Adding BGP_LC_FILTERED_ORIGIN_AS to ", net;', debug=True)
+        self.functions.conf.append(
+            '    print "[bgp_filter_allow_origin_asns] Adding BGP_LC_FILTERED_ORIGIN_AS to ", net;', debug=True
+        )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ORIGIN_AS);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
-        self.functions.conf.append("# Filter ASNs (DENY list)")
-        self.functions.conf.append("function bgp_filter_deny_asns(int set asns) {")
+        self.functions.conf.append("# Filter origin ASNs (DENY list)")
+        self.functions.conf.append("function bgp_filter_deny_origin_asns(int set asns) {")
         self.functions.conf.append("  if (bgp_path.last_nonaggregated ~ asns) then {")
-        self.functions.conf.append('    print "[bgp_filter_deny_asns] Adding BGP_LC_FILTERED_ORIGIN_AS to ", net;', debug=True)
+        self.functions.conf.append(
+            '    print "[bgp_filter_deny_origin_asns] Adding BGP_LC_FILTERED_ORIGIN_AS to ", net;', debug=True
+        )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ORIGIN_AS);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Filter peer ASNs (ALLOW list)")
+        self.functions.conf.append("function bgp_filter_allow_peer_asns(int set asns) {")
+        self.functions.conf.append("  if (bgp_path.first !~ asns) then {")
+        self.functions.conf.append('    print "[bgp_filter_allow_peer_asns] Adding BGP_LC_FILTERED_PEER_AS to ", net;', debug=True)
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PEER_AS);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("# Filter peer ASNs (DENY list)")
+        self.functions.conf.append("function bgp_filter_deny_peer_asns(int set asns) {")
+        self.functions.conf.append("  if (bgp_path.first ~ asns) then {")
+        self.functions.conf.append('    print "[bgp_filter_deny_peer_asns] Adding BGP_LC_FILTERED_PEER_AS to ", net;', debug=True)
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PEER_AS);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")

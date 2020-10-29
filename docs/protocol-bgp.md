@@ -460,8 +460,8 @@ bgp:
 Filtering of routes received from a peer. Options available are below...
 
 * `prefixes` will filter on a list of allowed prefixes
-* `asns` will filter on a list of allowed origin ASN's
-* `peer_asns` will filter on the peer ASN, but is only valid for a `routeserver`.
+* `origin_asns` will filter on a list of allowed origin ASN's
+* `peer_asns` will filter on the first ASN in the AS-PATH, but only really makes sense for `routeserver`.
 * `as_sets` will filter on a list of as-sets, resolving them at the same time.
 
 In the context of peer types `customer` and `peer` the above forms the ALLOW list. Everything other than what is specified will be filtered.

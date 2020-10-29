@@ -29,7 +29,7 @@ class Template(TemplateBase):
 
     r1_template_peer_config = """
       filter:
-        asns: [65002]
+        origin_asns: [65002]
 """
 
     def _test_announce_routes(self, sim):

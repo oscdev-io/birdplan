@@ -21,15 +21,11 @@
 
 """BGP filtering test case."""
 
-from ..template_bogon_asn import Template
-from ...config.peertype_customer.e1r1 import PeerTypeConfig
+from ..template_peer_as_filtered import Template
+from ...config.peertype_routecollector.e1r1 import PeerTypeConfig
 
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
 
-    # We need to override the ASN filter for this test
-    r1_peer_config = """
-      filter:
-        origin_asns: [65001, 23456]
-"""
+    routers_config_exception = {"r1": r"Having 'filter' specified for peer 'e1' with type 'routecollector' makes no sense"}

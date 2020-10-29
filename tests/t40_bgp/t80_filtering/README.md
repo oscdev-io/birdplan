@@ -33,6 +33,12 @@ In terms of test "test_bgp_filtering_origin_as_filtered_allowed":
 In terms of test "test_bgp_filtering_origin_as_filtered":
 - ExaBGP e1 should export a route where the origin AS is filtered and not allowed.
 
+In terms of test "test_bgp_filtering_peer_as_filtered_allowed":
+- ExaBGP e1 should export a route where the first AS is filtered, but allowed.
+
+In terms of test "test_bgp_filtering_peer_as_filtered":
+- ExaBGP e1 should export a route where the first AS is filtered and not allowed.
+
 In terms of test "test_bgp_filtering_prefix_filtered_allowed":
 - ExaBGP e1 should export a route where the prefix is filtered, but allowed.
 

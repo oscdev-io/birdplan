@@ -19,17 +19,25 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP filtering test case."""
+"""BGP peer AS filtered test case template."""
 
-from ..template_bogon_asn import Template
-from ...config.peertype_customer.e1r1 import PeerTypeConfig
+from .template_base import TemplateBase
 
 
-class Test(PeerTypeConfig, Template):
-    """BGP filtering test case."""
+class Template(TemplateBase):
+    """BGP peer AS filtered test case template."""
 
-    # We need to override the ASN filter for this test
-    r1_peer_config = """
+    r1_template_peer_config = """
       filter:
-        origin_asns: [65001, 23456]
+        peer_asns: [65001]
 """
+
+    def _test_announce_routes(self, sim):
+        """Announce a BGP prefix with a differnt origin."""
+
+        self._exabgpcli(
+            sim, "e1", ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 as-path [ 65001 65003 ]"]
+        )
+        self._exabgpcli(
+            sim, "e1", ["neighbor fc00:100::1 announce route fc00:101::/64 next-hop fc00:100::2 as-path [ 65001 65003 ]"]
+        )

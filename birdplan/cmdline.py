@@ -188,7 +188,7 @@ class BirdPlanCommandLine:
                 self.argparser.print_help()
                 sys.exit(1)
             else:
-                raise BirdPlanError(f"No action specified")
+                raise BirdPlanError("No action specified")
 
         if self.args.action == "configure":
             return self.configure()

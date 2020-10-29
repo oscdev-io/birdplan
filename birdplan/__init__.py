@@ -785,7 +785,7 @@ class BirdPlan:
                 peer["filter"] = {}
                 # Loop with filter configuration items
                 for filter_type, filter_config in config_value.items():
-                    if filter_type in ["prefixes", "asns", "as-set"]:
+                    if filter_type in ["prefixes", "origin_asns", "peer_asns", "as-set"]:
                         peer["filter"][filter_type] = filter_config
                     # If we don't understand this 'filter' entry, throw an error
                     else:

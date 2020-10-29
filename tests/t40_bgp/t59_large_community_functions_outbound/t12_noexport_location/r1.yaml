@@ -21,7 +21,7 @@ bgp:
       location:
         iso3166: 999
       filter:
-        asns:
+        origin_asns:
           - 65001
 
     r3:
