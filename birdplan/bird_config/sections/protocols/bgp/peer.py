@@ -937,7 +937,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 type_lines.append(f"    bgp_filter_deny_prefixes({self.prefix_list_name(ipv)});")
 
         # Quarantine mode...
-        if self.quarantined:
+        # NK: We don't quarantine route collectors as they are automagically filtered
+        if self.quarantined and self.peer_type != "routecollector":
             # Quarantine prefixes
             type_lines.append("    # Quarantine all prefixes received")
             type_lines.append("    bgp_quarantine_peer();")
