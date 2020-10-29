@@ -19,11 +19,11 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP filtering test case."""
+"""BGP quarantine test case."""
 
-from ..template_quarantine import Template
-from ...config.peertype_routecollector.e1r1 import PeerTypeConfig
+from ..template_quarantine_outbound_cmdline import Template
+from ...config.peertype_routeserver.r1r2 import PeerTypeConfig
 
 
 class Test(PeerTypeConfig, Template):
-    """BGP filtering test case."""
+    """BGP quarantine test case."""

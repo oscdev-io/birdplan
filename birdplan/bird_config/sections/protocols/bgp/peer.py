@@ -287,11 +287,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Check if we're quarantined
         if "quarantine" in peer_config and peer_config["quarantine"]:
-            # Raise an exception if quarantine makes no sense for this peer type
-            if self.peer_type == "routecollector":
-                raise BirdPlanError(
-                    f"Having 'quarantine' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense"
-                )
             self.quarantined = True
 
     def configure(self) -> None:

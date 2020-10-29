@@ -70,4 +70,6 @@
 
 [Filtering](t40_bgp/t80_filtering/README.md)
 
-[Filtering](t40_bgp/t90_graceful_shutdown/README.md)
+[Graceful Shutdown](t40_bgp/t90_graceful_shutdown/README.md)
+
+[Commandline Quarantine](t40_bgp/t98_cmdline_quarantine/README.md)

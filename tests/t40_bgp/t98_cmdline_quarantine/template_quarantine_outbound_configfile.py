@@ -19,11 +19,18 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP filtering test case."""
+"""BGP quarantine test case template."""
 
-from ..template_quarantine import Template
-from ...config.peertype_routecollector.e1r1 import PeerTypeConfig
+from .template_base import TemplateBase
 
 
-class Test(PeerTypeConfig, Template):
-    """BGP filtering test case."""
+class Template(TemplateBase):
+    """BGP quarantine test case template."""
+
+    r1_template_peer_config = """
+      quarantine: True
+"""
+
+    def _test_quarantine(self, sim, tmpdir):
+        """Quarantine test to customize template."""
+        # Configuration is in the config file
