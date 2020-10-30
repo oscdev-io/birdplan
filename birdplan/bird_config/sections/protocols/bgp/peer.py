@@ -31,6 +31,7 @@ from .peer_attributes import (
     BGPPeerLocation,
     BGPPeerPeeringDB,
     BGPPeerPrefixLimit,
+    BGPPeerPrepend,
     BGPPeerRoutePolicyAccept,
     BGPPeerRoutePolicyRedistribute,
     BGPPeerRoutePolicyRedistributeItem,
@@ -284,6 +285,45 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     )
                 # Set filter policy
                 setattr(self.filter_policy, filter_type, filter_config)
+
+        # Check for prepending we need to setup
+        if "prepend" in peer_config:
+            # Add prepending configuration
+            if isinstance(peer_config["prepend"], dict):
+                for prepend_type, prepend_config in peer_config["prepend"].items():
+                    if prepend_type not in (
+                        "default",
+                        "connected",
+                        "static",
+                        "kernel",
+                        "originated",
+                        "bgp",
+                        "bgp_own",
+                        "bgp_customer",
+                        "bgp_peering",
+                        "bgp_transit",
+                    ):
+                        raise BirdPlanError(
+                            f"BGP peer 'prepend' configuration '{prepend_type}' for peer '{self.name}' with type "
+                            f"'{self.peer_type}' is invalid"
+                        )
+                    # Check that we're not doing something stupid
+                    if self.peer_type in ("peer", "routecollector", "routeserver", "transit") and prepend_type in (
+                        "default",
+                        "bgp_peering",
+                        "bgp_transit",
+                    ):
+                        raise BirdPlanError(
+                            f"Having 'prepend:{prepend_type}' specified for peer '{self.name}' with type '{self.peer_type}' "
+                            "makes no sense"
+                        )
+                    # Grab the prepend attribute
+                    prepend_attr = getattr(self.prepend, prepend_type)
+                    # Set prepend count
+                    setattr(prepend_attr, "own_asn", prepend_config)
+            # If its just a number set the count
+            else:
+                self.prepend.bgp.own_asn = peer_config["prepend"]
 
         # Check if we're quarantined
         if "quarantine" in peer_config and peer_config["quarantine"]:
@@ -801,15 +841,37 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         for large_community in sorted(self.large_communities.outgoing):
             self.conf.add(f'    print "[{self.filter_name_import_bgp((ipv))}] Adding LC {large_community} to ", net;', debug=True)
             self.conf.add(f"    bgp_large_community.add({large_community});")
+        # Check if we're doing AS-PATH prepending...
+        if self.prepend.default.own_asn:
+            self.conf.add(f"    bgp_prepend_default{ipv}(BGP_ASN, {self.prepend.default.own_asn});")
+        if self.prepend.connected.own_asn:
+            self.conf.add(f"    bgp_prepend_connected{ipv}(BGP_ASN, {self.prepend.connected.own_asn});")
+        if self.prepend.static.own_asn:
+            self.conf.add(f"    bgp_prepend_static{ipv}(BGP_ASN, {self.prepend.static.own_asn});")
+        if self.prepend.kernel.own_asn:
+            self.conf.add(f"    bgp_prepend_kernel(BGP_ASN, {self.prepend.kernel.own_asn});")
+        if self.prepend.originated.own_asn:
+            self.conf.add(f"    bgp_prepend_originated{ipv}(BGP_ASN, {self.prepend.originated.own_asn});")
+        if self.prepend.bgp.own_asn:
+            self.conf.add(f"    bgp_prepend_bgp(BGP_ASN, {self.prepend.bgp.own_asn});")
+        if self.prepend.bgp_own.own_asn:
+            self.conf.add(f"    bgp_prepend_bgp_own(BGP_ASN, {self.prepend.bgp_own.own_asn});")
+        if self.prepend.bgp_customer.own_asn:
+            self.conf.add(f"    bgp_prepend_bgp_customer(BGP_ASN, {self.prepend.bgp_customer.own_asn});")
+        if self.prepend.bgp_peering.own_asn:
+            self.conf.add(f"    bgp_prepend_bgp_peering(BGP_ASN, {self.prepend.bgp_peering.own_asn});")
+        if self.prepend.bgp_transit.own_asn:
+            self.conf.add(f"    bgp_prepend_bgp_transit(BGP_ASN, {self.prepend.bgp_transit.own_asn});")
+
         # Do large community prepending if the peer is a customer, peer, routeserver or transit
         if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
             # Check if we're doing prepending
-            self.conf.add("    # Do prepend if we have any LCs set")
-            self.conf.add(f"    bgp_export_prepend({self.asn});")
+            self.conf.add("    # Do large community based prepending")
+            self.conf.add(f"    bgp_prepend_lc({self.asn});")
             # Check if we have a ISO-3166 country code
             if self.location.iso3166:
                 self.conf.add("    # Do prepending based on ISO-3166 location;")
-                self.conf.add(f"    bgp_export_location_prepend({self.location.iso3166});")
+                self.conf.add(f"    bgp_prepend_location({self.location.iso3166});")
         # If we have graceful_shutdown set, add the community
         if self.graceful_shutdown:
             self.conf.add(
@@ -1288,6 +1350,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def large_communities(self) -> BGPPeerLargeCommunities:
         """Return our large communities."""
         return self.peer_attributes.large_communities
+
+    @property
+    def prepend(self) -> BGPPeerPrepend:
+        """Return our prepending."""
+        return self.peer_attributes.prepend
 
     @property
     def passive(self) -> bool:

@@ -790,6 +790,35 @@ class BirdPlan:
                     # If we don't understand this 'filter' entry, throw an error
                     else:
                         raise BirdPlanError(f"Configuration item '{filter_type}' not understood in bgp:peers:{peer_name}:filter")
+            # Work out prepending options
+            elif config_item == "prepend":
+                if isinstance(config_value, dict):
+                    # Loop with prepend configuration items
+                    for prepend_type, prepend_config in config_value.items():
+                        if prepend_type in [
+                            "default",
+                            "connected",
+                            "static",
+                            "kernel",
+                            "originated",
+                            "bgp",
+                            "bgp_own",
+                            "bgp_customer",
+                            "bgp_peering",
+                            "bgp_transit",
+                        ]:
+                            # Make sure we have a prepend key
+                            if "prepend" not in peer:
+                                peer["prepend"] = {}
+                            # Then add the config...
+                            peer["prepend"][prepend_type] = prepend_config
+                        # If we don't understand this 'prepend' entry, throw an error
+                        else:
+                            raise BirdPlanError(
+                                f"Configuration item '{prepend_type}' not understood in bgp:peers:{peer_name}:prepend"
+                            )
+                else:
+                    peer["prepend"] = config_value
             else:
                 raise BirdPlanError(f"Configuration item '{config_item}' not understood in bgp:peers:{peer_name}")
 

@@ -68,6 +68,8 @@
 
 [Large Community Functions (outbound)](t40_bgp/t59_large_community_functions_outbound/README.md)
 
+[Prepending](t40_bgp/t60_prepending/README.md)
+
 [Filtering](t40_bgp/t80_filtering/README.md)
 
 [Graceful Shutdown](t40_bgp/t90_graceful_shutdown/README.md)

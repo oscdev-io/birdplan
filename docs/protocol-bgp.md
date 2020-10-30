@@ -710,6 +710,54 @@ bgp:
 ...
 ```
 
+## prepend
+
+This option controls AS-PATH prepending in various ways. The prepending count must be between 1 and 10.
+
+NOTE: Currently our own ASN will be prepended. Support for the first AS is not yet added.
+
+**The first method we can use to specify outbound prepending is just with a number:**
+
+This will result in our own ASN being prepended for the number of times specified.
+
+An example of this is below...
+```yaml
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prepend: 2
+```
+
+**The second method is we can use a dict to do fine grained prepending based on route type:**
+
+Route types...
+
+* `default` will match the default route.
+* `connected` will match connected routes.
+* `static` will match static routes.
+* `kernel` will match kernel routes.
+* `originated` will match originated routes.
+
+Internal route types...
+
+* `bgp` will match all BGP routes.
+* `bgp_own` will match BGP routes that originated from our ASN.
+* `bgp_customer` will match our customer routes.
+* `bgp_peering` will match our peers routes.
+* `bgp_transit` will match our transit providers routes.
+
+An example of this is below...
+```yaml
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prepend:
+        static: 2
+        bgp_customer: 2
+```
+
 
 ## quarantine
 
