@@ -481,8 +481,10 @@ bgp:
       description: Some peer
       filter:
         as-set: AS-EXAMPLE
-        asns:
+        origin_asns:
           - 65009
+        peer_asns:
+          - 65000
         prefixes:
           - "100.141.0.0/24"
           - "fc00:141::/64"

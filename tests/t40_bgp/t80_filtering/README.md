@@ -27,23 +27,23 @@ In terms of test "test_bgp_filtering_first_as_not_peer_as":
 In terms of test "test_bgp_filtering_next_hop_not_peer_ip":
 - ExaBGP e1 should export a route where the next hop IP is not the peer IP.
 
-In terms of test "test_bgp_filtering_origin_as_filtered_allowed":
-- ExaBGP e1 should export a route where the origin AS is filtered, but allowed.
+In terms of test "test_bgp_filtering_origin_as_filtered_with_match":
+- ExaBGP e1 should export a route where the origin AS is listed in the filter.
 
-In terms of test "test_bgp_filtering_origin_as_filtered":
-- ExaBGP e1 should export a route where the origin AS is filtered and not allowed.
+In terms of test "test_bgp_filtering_origin_as_filtered_without_match":
+- ExaBGP e1 should export a route where the origin AS is not listed in the filter.
 
-In terms of test "test_bgp_filtering_peer_as_filtered_allowed":
-- ExaBGP e1 should export a route where the first AS is filtered, but allowed.
+In terms of test "test_bgp_filtering_peer_as_filtered_with_match":
+- ExaBGP e1 should export a route where the first AS is listed in the filter.
 
-In terms of test "test_bgp_filtering_peer_as_filtered":
-- ExaBGP e1 should export a route where the first AS is filtered and not allowed.
+In terms of test "test_bgp_filtering_peer_as_filtered_without_match":
+- ExaBGP e1 should export a route where the first AS is not listed in the filter.
 
-In terms of test "test_bgp_filtering_prefix_filtered_allowed":
-- ExaBGP e1 should export a route where the prefix is filtered, but allowed.
+In terms of test "test_bgp_filtering_prefix_filtered_with_match":
+- ExaBGP e1 should export a route where the prefix is listed in the filter.
 
-In terms of test "test_bgp_filtering_prefix_filtered":
-- ExaBGP e1 should export a route where the prefix is filtered.
+In terms of test "test_bgp_filtering_prefix_filtered_without_match":
+- ExaBGP e1 should export a route where the prefix is not listed in the filter.
 
 In terms of test "test_bgp_filtering_prefix_too_long":
 - ExaBGP e1 should export a route where the prefix is too long.
