@@ -126,6 +126,7 @@ class BGPPeerPrependItem:  # pylint: disable=too-few-public-methods
     def __init__(self) -> None:
         """Initialize object."""
         self.own_asn = 0
+
     #    self.first_asn = 0
 
 

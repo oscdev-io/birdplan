@@ -929,7 +929,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("# BGP static route prepending")
         self.functions.conf.append("function bgp_prepend_static4(int peeras; int prepend_count)")
         self.functions.conf.append("{")
-        self.functions.conf.append('  if (proto = "static4") then {')
+        self.functions.conf.append('  if (proto = "static4" && net != DEFAULT_ROUTE_V4) then {')
         self.functions.conf.append(
             '    print "[bgp_prepend_static4] Prepending AS-PATH for type STATIC ", prepend_count, "x to ", net;',
             debug=True,
@@ -939,7 +939,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("function bgp_prepend_static6(int peeras; int prepend_count)")
         self.functions.conf.append("{")
-        self.functions.conf.append('  if (proto = "static6") then {')
+        self.functions.conf.append('  if (proto = "static6" && net != DEFAULT_ROUTE_V6) then {')
         self.functions.conf.append(
             '    print "[bgp_prepend_static6] Prepending AS-PATH for type STATIC ", prepend_count, "x to ", net;',
             debug=True,
@@ -950,11 +950,21 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# BGP kernel route prepending")
-        self.functions.conf.append("function bgp_prepend_kernel(int peeras; int prepend_count)")
+        self.functions.conf.append("function bgp_prepend_kernel4(int peeras; int prepend_count)")
         self.functions.conf.append("{")
-        self.functions.conf.append("  if (source = RTS_INHERIT) then {")
+        self.functions.conf.append("  if (source = RTS_INHERIT && net != DEFAULT_ROUTE_V4) then {")
         self.functions.conf.append(
-            '    print "[bgp_prepend_static] Prepending AS-PATH for type KERNEL ", prepend_count, "x to ", net;',
+            '    print "[bgp_prepend_kernel4] Prepending AS-PATH for type KERNEL ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_prepend_kernel6(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (source = RTS_INHERIT && net != DEFAULT_ROUTE_V6) then {")
+        self.functions.conf.append(
+            '    print "[bgp_prepend_kernel6] Prepending AS-PATH for type KERNEL ", prepend_count, "x to ", net;',
             debug=True,
         )
         self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
@@ -964,7 +974,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("# BGP originated route prepending")
         self.functions.conf.append("function bgp_prepend_originated4(int peeras; int prepend_count)")
         self.functions.conf.append("{")
-        self.functions.conf.append('  if (proto = "bgp_originate4") then {')
+        self.functions.conf.append('  if (proto = "bgp_originate4" && net != DEFAULT_ROUTE_V4) then {')
         self.functions.conf.append(
             '    print "[bgp_prepend_originate4] Prepending AS-PATH for type ORIGINATED ", prepend_count, "x to ", net;',
             debug=True,
@@ -974,7 +984,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("function bgp_prepend_originated6(int peeras; int prepend_count)")
         self.functions.conf.append("{")
-        self.functions.conf.append('  if (proto = "bgp_originate6") then {')
+        self.functions.conf.append('  if (proto = "bgp_originate6" && net != DEFAULT_ROUTE_V6) then {')
         self.functions.conf.append(
             '    print "[bgp_prepend_originate6] Prepending AS-PATH for type ORIGINATED ", prepend_count, "x to ", net;',
             debug=True,
@@ -1136,7 +1146,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("# BGP static route large community adding")
         self.functions.conf.append("function bgp_lc_add_static4(lc large_community)")
         self.functions.conf.append("{")
-        self.functions.conf.append('  if (proto = "static4") then {')
+        self.functions.conf.append('  if (proto = "static4" && net != DEFAULT_ROUTE_V4) then {')
         self.functions.conf.append(
             '    print "[bgp_lc_add_static4] Adding large community ", large_community, " for type STATIC to ", net;',
             debug=True,
@@ -1146,7 +1156,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("function bgp_lc_add_static6(lc large_community)")
         self.functions.conf.append("{")
-        self.functions.conf.append('  if (proto = "static6") then {')
+        self.functions.conf.append('  if (proto = "static6" && net != DEFAULT_ROUTE_V6) then {')
         self.functions.conf.append(
             '    print "[bgp_lc_add_static6] Adding large community ", large_community, " for type STATIC to ", net;',
             debug=True,
@@ -1157,11 +1167,21 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# BGP kernel route large community adding")
-        self.functions.conf.append("function bgp_lc_add_kernel(lc large_community)")
+        self.functions.conf.append("function bgp_lc_add_kernel4(lc large_community)")
         self.functions.conf.append("{")
-        self.functions.conf.append("  if (source = RTS_INHERIT) then {")
+        self.functions.conf.append("  if (source = RTS_INHERIT && net != DEFAULT_ROUTE_V4) then {")
         self.functions.conf.append(
-            '    print "[bgp_lc_add_static] Adding large community ", large_community, " for type KERNEL to ", net;',
+            '    print "[bgp_lc_add_kernel4] Adding large community ", large_community, " for type KERNEL to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_lc_add_kernel6(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (source = RTS_INHERIT && net != DEFAULT_ROUTE_V6) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_kernel6] Adding large community ", large_community, " for type KERNEL to ", net;',
             debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(large_community);")
@@ -1171,7 +1191,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("# BGP originated route large community adding")
         self.functions.conf.append("function bgp_lc_add_originated4(lc large_community)")
         self.functions.conf.append("{")
-        self.functions.conf.append('  if (proto = "bgp_originate4") then {')
+        self.functions.conf.append('  if (proto = "bgp_originate4" && net != DEFAULT_ROUTE_V4) then {')
         self.functions.conf.append(
             '    print "[bgp_lc_add_originate4] Adding large community ", large_community, " for type ORIGINATED to ", net;',
             debug=True,
@@ -1181,7 +1201,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("function bgp_lc_add_originated6(lc large_community)")
         self.functions.conf.append("{")
-        self.functions.conf.append('  if (proto = "bgp_originate6") then {')
+        self.functions.conf.append('  if (proto = "bgp_originate6" && net != DEFAULT_ROUTE_V6) then {')
         self.functions.conf.append(
             '    print "[bgp_lc_add_originate6] Adding large community ", large_community, " for type ORIGINATED to ", net;',
             debug=True,

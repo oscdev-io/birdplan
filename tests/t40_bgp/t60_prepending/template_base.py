@@ -116,7 +116,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         )
 
         # Don't continue if we have exceptions that will be raised
-        if hasattr(self, "routers_config_exception"):
+        if getattr(self, "routers_config_exception"):
             return
 
         # Add gateway'd kernel routes

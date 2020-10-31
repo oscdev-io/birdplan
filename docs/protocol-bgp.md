@@ -641,9 +641,9 @@ Route types...
 
 * `default` will match the default route.
 * `connected` will match connected routes.
-* `static` will match static routes.
-* `kernel` will match kernel routes.
-* `originated` will match originated routes.
+* `static` will match static routes. This will not match default routes.
+* `kernel` will match kernel routes. This will not match default routes.
+* `originated` will match originated routes. This will not match default routes.
 
 Internal route types...
 
@@ -764,9 +764,9 @@ Route types...
 
 * `default` will match the default route.
 * `connected` will match connected routes.
-* `static` will match static routes.
-* `kernel` will match kernel routes.
-* `originated` will match originated routes.
+* `static` will match static routes. This will not match default routes.
+* `kernel` will match kernel routes. This will not match default routes.
+* `originated` will match originated routes. This will not match default routes.
 
 Internal route types...
 
