@@ -34,7 +34,6 @@ from .peer_attributes import (
     BGPPeerPrepend,
     BGPPeerRoutePolicyAccept,
     BGPPeerRoutePolicyRedistribute,
-    BGPPeerRoutePolicyRedistributeItem,
 )
 from .typing import BGPPeerConfig
 from ..pipe import ProtocolPipe
