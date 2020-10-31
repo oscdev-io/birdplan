@@ -620,13 +620,12 @@ bgp:
 
 ## outgoing_large_communities
 
-Large communites to add to our outbound prefixes.
+**The first method we can use to specify outgoing large communities is just with a list:**
 
-You can specify the large communities as a list as per below...
+This will result in the large communities being added for all outbound prefixes.
+
+An example of this is below...
 ```yaml
-...
-
-bgp:
   peers:
     peer1:
       asn: 65000
@@ -634,7 +633,37 @@ bgp:
       outgoing_large_communities:
         - 65000:5000:1
         - 65000:5000:2
-...
+```
+
+**The second method is we can use a dict to do fine grained outgoing large communities based on route type:**
+
+Route types...
+
+* `default` will match the default route.
+* `connected` will match connected routes.
+* `static` will match static routes.
+* `kernel` will match kernel routes.
+* `originated` will match originated routes.
+
+Internal route types...
+
+* `bgp` will match all BGP routes.
+* `bgp_own` will match BGP routes that originated from our ASN.
+* `bgp_customer` will match our customer routes.
+* `bgp_peering` will match our peers routes.
+* `bgp_transit` will match our transit providers routes.
+
+An example of this is below...
+```yaml
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      outgoing_large_communities:
+        static:
+          - 65000:5000:1
+        bgp_customer:
+          - 65000:5000:2
 ```
 
 

@@ -60,9 +60,7 @@
 
 [Incoming Large Communities](t40_bgp/t54_incoming_large_communities/README.md)
 
-[Outgoing Large Communities](t40_bgp/t55_outgoing_large_communities/README.md)
-
-[Redistribute Large Communities](t40_bgp/t56_redistribute_large_communities/README.md)
+[Outgoing Large Communities](t40_bgp/t56_outgoing_large_communities/README.md)
 
 [Large Community Functions (inbound)](t40_bgp/t58_large_community_functions_inbound/README.md)
 

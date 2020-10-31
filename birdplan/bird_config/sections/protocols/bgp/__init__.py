@@ -1086,6 +1086,178 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
+        # BGP large community adding
+        self.functions.conf.append("# BGP default route large community adding")
+        self.functions.conf.append("function bgp_lc_add_default4(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (net = DEFAULT_ROUTE_V4) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_default4] Adding large community ", large_community, " for type DEFAULT to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_lc_add_default6(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (net = DEFAULT_ROUTE_V6) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_default6] Adding large community ", large_community, " for type DEFAULT to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP connected route large community adding")
+        self.functions.conf.append("function bgp_lc_add_connected4(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "direct4_bgp") then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_connected4] Adding large community ", large_community, " for type CONNECTED to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_lc_add_connected6(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "direct6_bgp") then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_connected6] Adding large community ", large_community, " for type CONNECTED to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP static route large community adding")
+        self.functions.conf.append("function bgp_lc_add_static4(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "static4") then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_static4] Adding large community ", large_community, " for type STATIC to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_lc_add_static6(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "static6") then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_static6] Adding large community ", large_community, " for type STATIC to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP kernel route large community adding")
+        self.functions.conf.append("function bgp_lc_add_kernel(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (source = RTS_INHERIT) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_static] Adding large community ", large_community, " for type KERNEL to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+
+        self.functions.conf.append("# BGP originated route large community adding")
+        self.functions.conf.append("function bgp_lc_add_originated4(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "bgp_originate4") then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_originate4] Adding large community ", large_community, " for type ORIGINATED to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_lc_add_originated6(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "bgp_originate6") then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_originate6] Adding large community ", large_community, " for type ORIGINATED to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP large community adding")
+        self.functions.conf.append("function bgp_lc_add_bgp(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append(
+            '  print "[bgp_lc_add_bgp] Adding large community ", large_community, " for type BGP to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("  bgp_large_community.add(large_community);")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP own route large community adding")
+        self.functions.conf.append("function bgp_lc_add_bgp_own(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (BGP_LC_RELATION_OWN ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_bgp_own] Adding large community ", large_community, " for type BGP_OWN to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP customer route large community adding")
+        self.functions.conf.append("function bgp_lc_add_bgp_customer(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (BGP_LC_RELATION_CUSTOMER ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_bgp_customer] Adding large community ", large_community, " for type BGP_CUSTOMER to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP peering route large community adding")
+        self.functions.conf.append("function bgp_lc_add_bgp_peering(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (")
+        self.functions.conf.append("    BGP_LC_RELATION_PEER ~ bgp_large_community")
+        self.functions.conf.append("    || BGP_LC_RELATION_ROUTESERVER ~ bgp_large_community")
+        self.functions.conf.append("  ) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_bgp_peer] Adding large community ", large_community, " for type BGP_PEER to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP transit route large community adding")
+        self.functions.conf.append("function bgp_lc_add_bgp_transit(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (BGP_LC_RELATION_TRANSIT ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_bgp_transit] Adding large community ", large_community, " for type BGP_TRANSIT to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        # Local pref manipulation
         self.functions.conf.append("# BGP import local_pref manipulation")
         self.functions.conf.append("function bgp_import_localpref() {")
         self.functions.conf.append("  # If we are reducing local_pref by three")

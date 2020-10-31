@@ -30,6 +30,60 @@ BGPPeerPeeringDB = Dict[str, Any]
 BGPPeerRoutePolicyRedistributeItem = Union[bool, Dict[str, Any]]
 
 
+class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
+    """
+    BGP peer outgoing large communities.
+
+    Attributes
+    ----------
+    connected: List[str]
+        Connected route outgoing large communities.
+    default: List[str]
+        Default route outgoing large communities.
+    kernel: List[str]
+        Kernel route outgoing large communities.
+    originated: List[str]
+        Originated route outgoing large communities.
+    static: List[str]
+        Static route outgoing large communities.
+    bgp: List[str]
+        BGP route outgoing large communities.
+    bgp_own: List[str]
+        BGP own route outgoing large communities.
+    bgp_customer: List[str]
+        BGP customer route outgoing large communities.
+    bgp_peering: List[str]
+        BGP peering route outgoing large communities.
+    bgp_transit: List[str]
+        BGP transit route outgoing large communities.
+
+    """
+
+    connected: List[str]
+    default: List[str]
+    kernel: List[str]
+    originated: List[str]
+    static: List[str]
+    bgp: List[str]
+    bgp_own: List[str]
+    bgp_customer: List[str]
+    bgp_peering: List[str]
+    bgp_transit: List[str]
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        self.connected = []
+        self.default = []
+        self.kernel = []
+        self.originated = []
+        self.static = []
+        self.bgp = []
+        self.bgp_own = []
+        self.bgp_customer = []
+        self.bgp_peering = []
+        self.bgp_transit = []
+
+
 class BGPPeerLargeCommunities:  # pylint: disable=too-few-public-methods
     """
     BGP peer large communities.
@@ -38,19 +92,19 @@ class BGPPeerLargeCommunities:  # pylint: disable=too-few-public-methods
     ----------
     incoming : List[str]
         List of large communities to add to incoming prefixes.
-    outgoing : List[str]
+    outgoing : BGPPeerLargeCommunitiesOutgoing
         List of large communities to add to outgoing prefixes.
 
     """
 
     incoming: List[str]
 
-    outgoing: List[str]
+    outgoing: BGPPeerLargeCommunitiesOutgoing
 
     def __init__(self) -> None:
         """Initialize object."""
         self.incoming = []
-        self.outgoing = []
+        self.outgoing = BGPPeerLargeCommunitiesOutgoing()
 
 
 class BGPPeerPrependItem:  # pylint: disable=too-few-public-methods
