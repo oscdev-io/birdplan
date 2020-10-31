@@ -567,9 +567,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def _peer_to_bgp_import_filter(self, ipv: str) -> None:  # pylint: disable=too-many-branches,too-many-statements
         """Import filter FROM the main BGP table to the BGP peer table."""
 
+        # Set our filter name
+        fn = self.filter_name_import_bgp((ipv))
+
         # Configure import filter from our main BGP table
         self.conf.add("# Import filter FROM the main BGP table to the BGP peer table")
-        self.conf.add(f"filter {self.filter_name_import_bgp((ipv))}")
+        self.conf.add(f"filter {fn}")
         self.conf.add("bool accept_route;")
         self.conf.add("bool bypass_bgp_redistribution_checks;")
         self.conf.add("{")
@@ -593,7 +596,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  # Check for large community to prevent export to customers")
             self.conf.add("  if (BGP_LC_EXPORT_NOCUSTOMER ~ bgp_large_community) then {")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOCUSTOMER";',
+                f'    print "[{fn}] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOCUSTOMER";',
                 debug=True,
             )
             self.conf.add("    reject;")
@@ -603,7 +606,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  # Check for large community to prevent export to {self.peer_type}")
             self.conf.add("  if (BGP_LC_EXPORT_NOPEER ~ bgp_large_community) then {")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOPEER";',
+                f'    print "[{fn}] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOPEER";',
                 debug=True,
             )
             self.conf.add("    reject;")
@@ -613,7 +616,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  # Check for large community to prevent export to transit")
             self.conf.add("  if (BGP_LC_EXPORT_NOTRANSIT ~ bgp_large_community) then {")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOTRANSIT";',
+                f'    print "[{fn}] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOTRANSIT";',
                 debug=True,
             )
             self.conf.add("    reject;")
@@ -628,7 +631,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     f"  if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT_LOCATION, {self.location.iso3166}) ~ bgp_large_community) then {{"
                 )
                 self.conf.add(
-                    f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on '
+                    f'    print "[{fn}] Rejecting ", net, " due to match on '
                     f'BGP_LC_FUNCTION_NOEXPORT_LOCATION location {self.location.iso3166}";',
                     debug=True,
                 )
@@ -640,8 +643,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  # Redistribute connected routes")
             self.conf.add(f'  if (proto = "direct{ipv}_bgp") then {{')
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on direct{ipv}_bgp '
-                '(redistribute connected)";',
+                f'    print "[{fn}] Accepting ", net, " due to match on direct{ipv}_bgp (redistribute connected)";',
                 debug=True,
             )
             self.conf.add("    accept_route = true;")
@@ -650,8 +652,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  # Do not redistribute connected routes")
             self.conf.add(f'  if (proto = "direct{ipv}_bgp") then {{')
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on direct{ipv}_bgp '
-                '(no redistribute connected)";',
+                f'    print "[{fn}] Rejecting ", net, " due to match on direct{ipv}_bgp (no redistribute connected)";',
                 debug=True,
             )
             self.conf.add("    reject;")
@@ -661,8 +662,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  # Redistribute static routes")
             self.conf.add(f'  if (proto = "static{ipv}") then {{')
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on proto static{ipv} '
-                '(redistribute static)";',
+                f'    print "[{fn}] Accepting ", net, " due to match on proto static{ipv} (redistribute static)";',
                 debug=True,
             )
             self.conf.add("    accept_route = true;")
@@ -671,8 +671,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  # Do not redistribute static routes")
             self.conf.add(f'  if (proto = "static{ipv}") then {{')
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on proto static{ipv} '
-                '(no redistribute static)";',
+                f'    print "[{fn}] Rejecting ", net, " due to match on proto static{ipv} (no redistribute static)";',
                 debug=True,
             )
             self.conf.add("    reject;")
@@ -682,8 +681,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  # Redistribute kernel routes")
             self.conf.add("  if (source = RTS_INHERIT) then {")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on RTS_INHERIT '
-                '(redistribute kernel)";',
+                f'    print "[{fn}] Accepting ", net, " due to match on RTS_INHERIT (redistribute kernel)";',
                 debug=True,
             )
             self.conf.add("    accept_route = true;")
@@ -692,8 +690,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  # Do not redistribute kernel routes")
             self.conf.add("  if (source = RTS_INHERIT) then {")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on RTS_INHERIT '
-                '(no redistribute kernel)";',
+                f'    print "[{fn}] Rejecting ", net, " due to match on RTS_INHERIT (no redistribute kernel)";',
                 debug=True,
             )
             self.conf.add("    reject;")
@@ -703,8 +700,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  # Redistribute originated routes")
             self.conf.add(f'  if (proto = "bgp_originate{ipv}") then {{')
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on proto bgp_originate{ipv}'
-                ' (redistribute originated)";',
+                f'    print "[{fn}] Accepting ", net, " due to match on proto bgp_originate{ipv} (redistribute originated)";',
                 debug=True,
             )
             self.conf.add("    accept_route = true;")
@@ -713,8 +709,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  # Do not redistribute originated routes")
             self.conf.add(f'  if (proto = "bgp_originate{ipv}") then {{')
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " due to match on proto bgp_originate{ipv}'
-                ' (no redistribute originated)";',
+                f'    print "[{fn}] Rejecting ", net, " due to match on proto bgp_originate{ipv} (no redistribute originated)";',
                 debug=True,
             )
             self.conf.add("    reject;")
@@ -731,7 +726,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("  # Accept the default route as we're redistributing, but only if, its been accepted above")
             self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv} && accept_route) then {{")
             self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting default route ", net, " due to match on '
+                f'    print "[{fn}] Accepting default route ", net, " due to match on '
                 ' accept_route=true (redistribute default)";',
                 debug=True,
             )
@@ -740,7 +735,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         else:
             self.conf.add("  # Reject the default route as we are not redistributing it")
             self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self.conf.add(f'    print "[{self.filter_name_import_bgp((ipv))}] Rejecting default route ", net, " export";')
+            self.conf.add(f'    print "[{fn}] Rejecting default route ", net, " export";')
             self.conf.add("    reject;")
         self.conf.add("  }")
 
@@ -762,14 +757,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("    if (BGP_LC_RELATION_OWN ~ bgp_large_community) then {")
             self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
             self.conf.add(
-                f'        print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, '
-                '" with match on BGP_LC_RELATION_OWN";',
+                f'        print "[{fn}] Cannot export ", net, " with match on BGP_LC_RELATION_OWN";',
                 debug=True,
             )
             self.conf.add("        reject;")
             self.conf.add("      }")
             self.conf.add(
-                f'      print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on BGP_LC_RELATION_OWN";',
+                f'      print "[{fn}] Accepting ", net, " due to match on BGP_LC_RELATION_OWN";',
                 debug=True,
             )
             self.conf.add("      accept_route = true;")
@@ -780,15 +774,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("    if (BGP_LC_RELATION_CUSTOMER ~ bgp_large_community) then {")
             self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
             self.conf.add(
-                f'        print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on '
-                'BGP_LC_RELATION_CUSTOMER";',
+                f'        print "[{fn}] Cannot export ", net, " with match on BGP_LC_RELATION_CUSTOMER";',
                 debug=True,
             )
             self.conf.add("        reject;")
             self.conf.add("      }")
             self.conf.add(
-                f'      print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on '
-                'BGP_LC_RELATION_CUSTOMER";',
+                f'      print "[{fn}] Accepting ", net, " due to match on BGP_LC_RELATION_CUSTOMER";',
                 debug=True,
             )
             self.conf.add("      accept_route = true;")
@@ -799,13 +791,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("    if (BGP_LC_RELATION_PEER ~ bgp_large_community) then {")
             self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
             self.conf.add(
-                f'      print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on BGP_LC_RELATION_PEER";',
+                f'      print "[{fn}] Cannot export ", net, " with match on BGP_LC_RELATION_PEER";',
                 debug=True,
             )
             self.conf.add("        reject;")
             self.conf.add("      }")
             self.conf.add(
-                f'      print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on BGP_LC_RELATION_PEER";',
+                f'      print "[{fn}] Accepting ", net, " due to match on BGP_LC_RELATION_PEER";',
                 debug=True,
             )
             self.conf.add("      accept_route = true;")
@@ -813,15 +805,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("    if (BGP_LC_RELATION_ROUTESERVER ~ bgp_large_community) then {")
             self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
             self.conf.add(
-                f'        print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on '
-                'BGP_LC_RELATION_ROUTESERVER";',
+                f'        print "[{fn}] Cannot export ", net, " with match on BGP_LC_RELATION_ROUTESERVER";',
                 debug=True,
             )
             self.conf.add("        reject;")
             self.conf.add("      }")
             self.conf.add(
-                f'      print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on '
-                'BGP_LC_RELATION_ROUTESERVER";',
+                f'      print "[{fn}] Accepting ", net, " due to match on BGP_LC_RELATION_ROUTESERVER";',
                 debug=True,
             )
             self.conf.add("      accept_route = true;")
@@ -832,15 +822,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("    if (BGP_LC_RELATION_TRANSIT ~ bgp_large_community) then {")
             self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
             self.conf.add(
-                f'        print "[{self.filter_name_import_bgp((ipv))}] Cannot export ", net, " with match on '
-                'BGP_LC_RELATION_TRANSIT";',
+                f'        print "[{fn}] Cannot export ", net, " with match on BGP_LC_RELATION_TRANSIT";',
                 debug=True,
             )
             self.conf.add("        reject;")
             self.conf.add("      }")
             self.conf.add(
-                f'      print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " due to match on '
-                'BGP_LC_RELATION_TRANSIT";',
+                f'      print "[{fn}] Accepting ", net, " due to match on BGP_LC_RELATION_TRANSIT";',
                 debug=True,
             )
             self.conf.add("      accept_route = true;")
@@ -914,19 +902,17 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.conf.add(f"    bgp_prepend_location({self.location.iso3166});")
         # If we have graceful_shutdown set, add the community
         if self.graceful_shutdown:
-            self.conf.add(
-                f'    print "[{self.filter_name_import_bgp((ipv))}] Adding GRACEFUL_SHUTDOWN community to ", net;', debug=True
-            )
+            self.conf.add(f'    print "[{fn}] Adding GRACEFUL_SHUTDOWN community to ", net;', debug=True)
             self.conf.add("    bgp_community.add(BGP_COMMUNITY_GRACEFUL_SHUTDOWN);")
         # Finally accept
         self.conf.add("    # Finally accept")
-        self.conf.add(f'    print "[{self.filter_name_import_bgp((ipv))}] Accepting ", net, " to peer";', debug=True)
+        self.conf.add(f'    print "[{fn}] Accepting ", net, " to peer";', debug=True)
         self.conf.add("    accept;")
         self.conf.add("  }")
 
         # By default reject all routes
         self.conf.add("  # Reject by default")
-        self.conf.add(f'  print "[{self.filter_name_import_bgp((ipv))}] Rejecting ", net, " to peer (fallthrough)";', debug=True)
+        self.conf.add(f'  print "[{fn}] Rejecting ", net, " to peer (fallthrough)";', debug=True)
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
