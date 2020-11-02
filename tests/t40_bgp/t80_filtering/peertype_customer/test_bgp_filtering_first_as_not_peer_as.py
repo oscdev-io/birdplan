@@ -31,5 +31,5 @@ class Test(PeerTypeConfig, Template):
     # We need to change the ASN for this test
     r1_peer_config = """
       filter:
-        asns: [65002]
+        origin_asns: [65002]
 """

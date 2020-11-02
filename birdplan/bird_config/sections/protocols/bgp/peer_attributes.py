@@ -30,6 +30,60 @@ BGPPeerPeeringDB = Dict[str, Any]
 BGPPeerRoutePolicyRedistributeItem = Union[bool, Dict[str, Any]]
 
 
+class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
+    """
+    BGP peer outgoing large communities.
+
+    Attributes
+    ----------
+    connected: List[str]
+        Connected route outgoing large communities.
+    default: List[str]
+        Default route outgoing large communities.
+    kernel: List[str]
+        Kernel route outgoing large communities.
+    originated: List[str]
+        Originated route outgoing large communities.
+    static: List[str]
+        Static route outgoing large communities.
+    bgp: List[str]
+        BGP route outgoing large communities.
+    bgp_own: List[str]
+        BGP own route outgoing large communities.
+    bgp_customer: List[str]
+        BGP customer route outgoing large communities.
+    bgp_peering: List[str]
+        BGP peering route outgoing large communities.
+    bgp_transit: List[str]
+        BGP transit route outgoing large communities.
+
+    """
+
+    connected: List[str]
+    default: List[str]
+    kernel: List[str]
+    originated: List[str]
+    static: List[str]
+    bgp: List[str]
+    bgp_own: List[str]
+    bgp_customer: List[str]
+    bgp_peering: List[str]
+    bgp_transit: List[str]
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        self.connected = []
+        self.default = []
+        self.kernel = []
+        self.originated = []
+        self.static = []
+        self.bgp = []
+        self.bgp_own = []
+        self.bgp_customer = []
+        self.bgp_peering = []
+        self.bgp_transit = []
+
+
 class BGPPeerLargeCommunities:  # pylint: disable=too-few-public-methods
     """
     BGP peer large communities.
@@ -38,19 +92,96 @@ class BGPPeerLargeCommunities:  # pylint: disable=too-few-public-methods
     ----------
     incoming : List[str]
         List of large communities to add to incoming prefixes.
-    outgoing : List[str]
+    outgoing : BGPPeerLargeCommunitiesOutgoing
         List of large communities to add to outgoing prefixes.
 
     """
 
     incoming: List[str]
 
-    outgoing: List[str]
+    outgoing: BGPPeerLargeCommunitiesOutgoing
 
     def __init__(self) -> None:
         """Initialize object."""
         self.incoming = []
-        self.outgoing = []
+        self.outgoing = BGPPeerLargeCommunitiesOutgoing()
+
+
+class BGPPeerPrependItem:  # pylint: disable=too-few-public-methods
+    """
+    BGP peer prepending item.
+
+    Attributes
+    ----------
+    own_asn: int
+        Number of times to prepend our own ASN.
+    first_asn: int
+        Number of times to prepend the first ASN.
+
+    """
+
+    own_asn: int
+    # first_asn: int
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        self.own_asn = 0
+
+    #    self.first_asn = 0
+
+
+class BGPPeerPrepend:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
+    """
+    BGP peer prepending.
+
+    Attributes
+    ----------
+    connected: BGPPeerPrependItem
+        Connected route prepending options.
+    default: BGPPeerPrependItem
+        Default route prepending options.
+    kernel: BGPPeerPrependItem
+        Kernel route prepending options.
+    originated: BGPPeerPrependItem
+        Originated route prepending options.
+    static: BGPPeerPrependItem
+        Static route prepending options.
+    bgp: BGPPeerPrependItem
+        BGP route prepending options.
+    bgp_own: BGPPeerPrependItem
+        BGP own route prepending options.
+    bgp_customer: BGPPeerPrependItem
+        BGP customer route prepending options.
+    bgp_peering: BGPPeerPrependItem
+        BGP peering route prepending options.
+    bgp_transit: BGPPeerPrependItem
+        BGP transit route prepending options.
+
+    """
+
+    connected: BGPPeerPrependItem
+    default: BGPPeerPrependItem
+    kernel: BGPPeerPrependItem
+    originated: BGPPeerPrependItem
+    static: BGPPeerPrependItem
+    bgp: BGPPeerPrependItem
+    bgp_own: BGPPeerPrependItem
+    bgp_customer: BGPPeerPrependItem
+    bgp_peering: BGPPeerPrependItem
+    bgp_transit: BGPPeerPrependItem
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        self.connected = BGPPeerPrependItem()
+        self.default = BGPPeerPrependItem()
+        self.kernel = BGPPeerPrependItem()
+        self.originated = BGPPeerPrependItem()
+        self.static = BGPPeerPrependItem()
+        self.bgp = BGPPeerPrependItem()
+        self.bgp_own = BGPPeerPrependItem()
+        self.bgp_customer = BGPPeerPrependItem()
+        self.bgp_peering = BGPPeerPrependItem()
+        self.bgp_transit = BGPPeerPrependItem()
 
 
 class BGPPeerRoutePolicyAccept:  # pylint: disable=too-few-public-methods
@@ -108,21 +239,25 @@ class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
     ----------
     prefixes : BGPPeerFilterItem
         List of prefixes to filter on.
-    asns : BGPPeerFilterItem
-        List of ASNs to filter on.
+    origin_asns : BGPPeerFilterItem
+        List of origin ASNs to filter on.
+    peer_asns : BGPPeerFilterItem
+        List of peer ASNs to filter on.
     as_sets : BGPPeerFilterItem
         List of AS-SET's to filter on.
 
     """
 
     prefixes: BGPPeerFilterItem
-    asns: BGPPeerFilterItem
+    origin_asns: BGPPeerFilterItem
+    peer_asns: BGPPeerFilterItem
     as_sets: BGPPeerFilterItem
 
     def __init__(self) -> None:
         """Initialize object."""
         self.prefixes = []
-        self.asns = []
+        self.origin_asns = []
+        self.peer_asns = []
         self.as_sets = []
 
 
@@ -156,7 +291,7 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,
     ----------
     connected : BGPPeerRoutePolicyRedistributeItem
         Redistribute connected routes to the peer BGP table. Defaults to `False`.
-    default : Dict[str, Bool]
+    default : BGPPeerRoutePolicyRedistributeItem
         Redistribute the default route to the peer BGP table. Defaults to `False`.
     originated : BGPPeerRoutePolicyRedistributeItem
         Redistribute originated routes to the peer BGP table. Defaults to `False`.
@@ -178,7 +313,7 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,
     """
 
     connected: BGPPeerRoutePolicyRedistributeItem
-    default: bool
+    default: BGPPeerRoutePolicyRedistributeItem
     kernel: BGPPeerRoutePolicyRedistributeItem
     originated: BGPPeerRoutePolicyRedistributeItem
     static: BGPPeerRoutePolicyRedistributeItem
@@ -240,6 +375,10 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         Cost of this peer, this is the number minused from the local_pref.
     graceful_shutdown : bool
         Set peer in GRACEFUL_SHUTDOWN mode if set to True.
+    large_communities: BGPPeerLargeCommunities
+        Incoming and outgoing large communities.
+    prepend:
+        AS-PATH prepending.
     passive : bool
         Indicate if this is a passive peer or not.
     quarantined : bool
@@ -261,7 +400,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     _name: Optional[str]
     _description: Optional[str]
-    _location: BGPPeerLocation
+    location: BGPPeerLocation
 
     _peer_type: Optional[str]
     _asn: Optional[int]
@@ -283,6 +422,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     large_communities: BGPPeerLargeCommunities
 
+    prepend: BGPPeerPrepend
+
     # Default to disabling passive mode
     passive: bool = False
 
@@ -303,12 +444,14 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
         self._name = None
         self._description = None
-        self._location = BGPPeerLocation()
+        self.location = BGPPeerLocation()
 
         self._peer_type = None
         self._asn = None
 
         self.large_communities = BGPPeerLargeCommunities()
+
+        self.prepend = BGPPeerPrepend()
 
         # Route policies
         self.route_policy_accept = BGPPeerRoutePolicyAccept()
@@ -355,11 +498,6 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     def description(self, description: str) -> None:
         """Set our description."""
         self._description = description
-
-    @property
-    def location(self) -> BGPPeerLocation:
-        """Return our location information."""
-        return self._location
 
     @property
     def peer_type(self) -> str:

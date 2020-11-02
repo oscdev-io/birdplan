@@ -29,12 +29,12 @@ class PeerTypeConfig:
     r1_peer_config = """
       passive: False
       filter:
-        asns: [65001]
+        origin_asns: [65001]
 """
 
     r2_peer_type = "customer"
     r2_peer_config = """
       passive: False
       filter:
-        asns: [65000]
+        origin_asns: [65000]
 """

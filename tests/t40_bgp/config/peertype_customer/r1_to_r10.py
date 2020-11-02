@@ -29,6 +29,6 @@ class PeerTypeConfig:
 
     r1_peer_config = """
       filter:
-        asns:
+        origin_asns:
           - 65100
 """

@@ -47,7 +47,9 @@ class BirdPlanCommandLine:
         self._argparser = argparse.ArgumentParser(add_help=False)
         self._birdplan = BirdPlan()
 
-    def run(self, raw_args: Optional[List[str]] = None) -> Any:  # pylint: disable=too-many-branches
+    def run(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
+        self, raw_args: Optional[List[str]] = None
+    ) -> Any:
         """Run BirdPlan from command line."""
 
         # Add main commandline arguments
@@ -127,16 +129,61 @@ class BirdPlanCommandLine:
             help=argparse.SUPPRESS,
         )
 
+        # CMD: bgp quarantine
+        parser_bgp_quarantine = bgp_subparsers.add_parser("quarantine", help="BGP quarantine commands")
+        parser_bgp_quarantine.add_argument(
+            "--action",
+            action="store_const",
+            const="bgp_quarantine",
+            default="bgp_quarantine",
+            help=argparse.SUPPRESS,
+        )
+        bgp_quarantine_subparsers = parser_bgp_quarantine.add_subparsers()
+
+        # CMD: bgp quarantine add
+        parser_bgp_quarantine_add = bgp_quarantine_subparsers.add_parser("add", help="Add peer(s) to BGP quarantine list")
+        parser_bgp_quarantine_add.add_argument(
+            "--action",
+            action="store_const",
+            const="bgp_quarantine_add",
+            default="bgp_quarantine_add",
+            help=argparse.SUPPRESS,
+        )
+        self._add_bgp_quarantine_peers_argument(parser_bgp_quarantine_add)
+
+        # CMD: bgp quarantine remove
+        parser_bgp_quarantine_remove = bgp_quarantine_subparsers.add_parser(
+            "remove", help="Remove peer(s) from BGP quarantine list"
+        )
+        parser_bgp_quarantine_remove.add_argument(
+            "--action",
+            action="store_const",
+            const="bgp_quarantine_remove",
+            default="bgp_quarantine_remove",
+            help=argparse.SUPPRESS,
+        )
+        self._add_bgp_quarantine_peers_argument(parser_bgp_quarantine_remove)
+
+        # CMD: bgp quarantine list
+        parser_bgp_quarantine_list = bgp_quarantine_subparsers.add_parser("list", help="List BGP qurantined peers")
+        parser_bgp_quarantine_list.add_argument(
+            "--action",
+            action="store_const",
+            const="bgp_quarantine_list",
+            default="bgp_quarantine_list",
+            help=argparse.SUPPRESS,
+        )
+
         # Parse args
         self._args = self.argparser.parse_args(raw_args)
 
         # Setup logging
-        if __name__ == "main":
+        if __name__ == "__main__":
             self._setup_logging()
 
         # Make sure we have an action
         if "action" not in self.args:
-            if __name__ == "main":
+            if __name__ == "__main__":
                 print("ERROR: No action specified!")
                 self.argparser.print_help()
                 sys.exit(1)
@@ -147,13 +194,15 @@ class BirdPlanCommandLine:
             return self.configure()
 
         if self.args.action == "bgp":
-            if __name__ == "main":
+            if __name__ == "__main__":
                 parser_bgp.print_help()
                 sys.exit(1)
             else:
                 raise BirdPlanError("No options specified to 'bgp' action")
+
+        # Graceful shutdown
         elif self.args.action == "bgp_graceful_shutdown":
-            if __name__ == "main":
+            if __name__ == "__main__":
                 parser_bgp_graceful_shutdown.print_help()
                 sys.exit(1)
             else:
@@ -164,6 +213,22 @@ class BirdPlanCommandLine:
             self.bgp_graceful_shutdown_remove(parser_bgp_graceful_shutdown_remove)
         elif self.args.action == "bgp_graceful_shutdown_list":
             return self.bgp_graceful_shutdown_list()
+
+        # Quarantine
+        elif self.args.action == "bgp_quarantine":
+            if __name__ == "__main__":
+                parser_bgp_quarantine.print_help()
+                sys.exit(1)
+            else:
+                raise BirdPlanError("No options specified to 'bgp quarantine' action")
+        elif self.args.action == "bgp_quarantine_add":
+            self.bgp_quarantine_add(parser_bgp_quarantine_add)
+        elif self.args.action == "bgp_quarantine_remove":
+            self.bgp_quarantine_remove(parser_bgp_quarantine_remove)
+        elif self.args.action == "bgp_quarantine_list":
+            return self.bgp_quarantine_list()
+
+        return None
 
     def configure(self) -> bool:
         """Configure BIRD."""
@@ -185,7 +250,7 @@ class BirdPlanCommandLine:
         # Grab peer list
         peer_list = self.birdplan.bgp_graceful_shutdown_peer_list()
 
-        if __name__ == "main":
+        if __name__ == "__main__":
             print("Peers in graceful shutdown:")
             for peer in peer_list:
                 print(f"  {peer}")
@@ -200,7 +265,7 @@ class BirdPlanCommandLine:
 
         # Make sure we have peers specified
         if not self.args.peers:
-            if __name__ == "main":
+            if __name__ == "__main__":
                 print("ERROR: No peer(s) specified to add")
                 arg_group.print_help()
                 sys.exit(1)
@@ -217,7 +282,7 @@ class BirdPlanCommandLine:
                 print(f"BGP peer '{peer}' already added to graceful shutdown list")
                 continue
             # Try add peer
-            if __name__ == "main":
+            if __name__ == "__main__":
                 try:
                     self.birdplan.bgp_graceful_shutdown_add_peer(peer)
                 except BirdPlanError as err:
@@ -235,7 +300,7 @@ class BirdPlanCommandLine:
 
         # Make sure we have peers specified
         if not self.args.peers:
-            if __name__ == "main":
+            if __name__ == "__main__":
                 print("ERROR: No peer(s) specified to add")
                 arg_group.print_help()
                 sys.exit(1)
@@ -252,7 +317,7 @@ class BirdPlanCommandLine:
                 print(f"BGP peer '{peer}' not in graceful shutdown list")
                 continue
             # Try add peer
-            if __name__ == "main":
+            if __name__ == "__main__":
                 try:
                     self.birdplan.bgp_graceful_shutdown_remove_peer(peer)
                 except BirdPlanError as err:
@@ -265,10 +330,99 @@ class BirdPlanCommandLine:
         # Commit BirdPlan our state
         self._birdplan_commit_state()
 
+    def bgp_quarantine_list(self) -> List[str]:
+        """Gracefully shutdown peers."""
+
+        # Load BirdPlan configuration
+        self._birdplan_load_config()
+
+        # Grab peer list
+        peer_list = self.birdplan.bgp_quarantine_peer_list()
+
+        if __name__ == "__main__":
+            print("Peers in quarantine:")
+            for peer in peer_list:
+                print(f"  {peer}")
+            if not peer_list:
+                print("--none--")
+            print(f"Total: {len(peer_list)}")
+
+        return peer_list
+
+    def bgp_quarantine_add(self, arg_group: argparse.ArgumentParser) -> None:
+        """Add peer(s) to the BirdPlan BGP quarantine list."""
+
+        # Make sure we have peers specified
+        if not self.args.peers:
+            if __name__ == "__main__":
+                print("ERROR: No peer(s) specified to add")
+                arg_group.print_help()
+                sys.exit(1)
+            else:
+                raise BirdPlanError("No peer(s) specified to add")
+
+        # Load BirdPlan configuration
+        self._birdplan_load_config()
+
+        peer_list = self.birdplan.bgp_quarantine_peer_list()
+        for peer in self.args.peers:
+            # Check if the peer is in the list
+            if peer in peer_list:
+                print(f"BGP peer '{peer}' already added to qurantine list")
+                continue
+            # Try add peer
+            if __name__ == "__main__":
+                try:
+                    self.birdplan.bgp_quarantine_add_peer(peer)
+                except BirdPlanError as err:
+                    print(f"ERROR: {err}")
+                    sys.exit(1)
+            else:
+                self.birdplan.bgp_quarantine_add_peer(peer)
+            print(f"BGP peer '{peer}' added to quarantine list")
+
+        # Commit BirdPlan our state
+        self._birdplan_commit_state()
+
+    def bgp_quarantine_remove(self, arg_group: argparse.ArgumentParser) -> None:
+        """Remove peer(s) from the BirdPlan BGP quarantine list."""
+
+        # Make sure we have peers specified
+        if not self.args.peers:
+            if __name__ == "__main__":
+                print("ERROR: No peer(s) specified to add")
+                arg_group.print_help()
+                sys.exit(1)
+            else:
+                raise BirdPlanError("No peer(s) specified to add")
+
+        # Load BirdPlan configuration
+        self._birdplan_load_config()
+
+        peer_list = self.birdplan.bgp_quarantine_peer_list()
+        for peer in self.args.peers:
+            # Check if the peer is not in the list
+            if peer not in peer_list:
+                print(f"BGP peer '{peer}' not in quarantine list")
+                continue
+            # Try add peer
+            if __name__ == "__main__":
+                try:
+                    self.birdplan.bgp_quarantine_remove_peer(peer)
+                except BirdPlanError as err:
+                    print(f"ERROR: {err}")
+                    sys.exit(1)
+            else:
+                self.birdplan.bgp_quarantine_remove_peer(peer)
+            print(f"BGP peer '{peer}' removed from quarantine list")
+
+        # Commit BirdPlan our state
+        self._birdplan_commit_state()
+
     def _birdplan_load_config(self) -> None:
         """Load BirdPlan configuration."""
         # Try load configuration
-        if __name__ == "main":
+        if __name__ == "__main__":
             try:
                 self.birdplan.load(plan_file=self.args.birdplan_file[0], state_file=self.args.birdplan_state_file[0])
             except BirdPlanError as err:
@@ -280,7 +434,7 @@ class BirdPlanCommandLine:
     def _birdplan_configure(self) -> None:
         """Configure BirdPlan."""
         # Try load configuration
-        if __name__ == "main":
+        if __name__ == "__main__":
             try:
                 self.birdplan.configure(self.args.bird_config_file[0])
             except BirdPlanError as err:
@@ -292,7 +446,7 @@ class BirdPlanCommandLine:
     def _birdplan_commit_state(self) -> None:
         """Commit BirdPlan state."""
         # Try commit our state
-        if __name__ == "main":
+        if __name__ == "__main__":
             try:
                 self.birdplan.commit_state()
             except BirdPlanError as err:
@@ -307,7 +461,7 @@ class BirdPlanCommandLine:
     def _add_main_arguments(self) -> None:
         """Add main commandline arguments."""
 
-        if __name__ == "main":
+        if __name__ == "__main__":
             print(f"BirdPlan v{__VERSION__} - Copyright © 2019-2020, AllWorldIT.\n", file=sys.stderr)
 
         optional_group = self.argparser.add_argument_group("Optional arguments")
@@ -340,13 +494,22 @@ class BirdPlanCommandLine:
             help=f"BirdPlan state file to use (default: {BIRDPLAN_STATE_FILE})",
         )
 
-    def _add_bgp_graceful_shutdown_peers_argument(self, arg_group: argparse.ArgumentParser) -> None:
+    def _add_bgp_graceful_shutdown_peers_argument(self, arg_group: argparse.ArgumentParser) -> None:  # pylint: disable=no-self-use
         """Add BGP graceful shutdown arguments for a command that takes peers."""
         arg_group.add_argument(
             "peers",
             nargs="+",
             metavar="PEER",
             help="Peer name (* = all)",
+        )
+
+    def _add_bgp_quarantine_peers_argument(self, arg_group: argparse.ArgumentParser) -> None:  # pylint: disable=no-self-use
+        """Add BGP qurantine arguments for a command that takes peers."""
+        arg_group.add_argument(
+            "peers",
+            nargs="+",
+            metavar="PEER",
+            help="Peer name",
         )
 
     def _setup_logging(self) -> None:

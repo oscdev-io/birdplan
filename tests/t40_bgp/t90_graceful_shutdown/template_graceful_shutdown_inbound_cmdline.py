@@ -31,12 +31,12 @@ class Template(TemplateBase):
     def _test_graceful_shutdown(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
-        # Add r2 to graceful shutdown list
+        # Add r1 to graceful shutdown list
         self._birdplan_run(sim, tmpdir, "r2", ["bgp", "graceful_shutdown", "add", "r1"])
 
         # Check r2 was added
         graceful_shutdown_list = self._birdplan_run(sim, tmpdir, "r2", ["bgp", "graceful_shutdown", "list"])
-        assert graceful_shutdown_list == ["r1"], "Router r2 is not in the graceful shutdown list"
+        assert graceful_shutdown_list == ["r1"], "Router r1 is not in the graceful shutdown list"
 
         # Rewrite configuration file
         self._birdplan_run(sim, tmpdir, "r2", ["configure"])

@@ -460,8 +460,8 @@ bgp:
 Filtering of routes received from a peer. Options available are below...
 
 * `prefixes` will filter on a list of allowed prefixes
-* `asns` will filter on a list of allowed origin ASN's
-* `peer_asns` will filter on the peer ASN, but is only valid for a `routeserver`.
+* `origin_asns` will filter on a list of allowed origin ASN's
+* `peer_asns` will filter on the first ASN in the AS-PATH, but only really makes sense for `routeserver`.
 * `as_sets` will filter on a list of as-sets, resolving them at the same time.
 
 In the context of peer types `customer` and `peer` the above forms the ALLOW list. Everything other than what is specified will be filtered.
@@ -481,8 +481,10 @@ bgp:
       description: Some peer
       filter:
         as-set: AS-EXAMPLE
-        asns:
+        origin_asns:
           - 65009
+        peer_asns:
+          - 65000
         prefixes:
           - "100.141.0.0/24"
           - "fc00:141::/64"
@@ -618,13 +620,12 @@ bgp:
 
 ## outgoing_large_communities
 
-Large communites to add to our outbound prefixes.
+**The first method we can use to specify outgoing large communities is just with a list:**
 
-You can specify the large communities as a list as per below...
+This will result in the large communities being added for all outbound prefixes.
+
+An example of this is below...
 ```yaml
-...
-
-bgp:
   peers:
     peer1:
       asn: 65000
@@ -632,7 +633,37 @@ bgp:
       outgoing_large_communities:
         - 65000:5000:1
         - 65000:5000:2
-...
+```
+
+**The second method is we can use a dict to do fine grained outgoing large communities based on route type:**
+
+Route types...
+
+* `default` will match the default route.
+* `connected` will match connected routes.
+* `static` will match static routes. This will not match default routes.
+* `kernel` will match kernel routes. This will not match default routes.
+* `originated` will match originated routes. This will not match default routes.
+
+Internal route types...
+
+* `bgp` will match all BGP routes.
+* `bgp_own` will match BGP routes that originated from our ASN.
+* `bgp_customer` will match our customer routes.
+* `bgp_peering` will match our peers routes.
+* `bgp_transit` will match our transit providers routes.
+
+An example of this is below...
+```yaml
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      outgoing_large_communities:
+        static:
+          - 65000:5000:1
+        bgp_customer:
+          - 65000:5000:2
 ```
 
 
@@ -706,6 +737,54 @@ bgp:
       description: Some peer
       prefix_limit6: 100
 ...
+```
+
+## prepend
+
+This option controls AS-PATH prepending in various ways. The prepending count must be between 1 and 10.
+
+NOTE: Currently our own ASN will be prepended. Support for the first AS is not yet added.
+
+**The first method we can use to specify outbound prepending is just with a number:**
+
+This will result in our own ASN being prepended for the number of times specified.
+
+An example of this is below...
+```yaml
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prepend: 2
+```
+
+**The second method is we can use a dict to do fine grained prepending based on route type:**
+
+Route types...
+
+* `default` will match the default route.
+* `connected` will match connected routes.
+* `static` will match static routes. This will not match default routes.
+* `kernel` will match kernel routes. This will not match default routes.
+* `originated` will match originated routes. This will not match default routes.
+
+Internal route types...
+
+* `bgp` will match all BGP routes.
+* `bgp_own` will match BGP routes that originated from our ASN.
+* `bgp_customer` will match our customer routes.
+* `bgp_peering` will match our peers routes.
+* `bgp_transit` will match our transit providers routes.
+
+An example of this is below...
+```yaml
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prepend:
+        static: 2
+        bgp_customer: 2
 ```
 
 

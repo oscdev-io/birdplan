@@ -172,3 +172,4 @@ Internally set, not allowable from any BGP peer type.
 | (OWN_ASN, 1101, 18) | Quarantined |
 | (OWN_ASN, 1101, 19) | Too many extended communities |
 | (OWN_ASN, 1101, 20) | Too many large communities |
+| (OWN_ASN, 1101, 21) | Peer AS filtered (not in filter list) |

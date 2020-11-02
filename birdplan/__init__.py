@@ -225,6 +225,76 @@ class BirdPlan:
 
         return [f"{x}" for x in self.state["bgp"]["graceful_shutdown"]]
 
+    def bgp_quarantine_add_peer(self, peer: str) -> None:
+        """
+        Add a peer to the BGP quarantine list.
+
+        Parameters
+        ----------
+        peer : str
+            Peer name to add to BGP quarantine list.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("Using of BGP quarantine requires a state file, none loaded")
+
+        # Prepare the state structure if its not got what we need
+        if "bgp" not in self.state:
+            self.state["bgp"] = {}
+        if "quarantine" not in self.state["bgp"]:
+            self.state["bgp"]["quarantine"] = []
+
+        # If the peer is not in the list, then add it
+        if peer not in self.state["bgp"]["quarantine"]:
+            self.state["bgp"]["quarantine"].append(peer)
+        else:
+            raise BirdPlanError("BGP peer already in quarantine list")
+
+    def bgp_quarantine_remove_peer(self, peer: str) -> None:
+        """
+        Remove a peer from the BGP quarantine list.
+
+        Parameters
+        ----------
+        peer : str
+            Peer name to remove from BGP quarantine list.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("Using of BGP quarantine requires a state file, none loaded")
+
+        # Prepare the state structure if its not got what we need
+        if "bgp" not in self.state or "quarantine" not in self.state["bgp"] or peer not in self.state["bgp"]["quarantine"]:
+            raise BirdPlanError("BGP peer not in quarantine list")
+
+        # Remove peer from quarantine list
+        self.state["bgp"]["quarantine"].remove(peer)
+
+    def bgp_quarantine_peer_list(self) -> List[str]:
+        """
+        Return the list of peers that are currently set for quarantine.
+
+        Returns
+        -------
+        List[str]
+            List of BGP peers set for quarantine.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("Using of BGP quarantine requires a state file, none loaded")
+
+        # Prepare the state structure if its not got what we need
+        if "bgp" not in self.state or "quarantine" not in self.state["bgp"]:
+            return []
+
+        return [f"{x}" for x in self.state["bgp"]["quarantine"]]
+
     def _config_global(self) -> None:
         """Configure global options."""
 
@@ -715,11 +785,40 @@ class BirdPlan:
                 peer["filter"] = {}
                 # Loop with filter configuration items
                 for filter_type, filter_config in config_value.items():
-                    if filter_type in ["prefixes", "asns", "as-set"]:
+                    if filter_type in ["prefixes", "origin_asns", "peer_asns", "as-set"]:
                         peer["filter"][filter_type] = filter_config
                     # If we don't understand this 'filter' entry, throw an error
                     else:
                         raise BirdPlanError(f"Configuration item '{filter_type}' not understood in bgp:peers:{peer_name}:filter")
+            # Work out prepending options
+            elif config_item == "prepend":
+                if isinstance(config_value, dict):
+                    # Loop with prepend configuration items
+                    for prepend_type, prepend_config in config_value.items():
+                        if prepend_type in [
+                            "default",
+                            "connected",
+                            "static",
+                            "kernel",
+                            "originated",
+                            "bgp",
+                            "bgp_own",
+                            "bgp_customer",
+                            "bgp_peering",
+                            "bgp_transit",
+                        ]:
+                            # Make sure we have a prepend key
+                            if "prepend" not in peer:
+                                peer["prepend"] = {}
+                            # Then add the config...
+                            peer["prepend"][prepend_type] = prepend_config
+                        # If we don't understand this 'prepend' entry, throw an error
+                        else:
+                            raise BirdPlanError(
+                                f"Configuration item '{prepend_type}' not understood in bgp:peers:{peer_name}:prepend"
+                            )
+                else:
+                    peer["prepend"] = config_value
             else:
                 raise BirdPlanError(f"Configuration item '{config_item}' not understood in bgp:peers:{peer_name}")
 
@@ -728,6 +827,12 @@ class BirdPlan:
             # If we do, then check if this peer is in it
             if peer_name in self.state["bgp"]["graceful_shutdown"] or "*" in self.state["bgp"]["graceful_shutdown"]:
                 peer["graceful_shutdown"] = self.state["bgp"]["graceful_shutdown"]
+
+        # Check if we have a quarantine state
+        if "bgp" in self.state and "quarantine" in self.state["bgp"]:
+            # If we do, then check if this peer is in it
+            if peer_name in self.state["bgp"]["quarantine"]:
+                peer["quarantine"] = self.state["bgp"]["quarantine"]
 
         # Check items we need
         for required_item in ["asn", "description", "type"]:

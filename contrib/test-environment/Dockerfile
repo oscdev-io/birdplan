@@ -11,6 +11,7 @@ RUN set -ex; \
         python-pytest-pydocstyle \
         python-pytest-pylint \
         python-pytest-mypy \
+        python-pytest-xdist \
         python-requests \
         python-yaml \
         iproute2 \

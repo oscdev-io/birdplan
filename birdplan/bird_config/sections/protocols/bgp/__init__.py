@@ -324,6 +324,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             "define BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 19);"
         )
         self.constants.conf.append("define BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 20);")
+        self.constants.conf.append("define BGP_LC_FILTERED_PEER_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 21);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Ref http://bgpfilterguide.nlnog.net/guides/no_transit_leaks")
@@ -597,18 +598,38 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-        self.functions.conf.append("# Filter ASNs (ALLOW list)")
-        self.functions.conf.append("function bgp_filter_allow_asns(int set asns) {")
+        self.functions.conf.append("# Filter origin ASNs (ALLOW list)")
+        self.functions.conf.append("function bgp_filter_allow_origin_asns(int set asns) {")
         self.functions.conf.append("  if (bgp_path.last_nonaggregated !~ asns) then {")
-        self.functions.conf.append('    print "[bgp_filter_allow_asns] Adding BGP_LC_FILTERED_ORIGIN_AS to ", net;', debug=True)
+        self.functions.conf.append(
+            '    print "[bgp_filter_allow_origin_asns] Adding BGP_LC_FILTERED_ORIGIN_AS to ", net;', debug=True
+        )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ORIGIN_AS);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
-        self.functions.conf.append("# Filter ASNs (DENY list)")
-        self.functions.conf.append("function bgp_filter_deny_asns(int set asns) {")
+        self.functions.conf.append("# Filter origin ASNs (DENY list)")
+        self.functions.conf.append("function bgp_filter_deny_origin_asns(int set asns) {")
         self.functions.conf.append("  if (bgp_path.last_nonaggregated ~ asns) then {")
-        self.functions.conf.append('    print "[bgp_filter_deny_asns] Adding BGP_LC_FILTERED_ORIGIN_AS to ", net;', debug=True)
+        self.functions.conf.append(
+            '    print "[bgp_filter_deny_origin_asns] Adding BGP_LC_FILTERED_ORIGIN_AS to ", net;', debug=True
+        )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ORIGIN_AS);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Filter peer ASNs (ALLOW list)")
+        self.functions.conf.append("function bgp_filter_allow_peer_asns(int set asns) {")
+        self.functions.conf.append("  if (bgp_path.first !~ asns) then {")
+        self.functions.conf.append('    print "[bgp_filter_allow_peer_asns] Adding BGP_LC_FILTERED_PEER_AS to ", net;', debug=True)
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PEER_AS);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("# Filter peer ASNs (DENY list)")
+        self.functions.conf.append("function bgp_filter_deny_peer_asns(int set asns) {")
+        self.functions.conf.append("  if (bgp_path.first ~ asns) then {")
+        self.functions.conf.append('    print "[bgp_filter_deny_peer_asns] Adding BGP_LC_FILTERED_PEER_AS to ", net;', debug=True)
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PEER_AS);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
@@ -816,8 +837,24 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-        self.functions.conf.append("# BGP export prepending")
-        self.functions.conf.append("function bgp_export_prepend(int peeras)")
+        self.functions.conf.append("# BGP prepending")
+        self.functions.conf.append("function bgp_prepend(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (prepend_count > 0) then bgp_path.prepend(peeras);")
+        self.functions.conf.append("  if (prepend_count > 1) then bgp_path.prepend(peeras);")
+        self.functions.conf.append("  if (prepend_count > 2) then bgp_path.prepend(peeras);")
+        self.functions.conf.append("  if (prepend_count > 3) then bgp_path.prepend(peeras);")
+        self.functions.conf.append("  if (prepend_count > 4) then bgp_path.prepend(peeras);")
+        self.functions.conf.append("  if (prepend_count > 5) then bgp_path.prepend(peeras);")
+        self.functions.conf.append("  if (prepend_count > 6) then bgp_path.prepend(peeras);")
+        self.functions.conf.append("  if (prepend_count > 7) then bgp_path.prepend(peeras);")
+        self.functions.conf.append("  if (prepend_count > 8) then bgp_path.prepend(peeras);")
+        self.functions.conf.append("  if (prepend_count > 9) then bgp_path.prepend(peeras);")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP large community based prepending")
+        self.functions.conf.append("function bgp_prepend_lc(int peeras)")
         self.functions.conf.append("int prepend_asn;")
         self.functions.conf.append("{")
         self.functions.conf.append("  # Make sure we use the right ASN when prepending, and not 0 if bgp_path is empty")
@@ -828,25 +865,203 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("  }")
         self.functions.conf.append("  # If we are prepending three times")
         self.functions.conf.append("  if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_THREE, peeras) ~ bgp_large_community) then {")
-        self.functions.conf.append('    print "[bgp_export_prepend] Matched BGP_LC_FUNCTION_PREPEND_THREE for ", net;', debug=True)
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append('    print "[bgp_prepend_lc] Matched BGP_LC_FUNCTION_PREPEND_THREE for ", net;', debug=True)
+        self.functions.conf.append("    bgp_prepend(prepend_asn, 3);")
         self.functions.conf.append("  # If we are prepending two times")
         self.functions.conf.append("  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_TWO, peeras) ~ bgp_large_community) then {")
-        self.functions.conf.append('    print "[bgp_export_prepend] Matched BGP_LC_FUNCTION_PREPEND_TWO for ", net;', debug=True)
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append('    print "[bgp_prepend_lc] Matched BGP_LC_FUNCTION_PREPEND_TWO for ", net;', debug=True)
+        self.functions.conf.append("    bgp_prepend(prepend_asn, 2);")
         self.functions.conf.append("  # If we are prepending one time")
         self.functions.conf.append("  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_ONE, peeras) ~ bgp_large_community) then {")
-        self.functions.conf.append('    print "[bgp_export_prepend] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True)
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append('    print "[bgp_prepend_lc] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True)
+        self.functions.conf.append("    bgp_prepend(prepend_asn, 1);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-        self.functions.conf.append("# BGP export location-based prepending")
-        self.functions.conf.append("function bgp_export_location_prepend(int location)")
+        # BGP Prepending
+        self.functions.conf.append("# BGP default route prepending")
+        self.functions.conf.append("function bgp_prepend_default4(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (net = DEFAULT_ROUTE_V4) then {")
+        self.functions.conf.append(
+            '    print "[bgp_prepend_default4] Prepending AS-PATH for type DEFAULT ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_prepend_default6(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (net = DEFAULT_ROUTE_V6) then {")
+        self.functions.conf.append(
+            '    print "[bgp_prepend_default6] Prepending AS-PATH for type DEFAULT ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP connected route prepending")
+        self.functions.conf.append("function bgp_prepend_connected4(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "direct4_bgp") then {')
+        self.functions.conf.append(
+            '    print "[bgp_prepend_connected4] Prepending AS-PATH for type CONNECTED ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_prepend_connected6(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "direct6_bgp") then {')
+        self.functions.conf.append(
+            '    print "[bgp_prepend_connected6] Prepending AS-PATH for type CONNECTED ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP static route prepending")
+        self.functions.conf.append("function bgp_prepend_static4(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "static4" && net != DEFAULT_ROUTE_V4) then {')
+        self.functions.conf.append(
+            '    print "[bgp_prepend_static4] Prepending AS-PATH for type STATIC ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_prepend_static6(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "static6" && net != DEFAULT_ROUTE_V6) then {')
+        self.functions.conf.append(
+            '    print "[bgp_prepend_static6] Prepending AS-PATH for type STATIC ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP kernel route prepending")
+        self.functions.conf.append("function bgp_prepend_kernel4(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (source = RTS_INHERIT && net != DEFAULT_ROUTE_V4) then {")
+        self.functions.conf.append(
+            '    print "[bgp_prepend_kernel4] Prepending AS-PATH for type KERNEL ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_prepend_kernel6(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (source = RTS_INHERIT && net != DEFAULT_ROUTE_V6) then {")
+        self.functions.conf.append(
+            '    print "[bgp_prepend_kernel6] Prepending AS-PATH for type KERNEL ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+
+        self.functions.conf.append("# BGP originated route prepending")
+        self.functions.conf.append("function bgp_prepend_originated4(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "bgp_originate4" && net != DEFAULT_ROUTE_V4) then {')
+        self.functions.conf.append(
+            '    print "[bgp_prepend_originate4] Prepending AS-PATH for type ORIGINATED ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_prepend_originated6(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "bgp_originate6" && net != DEFAULT_ROUTE_V6) then {')
+        self.functions.conf.append(
+            '    print "[bgp_prepend_originate6] Prepending AS-PATH for type ORIGINATED ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP route prepending")
+        self.functions.conf.append("function bgp_prepend_bgp(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append(
+            '  print "[bgp_prepend_bgp] Prepending AS-PATH for type BGP ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP own route prepending")
+        self.functions.conf.append("function bgp_prepend_bgp_own(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (BGP_LC_RELATION_OWN ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_prepend_bgp_own] Prepending AS-PATH for type BGP_OWN ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP customer route prepending")
+        self.functions.conf.append("function bgp_prepend_bgp_customer(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (BGP_LC_RELATION_CUSTOMER ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_prepend_bgp_customer] Prepending AS-PATH for type BGP_CUSTOMER ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP peering route prepending")
+        self.functions.conf.append("function bgp_prepend_bgp_peering(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (")
+        self.functions.conf.append("    BGP_LC_RELATION_PEER ~ bgp_large_community")
+        self.functions.conf.append("    || BGP_LC_RELATION_ROUTESERVER ~ bgp_large_community")
+        self.functions.conf.append("  ) then {")
+        self.functions.conf.append(
+            '    print "[bgp_prepend_bgp_peer] Prepending AS-PATH for type BGP_PEER ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP transit route prepending")
+        self.functions.conf.append("function bgp_prepend_bgp_transit(int peeras; int prepend_count)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (BGP_LC_RELATION_TRANSIT ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_prepend_bgp_transit] Prepending AS-PATH for type BGP_TRANSIT ", prepend_count, "x to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP location based prepending")
+        self.functions.conf.append("function bgp_prepend_location(int location)")
         self.functions.conf.append("int prepend_asn;")
         self.functions.conf.append("{")
         self.functions.conf.append("  # Make sure we use the right ASN when prepending, and not 0 if bgp_path is empty")
@@ -860,32 +1075,209 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             "  if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_THREE, location) ~ bgp_large_community) then {"
         )
         self.functions.conf.append(
-            '    print "[bgp_export_location_prepend] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_THREE for ", net;', debug=True
+            '    print "[bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_THREE for ", net;', debug=True
         )
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("    bgp_prepend(prepend_asn, 3);")
         self.functions.conf.append("  # If we are prepending two times")
         self.functions.conf.append(
             "  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_TWO, location) ~ bgp_large_community) then {"
         )
         self.functions.conf.append(
-            '    print "[bgp_export_location_prepend] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_TWO for ", net;', debug=True
+            '    print "[bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_TWO for ", net;', debug=True
         )
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append("    bgp_prepend(prepend_asn, 2);")
         self.functions.conf.append("  # If we are prepending one time")
         self.functions.conf.append(
             "  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_ONE, location) ~ bgp_large_community) then {"
         )
-        self.functions.conf.append(
-            '    print "[bgp_export_location_prepend] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True
-        )
-        self.functions.conf.append("    bgp_path.prepend(prepend_asn);")
+        self.functions.conf.append('    print "[bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True)
+        self.functions.conf.append("    bgp_prepend(prepend_asn, 1);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
+        # BGP large community adding
+        self.functions.conf.append("# BGP default route large community adding")
+        self.functions.conf.append("function bgp_lc_add_default4(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (net = DEFAULT_ROUTE_V4) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_default4] Adding large community ", large_community, " for type DEFAULT to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_lc_add_default6(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (net = DEFAULT_ROUTE_V6) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_default6] Adding large community ", large_community, " for type DEFAULT to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP connected route large community adding")
+        self.functions.conf.append("function bgp_lc_add_connected4(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "direct4_bgp") then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_connected4] Adding large community ", large_community, " for type CONNECTED to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_lc_add_connected6(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "direct6_bgp") then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_connected6] Adding large community ", large_community, " for type CONNECTED to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP static route large community adding")
+        self.functions.conf.append("function bgp_lc_add_static4(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "static4" && net != DEFAULT_ROUTE_V4) then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_static4] Adding large community ", large_community, " for type STATIC to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_lc_add_static6(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "static6" && net != DEFAULT_ROUTE_V6) then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_static6] Adding large community ", large_community, " for type STATIC to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP kernel route large community adding")
+        self.functions.conf.append("function bgp_lc_add_kernel4(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (source = RTS_INHERIT && net != DEFAULT_ROUTE_V4) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_kernel4] Adding large community ", large_community, " for type KERNEL to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_lc_add_kernel6(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (source = RTS_INHERIT && net != DEFAULT_ROUTE_V6) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_kernel6] Adding large community ", large_community, " for type KERNEL to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+
+        self.functions.conf.append("# BGP originated route large community adding")
+        self.functions.conf.append("function bgp_lc_add_originated4(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "bgp_originate4" && net != DEFAULT_ROUTE_V4) then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_originate4] Adding large community ", large_community, " for type ORIGINATED to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("function bgp_lc_add_originated6(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append('  if (proto = "bgp_originate6" && net != DEFAULT_ROUTE_V6) then {')
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_originate6] Adding large community ", large_community, " for type ORIGINATED to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP large community adding")
+        self.functions.conf.append("function bgp_lc_add_bgp(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append(
+            '  print "[bgp_lc_add_bgp] Adding large community ", large_community, " for type BGP to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("  bgp_large_community.add(large_community);")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP own route large community adding")
+        self.functions.conf.append("function bgp_lc_add_bgp_own(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (BGP_LC_RELATION_OWN ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_bgp_own] Adding large community ", large_community, " for type BGP_OWN to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP customer route large community adding")
+        self.functions.conf.append("function bgp_lc_add_bgp_customer(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (BGP_LC_RELATION_CUSTOMER ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_bgp_customer] Adding large community ", large_community, " for type BGP_CUSTOMER to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP peering route large community adding")
+        self.functions.conf.append("function bgp_lc_add_bgp_peering(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (")
+        self.functions.conf.append("    BGP_LC_RELATION_PEER ~ bgp_large_community")
+        self.functions.conf.append("    || BGP_LC_RELATION_ROUTESERVER ~ bgp_large_community")
+        self.functions.conf.append("  ) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_bgp_peer] Adding large community ", large_community, " for type BGP_PEER to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# BGP transit route large community adding")
+        self.functions.conf.append("function bgp_lc_add_bgp_transit(lc large_community)")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  if (BGP_LC_RELATION_TRANSIT ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_lc_add_bgp_transit] Adding large community ", large_community, " for type BGP_TRANSIT to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(large_community);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        # Local pref manipulation
         self.functions.conf.append("# BGP import local_pref manipulation")
         self.functions.conf.append("function bgp_import_localpref() {")
         self.functions.conf.append("  # If we are reducing local_pref by three")
