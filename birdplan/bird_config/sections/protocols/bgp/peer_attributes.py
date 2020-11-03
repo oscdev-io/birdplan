@@ -387,6 +387,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         Prefix limit for IPv4.
     prefix_limit6 : BGPPeerPrefixLimit
         Prefix limit for IPv6.
+    replace_aspath : Optional[int]
+        ASN to substitute in the AS-PATH.
     route_policy_accept : BGPPeerRoutePolicyAccept
         Route policy for acceptance of routes from BGP peers into our main BGP table.
     route_policy_redistribute : BGPPeerRoutePolicyRedistribute
@@ -432,6 +434,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     prefix_limit4: BGPPeerPrefixLimit = None
     prefix_limit6: BGPPeerPrefixLimit = None
 
+    replace_aspath: bool = False
+
     route_policy_accept: BGPPeerRoutePolicyAccept
     route_policy_redistribute: BGPPeerRoutePolicyRedistribute
 
@@ -464,7 +468,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     @property
     def peeringdb(self) -> BGPPeerPeeringDB:
         """Return our peeringdb entry, if there is one."""
-        if self.asn > 64512 and self.asn < 65534:
+        # We cannot do lookups on private ASN's
+        if (self.asn >= 64512 and self.asn <= 65534) or (self.asn >= 4200000000 and self.asn <= 4294967294):
             return {"info_prefixes4": None, "info_prefixes6": None}
         # If we don't having peerindb info, grab it
         if not self._peeringdb:

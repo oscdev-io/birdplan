@@ -845,6 +845,31 @@ bgp:
 ...
 ```
 
+
+## replace_aspath
+
+Replace the advertised routes AS-PATH with our own ASN.
+
+This is only valid for peer types of `customer` and `internal`.
+
+This will result in a large community being added to the prefix, which will end up in the AS-PATH being replaced on all eBGP peers.
+
+All private ASN's will be replaced up to a limit of 10, any AS-PATH longer than this will be truncated.
+
+An example is below...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      replace_aspath: True
+...
+```
+
+
 ## source_address4
 
 The source IPv4 address we'll be using to connect to this peer.

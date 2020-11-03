@@ -31,6 +31,7 @@ class TemplateBase(BirdPlanBaseTestCase):
     exabgps = ["e1"]
 
     e1_template_communities = ""
+    e1_template_extra = ""
     e1_extra_communities = ""
 
     r1_peer_asn = 65100
@@ -94,7 +95,8 @@ class TemplateBase(BirdPlanBaseTestCase):
             "e1",
             [
                 "neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.100 "
-                f"large-community [ {self.e1_template_communities} {self.e1_extra_communities} ]"
+                f"large-community [ {self.e1_template_communities} {self.e1_extra_communities} ] "
+                f"{self.e1_template_extra}"
             ],
         )
         self._exabgpcli(
@@ -102,7 +104,8 @@ class TemplateBase(BirdPlanBaseTestCase):
             "e1",
             [
                 "neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::100 "
-                f"large-community [ {self.e1_template_communities} {self.e1_extra_communities} ]"
+                f"large-community [ {self.e1_template_communities} {self.e1_extra_communities} ] "
+                f"{self.e1_template_extra}"
             ],
         )
 

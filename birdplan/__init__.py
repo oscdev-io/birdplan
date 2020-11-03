@@ -729,6 +729,7 @@ class BirdPlan:
                 "prefix_limit4",
                 "prefix_limit6",
                 "quarantine",
+                "replace_aspath",
                 "incoming_large_communities",
                 "outgoing_large_communities",
                 "cost",

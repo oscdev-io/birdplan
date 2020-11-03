@@ -72,7 +72,6 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         """Configure the BGP protocol."""
         super().configure()
 
-        self._configure_constants_bogon_asns()
         self._configure_constants_bgp()
         self._configure_constants_functions()
 
@@ -157,8 +156,13 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         """Return a BGP peer configuration object."""
         return self.peers[name]
 
-    def _configure_constants_bogon_asns(self) -> None:
-        """Configure ASN bogons."""
+    def _configure_constants_bgp(self) -> None:  # pylint: disable=too-many-statements
+        """Configure BGP constants."""
+        self.constants.conf.append_title("BGP Constants")
+
+        self.constants.conf.append("# Our BGP ASN")
+        self.constants.conf.append(f"define BGP_ASN = {self.asn};")
+        self.constants.conf.append("")
 
         self.constants.conf.append("# Ref http://bgpfilterguide.nlnog.net/guides/bogon_asns/")
         self.constants.conf.append("define BOGON_ASNS = [")
@@ -177,12 +181,39 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("];")
         self.constants.conf.append("")
 
-    def _configure_constants_bgp(self) -> None:  # pylint: disable=too-many-statements
-        """Configure BGP constants."""
-        self.constants.conf.append_title("BGP Constants")
+        self.constants.conf.append("define PRIVATE_ASNS = [")
+        if self.birdconfig_globals.test_mode:
+            self.constants.conf.append("  # EXCLUDING DUE TO TESTING: 64512..65534, # RFC 6996 Private ASNs")
+        else:
+            self.constants.conf.append("  64512..65534, # RFC 6996 Private ASNs")
+        self.constants.conf.append("  4200000000..4294967294 # RFC 6996 Private ASNs")
+        self.constants.conf.append("];")
+        self.constants.conf.append("")
 
-        self.constants.conf.append("# Our BGP ASN")
-        self.constants.conf.append(f"define BGP_ASN = {self.asn};")
+        self.constants.conf.append("# Ref http://bgpfilterguide.nlnog.net/guides/no_transit_leaks")
+        self.constants.conf.append("define BGP_ASNS_TRANSIT = [")
+        self.constants.conf.append("  174, # Cogent")
+        self.constants.conf.append("  209, # Qwest (HE carries this on IXPs IPv6 (Jul 12 2018))")
+        self.constants.conf.append("  701, # UUNET")
+        self.constants.conf.append("  702, # UUNET")
+        self.constants.conf.append("  1239, # Sprint")
+        self.constants.conf.append("  1299, # Telia")
+        self.constants.conf.append("  2914, # NTT Communications")
+        self.constants.conf.append("  3257, # GTT Backbone")
+        self.constants.conf.append("  3320, # Deutsche Telekom AG (DTAG)")
+        self.constants.conf.append("  3356, # Level3")
+        self.constants.conf.append("  3491, # PCCW")
+        self.constants.conf.append("  3549, # Level3")
+        self.constants.conf.append("  3561, # Savvis / CenturyLink")
+        self.constants.conf.append("  4134, # Chinanet")
+        self.constants.conf.append("  5511, # Chinanet")
+        self.constants.conf.append("  5511, # Orange opentransit")
+        self.constants.conf.append("  6453, # Tata Communications")
+        self.constants.conf.append("  6461, # Zayo Bandwidth")
+        self.constants.conf.append("  6762, # Seabone / Telecom Italia")
+        self.constants.conf.append("  6830, # Liberty Global")
+        self.constants.conf.append("  7018 # AT&T")
+        self.constants.conf.append("];")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Prefix sizes we will be using")
@@ -274,6 +305,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF = 8;")
         self.constants.conf.append("define BGP_LC_FUNCTION_INFORMATION = 1000;")
         self.constants.conf.append("define BGP_LC_FUNCTION_FILTERED = 1101;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_ACTION = 1200;")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community noexport")
@@ -325,32 +357,10 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         )
         self.constants.conf.append("define BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 20);")
         self.constants.conf.append("define BGP_LC_FILTERED_PEER_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 21);")
+        self.constants.conf.append("define BGP_LC_FILTERED_ASPATH_NOT_ALLOWED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 22);")
         self.constants.conf.append("")
-
-        self.constants.conf.append("# Ref http://bgpfilterguide.nlnog.net/guides/no_transit_leaks")
-        self.constants.conf.append("define BGP_ASNS_TRANSIT = [")
-        self.constants.conf.append("  174, # Cogent")
-        self.constants.conf.append("  209, # Qwest (HE carries this on IXPs IPv6 (Jul 12 2018))")
-        self.constants.conf.append("  701, # UUNET")
-        self.constants.conf.append("  702, # UUNET")
-        self.constants.conf.append("  1239, # Sprint")
-        self.constants.conf.append("  1299, # Telia")
-        self.constants.conf.append("  2914, # NTT Communications")
-        self.constants.conf.append("  3257, # GTT Backbone")
-        self.constants.conf.append("  3320, # Deutsche Telekom AG (DTAG)")
-        self.constants.conf.append("  3356, # Level3")
-        self.constants.conf.append("  3491, # PCCW")
-        self.constants.conf.append("  3549, # Level3")
-        self.constants.conf.append("  3561, # Savvis / CenturyLink")
-        self.constants.conf.append("  4134, # Chinanet")
-        self.constants.conf.append("  5511, # Chinanet")
-        self.constants.conf.append("  5511, # Orange opentransit")
-        self.constants.conf.append("  6453, # Tata Communications")
-        self.constants.conf.append("  6461, # Zayo Bandwidth")
-        self.constants.conf.append("  6762, # Seabone / Telecom Italia")
-        self.constants.conf.append("  6830, # Liberty Global")
-        self.constants.conf.append("  7018 # AT&T")
-        self.constants.conf.append("];")
+        self.constants.conf.append("# Large community actions")
+        self.constants.conf.append("define BGP_LC_ACTION_REPLACE_ASPATH = (BGP_ASN, BGP_LC_FUNCTION_ACTION, 1);")
         self.constants.conf.append("")
 
     def _configure_constants_functions(self) -> None:  # pylint: disable=too-many-statements
@@ -636,10 +646,20 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         self.functions.conf.append("# Filter bogon ASNs")
         self.functions.conf.append("function bgp_filter_asn_bogons() {")
-        self.functions.conf.append("  # Filter bogon ASNs")
         self.functions.conf.append("  if (bgp_path ~ BOGON_ASNS) then {")
         self.functions.conf.append('    print "[bgp_filter_asn_bogons] Adding BGP_LC_FILTERED_BOGON_ASN to ", net;', debug=True)
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_BOGON_ASN);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Filter private ASN's")
+        self.functions.conf.append("function bgp_filter_asn_private(int set allowed_asns) {")
+        self.functions.conf.append("  if (bgp_path != filter(bgp_path, allowed_asns)) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_asn_private] Adding BGP_LC_FILTERED_ASPATH_NOT_ALLOWED to ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ASPATH_NOT_ALLOWED);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
@@ -875,6 +895,27 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_ONE, peeras) ~ bgp_large_community) then {")
         self.functions.conf.append('    print "[bgp_prepend_lc] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True)
         self.functions.conf.append("    bgp_prepend(prepend_asn, 1);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        # Replace AS-PATH
+        self.functions.conf.append("# Check if we need to replace the AS-PATH")
+        self.functions.conf.append("function bgp_replace_aspath()")
+        self.functions.conf.append("int path_len;")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  # Check for replace AS-PATH large community action")
+        self.functions.conf.append("  if (BGP_LC_ACTION_REPLACE_ASPATH ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_replace_aspath] Replacing AS-PATH [", bgp_path,"] for ",' "net;",
+            debug=True,
+        )
+        self.functions.conf.append("    # Grab current path length")
+        self.functions.conf.append("    path_len = bgp_path.len;")
+        self.functions.conf.append("    # Empty the path, as we cannot assign a sequence")
+        self.functions.conf.append("    bgp_path.empty;")
+        self.functions.conf.append("    # Prepend our own ASN the number of times there was an ASN in the path")
+        self.functions.conf.append("    bgp_prepend(BGP_ASN, path_len - 1);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")

@@ -88,9 +88,28 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             raise BirdPlanError(f"BGP peer '{self.name}' need a 'asn' field")
         self.asn = peer_config["asn"]
 
+        # Check if we're replacing the ASN in the AS-PATH
+        if "replace_aspath" in peer_config:
+            # Do a sanity check on replacing the ASN
+            if self.peer_type not in ("customer", "internal"):
+                raise BirdPlanError(
+                    f"Having 'replace_aspath' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            # Make sure the ASN is private and not public
+            if not (
+                (not self.birdconfig_globals.test_mode and self.asn >= 64512 and self.asn <= 65534)
+                or (self.asn >= 4200000000 and self.asn <= 4294967294)
+            ):
+                raise BirdPlanError(
+                    f"Having 'replace_aspath' set for peer '{self.name}' with a non-private ASN {self.asn} makes no sense"
+                )
+            # Check if we're actually replacing it?
+            if peer_config["replace_aspath"]:
+                self.replace_aspath = True
+
         # If the peer type is of internal nature, but doesn't match our peer type, throw an exception
         if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
-            if self.asn != self.bgp_attributes.asn:
+            if self.asn != self.bgp_attributes.asn and not (self.peer_type == "internal" and self.replace_aspath):
                 raise BirdPlanError(
                     f"BGP peer '{self.name}' ({self.asn}) is of internal nature, "
                     f"but has a different ASN ({self.bgp_attributes.asn})"
@@ -621,7 +640,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("    reject;")
             self.conf.add("  }")
 
-        # Add location-based large communities
+        # Rejections based on location-based large communities
         if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
             # Check if we have a ISO-3166 country code
             if self.location.iso3166:
@@ -870,6 +889,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.large_communities.outgoing.bgp_transit:
             for large_community in self.large_communities.outgoing.bgp_transit:
                 self.conf.add(f"    bgp_lc_add_bgp_transit({large_community});")
+
+        # For eBGP peer types, make sure we replace AS-PATHs with the LC action set
+        if self.peer_type in ("customer", "peer", "routecollector", "routeserver", "transit"):
+            self.conf.add("    bgp_replace_aspath();")
+
         # Check if we're doing AS-PATH prepending...
         if self.prepend.default.own_asn:
             self.conf.add(f"    bgp_prepend_default{ipv}(BGP_ASN, {self.prepend.default.own_asn});")
@@ -940,9 +964,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def _peer_import_filter(self, ipv: str) -> None:  # pylint: disable=too-many-branches,too-many-statements
         """Peer import filter setup from peer to peer table."""
 
+        # Set our filter name
+        func_name = self.filter_name_import((ipv))
+
         # Configure import filter from the BGP peer
         self.conf.add("# Import filter FROM the BGP peer TO the peer BGP table")
-        self.conf.add(f"filter {self.filter_name_import(ipv)} {{")
+        self.conf.add(f"filter {func_name} {{")
 
         # If this is the route from our peer, we need to check what type it is
         type_lines = []
@@ -966,7 +993,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
             type_lines.append(f"    bgp_filter_size_v{ipv}();")
-            type_lines.append("    bgp_filter_asn_bogons();")
+            # If we're replacing the ASN we only allow private ASN's in the AS-PATH
+            if self.replace_aspath:
+                type_lines.append(f"    bgp_filter_asn_private([{self.asn}]);")
+            # Else, filter bogon ASN's
+            else:
+                type_lines.append("    bgp_filter_asn_bogons();")
             type_lines.append("    bgp_filter_asn_long();")
             type_lines.append("    bgp_filter_asn_short();")
             type_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
@@ -1007,6 +1039,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         elif self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             if not self.route_policy_accept.default:
                 type_lines.append(f"    bgp_filter_default_v{ipv}();")
+            if self.peer_type == "internal" and self.replace_aspath:
+                type_lines.append(f"    bgp_filter_asn_private(PRIVATE_ASNS);")
         # Transit providers
         elif self.peer_type == "transit":
             type_lines.append("    bgp_communities_strip_all();")
@@ -1076,12 +1110,19 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             if self.location.unm49:
                 type_lines.append(f"    bgp_import_location_unm49({self.location.unm49});")
 
+        # If this is a customer or internal peer type, check if we're doing replacement of the AS-PATH and add the action community
+        if self.peer_type in ("customer", "internal"):
+            if self.replace_aspath:
+                # Lastly add the large community to replace the ASN
+                type_lines.append(f'    print "[{func_name}] Adding LC action BGP_LC_ACTION_REPLACE_ASPATH to ", net;')
+                type_lines.append("    bgp_large_community.add(BGP_LC_ACTION_REPLACE_ASPATH);")
+
         # Check if we are adding a large community to incoming routes
         if self.large_communities.incoming:
             # Loop with large communities and add to the prefix
             for large_community in sorted(self.large_communities.incoming):
                 if self.birdconfig_globals.debug:
-                    type_lines.append(f'    print "[{self.filter_name_import(ipv)}] Adding LC {large_community} to ", net;')
+                    type_lines.append(f'    print "[{func_name}] Adding LC {large_community} to ", net;')
                 type_lines.append(f"    bgp_large_community.add({large_community});")
 
         # Support for changing incoming local_pref
@@ -1427,6 +1468,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def prefix_limit6(self, prefix_limit6: str) -> None:
         """Set our IPv6 prefix limit."""
         self.peer_attributes.prefix_limit6 = prefix_limit6
+
+    @property
+    def replace_aspath(self) -> bool:
+        """Return the ASN which replaces the AS-PATH."""
+        return self.peer_attributes.replace_aspath
+
+    @replace_aspath.setter
+    def replace_aspath(self, replace_aspath: bool) -> None:
+        """Set the ASN which will replace the AS-PATH."""
+        self.peer_attributes.replace_aspath = replace_aspath
 
     @property
     def peeringdb(self) -> BGPPeerPeeringDB:

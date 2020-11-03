@@ -54,6 +54,7 @@ Brief overview of FUNCTION assignments...
 | 8 | Manipulation of the LOCAL_PREF Attribute - ENHANCED [^lc-function-8] |
 | 1000 | Route information |
 | 1101 | Route filtered |
+| 1200 | Actions |
 
 [^lc-function-1]: Route learned in ISO-3166-1 country. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 3.1.1 pg. 6
 
@@ -173,3 +174,12 @@ Internally set, not allowable from any BGP peer type.
 | (OWN_ASN, 1101, 19) | Too many extended communities |
 | (OWN_ASN, 1101, 20) | Too many large communities |
 | (OWN_ASN, 1101, 21) | Peer AS filtered (not in filter list) |
+| (OWN_ASN, 1101, 22) | AS path not allowed |
+
+## Action Communities
+
+Internally set, not allowable from any BGP peer type.
+
+| Community | Description |
+| --- | --- |
+| (OWN_ASN, 1200, 1) | Replace AS-PATH with our own ASN |
