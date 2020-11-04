@@ -1,4 +1,5 @@
 # type: ignore
+# pylint: disable=too-many-lines
 
 """Expected test result data."""
 
@@ -8,7 +9,7 @@ r1_t_bgp4_AS65000_e1_peer = {
             "asn": "AS65003",
             "attributes": {
                 "BGP.as_path": [65001, 65003],
-                "BGP.large_community": [(65000, 1101, 10)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1101, 10)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
@@ -30,7 +31,7 @@ r1_t_bgp6_AS65000_e1_peer = {
             "asn": "AS65003",
             "attributes": {
                 "BGP.as_path": [65001, 65003],
-                "BGP.large_community": [(65000, 1101, 10)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1101, 10)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",

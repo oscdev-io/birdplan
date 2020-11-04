@@ -9,7 +9,7 @@ r1_t_bgp4_AS4200000000_e1_peer = {
             "asn": "AS4200000002",
             "attributes": {
                 "BGP.as_path": [4200000000, 4200000001, 4200000002],
-                "BGP.large_community": [(65000, 1200, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
@@ -28,7 +28,7 @@ r1_t_bgp4_AS4200000000_e1_peer = {
             "asn": "AS4200000002",
             "attributes": {
                 "BGP.as_path": [4200000000, 65100, 4200000002],
-                "BGP.large_community": [(65000, 1101, 22), (65000, 1200, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1101, 22), (65000, 1200, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
@@ -50,7 +50,7 @@ r1_t_bgp6_AS4200000000_e1_peer = {
             "asn": "AS4200000002",
             "attributes": {
                 "BGP.as_path": [4200000000, 4200000001, 4200000002],
-                "BGP.large_community": [(65000, 1200, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",
@@ -69,7 +69,7 @@ r1_t_bgp6_AS4200000000_e1_peer = {
             "asn": "AS4200000002",
             "attributes": {
                 "BGP.as_path": [4200000000, 65100, 4200000002],
-                "BGP.large_community": [(65000, 1101, 22), (65000, 1200, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1101, 22), (65000, 1200, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",
@@ -91,7 +91,7 @@ r1_t_bgp4 = {
             "asn": "AS4200000002",
             "attributes": {
                 "BGP.as_path": [4200000000, 4200000001, 4200000002],
-                "BGP.large_community": [(65000, 1200, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
@@ -113,7 +113,7 @@ r1_t_bgp6 = {
             "asn": "AS4200000002",
             "attributes": {
                 "BGP.as_path": [4200000000, 4200000001, 4200000002],
-                "BGP.large_community": [(65000, 1200, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",
@@ -144,7 +144,7 @@ r1_master4 = {
             "asn": "AS4200000002",
             "attributes": {
                 "BGP.as_path": [4200000000, 4200000001, 4200000002],
-                "BGP.large_community": [(65000, 1200, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
@@ -175,7 +175,7 @@ r1_master6 = {
             "asn": "AS4200000002",
             "attributes": {
                 "BGP.as_path": [4200000000, 4200000001, 4200000002],
-                "BGP.large_community": [(65000, 1200, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",
@@ -197,7 +197,7 @@ r1_t_kernel4 = {
             "asn": "AS4200000002",
             "attributes": {
                 "BGP.as_path": [4200000000, 4200000001, 4200000002],
-                "BGP.large_community": [(65000, 1200, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
@@ -219,7 +219,7 @@ r1_t_kernel6 = {
             "asn": "AS4200000002",
             "attributes": {
                 "BGP.as_path": [4200000000, 4200000001, 4200000002],
-                "BGP.large_community": [(65000, 1200, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",

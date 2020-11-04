@@ -1,4 +1,5 @@
 # type: ignore
+# pylint: disable=too-many-lines
 
 """Expected test result data."""
 
@@ -60,6 +61,7 @@ r1_t_bgp4_AS65000_e1_peer = {
                     65001,
                     65001,
                 ],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
@@ -133,6 +135,7 @@ r1_t_bgp6_AS65000_e1_peer = {
                     65001,
                     65001,
                 ],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",
@@ -206,6 +209,7 @@ r1_t_bgp4 = {
                     65001,
                     65001,
                 ],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
@@ -279,6 +283,7 @@ r1_t_bgp6 = {
                     65001,
                     65001,
                 ],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",
@@ -361,6 +366,7 @@ r1_master4 = {
                     65001,
                     65001,
                 ],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
@@ -443,6 +449,7 @@ r1_master6 = {
                     65001,
                     65001,
                 ],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",
@@ -516,6 +523,7 @@ r1_t_kernel4 = {
                     65001,
                     65001,
                 ],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
@@ -589,6 +597,7 @@ r1_t_kernel6 = {
                     65001,
                     65001,
                 ],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",

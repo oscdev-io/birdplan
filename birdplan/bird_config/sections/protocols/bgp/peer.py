@@ -1038,10 +1038,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append("    bgp_filter_community_length();")
         # Internal router peer types
         elif self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            type_lines.append("    bgp_filter_lc_no_relation();")
             if not self.route_policy_accept.default:
                 type_lines.append(f"    bgp_filter_default_v{ipv}();")
             if self.peer_type == "internal" and self.replace_aspath:
-                type_lines.append(f"    bgp_filter_asn_private(PRIVATE_ASNS);")
+                type_lines.append("    bgp_filter_asn_private(PRIVATE_ASNS);")
         # Transit providers
         elif self.peer_type == "transit":
             type_lines.append("    bgp_communities_strip_all();")

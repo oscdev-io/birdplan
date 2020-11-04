@@ -30,6 +30,8 @@ class TemplateBase(BirdPlanBaseTestCase):
     routers = ["r1"]
     exabgps = ["e1"]
 
+    e1_large_communities = ""
+
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
@@ -37,15 +39,20 @@ class TemplateBase(BirdPlanBaseTestCase):
     def test_announce_routes(self, sim):
         """Announce a prefix from ExaBGP to BIRD."""
 
+        # Add large communities for peer types that require them
+        large_communities = ""
+        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            large_communities = "65000:3:1"
+
         self._exabgpcli(
             sim,
             "e1",
-            ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2"],
+            ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 " f"large-community [ {large_communities} ]"],
         )
         self._exabgpcli(
             sim,
             "e1",
-            ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2"],
+            ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 large-community " f"[ {large_communities} ]"],
         )
 
     def test_bird_status(self, sim):

@@ -36,13 +36,18 @@ class Template(TemplateBase):
 
         too_many_communities_str = " ".join([f"65001:{x}:{x}" for x in range(6)])
 
+        # Add large communities for peer types that require them
+        large_communities = ""
+        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            large_communities = "65000:3:1"
+
         self._exabgpcli(
             sim,
             "e1",
             [
                 "neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 large-community ["
                 + too_many_communities_str
-                + "]"
+                + f" {large_communities}]"
             ],
         )
         self._exabgpcli(
@@ -51,6 +56,6 @@ class Template(TemplateBase):
             [
                 "neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 large-community ["
                 + too_many_communities_str
-                + "]"
+                + f" {large_communities}]"
             ],
         )

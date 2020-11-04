@@ -321,6 +321,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community relations")
+        self.constants.conf.append("define BGP_LC_RELATION = [(BGP_ASN, BGP_LC_FUNCTION_RELATION, 1..5)];")
         self.constants.conf.append("define BGP_LC_RELATION_OWN = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 1);")
         self.constants.conf.append("define BGP_LC_RELATION_CUSTOMER = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 2);")
         self.constants.conf.append("define BGP_LC_RELATION_PEER = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 3);")
@@ -365,6 +366,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 20);")
         self.constants.conf.append("define BGP_LC_FILTERED_PEER_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 21);")
         self.constants.conf.append("define BGP_LC_FILTERED_ASPATH_NOT_ALLOWED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 22);")
+        self.constants.conf.append("define BGP_LC_FILTERED_NO_RELATION_LC = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 23);")
         self.constants.conf.append("")
         self.constants.conf.append("# Large community actions")
         self.constants.conf.append("define BGP_LC_ACTION_REPLACE_ASPATH = (BGP_ASN, BGP_LC_FUNCTION_ACTION, 1);")
@@ -772,6 +774,17 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Filter prefixes without a large community relation set")
+        self.functions.conf.append("function bgp_filter_lc_no_relation() {")
+        self.functions.conf.append("  if (bgp_large_community !~ BGP_LC_RELATION) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_lc_no_relation] Adding BGP_LC_FILTERED_NO_RELATION_LC to ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_NO_RELATION_LC);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")

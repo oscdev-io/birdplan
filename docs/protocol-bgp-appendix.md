@@ -176,6 +176,7 @@ Internally set, not allowable from any BGP peer type.
 | (OWN_ASN, 1101, 20) | Too many large communities |
 | (OWN_ASN, 1101, 21) | Peer AS filtered (not in filter list) |
 | (OWN_ASN, 1101, 22) | AS path not allowed |
+| (OWN_ASN, 1101, 23) | No relation large community set |
 
 ## Action Communities
 
