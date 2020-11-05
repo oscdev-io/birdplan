@@ -276,6 +276,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_COMMUNITY_STRIP_ALL = BGP_COMMUNITY_STRIP;")
         # This is used for stripping large communities from peers and transit providers
         self.constants.conf.append("define BGP_LC_STRIP_ALL = [ (BGP_ASN, *, *) ];")
+        self.constants.conf.append("define BGP_LC_STRIP_PRIVATE = [")
+        # Don't strip the lower private ASN range during testing
+        if not self.birdconfig_globals.test_mode:
+            self.constants.conf.append("  (64512..65534, *, *),")
+        self.constants.conf.append("  (4200000000..4294967294, *, *)")
+        self.constants.conf.append("];")
 
         self.constants.conf.append("# BGP Route Preferences")
         self.constants.conf.append("define BGP_PREF_OWN = 950;")  # -20 = Originate, -10 = static, -5 = kernel
@@ -331,6 +337,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("# Large community information")
         self.constants.conf.append("define BGP_LC_INFORMATION_STRIPPED_COMMUNITY = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 1);")
         self.constants.conf.append("define BGP_LC_INFORMATION_STRIPPED_LC = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 3);")
+        self.constants.conf.append("define BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 4);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community filtered")
@@ -369,52 +376,70 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         self.functions.conf.append("# Strip all communities we could interpret internally")
         self.functions.conf.append("function bgp_communities_strip_all() ")
-        self.functions.conf.append("int stripped_community;")
-        self.functions.conf.append("int stripped_lc;")
+        self.functions.conf.append("bool stripped_community;")
+        self.functions.conf.append("bool stripped_lc;")
+        self.functions.conf.append("bool stripped_lc_private;")
         self.functions.conf.append("{")
-        self.functions.conf.append("  stripped_community = 0;")
-        self.functions.conf.append("  stripped_lc = 0;")
+        self.functions.conf.append("  stripped_community = false;")
+        self.functions.conf.append("  stripped_lc = false;")
+        self.functions.conf.append("  stripped_lc_private = false;")
         self.functions.conf.append("  # Sanitize communities")
         self.functions.conf.append("  if (bgp_community ~ BGP_COMMUNITY_STRIP_ALL) then {")
         self.functions.conf.append('    print "[bgp_communities_strip_all] Sanitizing communities for ", net;', debug=True)
         self.functions.conf.append("    bgp_community.delete(BGP_COMMUNITY_STRIP_ALL);")
-        self.functions.conf.append("    stripped_community = 1;")
+        self.functions.conf.append("    stripped_community = true;")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Sanitize large communities")
         self.functions.conf.append("  if (bgp_large_community ~ BGP_LC_STRIP_ALL) then {")
         self.functions.conf.append('    print "[bgp_communities_strip_all] Sanitizing large communities for ", net;', debug=True)
         self.functions.conf.append("    bgp_large_community.delete(BGP_LC_STRIP_ALL);")
-        self.functions.conf.append("    stripped_lc = 1;")
+        self.functions.conf.append("    stripped_lc = true;")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if (stripped_community > 0) then {")
+        self.functions.conf.append("  # Sanitize private large communities")
+        self.functions.conf.append("  if (bgp_large_community ~ BGP_LC_STRIP_PRIVATE) then {")
+        self.functions.conf.append(
+            '    print "[bgp_communities_strip_all] Sanitizing private large communities for ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);")
+        self.functions.conf.append("    stripped_lc_private = true;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  if (stripped_community) then {")
         self.functions.conf.append(
             '    print "[bgp_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_COMMUNITY);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if (stripped_lc > 0) then {")
+        self.functions.conf.append("  if (stripped_lc) then {")
         self.functions.conf.append(
-            '    print "[bgp_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;', debug=True
+            '    print "[bgp_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_LC to ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  if (stripped_lc_private) then {")
+        self.functions.conf.append(
+            '    print "[bgp_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE to ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
         self.functions.conf.append("# Strip internal communities")
         self.functions.conf.append("function bgp_communities_strip_internal() ")
-        self.functions.conf.append("int stripped_community;")
-        self.functions.conf.append("int stripped_lc;")
+        self.functions.conf.append("bool stripped_community;")
+        self.functions.conf.append("bool stripped_lc;")
+        self.functions.conf.append("bool stripped_lc_private;")
         self.functions.conf.append("{")
-        self.functions.conf.append("  stripped_community = 0;")
-        self.functions.conf.append("  stripped_lc = 0;")
+        self.functions.conf.append("  stripped_community = false;")
+        self.functions.conf.append("  stripped_lc = false;")
+        self.functions.conf.append("  stripped_lc_private = false;")
         self.functions.conf.append("  # Remove stripped communities")
         self.functions.conf.append("  if (bgp_community ~ BGP_COMMUNITY_STRIP) then {")
         self.functions.conf.append(
             '    print "[bgp_communities_strip_internal] Removing stripped communities from ", net;', debug=True
         )
         self.functions.conf.append("    bgp_community.delete(BGP_COMMUNITY_STRIP);")
-        self.functions.conf.append("    stripped_community = 1;")
+        self.functions.conf.append("    stripped_community = true;")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Remove stripped large communities")
         self.functions.conf.append("  if (bgp_large_community ~ BGP_LC_STRIP) then {")
@@ -422,19 +447,44 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             '    print "[bgp_communities_strip_internal] Removing stripped large communities from ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.delete(BGP_LC_STRIP);")
-        self.functions.conf.append("    stripped_lc = 1;")
+        self.functions.conf.append("    stripped_lc = true;")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if (stripped_community > 0) then {")
+        self.functions.conf.append("  # Remove stripped private large communities")
+        self.functions.conf.append("  if (bgp_large_community ~ BGP_LC_STRIP_PRIVATE) then {")
+        self.functions.conf.append(
+            '    print "[bgp_communities_strip_internal] Removing stripped private large communities from ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);")
+        self.functions.conf.append("    stripped_lc_private = true;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  if (stripped_community) then {")
         self.functions.conf.append(
             '    print "[bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_COMMUNITY);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if (stripped_lc > 0) then {")
+        self.functions.conf.append("  if (stripped_lc) then {")
         self.functions.conf.append(
             '    print "[bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  if (stripped_lc_private) then {")
+        self.functions.conf.append(
+            '    print "[bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE to ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Remove private large communities")
+        self.functions.conf.append("function bgp_remove_lc_private() ")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  # Remove private large communities")
+        self.functions.conf.append("  if (bgp_large_community ~ BGP_LC_STRIP_PRIVATE) then {")
+        self.functions.conf.append('    print "[bgp_strip_lc_private] Removing private large communities from ", net;', debug=True)
+        self.functions.conf.append("    bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")

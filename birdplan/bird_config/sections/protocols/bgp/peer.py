@@ -893,6 +893,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # For eBGP peer types, make sure we replace AS-PATHs with the LC action set
         if self.peer_type in ("customer", "peer", "routecollector", "routeserver", "transit"):
             self.conf.add("    bgp_replace_aspath();")
+            self.conf.add("    bgp_remove_lc_private();")
 
         # Check if we're doing AS-PATH prepending...
         if self.prepend.default.own_asn:

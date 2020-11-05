@@ -147,6 +147,7 @@ Internally set, not allowable from any BGP peer type.
 | --- | --- |
 | (OWN_ASN, 1000, 1) | Communities were stripped |
 | (OWN_ASN, 1000, 3) | Large communities were stripped |
+| (OWN_ASN, 1000, 4) | Private large communities were stripped |
 
 ## Filtered Communities
 
