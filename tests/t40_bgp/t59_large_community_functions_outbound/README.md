@@ -14,6 +14,9 @@ In terms of test set "t20_noexport":
 In terms of test set "t30_prepend_1x":
   - ExaBGP e1 should advertise a route with a large community that should result in prepending 1x.
 
+In terms of test set "t30_prepend_1x_61":
+  - ExaBGP e1 should advertise a route with a large community that should result in prepending 1x.
+
 In terms of test set "t31_prepend_2x":
   - ExaBGP e1 should advertise a route with a large community that should result in prepending 2x.
 
@@ -21,6 +24,9 @@ In terms of test set "t32_prepend_3x":
   - ExaBGP e1 should advertise a route with a large community that should result in prepending 3x.
 
 In terms of test set "t40_prepend_location_1x":
+  - ExaBGP e1 should advertise a route with a large community that should result in prepending 1x to the specified location.
+
+In terms of test set "t40_prepend_location_1x_71":
   - ExaBGP e1 should advertise a route with a large community that should result in prepending 1x to the specified location.
 
 In terms of test set "t40_prepend_location_2x":
