@@ -21,27 +21,8 @@
 
 """BGP prefix too short test case template."""
 
-from ..template_base import TemplateBase
+from .template_base_too_short import TemplateBase
 
 
 class Template(TemplateBase):
     """BGP prefix too short test case template."""
-
-    def _test_announce_routes(self, sim):
-        """Announce a BGP prefix that is too short."""
-
-        # Add large communities for peer types that require them
-        large_communities = ""
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
-            large_communities = "65000:3:1"
-
-        self._exabgpcli(
-            sim,
-            "e1",
-            [f"neighbor 100.64.0.1 announce route 100.66.0.0/15 next-hop 100.64.0.2 large-community [{large_communities}]"],
-        )
-        self._exabgpcli(
-            sim,
-            "e1",
-            [f"neighbor fc00:100::1 announce route fc00:102::/31 next-hop fc00:100::2 large-community [{large_communities}]"],
-        )

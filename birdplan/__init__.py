@@ -578,11 +578,11 @@ class BirdPlan:
                 "prefix_export_maxlen6",
                 "prefix_import_minlen6",
                 "prefix_export_minlen6",
-                "aspath_maxlen",
-                "aspath_minlen",
-                "community_maxlen",
-                "extended_community_maxlen",
-                "large_community_maxlen",
+                "aspath_import_maxlen",
+                "aspath_import_minlen",
+                "community_import_maxlen",
+                "extended_community_import_maxlen",
+                "large_community_import_maxlen",
                 "originate",  # Origination
                 "accept",
                 "import",
@@ -628,11 +628,11 @@ class BirdPlan:
             "prefix_export_maxlen6",
             "prefix_import_minlen6",
             "prefix_export_minlen6",
-            "aspath_maxlen",
-            "aspath_minlen",
-            "community_maxlen",
-            "extended_community_maxlen",
-            "large_community_maxlen",
+            "aspath_import_maxlen",
+            "aspath_import_minlen",
+            "community_import_maxlen",
+            "extended_community_import_maxlen",
+            "large_community_import_maxlen",
         ]:
             if item in self.config["bgp"]:
                 setattr(self.birdconf.protocols.bgp, item, self.config["bgp"][item])
@@ -734,6 +734,19 @@ class BirdPlan:
                 "outgoing_large_communities",
                 "cost",
                 "graceful_shutdown",
+                "prefix_import_maxlen4",
+                "prefix_import_minlen4",
+                "prefix_export_maxlen4",
+                "prefix_export_minlen4",
+                "prefix_import_maxlen6",
+                "prefix_import_minlen6",
+                "prefix_export_maxlen6",
+                "prefix_export_minlen6",
+                "aspath_import_maxlen",
+                "aspath_import_minlen",
+                "community_import_maxlen",
+                "extended_community_import_maxlen",
+                "large_community_import_maxlen",
             ):
                 peer[config_item] = config_value
             # Peer location configuration

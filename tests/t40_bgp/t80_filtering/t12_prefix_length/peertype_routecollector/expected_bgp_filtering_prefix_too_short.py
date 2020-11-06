@@ -4,7 +4,7 @@
 """Expected test result data."""
 
 r1_t_bgp4_AS65001_e1_peer = {
-    "100.66.0.0/15": [
+    "100.68.0.0/15": [
         {
             "asn": "AS65001",
             "attributes": {
@@ -25,27 +25,7 @@ r1_t_bgp4_AS65001_e1_peer = {
     ]
 }
 
-r1_t_bgp6_AS65001_e1_peer = {
-    "fc00:102::/31": [
-        {
-            "asn": "AS65001",
-            "attributes": {
-                "BGP.as_path": [65001],
-                "BGP.large_community": [(65000, 1101, 17)],
-                "BGP.local_pref": 100,
-                "BGP.next_hop": ["fc00:100::2"],
-                "BGP.origin": "IGP",
-            },
-            "bestpath": True,
-            "bgp_type": "i",
-            "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
-            "pref": 100,
-            "prefix_type": "unicast",
-            "protocol": "bgp6_AS65001_e1",
-            "type": ["BGP", "univ"],
-        }
-    ]
-}
+r1_t_bgp6_AS65001_e1_peer = {}
 
 r1_t_bgp4 = {}
 

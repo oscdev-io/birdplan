@@ -68,6 +68,20 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Setup BGP attributes
         self._bgp_attributes = BGPAttributes()
 
+        # For test mode we need to slightly adjust our prefix lengths that we permit
+        if self.birdconfig_globals.test_mode:
+            self.aspath_import_maxlen = 25
+            self.community_import_maxlen = 25
+            self.extended_community_import_maxlen = 25
+            self.large_community_import_maxlen = 25
+
+            self.prefix_import_minlen4 = 16
+            self.prefix_export_minlen4 = 16
+            self.prefix_import_maxlen6 = 64
+            self.prefix_import_minlen6 = 32
+            self.prefix_export_maxlen6 = 64
+            self.prefix_export_minlen6 = 32
+
     def configure(self) -> None:
         """Configure the BGP protocol."""
         super().configure()
@@ -216,43 +230,6 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("];")
         self.constants.conf.append("")
 
-        self.constants.conf.append("# Prefix sizes we will be using")
-        self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MAXLEN4 = {self.bgp_attributes.prefix_import_maxlen4};")
-        # If we're in test mode, we need to restrict the minimum length so we can trigger tests with 100.64.0.0/X<16
-        if self.birdconfig_globals.test_mode:
-            self.constants.conf.append("define BGP_PREFIX_IMPORT_MINLEN4 = 16;")
-        else:
-            self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MINLEN4 = {self.bgp_attributes.prefix_import_minlen4};")
-        self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MAXLEN4 = {self.bgp_attributes.prefix_export_maxlen4};")
-        # If we're in test mode, we need to restrict the minimum length so we can trigger tests with 100.64.0.0/X<16
-        if self.birdconfig_globals.test_mode:
-            self.constants.conf.append("define BGP_PREFIX_EXPORT_MINLEN4 = 16;")
-        else:
-            self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MINLEN4 = {self.bgp_attributes.prefix_export_minlen4};")
-
-        # If we're in test mode, allow smaller prefixes
-        if self.birdconfig_globals.test_mode:
-            self.constants.conf.append("define BGP_PREFIX_IMPORT_MAXLEN6 = 64;")
-            self.constants.conf.append("define BGP_PREFIX_IMPORT_MINLEN6 = 32;")
-            self.constants.conf.append("define BGP_PREFIX_EXPORT_MAXLEN6 = 64;")
-            self.constants.conf.append("define BGP_PREFIX_EXPORT_MINLEN6 = 32;")
-        else:
-            self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MAXLEN6 = {self.bgp_attributes.prefix_import_maxlen6};")
-            self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MINLEN6 = {self.bgp_attributes.prefix_import_minlen6};")
-            self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MAXLEN6 = {self.bgp_attributes.prefix_export_maxlen6};")
-            self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MINLEN6 = {self.bgp_attributes.prefix_export_minlen6};")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# BGP AS path min and max lengths")
-        self.constants.conf.append(f"define BGP_ASPATH_MAXLEN = {self.bgp_attributes.aspath_maxlen};")
-        self.constants.conf.append(f"define BGP_ASPATH_MINLEN = {self.bgp_attributes.aspath_minlen};")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# Community maximum lengths")
-        self.constants.conf.append(f"define BGP_COMMUNITY_MAXLEN = {self.bgp_attributes.community_maxlen};")
-        self.constants.conf.append(f"define BGP_EXTENDED_COMMUNITY_MAXLEN = {self.bgp_attributes.extended_community_maxlen};")
-        self.constants.conf.append(f"define BGP_LARGE_COMMUNITY_MAXLEN = {self.bgp_attributes.large_community_maxlen};")
-        self.constants.conf.append("")
         # NK: IMPORTANT IF THE ABOVE CHANGES UPDATE THE BELOW
         self.constants.conf.append("# Community stripping")
         if self.birdconfig_globals.test_mode:
@@ -568,30 +545,21 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-        self.functions.conf.append("# Filter IPv4 prefix size")
-        self.functions.conf.append("function bgp_filter_size_v4() {")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_IMPORT_MAXLEN4) then {")
-        self.functions.conf.append('    print "[bgp_filter_size_v4] Adding BGP_FILTERED_PREFIX_LEN_TOO_LONG to ", net;', debug=True)
-        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_LONG);")
-        self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_IMPORT_MINLEN4) then {")
+        self.functions.conf.append("# Filter prefix size")
+        self.functions.conf.append("function bgp_filter_prefix_size(int prefix_maxlen; int prefix_minlen) {")
+        self.functions.conf.append("  if prefix_is_longer(prefix_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_size_v4] Adding BGP_FILTERED_PREFIX_LEN_TOO_SHORT to ", net;', debug=True
+            '    print "[bgp_filter_prefix_size] Prefix length >", prefix_maxlen,", '
+            'adding BGP_FILTERED_PREFIX_LEN_TOO_LONG to ", net;',
+            debug=True,
         )
-        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_SHORT);")
-        self.functions.conf.append("  }")
-        self.functions.conf.append("}")
-        self.functions.conf.append("")
-
-        self.functions.conf.append("# Filter IPv6 prefix size")
-        self.functions.conf.append("function bgp_filter_size_v6() {")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_IMPORT_MAXLEN6) then {")
-        self.functions.conf.append('    print "[bgp_filter_size_v6] Adding BGP_FILTERED_PREFIX_LEN_TOO_LONG to ", net;', debug=True)
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_LONG);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_IMPORT_MINLEN6) then {")
+        self.functions.conf.append("  if prefix_is_shorter(prefix_minlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_size_v6] Adding BGP_FILTERED_PREFIX_LEN_TOO_SHORT to ", net;', debug=True
+            '    print "[bgp_filter_prefix_size] Prefix length <", prefix_minlen,", '
+            'adding BGP_FILTERED_PREFIX_LEN_TOO_SHORT to ", net;',
+            debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_SHORT);")
         self.functions.conf.append("  }")
@@ -728,20 +696,21 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-        self.functions.conf.append("# Filter long AS paths")
-        self.functions.conf.append("function bgp_filter_asn_long() {")
-        self.functions.conf.append("  if (bgp_path.len > BGP_ASPATH_MAXLEN) then {")
-        self.functions.conf.append('    print "[bgp_filter_asn_long] Adding BGP_LC_FILTERED_ASPATH_TOO_LONG to ", net;', debug=True)
+        self.functions.conf.append("# Filter AS-PATH length")
+        self.functions.conf.append("function bgp_filter_aspath_length(int aspath_maxlen; int aspath_minlen) {")
+        self.functions.conf.append("  if (bgp_path.len > aspath_maxlen) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_aspath_length] AS-PATH length >", aspath_maxlen, ", '
+            'adding BGP_LC_FILTERED_ASPATH_TOO_LONG to ", net;',
+            debug=True,
+        )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ASPATH_TOO_LONG);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("}")
-        self.functions.conf.append("")
-
-        self.functions.conf.append("# Filter short AS paths")
-        self.functions.conf.append("function bgp_filter_asn_short() {")
-        self.functions.conf.append("  if (bgp_path.len < BGP_ASPATH_MINLEN) then {")
+        self.functions.conf.append("  if (bgp_path.len < aspath_minlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_asn_short] Adding BGP_LC_FILTERED_ASPATH_TOO_SHORT to ", net;', debug=True
+            '    print "[bgp_filter_aspath_length] AS-PATH length <", aspath_minlen, ", '
+            'adding BGP_LC_FILTERED_ASPATH_TOO_SHORT to ", net;',
+            debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ASPATH_TOO_SHORT);")
         self.functions.conf.append("  }")
@@ -749,28 +718,28 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# Filter too many communities")
-        self.functions.conf.append("function bgp_filter_community_length() {")
-        self.functions.conf.append("  if (bgp_community.len > BGP_COMMUNITY_MAXLEN) then {")
+        self.functions.conf.append("function bgp_filter_community_length(int community_maxlen; int ext_maxlen; int large_maxlen) {")
+        self.functions.conf.append("  if (bgp_community.len > community_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_community_length] Adding BGP_LC_FILTERED_TOO_MANY_COMMUNITIES to ", net, '
-            '" counted ", bgp_community.len;',
+            '    print "[bgp_filter_community_length] Community list length >", community_maxlen, ", '
+            'adding BGP_LC_FILTERED_TOO_MANY_COMMUNITIES to ", net, " counted ", bgp_community.len;',
             debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_TOO_MANY_COMMUNITIES);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if (bgp_ext_community.len > BGP_EXTENDED_COMMUNITY_MAXLEN) then {")
+        self.functions.conf.append("  if (bgp_ext_community.len > ext_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_community_length] Adding BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES to ", net, '
-            '" counted ", bgp_ext_community.len;',
+            '    print "[bgp_filter_community_length] Extended community list length >", ext_maxlen, ", '
+            'adding BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES to ", net, " counted ", bgp_ext_community.len;',
             debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES);")
         self.functions.conf.append("  }")
         self.functions.conf.append("")
-        self.functions.conf.append("  if (bgp_large_community.len > BGP_LARGE_COMMUNITY_MAXLEN) then {")
+        self.functions.conf.append("  if (bgp_large_community.len > large_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_community_length] Adding BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES to ", net, '
-            '" counted ", bgp_large_community.len;',
+            '    print "[bgp_filter_community_length] Large community list length >", large_maxlen, ", '
+            ', adding BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES to ", net, " counted ", bgp_large_community.len;',
             debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES);")
@@ -853,7 +822,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# Can we export this IPv4 BGP route to the peeras?")
-        self.functions.conf.append("function bgp_can_export_v4(int peeras) {")
+        self.functions.conf.append("function bgp_can_export_v4(int peeras; int prefix_maxlen; int prefix_minlen) {")
         self.functions.conf.append("  # Check for NOEXPORT large community")
         self.functions.conf.append("  if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peeras) ~ bgp_large_community) then {")
         self.functions.conf.append(
@@ -863,15 +832,15 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Validate route before export")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_EXPORT_MAXLEN4) then {")
+        self.functions.conf.append("  if prefix_is_longer(prefix_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v4] Not exporting due to prefix length > BGP_PREFIX_EXPORT_MAXLEN4 for ", net;', debug=True
+            '    print "[bgp_can_export_v4] Not exporting due to prefix length >", prefix_maxlen, " for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_EXPORT_MINLEN4) then {")
+        self.functions.conf.append("  if prefix_is_shorter(prefix_minlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v4] Not exporting due to prefix length < BGP_PREFIX_EXPORT_MINLEN4 for ", net;', debug=True
+            '    print "[bgp_can_export_v4] Not exporting due to prefix length <", prefix_minlen, " for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
@@ -887,7 +856,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# Can we export this IPv6 BGP route to the peeras?")
-        self.functions.conf.append("function bgp_can_export_v6(int peeras) {")
+        self.functions.conf.append("function bgp_can_export_v6(int peeras; int prefix_maxlen; int prefix_minlen) {")
         self.functions.conf.append("  # Check for NOEXPORT large community")
         self.functions.conf.append("  if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peeras) ~ bgp_large_community) then {")
         self.functions.conf.append(
@@ -897,15 +866,15 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Validate route before export")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_EXPORT_MAXLEN6) then {")
+        self.functions.conf.append("  if prefix_is_longer(prefix_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v6] Not exporting due to prefix length > BGP_PREFIX_EXPORT_MAXLEN6 for ", net;', debug=True
+            '    print "[bgp_can_export_v6] Not exporting due to prefix length >", prefix_maxlen," for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_EXPORT_MINLEN6) then {")
+        self.functions.conf.append("  if prefix_is_shorter(prefix_minlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v6] Not exporting due to prefix length < BGP_PREFIX_EXPORT_MINLEN6 for ", net;', debug=True
+            '    print "[bgp_can_export_v6] Not exporting due to prefix length <", prefix_minlen, " for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
@@ -1684,53 +1653,53 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     # AS PATH LENGTHS
 
     @property
-    def aspath_minlen(self) -> int:
-        """Return the current value of aspath_minlen."""
-        return self.bgp_attributes.aspath_minlen
+    def aspath_import_minlen(self) -> int:
+        """Return the current value of aspath_import_minlen."""
+        return self.bgp_attributes.aspath_import_minlen
 
-    @aspath_minlen.setter
-    def aspath_minlen(self, aspath_minlen: int) -> None:
+    @aspath_import_minlen.setter
+    def aspath_import_minlen(self, aspath_import_minlen: int) -> None:
         """Set the AS path minlen."""
-        self.bgp_attributes.aspath_minlen = aspath_minlen
+        self.bgp_attributes.aspath_import_minlen = aspath_import_minlen
 
     @property
-    def aspath_maxlen(self) -> int:
-        """Return the current value of aspath_maxlen."""
-        return self.bgp_attributes.aspath_maxlen
+    def aspath_import_maxlen(self) -> int:
+        """Return the current value of aspath_import_maxlen."""
+        return self.bgp_attributes.aspath_import_maxlen
 
-    @aspath_maxlen.setter
-    def aspath_maxlen(self, aspath_maxlen: int) -> None:
+    @aspath_import_maxlen.setter
+    def aspath_import_maxlen(self, aspath_import_maxlen: int) -> None:
         """Set the AS path maxlen."""
-        self.bgp_attributes.aspath_maxlen = aspath_maxlen
+        self.bgp_attributes.aspath_import_maxlen = aspath_import_maxlen
 
     # COMMUNITY LENGTHS
 
     @property
-    def community_maxlen(self) -> int:
-        """Return the current value of community_maxlen."""
-        return self.bgp_attributes.community_maxlen
+    def community_import_maxlen(self) -> int:
+        """Return the current value of community_import_maxlen."""
+        return self.bgp_attributes.community_import_maxlen
 
-    @community_maxlen.setter
-    def community_maxlen(self, community_maxlen: int) -> None:
-        """Set the value of community_maxlen."""
-        self.bgp_attributes.community_maxlen = community_maxlen
-
-    @property
-    def extended_community_maxlen(self) -> int:
-        """Return the current value of extended_community_maxlen."""
-        return self.bgp_attributes.extended_community_maxlen
-
-    @extended_community_maxlen.setter
-    def extended_community_maxlen(self, extended_community_maxlen: int) -> None:
-        """Set the value of extended_community_maxlen."""
-        self.bgp_attributes.extended_community_maxlen = extended_community_maxlen
+    @community_import_maxlen.setter
+    def community_import_maxlen(self, community_import_maxlen: int) -> None:
+        """Set the value of community_import_maxlen."""
+        self.bgp_attributes.community_import_maxlen = community_import_maxlen
 
     @property
-    def large_community_maxlen(self) -> int:
-        """Return the current value of large_community_maxlen."""
-        return self.bgp_attributes.large_community_maxlen
+    def extended_community_import_maxlen(self) -> int:
+        """Return the current value of extended_community_import_maxlen."""
+        return self.bgp_attributes.extended_community_import_maxlen
 
-    @large_community_maxlen.setter
-    def large_community_maxlen(self, large_community_maxlen: int) -> None:
-        """Set the value of large_community_maxlen."""
-        self.bgp_attributes.large_community_maxlen = large_community_maxlen
+    @extended_community_import_maxlen.setter
+    def extended_community_import_maxlen(self, extended_community_import_maxlen: int) -> None:
+        """Set the value of extended_community_import_maxlen."""
+        self.bgp_attributes.extended_community_import_maxlen = extended_community_import_maxlen
+
+    @property
+    def large_community_import_maxlen(self) -> int:
+        """Return the current value of large_community_import_maxlen."""
+        return self.bgp_attributes.large_community_import_maxlen
+
+    @large_community_import_maxlen.setter
+    def large_community_import_maxlen(self, large_community_import_maxlen: int) -> None:
+        """Set the value of large_community_import_maxlen."""
+        self.bgp_attributes.large_community_import_maxlen = large_community_import_maxlen

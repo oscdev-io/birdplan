@@ -21,42 +21,8 @@
 
 """BGP too many communities test case template."""
 
-from ..template_base import TemplateBase
+from .template_base_too_many_communities import TemplateBase
 
 
 class Template(TemplateBase):
     """BGP too many communities test case template."""
-
-    r1_template_global_config = """
-  community_maxlen: 50
-"""
-
-    def _test_announce_routes(self, sim):
-        """Announce a BGP prefix with too many communities."""
-
-        # Convert to a 1:x format separated by spaces for exabgp
-        too_many_communities_str = " ".join([f"1:{x}" for x in range(51)])
-
-        # Add large communities for peer types that require them
-        large_communities = ""
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
-            large_communities = "65000:3:1"
-
-        self._exabgpcli(
-            sim,
-            "e1",
-            [
-                "neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 community ["
-                + too_many_communities_str
-                + f"] large-community [{large_communities}]"
-            ],
-        )
-        self._exabgpcli(
-            sim,
-            "e1",
-            [
-                "neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 community ["
-                + too_many_communities_str
-                + f"] large-community [{large_communities}]"
-            ],
-        )
