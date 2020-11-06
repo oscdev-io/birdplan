@@ -46,14 +46,17 @@ Brief overview of FUNCTION assignments...
 | 4 | ASN-based selective NOEXPORT [^lc-function-4] |
 | 5 | Location-based selective NOEXPORT [^lc-function-5] |
 | 6 | ASN-Based Selective AS Path Prepending (one) [^lc-function-6] |
+| 61 | ASN-Based Selective AS Path Prepending (one) - ENHANCED [^lc-function-6] |
 | 62 | ASN-Based Selective AS Path Prepending (two) - ENHANCED [^lc-function-6] |
 | 63 | ASN-Based Selective AS Path Prepending (three) - ENHANCED [^lc-function-6] |
 | 7 | Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
+| 71 | Location-Based Selective AS Path Prepending (one) - ENHANCED [^lc-function-7] |
 | 72 | Location-Based Selective AS Path Prepending (two) - ENHANCED [^lc-function-7] |
 | 73 | Location-Based Selective AS Path Prepending (three) - ENHANCED [^lc-function-7] |
 | 8 | Manipulation of the LOCAL_PREF Attribute - ENHANCED [^lc-function-8] |
 | 1000 | Route information |
 | 1101 | Route filtered |
+| 1200 | Actions |
 
 [^lc-function-1]: Route learned in ISO-3166-1 country. ref [RFC 8195](https://tools.ietf.org/html/rfc8195) section 3.1.1 pg. 6
 
@@ -146,6 +149,7 @@ Internally set, not allowable from any BGP peer type.
 | --- | --- |
 | (OWN_ASN, 1000, 1) | Communities were stripped |
 | (OWN_ASN, 1000, 3) | Large communities were stripped |
+| (OWN_ASN, 1000, 4) | Private large communities were stripped |
 
 ## Filtered Communities
 
@@ -173,3 +177,13 @@ Internally set, not allowable from any BGP peer type.
 | (OWN_ASN, 1101, 19) | Too many extended communities |
 | (OWN_ASN, 1101, 20) | Too many large communities |
 | (OWN_ASN, 1101, 21) | Peer AS filtered (not in filter list) |
+| (OWN_ASN, 1101, 22) | AS path not allowed |
+| (OWN_ASN, 1101, 23) | No relation large community set |
+
+## Action Communities
+
+Internally set, not allowable from any BGP peer type.
+
+| Community | Description |
+| --- | --- |
+| (OWN_ASN, 1200, 1) | Replace AS-PATH with our own ASN |

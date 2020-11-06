@@ -88,9 +88,36 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             raise BirdPlanError(f"BGP peer '{self.name}' need a 'asn' field")
         self.asn = peer_config["asn"]
 
+        # Check if we're replacing the ASN in the AS-PATH
+        if "replace_aspath" in peer_config:
+            # Do a sanity check on replacing the ASN
+            if self.peer_type not in ("customer", "internal"):
+                raise BirdPlanError(
+                    f"Having 'replace_aspath' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            # Make sure the ASN is private and not public
+            if not (
+                (not self.birdconfig_globals.test_mode and self.asn >= 64512 and self.asn <= 65534)
+                or (self.asn >= 4200000000 and self.asn <= 4294967294)
+            ):
+                raise BirdPlanError(
+                    f"Having 'replace_aspath' set for peer '{self.name}' with a non-private ASN {self.asn} makes no sense"
+                )
+            # Check if we're actually replacing it?
+            if peer_config["replace_aspath"]:
+                self.replace_aspath = True
+                self.prefix_import_minlen4 = 16
+                self.prefix_import_maxlen4 = 29
+                self.prefix_export_minlen4 = 16
+                self.prefix_export_maxlen4 = 29
+                self.prefix_import_maxlen6 = 64
+                self.prefix_import_minlen6 = 32
+                self.prefix_export_maxlen6 = 64
+                self.prefix_export_minlen6 = 32
+
         # If the peer type is of internal nature, but doesn't match our peer type, throw an exception
         if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
-            if self.asn != self.bgp_attributes.asn:
+            if self.asn != self.bgp_attributes.asn and not (self.peer_type == "internal" and self.replace_aspath):
                 raise BirdPlanError(
                     f"BGP peer '{self.name}' ({self.asn}) is of internal nature, "
                     f"but has a different ASN ({self.bgp_attributes.asn})"
@@ -363,6 +390,26 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "quarantine" in peer_config and peer_config["quarantine"]:
             self.quarantined = True
 
+        # Setup our limits
+        for attr_name in (
+            "prefix_import_maxlen4",
+            "prefix_import_minlen4",
+            "prefix_export_maxlen4",
+            "prefix_export_minlen4",
+            "prefix_import_maxlen6",
+            "prefix_import_minlen6",
+            "prefix_export_maxlen6",
+            "prefix_export_minlen6",
+            "aspath_import_maxlen",
+            "aspath_import_minlen",
+            "community_import_maxlen",
+            "extended_community_import_maxlen",
+            "large_community_import_maxlen",
+        ):
+            # Check if we have peer configuration for this attribute, if we do set it
+            if attr_name in peer_config:
+                setattr(self, attr_name, peer_config[attr_name])
+
     def configure(self) -> None:
         """Configure BGP peer."""
         super().configure()
@@ -621,7 +668,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("    reject;")
             self.conf.add("  }")
 
-        # Add location-based large communities
+        # Rejections based on location-based large communities
         if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
             # Check if we have a ISO-3166 country code
             if self.location.iso3166:
@@ -756,7 +803,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.route_policy_redistribute.bgp_own:
             self.conf.add("    # Redistribute our own BGP routes")
             self.conf.add("    if (BGP_LC_RELATION_OWN ~ bgp_large_community) then {")
-            self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
+            self.conf.add(f"      if !{self._bgp_can_export(ipv)} then {{")
             self.conf.add(
                 f'        print "[{func_name}] Cannot export ", net, " with match on BGP_LC_RELATION_OWN";',
                 debug=True,
@@ -773,7 +820,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.route_policy_redistribute.bgp_customer:
             self.conf.add("    # Redistribute customer BGP routes")
             self.conf.add("    if (BGP_LC_RELATION_CUSTOMER ~ bgp_large_community) then {")
-            self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
+            self.conf.add(f"      if !{self._bgp_can_export(ipv)} then {{")
             self.conf.add(
                 f'        print "[{func_name}] Cannot export ", net, " with match on BGP_LC_RELATION_CUSTOMER";',
                 debug=True,
@@ -790,7 +837,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.route_policy_redistribute.bgp_peering:
             self.conf.add("    # Redistribute peering BGP routes")
             self.conf.add("    if (BGP_LC_RELATION_PEER ~ bgp_large_community) then {")
-            self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
+            self.conf.add(f"      if !{self._bgp_can_export(ipv)} then {{")
             self.conf.add(
                 f'      print "[{func_name}] Cannot export ", net, " with match on BGP_LC_RELATION_PEER";',
                 debug=True,
@@ -804,7 +851,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add("      accept_route = true;")
             self.conf.add("    }")
             self.conf.add("    if (BGP_LC_RELATION_ROUTESERVER ~ bgp_large_community) then {")
-            self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
+            self.conf.add(f"      if !{self._bgp_can_export(ipv)} then {{")
             self.conf.add(
                 f'        print "[{func_name}] Cannot export ", net, " with match on BGP_LC_RELATION_ROUTESERVER";',
                 debug=True,
@@ -821,7 +868,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.route_policy_redistribute.bgp_transit:
             self.conf.add("    # Redistribute transit BGP routes")
             self.conf.add("    if (BGP_LC_RELATION_TRANSIT ~ bgp_large_community) then {")
-            self.conf.add(f"      if !bgp_can_export_v{ipv}({self.asn}) then {{")
+            self.conf.add(f"      if !{self._bgp_can_export(ipv)} then {{")
             self.conf.add(
                 f'        print "[{func_name}] Cannot export ", net, " with match on BGP_LC_RELATION_TRANSIT";',
                 debug=True,
@@ -870,6 +917,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.large_communities.outgoing.bgp_transit:
             for large_community in self.large_communities.outgoing.bgp_transit:
                 self.conf.add(f"    bgp_lc_add_bgp_transit({large_community});")
+
+        # For eBGP peer types, make sure we replace AS-PATHs with the LC action set
+        if self.peer_type in ("customer", "peer", "routecollector", "routeserver", "transit"):
+            self.conf.add("    bgp_replace_aspath();")
+            self.conf.add("    bgp_remove_lc_private();")
+
         # Check if we're doing AS-PATH prepending...
         if self.prepend.default.own_asn:
             self.conf.add(f"    bgp_prepend_default{ipv}(BGP_ASN, {self.prepend.default.own_asn});")
@@ -940,9 +993,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def _peer_import_filter(self, ipv: str) -> None:  # pylint: disable=too-many-branches,too-many-statements
         """Peer import filter setup from peer to peer table."""
 
+        # Set our filter name
+        func_name = self.filter_name_import((ipv))
+
         # Configure import filter from the BGP peer
         self.conf.add("# Import filter FROM the BGP peer TO the peer BGP table")
-        self.conf.add(f"filter {self.filter_name_import(ipv)} {{")
+        self.conf.add(f"filter {func_name} {{")
 
         # If this is the route from our peer, we need to check what type it is
         type_lines = []
@@ -965,28 +1021,31 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append(f"    bgp_import_customer({self.asn}, {self.cost});")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
-            type_lines.append(f"    bgp_filter_size_v{ipv}();")
-            type_lines.append("    bgp_filter_asn_bogons();")
-            type_lines.append("    bgp_filter_asn_long();")
-            type_lines.append("    bgp_filter_asn_short();")
+            type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
+            # If we're replacing the ASN we only allow private ASN's in the AS-PATH
+            if self.replace_aspath:
+                type_lines.append(f"    bgp_filter_asn_private([{self.asn}]);")
+            # Else, filter bogon ASN's
+            else:
+                type_lines.append("    bgp_filter_asn_bogons();")
+            type_lines.append(f"    {self._bgp_filter_aspath_length()}")
             type_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
             type_lines.append("    bgp_filter_asn_transit();")
             type_lines.append("    bgp_filter_nexthop_not_peerip();")
-            type_lines.append("    bgp_filter_community_length();")
+            type_lines.append(f"    {self._bgp_filter_community_length()}")
         # Peers
         elif self.peer_type == "peer":
             type_lines.append("    bgp_communities_strip_all();")
             type_lines.append(f"    bgp_import_peer({self.asn}, {self.cost});")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
-            type_lines.append(f"    bgp_filter_size_v{ipv}();")
+            type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
             type_lines.append("    bgp_filter_asn_bogons();")
-            type_lines.append("    bgp_filter_asn_long();")
-            type_lines.append("    bgp_filter_asn_short();")
+            type_lines.append(f"    {self._bgp_filter_aspath_length()}")
             type_lines.append("    bgp_filter_nexthop_not_peerip();")
             type_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
             type_lines.append("    bgp_filter_asn_transit();")
-            type_lines.append("    bgp_filter_community_length();")
+            type_lines.append(f"    {self._bgp_filter_community_length()}")
         # Routecollector
         elif self.peer_type == "routecollector":
             type_lines.append("    bgp_communities_strip_all();")
@@ -997,16 +1056,18 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append(f"    bgp_import_routeserver({self.asn}, {self.cost});")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
-            type_lines.append(f"    bgp_filter_size_v{ipv}();")
+            type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
             type_lines.append("    bgp_filter_asn_bogons();")
-            type_lines.append("    bgp_filter_asn_long();")
-            type_lines.append("    bgp_filter_asn_short();")
+            type_lines.append(f"    {self._bgp_filter_aspath_length()}")
             type_lines.append("    bgp_filter_asn_transit();")
-            type_lines.append("    bgp_filter_community_length();")
+            type_lines.append(f"    {self._bgp_filter_community_length()}")
         # Internal router peer types
         elif self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            type_lines.append("    bgp_filter_lc_no_relation();")
             if not self.route_policy_accept.default:
                 type_lines.append(f"    bgp_filter_default_v{ipv}();")
+            if self.peer_type == "internal" and self.replace_aspath:
+                type_lines.append("    bgp_filter_asn_private(PRIVATE_ASNS);")
         # Transit providers
         elif self.peer_type == "transit":
             type_lines.append("    bgp_communities_strip_all();")
@@ -1015,18 +1076,17 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 type_lines.append("    # Bypass bogon and size filters for the default route")
                 type_lines.append(f"    if (net != DEFAULT_ROUTE_V{ipv}) then {{")
                 type_lines.append(f"      bgp_filter_bogons_v{ipv}();")
-                type_lines.append(f"      bgp_filter_size_v{ipv}();")
+                type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
                 type_lines.append("    }")
             else:
                 type_lines.append(f"    bgp_filter_default_v{ipv}();")
                 type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
-                type_lines.append(f"    bgp_filter_size_v{ipv}();")
+                type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
             type_lines.append("    bgp_filter_asn_bogons();")
-            type_lines.append("    bgp_filter_asn_long();")
-            type_lines.append("    bgp_filter_asn_short();")
+            type_lines.append(f"    {self._bgp_filter_aspath_length()}")
             type_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
             type_lines.append("    bgp_filter_nexthop_not_peerip();")
-            type_lines.append("    bgp_filter_community_length();")
+            type_lines.append(f"    {self._bgp_filter_community_length()}")
         else:
             raise BirdPlanError(f"The BGP peer type '{self.peer_type}' is not supported")
 
@@ -1076,12 +1136,19 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             if self.location.unm49:
                 type_lines.append(f"    bgp_import_location_unm49({self.location.unm49});")
 
+        # If this is a customer or internal peer type, check if we're doing replacement of the AS-PATH and add the action community
+        if self.peer_type in ("customer", "internal"):
+            if self.replace_aspath:
+                # Lastly add the large community to replace the ASN
+                type_lines.append(f'    print "[{func_name}] Adding LC action BGP_LC_ACTION_REPLACE_ASPATH to ", net;')
+                type_lines.append("    bgp_large_community.add(BGP_LC_ACTION_REPLACE_ASPATH);")
+
         # Check if we are adding a large community to incoming routes
         if self.large_communities.incoming:
             # Loop with large communities and add to the prefix
             for large_community in sorted(self.large_communities.incoming):
                 if self.birdconfig_globals.debug:
-                    type_lines.append(f'    print "[{self.filter_name_import(ipv)}] Adding LC {large_community} to ", net;')
+                    type_lines.append(f'    print "[{func_name}] Adding LC {large_community} to ", net;')
                 type_lines.append(f"    bgp_large_community.add({large_community});")
 
         # Support for changing incoming local_pref
@@ -1207,6 +1274,31 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self._peer_import_filter("4")
         if self.has_ipv6:
             self._peer_import_filter("6")
+
+    def _bgp_can_export(self, ipv: str) -> str:
+        """Generate the BGP can export function with relevant arguments to see if we can export a prefix."""
+        maxlen = getattr(self, f"prefix_export_maxlen{ipv}")
+        minlen = getattr(self, f"prefix_export_minlen{ipv}")
+        return f"bgp_can_export_v{ipv}({self.asn},{maxlen},{minlen})"
+
+    def _bgp_filter_prefix_size(self, ipv: str) -> str:
+        """Return a BGP prefix size filter for a specific IP version."""
+        maxlen = getattr(self, f"prefix_import_maxlen{ipv}")
+        minlen = getattr(self, f"prefix_import_minlen{ipv}")
+        return f"bgp_filter_prefix_size({maxlen},{minlen});"
+
+    def _bgp_filter_aspath_length(self) -> str:
+        """Generate the BGP filter function for the AS-PATH lengths."""
+        maxlen = self.aspath_import_maxlen
+        minlen = self.aspath_import_minlen
+        return f"bgp_filter_aspath_length({maxlen},{minlen});"
+
+    def _bgp_filter_community_length(self) -> str:
+        """Generate the BGP filter function for the community lengths."""
+        maxlen = self.community_import_maxlen
+        maxlen_extended = self.extended_community_import_maxlen
+        maxlen_large = self.large_community_import_maxlen
+        return f"bgp_filter_community_length({maxlen},{maxlen_extended},{maxlen_large});"
 
     @property
     def bgp_attributes(self) -> BGPAttributes:
@@ -1429,9 +1521,161 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.prefix_limit6 = prefix_limit6
 
     @property
+    def replace_aspath(self) -> bool:
+        """Return the ASN which replaces the AS-PATH."""
+        return self.peer_attributes.replace_aspath
+
+    @replace_aspath.setter
+    def replace_aspath(self, replace_aspath: bool) -> None:
+        """Set the ASN which will replace the AS-PATH."""
+        self.peer_attributes.replace_aspath = replace_aspath
+
+    @property
     def peeringdb(self) -> BGPPeerPeeringDB:
         """Return our peeringdb entry."""
         return self.peer_attributes.peeringdb
+
+    # IPV4 IMPORT PREFIX LENGTHS
+
+    @property
+    def prefix_import_maxlen4(self) -> int:
+        """Return the current value of prefix_import_maxlen4."""
+        return self.peer_attributes.prefix_import_maxlen4 or self.bgp_attributes.prefix_import_maxlen4
+
+    @prefix_import_maxlen4.setter
+    def prefix_import_maxlen4(self, prefix_import_maxlen4: int) -> None:
+        """Setter for prefix_import_maxlen4."""
+        self.peer_attributes.prefix_import_maxlen4 = prefix_import_maxlen4
+
+    @property
+    def prefix_import_minlen4(self) -> int:
+        """Return the current value of prefix_import_minlen4."""
+        return self.peer_attributes.prefix_import_minlen4 or self.bgp_attributes.prefix_import_minlen4
+
+    @prefix_import_minlen4.setter
+    def prefix_import_minlen4(self, prefix_import_minlen4: int) -> None:
+        """Setter for prefix_import_minlen4."""
+        self.peer_attributes.prefix_import_minlen4 = prefix_import_minlen4
+
+    # IPV4 EXPORT PREFIX LENGHTS
+
+    @property
+    def prefix_export_maxlen4(self) -> int:
+        """Return the current value of prefix_export_maxlen4."""
+        return self.peer_attributes.prefix_export_maxlen4 or self.bgp_attributes.prefix_export_maxlen4
+
+    @prefix_export_maxlen4.setter
+    def prefix_export_maxlen4(self, prefix_export_maxlen4: int) -> None:
+        """Setter for prefix_export_maxlen4."""
+        self.peer_attributes.prefix_export_maxlen4 = prefix_export_maxlen4
+
+    @property
+    def prefix_export_minlen4(self) -> int:
+        """Return the current value of prefix_export_minlen4."""
+        return self.peer_attributes.prefix_export_minlen4 or self.bgp_attributes.prefix_export_minlen4
+
+    @prefix_export_minlen4.setter
+    def prefix_export_minlen4(self, prefix_export_minlen4: int) -> None:
+        """Setter for prefix_export_minlen4."""
+        self.peer_attributes.prefix_export_minlen4 = prefix_export_minlen4
+
+    # IPV6 IMPORT LENGTHS
+
+    @property
+    def prefix_import_maxlen6(self) -> int:
+        """Return the current value of prefix_import_maxlen6."""
+        return self.peer_attributes.prefix_import_maxlen6 or self.bgp_attributes.prefix_import_maxlen6
+
+    @prefix_import_maxlen6.setter
+    def prefix_import_maxlen6(self, prefix_import_maxlen6: int) -> None:
+        """Setter for prefix_import_maxlen6."""
+        self.peer_attributes.prefix_import_maxlen6 = prefix_import_maxlen6
+
+    @property
+    def prefix_import_minlen6(self) -> int:
+        """Return the current value of prefix_import_minlen6."""
+        return self.peer_attributes.prefix_import_minlen6 or self.bgp_attributes.prefix_import_minlen6
+
+    @prefix_import_minlen6.setter
+    def prefix_import_minlen6(self, prefix_import_minlen6: int) -> None:
+        """Setter for prefix_import_minlen6."""
+        self.peer_attributes.prefix_import_minlen6 = prefix_import_minlen6
+
+    # IPV6 EXPORT LENGTHS
+
+    @property
+    def prefix_export_minlen6(self) -> int:
+        """Return the current value of prefix_export_minlen6."""
+        return self.peer_attributes.prefix_export_minlen6 or self.bgp_attributes.prefix_export_minlen6
+
+    @prefix_export_minlen6.setter
+    def prefix_export_minlen6(self, prefix_export_minlen6: int) -> None:
+        """Setter for prefix_export_minlen6."""
+        self.peer_attributes.prefix_export_minlen6 = prefix_export_minlen6
+
+    @property
+    def prefix_export_maxlen6(self) -> int:
+        """Return the current value of prefix_export_maxlen6."""
+        return self.peer_attributes.prefix_export_maxlen6 or self.bgp_attributes.prefix_export_maxlen6
+
+    @prefix_export_maxlen6.setter
+    def prefix_export_maxlen6(self, prefix_export_maxlen6: int) -> None:
+        """Setter for prefix_export_maxlen6."""
+        self.peer_attributes.prefix_export_maxlen6 = prefix_export_maxlen6
+
+    # AS PATH LENGTHS
+
+    @property
+    def aspath_import_minlen(self) -> int:
+        """Return the current value of aspath_import_minlen."""
+        return self.peer_attributes.aspath_import_minlen or self.bgp_attributes.aspath_import_minlen
+
+    @aspath_import_minlen.setter
+    def aspath_import_minlen(self, aspath_import_minlen: int) -> None:
+        """Set the AS path minlen."""
+        self.peer_attributes.aspath_import_minlen = aspath_import_minlen
+
+    @property
+    def aspath_import_maxlen(self) -> int:
+        """Return the current value of aspath_import_maxlen."""
+        return self.peer_attributes.aspath_import_maxlen or self.bgp_attributes.aspath_import_maxlen
+
+    @aspath_import_maxlen.setter
+    def aspath_import_maxlen(self, aspath_import_maxlen: int) -> None:
+        """Set the AS path maxlen."""
+        self.peer_attributes.aspath_import_maxlen = aspath_import_maxlen
+
+    # COMMUNITY LENGTHS
+
+    @property
+    def community_import_maxlen(self) -> int:
+        """Return the current value of community_import_maxlen."""
+        return self.peer_attributes.community_import_maxlen or self.bgp_attributes.community_import_maxlen
+
+    @community_import_maxlen.setter
+    def community_import_maxlen(self, community_import_maxlen: int) -> None:
+        """Set the value of community_import_maxlen."""
+        self.peer_attributes.community_import_maxlen = community_import_maxlen
+
+    @property
+    def extended_community_import_maxlen(self) -> int:
+        """Return the current value of extended_community_import_maxlen."""
+        return self.peer_attributes.extended_community_import_maxlen or self.bgp_attributes.extended_community_import_maxlen
+
+    @extended_community_import_maxlen.setter
+    def extended_community_import_maxlen(self, extended_community_import_maxlen: int) -> None:
+        """Set the value of extended_community_import_maxlen."""
+        self.peer_attributes.extended_community_import_maxlen = extended_community_import_maxlen
+
+    @property
+    def large_community_import_maxlen(self) -> int:
+        """Return the current value of large_community_import_maxlen."""
+        return self.peer_attributes.large_community_import_maxlen or self.bgp_attributes.large_community_import_maxlen
+
+    @large_community_import_maxlen.setter
+    def large_community_import_maxlen(self, large_community_import_maxlen: int) -> None:
+        """Set the value of large_community_import_maxlen."""
+        self.peer_attributes.large_community_import_maxlen = large_community_import_maxlen
 
     #
     # Helper properties

@@ -34,11 +34,9 @@ class BirdConfig:
 
     _sections: Sections
 
-    def __init__(self) -> None:
+    def __init__(self, test_mode: bool = False) -> None:
         """Initialize the object."""
-        super().__init__()
-
-        self._birdconfig_globals = BirdConfigGlobals()
+        self._birdconfig_globals = BirdConfigGlobals(test_mode=test_mode)
         self._sections = Sections(self.birdconfig_globals)
 
     def get_config(self) -> List[str]:

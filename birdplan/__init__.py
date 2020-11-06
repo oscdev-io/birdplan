@@ -36,10 +36,10 @@ class BirdPlan:
     _state: Dict[str, Any]
     _state_file: Optional[str]
 
-    def __init__(self) -> None:
+    def __init__(self, test_mode: bool = False) -> None:
         """Initialize object."""
 
-        self._birdconf = BirdConfig()
+        self._birdconf = BirdConfig(test_mode=test_mode)
         self._config = {}
         self._state = {}
         self._state_file = None
@@ -578,11 +578,11 @@ class BirdPlan:
                 "prefix_export_maxlen6",
                 "prefix_import_minlen6",
                 "prefix_export_minlen6",
-                "aspath_maxlen",
-                "aspath_minlen",
-                "community_maxlen",
-                "extended_community_maxlen",
-                "large_community_maxlen",
+                "aspath_import_maxlen",
+                "aspath_import_minlen",
+                "community_import_maxlen",
+                "extended_community_import_maxlen",
+                "large_community_import_maxlen",
                 "originate",  # Origination
                 "accept",
                 "import",
@@ -628,11 +628,11 @@ class BirdPlan:
             "prefix_export_maxlen6",
             "prefix_import_minlen6",
             "prefix_export_minlen6",
-            "aspath_maxlen",
-            "aspath_minlen",
-            "community_maxlen",
-            "extended_community_maxlen",
-            "large_community_maxlen",
+            "aspath_import_maxlen",
+            "aspath_import_minlen",
+            "community_import_maxlen",
+            "extended_community_import_maxlen",
+            "large_community_import_maxlen",
         ]:
             if item in self.config["bgp"]:
                 setattr(self.birdconf.protocols.bgp, item, self.config["bgp"][item])
@@ -729,10 +729,24 @@ class BirdPlan:
                 "prefix_limit4",
                 "prefix_limit6",
                 "quarantine",
+                "replace_aspath",
                 "incoming_large_communities",
                 "outgoing_large_communities",
                 "cost",
                 "graceful_shutdown",
+                "prefix_import_maxlen4",
+                "prefix_import_minlen4",
+                "prefix_export_maxlen4",
+                "prefix_export_minlen4",
+                "prefix_import_maxlen6",
+                "prefix_import_minlen6",
+                "prefix_export_maxlen6",
+                "prefix_export_minlen6",
+                "aspath_import_maxlen",
+                "aspath_import_minlen",
+                "community_import_maxlen",
+                "extended_community_import_maxlen",
+                "large_community_import_maxlen",
             ):
                 peer[config_item] = config_value
             # Peer location configuration

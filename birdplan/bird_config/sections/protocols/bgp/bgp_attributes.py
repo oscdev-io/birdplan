@@ -82,40 +82,87 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
         Route policy for acceptance of routes from the main BGP table into the master table.
     route_policy_import : BGPRoutePolicyImport
         Route policy for importing of routes from internal tables into our main BGP table.
+    prefix_import_maxlen4 : int
+        Prefix import maximum length for IPv4.
+    prefix_import_minlen4 : int
+        Prefix import minimum length for IPv4.
+    prefix_export_maxlen4 : int
+        Prefix export maximum length for IPv4.
+    prefix_export_minlen4 : int
+        Prefix export minimum length for IPv4.
+    prefix_import_maxlen6 : int
+        Prefix import maximum length for IPv6.
+    prefix_import_minlen6 : int
+        Prefix import minimum length for IPv6.
+    prefix_export_maxlen6 : int
+        Prefix export maximum length for IPv6.
+    prefix_export_minlen6 : int
+        Prefix export minimum length for IPv6.
+    aspath_import_maxlen : int
+        AS-PATH maximum length.
+    aspath_import_minlen : int
+        AS-PATH minimum length.
+    community_import_maxlen : int
+        Community maximum length.
+    extended_community_import_maxlen : int
+        Extended community maximum length.
+    large_community_import_maxlen : int
+        Large community maximum length.
 
     """
 
     asn: Optional[int]
-    graceful_shutdown: bool = False
+    graceful_shutdown: bool
     rr_cluster_id: Optional[str]
     route_policy_accept: BGPRoutePolicyAccept
     route_policy_import: BGPRoutePolicyImport
 
-    prefix_import_maxlen4: int = 24
-    prefix_import_minlen4: int = 8
+    prefix_import_maxlen4: int
+    prefix_import_minlen4: int
 
-    prefix_export_maxlen4: int = 24
-    prefix_export_minlen4: int = 8
+    prefix_export_maxlen4: int
+    prefix_export_minlen4: int
 
-    prefix_import_maxlen6: int = 48
-    prefix_import_minlen6: int = 16
+    prefix_import_maxlen6: int
+    prefix_import_minlen6: int
 
-    prefix_export_maxlen6: int = 48
-    prefix_export_minlen6: int = 16
+    prefix_export_maxlen6: int
+    prefix_export_minlen6: int
 
-    aspath_maxlen: int = 100
-    aspath_minlen: int = 1
+    aspath_import_maxlen: int
+    aspath_import_minlen: int
 
-    community_maxlen: int = 100
-    extended_community_maxlen: int = 100
-    large_community_maxlen: int = 100
+    community_import_maxlen: int
+    extended_community_import_maxlen: int
+    large_community_import_maxlen: int
 
     def __init__(self) -> None:
         """Initialize object."""
 
         self.asn = None
 
+        self.graceful_shutdown = False
+
         self.rr_cluster_id = None
 
         self.route_policy_accept = BGPRoutePolicyAccept()
         self.route_policy_import = BGPRoutePolicyImport()
+
+        self.prefix_import_maxlen4 = 24
+        self.prefix_import_minlen4 = 8
+
+        self.prefix_export_maxlen4 = 24
+        self.prefix_export_minlen4 = 8
+
+        self.prefix_import_maxlen6 = 48
+        self.prefix_import_minlen6 = 16
+
+        self.prefix_export_maxlen6 = 48
+        self.prefix_export_minlen6 = 16
+
+        self.aspath_import_maxlen = 100
+        self.aspath_import_minlen = 1
+
+        self.community_import_maxlen = 100
+        self.extended_community_import_maxlen = 100
+        self.large_community_import_maxlen = 100

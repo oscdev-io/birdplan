@@ -22,7 +22,9 @@ from typing import Any, Dict, List, Optional, Union
 import requests
 from birdplan.exceptions import BirdPlanError
 
+# This type is a string as we can have it set to "peeringdb"
 BGPPeerPrefixLimit = Optional[str]
+
 BGPPeerFilterItem = Union[str, List[str]]
 BGPPeerFilter = Dict[str, BGPPeerFilterItem]
 BGPPeerPeeringDB = Dict[str, Any]
@@ -387,6 +389,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         Prefix limit for IPv4.
     prefix_limit6 : BGPPeerPrefixLimit
         Prefix limit for IPv6.
+    replace_aspath : Optional[int]
+        ASN to substitute in the AS-PATH.
     route_policy_accept : BGPPeerRoutePolicyAccept
         Route policy for acceptance of routes from BGP peers into our main BGP table.
     route_policy_redistribute : BGPPeerRoutePolicyRedistribute
@@ -395,6 +399,32 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         BGP peer filtering options.
     peeringdb: Optional[BGPPeerPeeringDB]
         BGP peer peeringdb entry.
+    prefix_import_maxlen4 : Optional[int]
+        Prefix import maximum length for IPv4.
+    prefix_import_minlen4 : Optional[int]
+        Prefix import minimum length for IPv4.
+    prefix_export_maxlen4 : Optional[int]
+        Prefix export maximum length for IPv4.
+    prefix_export_minlen4 : Optional[int]
+        Prefix export minimum length for IPv4.
+    prefix_import_maxlen6 : Optional[int]
+        Prefix import maximum length for IPv6.
+    prefix_import_minlen6 : Optional[int]
+        Prefix import minimum length for IPv6.
+    prefix_export_maxlen6 : Optional[int]
+        Prefix export maximum length for IPv6.
+    prefix_export_minlen6 : Optional[int]
+        Prefix export minimum length for IPv6.
+    aspath_import_maxlen : Optional[int]
+        AS-PATH maximum length.
+    aspath_import_minlen : Optional[int]
+        AS-PATH minimum length.
+    community_maxlen : Optional[int]
+        Community maximum length.
+    extended_community_maxlen : Optional[int]
+        Extended community maximum length.
+    large_community_maxlen : Optional[int]
+        Large community maximum length.
 
     """
 
@@ -405,32 +435,34 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     _peer_type: Optional[str]
     _asn: Optional[int]
 
-    neighbor4: Optional[str] = None
-    neighbor6: Optional[str] = None
-    source_address4: Optional[str] = None
-    source_address6: Optional[str] = None
+    neighbor4: Optional[str]
+    neighbor6: Optional[str]
+    source_address4: Optional[str]
+    source_address6: Optional[str]
 
-    connect_delay_time: Optional[str] = None
-    connect_retry_time: Optional[str] = None
-    error_wait_time: Optional[str] = None
-    multihop: Optional[str] = None
-    password: Optional[str] = None
+    connect_delay_time: Optional[str]
+    connect_retry_time: Optional[str]
+    error_wait_time: Optional[str]
+    multihop: Optional[str]
+    password: Optional[str]
 
-    cost: int = 0
+    cost: int
 
-    graceful_shutdown: bool = False
+    graceful_shutdown: bool
 
     large_communities: BGPPeerLargeCommunities
 
     prepend: BGPPeerPrepend
 
     # Default to disabling passive mode
-    passive: bool = False
+    passive: bool
 
-    quarantined: bool = False
+    quarantined: bool
 
-    prefix_limit4: BGPPeerPrefixLimit = None
-    prefix_limit6: BGPPeerPrefixLimit = None
+    prefix_limit4: BGPPeerPrefixLimit
+    prefix_limit6: BGPPeerPrefixLimit
+
+    replace_aspath: bool
 
     route_policy_accept: BGPPeerRoutePolicyAccept
     route_policy_redistribute: BGPPeerRoutePolicyRedistribute
@@ -438,6 +470,25 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     filter_policy: BGPPeerFilterPolicy
 
     _peeringdb: Optional[BGPPeerPeeringDB]
+
+    prefix_import_maxlen4: Optional[int]
+    prefix_import_minlen4: Optional[int]
+
+    prefix_export_maxlen4: Optional[int]
+    prefix_export_minlen4: Optional[int]
+
+    prefix_import_maxlen6: Optional[int]
+    prefix_import_minlen6: Optional[int]
+
+    prefix_export_maxlen6: Optional[int]
+    prefix_export_minlen6: Optional[int]
+
+    aspath_import_maxlen: Optional[int]
+    aspath_import_minlen: Optional[int]
+
+    community_import_maxlen: Optional[int]
+    extended_community_import_maxlen: Optional[int]
+    large_community_import_maxlen: Optional[int]
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -449,9 +500,34 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self._peer_type = None
         self._asn = None
 
+        self.neighbor4 = None
+        self.neighbor6 = None
+        self.source_address4 = None
+        self.source_address6 = None
+
+        self.connect_delay_time = None
+        self.connect_retry_time = None
+        self.error_wait_time = None
+        self.multihop = None
+        self.password = None
+
+        self.cost = 0
+
+        self.graceful_shutdown = False
+
         self.large_communities = BGPPeerLargeCommunities()
 
         self.prepend = BGPPeerPrepend()
+
+        # Default to disabling passive mode
+        self.passive = False
+
+        self.quarantined = False
+
+        self.prefix_limit4 = None
+        self.prefix_limit6 = None
+
+        self.replace_aspath = False
 
         # Route policies
         self.route_policy_accept = BGPPeerRoutePolicyAccept()
@@ -461,10 +537,30 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
         self._peeringdb = None
 
+        self.prefix_import_maxlen4 = None
+        self.prefix_import_minlen4 = None
+
+        self.prefix_export_maxlen4 = None
+        self.prefix_export_minlen4 = None
+
+        self.prefix_import_maxlen6 = None
+        self.prefix_import_minlen6 = None
+
+        self.prefix_export_maxlen6 = None
+        self.prefix_export_minlen6 = None
+
+        self.aspath_import_maxlen = None
+        self.aspath_import_minlen = None
+
+        self.community_import_maxlen = None
+        self.extended_community_import_maxlen = None
+        self.large_community_import_maxlen = None
+
     @property
     def peeringdb(self) -> BGPPeerPeeringDB:
         """Return our peeringdb entry, if there is one."""
-        if self.asn > 64512 and self.asn < 65534:
+        # We cannot do lookups on private ASN's
+        if (self.asn >= 64512 and self.asn <= 65534) or (self.asn >= 4200000000 and self.asn <= 4294967294):
             return {"info_prefixes4": None, "info_prefixes6": None}
         # If we don't having peerindb info, grab it
         if not self._peeringdb:

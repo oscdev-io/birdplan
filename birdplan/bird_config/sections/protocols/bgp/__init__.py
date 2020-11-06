@@ -68,11 +68,24 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Setup BGP attributes
         self._bgp_attributes = BGPAttributes()
 
+        # For test mode we need to slightly adjust our prefix lengths that we permit
+        if self.birdconfig_globals.test_mode:
+            self.aspath_import_maxlen = 25
+            self.community_import_maxlen = 25
+            self.extended_community_import_maxlen = 25
+            self.large_community_import_maxlen = 25
+
+            self.prefix_import_minlen4 = 16
+            self.prefix_export_minlen4 = 16
+            self.prefix_import_maxlen6 = 64
+            self.prefix_import_minlen6 = 32
+            self.prefix_export_maxlen6 = 64
+            self.prefix_export_minlen6 = 32
+
     def configure(self) -> None:
         """Configure the BGP protocol."""
         super().configure()
 
-        self._configure_constants_bogon_asns()
         self._configure_constants_bgp()
         self._configure_constants_functions()
 
@@ -157,8 +170,13 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         """Return a BGP peer configuration object."""
         return self.peers[name]
 
-    def _configure_constants_bogon_asns(self) -> None:
-        """Configure ASN bogons."""
+    def _configure_constants_bgp(self) -> None:  # pylint: disable=too-many-statements
+        """Configure BGP constants."""
+        self.constants.conf.append_title("BGP Constants")
+
+        self.constants.conf.append("# Our BGP ASN")
+        self.constants.conf.append(f"define BGP_ASN = {self.asn};")
+        self.constants.conf.append("")
 
         self.constants.conf.append("# Ref http://bgpfilterguide.nlnog.net/guides/bogon_asns/")
         self.constants.conf.append("define BOGON_ASNS = [")
@@ -177,154 +195,13 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("];")
         self.constants.conf.append("")
 
-    def _configure_constants_bgp(self) -> None:  # pylint: disable=too-many-statements
-        """Configure BGP constants."""
-        self.constants.conf.append_title("BGP Constants")
-
-        self.constants.conf.append("# Our BGP ASN")
-        self.constants.conf.append(f"define BGP_ASN = {self.asn};")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# Prefix sizes we will be using")
-        self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MAXLEN4 = {self.bgp_attributes.prefix_import_maxlen4};")
-        # If we're in test mode, we need to restrict the minimum length so we can trigger tests with 100.64.0.0/X<16
+        self.constants.conf.append("define PRIVATE_ASNS = [")
         if self.birdconfig_globals.test_mode:
-            self.constants.conf.append("define BGP_PREFIX_IMPORT_MINLEN4 = 16;")
+            self.constants.conf.append("  # EXCLUDING DUE TO TESTING: 64512..65534, # RFC 6996 Private ASNs")
         else:
-            self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MINLEN4 = {self.bgp_attributes.prefix_import_minlen4};")
-        self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MAXLEN4 = {self.bgp_attributes.prefix_export_maxlen4};")
-        # If we're in test mode, we need to restrict the minimum length so we can trigger tests with 100.64.0.0/X<16
-        if self.birdconfig_globals.test_mode:
-            self.constants.conf.append("define BGP_PREFIX_EXPORT_MINLEN4 = 16;")
-        else:
-            self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MINLEN4 = {self.bgp_attributes.prefix_export_minlen4};")
-
-        # If we're in test mode, allow smaller prefixes
-        if self.birdconfig_globals.test_mode:
-            self.constants.conf.append("define BGP_PREFIX_IMPORT_MAXLEN6 = 64;")
-            self.constants.conf.append("define BGP_PREFIX_IMPORT_MINLEN6 = 32;")
-            self.constants.conf.append("define BGP_PREFIX_EXPORT_MAXLEN6 = 64;")
-            self.constants.conf.append("define BGP_PREFIX_EXPORT_MINLEN6 = 32;")
-        else:
-            self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MAXLEN6 = {self.bgp_attributes.prefix_import_maxlen6};")
-            self.constants.conf.append(f"define BGP_PREFIX_IMPORT_MINLEN6 = {self.bgp_attributes.prefix_import_minlen6};")
-            self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MAXLEN6 = {self.bgp_attributes.prefix_export_maxlen6};")
-            self.constants.conf.append(f"define BGP_PREFIX_EXPORT_MINLEN6 = {self.bgp_attributes.prefix_export_minlen6};")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# BGP AS path min and max lengths")
-        self.constants.conf.append(f"define BGP_ASPATH_MAXLEN = {self.bgp_attributes.aspath_maxlen};")
-        self.constants.conf.append(f"define BGP_ASPATH_MINLEN = {self.bgp_attributes.aspath_minlen};")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# Community maximum lengths")
-        self.constants.conf.append(f"define BGP_COMMUNITY_MAXLEN = {self.bgp_attributes.community_maxlen};")
-        self.constants.conf.append(f"define BGP_EXTENDED_COMMUNITY_MAXLEN = {self.bgp_attributes.extended_community_maxlen};")
-        self.constants.conf.append(f"define BGP_LARGE_COMMUNITY_MAXLEN = {self.bgp_attributes.large_community_maxlen};")
-        self.constants.conf.append("")
-        # NK: IMPORTANT IF THE ABOVE CHANGES UPDATE THE BELOW
-        self.constants.conf.append("# Community stripping")
-        if self.birdconfig_globals.test_mode:
-            self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (2..65534, *) ];  # TESTING: Start changed from 1 to 2")
-        else:
-            self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (1..65534, *) ];")
-        # This is used for stripping large communities from customers mostly
-        self.constants.conf.append("define BGP_LC_STRIP = [ ")
-        self.constants.conf.append("  (BGP_ASN, 1..3, *),")  # Strip route learned functions
-        # Allow client traffic engineering: 4, 5, 6, 7, 8
-        self.constants.conf.append("  (BGP_ASN, 9..61, *),")  # Strip unused
-        self.constants.conf.append("  (BGP_ASN, 64..71, *),")  # Strip unused
-        self.constants.conf.append("  (BGP_ASN, 74..65535, *),")  # Strip unsed + rest (incl. 1000 - info, 1101 - filter)
-        # These functions should never be used on our own ASN
-        self.constants.conf.append("  (BGP_ASN, 4, BGP_ASN),")
-        self.constants.conf.append("  (BGP_ASN, 6, BGP_ASN),")
-        self.constants.conf.append("  (BGP_ASN, 62, BGP_ASN),")
-        self.constants.conf.append("  (BGP_ASN, 63, BGP_ASN)")
+            self.constants.conf.append("  64512..65534, # RFC 6996 Private ASNs")
+        self.constants.conf.append("  4200000000..4294967294 # RFC 6996 Private ASNs")
         self.constants.conf.append("];")
-        # Strip communities from all peer types
-        self.constants.conf.append("define BGP_COMMUNITY_STRIP_ALL = BGP_COMMUNITY_STRIP;")
-        # This is used for stripping large communities from peers and transit providers
-        self.constants.conf.append("define BGP_LC_STRIP_ALL = [ (BGP_ASN, *, *) ];")
-
-        self.constants.conf.append("# BGP Route Preferences")
-        self.constants.conf.append("define BGP_PREF_OWN = 950;")  # -20 = Originate, -10 = static, -5 = kernel
-        self.constants.conf.append("define BGP_PREF_CUSTOMER = 750;")
-        self.constants.conf.append("define BGP_PREF_PEER = 470;")
-        self.constants.conf.append("define BGP_PREF_ROUTESERVER = 450;")
-        self.constants.conf.append("define BGP_PREF_TRANSIT = 150;")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# Well known communities")
-        self.constants.conf.append("define BGP_COMMUNITY_GRACEFUL_SHUTDOWN = (65535, 0);")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# Large community functions")
-        # NK: IMPORTANT IF YOU CHANGE THE BELOW, UPDATE BGP_LC_STRIP
-        self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_ISO3166 = 1;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_UNM49 = 2;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_RELATION = 3;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_NOEXPORT = 4;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_NOEXPORT_LOCATION = 5;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_ONE = 6;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_TWO = 62;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_THREE = 63;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_ONE = 7;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_TWO = 72;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_THREE = 73;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF = 8;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_INFORMATION = 1000;")
-        self.constants.conf.append("define BGP_LC_FUNCTION_FILTERED = 1101;")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# Large community noexport")
-        self.constants.conf.append("define BGP_LC_EXPORT_NOTRANSIT = (BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, 65412);")
-        self.constants.conf.append("define BGP_LC_EXPORT_NOPEER = (BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, 65413);")
-        self.constants.conf.append("define BGP_LC_EXPORT_NOCUSTOMER = (BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, 65414);")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# Large community relations")
-        self.constants.conf.append("define BGP_LC_RELATION_OWN = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 1);")
-        self.constants.conf.append("define BGP_LC_RELATION_CUSTOMER = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 2);")
-        self.constants.conf.append("define BGP_LC_RELATION_PEER = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 3);")
-        self.constants.conf.append("define BGP_LC_RELATION_TRANSIT = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 4);")
-        self.constants.conf.append("define BGP_LC_RELATION_ROUTESERVER = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 5);")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# Large communities for LOCAL_PREF attribute manipulation")
-        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_ONE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 1);")
-        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_TWO = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 2);")
-        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_THREE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 3);")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# Large community information")
-        self.constants.conf.append("define BGP_LC_INFORMATION_STRIPPED_COMMUNITY = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 1);")
-        self.constants.conf.append("define BGP_LC_INFORMATION_STRIPPED_LC = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 3);")
-        self.constants.conf.append("")
-
-        self.constants.conf.append("# Large community filtered")
-        self.constants.conf.append("define BGP_LC_FILTERED_PREFIX_LEN_TOO_LONG = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 1);")
-        self.constants.conf.append("define BGP_LC_FILTERED_PREFIX_LEN_TOO_SHORT = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 2);")
-        self.constants.conf.append("define BGP_LC_FILTERED_BOGON = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 3);")
-        self.constants.conf.append("define BGP_LC_FILTERED_BOGON_ASN = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 4);")
-        self.constants.conf.append("define BGP_LC_FILTERED_ASPATH_TOO_LONG = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 5);")
-        self.constants.conf.append("define BGP_LC_FILTERED_ASPATH_TOO_SHORT = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 6);")
-        self.constants.conf.append("define BGP_LC_FILTERED_FIRST_AS_NOT_PEER_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 7);")
-        self.constants.conf.append("define BGP_LC_FILTERED_NEXT_HOP_NOT_PEER_IP = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 8);")
-        self.constants.conf.append("define BGP_LC_FILTERED_PREFIX_FILTERED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 9);")
-        self.constants.conf.append("define BGP_LC_FILTERED_ORIGIN_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 10);")
-        # self.constants.conf.append('define BGP_LC_FILTERED_PREFIX_NOT_IN_ORIGIN_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 11);')
-        self.constants.conf.append("define BGP_LC_FILTERED_DEFAULT_NOT_ALLOWED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 12);")
-        self.constants.conf.append("define BGP_LC_FILTERED_RPKI_UNKNOWN = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 13);")
-        self.constants.conf.append("define BGP_LC_FILTERED_RPKI_INVALID = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 14);")
-        self.constants.conf.append("define BGP_LC_FILTERED_TRANSIT_FREE_ASN = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 15);")
-        self.constants.conf.append("define BGP_LC_FILTERED_TOO_MANY_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 16);")
-        self.constants.conf.append("define BGP_LC_FILTERED_ROUTECOLLECTOR = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 17);")
-        self.constants.conf.append("define BGP_LC_FILTERED_QUARANTINED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 18);")
-        self.constants.conf.append(
-            "define BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 19);"
-        )
-        self.constants.conf.append("define BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 20);")
-        self.constants.conf.append("define BGP_LC_FILTERED_PEER_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 21);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Ref http://bgpfilterguide.nlnog.net/guides/no_transit_leaks")
@@ -353,58 +230,198 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("];")
         self.constants.conf.append("")
 
+        # NK: IMPORTANT IF THE ABOVE CHANGES UPDATE THE BELOW
+        self.constants.conf.append("# Community stripping")
+        if self.birdconfig_globals.test_mode:
+            self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (2..65534, *) ];  # TESTING: Start changed from 1 to 2")
+        else:
+            self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (1..65534, *) ];")
+        # This is used for stripping large communities from customers mostly
+        self.constants.conf.append("define BGP_LC_STRIP = [ ")
+        self.constants.conf.append("  (BGP_ASN, 1..3, *),")  # Strip route learned functions
+        # Allow client traffic engineering: 4, 5, 6, 7, 8
+        self.constants.conf.append("  (BGP_ASN, 9..60, *),")  # Strip unused
+        self.constants.conf.append("  (BGP_ASN, 64..70, *),")  # Strip unused
+        self.constants.conf.append("  (BGP_ASN, 74..65535, *),")  # Strip unsed + rest (incl. 1000 - info, 1101 - filter)
+        # These functions should never be used on our own ASN
+        self.constants.conf.append("  (BGP_ASN, 4, BGP_ASN),")
+        self.constants.conf.append("  (BGP_ASN, 6, BGP_ASN),")
+        self.constants.conf.append("  (BGP_ASN, 61, BGP_ASN),")
+        self.constants.conf.append("  (BGP_ASN, 62, BGP_ASN),")
+        self.constants.conf.append("  (BGP_ASN, 63, BGP_ASN)")
+        self.constants.conf.append("];")
+        # Strip communities from all peer types
+        self.constants.conf.append("define BGP_COMMUNITY_STRIP_ALL = BGP_COMMUNITY_STRIP;")
+        # This is used for stripping large communities from peers and transit providers
+        self.constants.conf.append("define BGP_LC_STRIP_ALL = [ (BGP_ASN, *, *) ];")
+        self.constants.conf.append("define BGP_LC_STRIP_PRIVATE = [")
+        # Don't strip the lower private ASN range during testing
+        if not self.birdconfig_globals.test_mode:
+            self.constants.conf.append("  (64512..65534, *, *),")
+        self.constants.conf.append("  (4200000000..4294967294, *, *)")
+        self.constants.conf.append("];")
+
+        self.constants.conf.append("# BGP Route Preferences")
+        self.constants.conf.append("define BGP_PREF_OWN = 950;")  # -20 = Originate, -10 = static, -5 = kernel
+        self.constants.conf.append("define BGP_PREF_CUSTOMER = 750;")
+        self.constants.conf.append("define BGP_PREF_PEER = 470;")
+        self.constants.conf.append("define BGP_PREF_ROUTESERVER = 450;")
+        self.constants.conf.append("define BGP_PREF_TRANSIT = 150;")
+        self.constants.conf.append("")
+
+        self.constants.conf.append("# Well known communities")
+        self.constants.conf.append("define BGP_COMMUNITY_GRACEFUL_SHUTDOWN = (65535, 0);")
+        self.constants.conf.append("")
+
+        self.constants.conf.append("# Large community functions")
+        # NK: IMPORTANT IF YOU CHANGE THE BELOW, UPDATE BGP_LC_STRIP
+        self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_ISO3166 = 1;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_LOCATION_UNM49 = 2;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_RELATION = 3;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_NOEXPORT = 4;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_NOEXPORT_LOCATION = 5;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_ONE = 6;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_ONE_2 = 61;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_TWO = 62;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_THREE = 63;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_ONE = 7;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_ONE_2 = 71;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_TWO = 72;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_THREE = 73;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF = 8;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_INFORMATION = 1000;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_FILTERED = 1101;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_ACTION = 1200;")
+        self.constants.conf.append("")
+
+        self.constants.conf.append("# Large community noexport")
+        self.constants.conf.append("define BGP_LC_EXPORT_NOTRANSIT = (BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, 65412);")
+        self.constants.conf.append("define BGP_LC_EXPORT_NOPEER = (BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, 65413);")
+        self.constants.conf.append("define BGP_LC_EXPORT_NOCUSTOMER = (BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, 65414);")
+        self.constants.conf.append("")
+
+        self.constants.conf.append("# Large community relations")
+        self.constants.conf.append("define BGP_LC_RELATION = [(BGP_ASN, BGP_LC_FUNCTION_RELATION, 1..5)];")
+        self.constants.conf.append("define BGP_LC_RELATION_OWN = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 1);")
+        self.constants.conf.append("define BGP_LC_RELATION_CUSTOMER = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 2);")
+        self.constants.conf.append("define BGP_LC_RELATION_PEER = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 3);")
+        self.constants.conf.append("define BGP_LC_RELATION_TRANSIT = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 4);")
+        self.constants.conf.append("define BGP_LC_RELATION_ROUTESERVER = (BGP_ASN, BGP_LC_FUNCTION_RELATION, 5);")
+        self.constants.conf.append("")
+
+        self.constants.conf.append("# Large communities for LOCAL_PREF attribute manipulation")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_ONE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 1);")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_TWO = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 2);")
+        self.constants.conf.append("define BGP_LC_LOCALPREF_MINUS_THREE = (BGP_ASN, BGP_LC_FUNCTION_LOCALPREF, 3);")
+        self.constants.conf.append("")
+
+        self.constants.conf.append("# Large community information")
+        self.constants.conf.append("define BGP_LC_INFORMATION_STRIPPED_COMMUNITY = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 1);")
+        self.constants.conf.append("define BGP_LC_INFORMATION_STRIPPED_LC = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 3);")
+        self.constants.conf.append("define BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 4);")
+        self.constants.conf.append("")
+
+        self.constants.conf.append("# Large community filtered")
+        self.constants.conf.append("define BGP_LC_FILTERED_PREFIX_LEN_TOO_LONG = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 1);")
+        self.constants.conf.append("define BGP_LC_FILTERED_PREFIX_LEN_TOO_SHORT = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 2);")
+        self.constants.conf.append("define BGP_LC_FILTERED_BOGON = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 3);")
+        self.constants.conf.append("define BGP_LC_FILTERED_BOGON_ASN = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 4);")
+        self.constants.conf.append("define BGP_LC_FILTERED_ASPATH_TOO_LONG = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 5);")
+        self.constants.conf.append("define BGP_LC_FILTERED_ASPATH_TOO_SHORT = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 6);")
+        self.constants.conf.append("define BGP_LC_FILTERED_FIRST_AS_NOT_PEER_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 7);")
+        self.constants.conf.append("define BGP_LC_FILTERED_NEXT_HOP_NOT_PEER_IP = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 8);")
+        self.constants.conf.append("define BGP_LC_FILTERED_PREFIX_FILTERED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 9);")
+        self.constants.conf.append("define BGP_LC_FILTERED_ORIGIN_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 10);")
+        # self.constants.conf.append('define BGP_LC_FILTERED_PREFIX_NOT_IN_ORIGIN_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 11);')
+        self.constants.conf.append("define BGP_LC_FILTERED_DEFAULT_NOT_ALLOWED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 12);")
+        self.constants.conf.append("define BGP_LC_FILTERED_RPKI_UNKNOWN = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 13);")
+        self.constants.conf.append("define BGP_LC_FILTERED_RPKI_INVALID = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 14);")
+        self.constants.conf.append("define BGP_LC_FILTERED_TRANSIT_FREE_ASN = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 15);")
+        self.constants.conf.append("define BGP_LC_FILTERED_TOO_MANY_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 16);")
+        self.constants.conf.append("define BGP_LC_FILTERED_ROUTECOLLECTOR = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 17);")
+        self.constants.conf.append("define BGP_LC_FILTERED_QUARANTINED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 18);")
+        self.constants.conf.append(
+            "define BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 19);"
+        )
+        self.constants.conf.append("define BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 20);")
+        self.constants.conf.append("define BGP_LC_FILTERED_PEER_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 21);")
+        self.constants.conf.append("define BGP_LC_FILTERED_ASPATH_NOT_ALLOWED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 22);")
+        self.constants.conf.append("define BGP_LC_FILTERED_NO_RELATION_LC = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 23);")
+        self.constants.conf.append("")
+        self.constants.conf.append("# Large community actions")
+        self.constants.conf.append("define BGP_LC_ACTION_REPLACE_ASPATH = (BGP_ASN, BGP_LC_FUNCTION_ACTION, 1);")
+        self.constants.conf.append("")
+
     def _configure_constants_functions(self) -> None:  # pylint: disable=too-many-statements
         """Configure BGP functions."""
         self.functions.conf.append_title("BGP Functions")
 
         self.functions.conf.append("# Strip all communities we could interpret internally")
         self.functions.conf.append("function bgp_communities_strip_all() ")
-        self.functions.conf.append("int stripped_community;")
-        self.functions.conf.append("int stripped_lc;")
+        self.functions.conf.append("bool stripped_community;")
+        self.functions.conf.append("bool stripped_lc;")
+        self.functions.conf.append("bool stripped_lc_private;")
         self.functions.conf.append("{")
-        self.functions.conf.append("  stripped_community = 0;")
-        self.functions.conf.append("  stripped_lc = 0;")
+        self.functions.conf.append("  stripped_community = false;")
+        self.functions.conf.append("  stripped_lc = false;")
+        self.functions.conf.append("  stripped_lc_private = false;")
         self.functions.conf.append("  # Sanitize communities")
         self.functions.conf.append("  if (bgp_community ~ BGP_COMMUNITY_STRIP_ALL) then {")
         self.functions.conf.append('    print "[bgp_communities_strip_all] Sanitizing communities for ", net;', debug=True)
         self.functions.conf.append("    bgp_community.delete(BGP_COMMUNITY_STRIP_ALL);")
-        self.functions.conf.append("    stripped_community = 1;")
+        self.functions.conf.append("    stripped_community = true;")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Sanitize large communities")
         self.functions.conf.append("  if (bgp_large_community ~ BGP_LC_STRIP_ALL) then {")
         self.functions.conf.append('    print "[bgp_communities_strip_all] Sanitizing large communities for ", net;', debug=True)
         self.functions.conf.append("    bgp_large_community.delete(BGP_LC_STRIP_ALL);")
-        self.functions.conf.append("    stripped_lc = 1;")
+        self.functions.conf.append("    stripped_lc = true;")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if (stripped_community > 0) then {")
+        self.functions.conf.append("  # Sanitize private large communities")
+        self.functions.conf.append("  if (bgp_large_community ~ BGP_LC_STRIP_PRIVATE) then {")
+        self.functions.conf.append(
+            '    print "[bgp_communities_strip_all] Sanitizing private large communities for ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);")
+        self.functions.conf.append("    stripped_lc_private = true;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  if (stripped_community) then {")
         self.functions.conf.append(
             '    print "[bgp_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_COMMUNITY);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if (stripped_lc > 0) then {")
+        self.functions.conf.append("  if (stripped_lc) then {")
         self.functions.conf.append(
-            '    print "[bgp_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;', debug=True
+            '    print "[bgp_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_LC to ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  if (stripped_lc_private) then {")
+        self.functions.conf.append(
+            '    print "[bgp_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE to ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
         self.functions.conf.append("# Strip internal communities")
         self.functions.conf.append("function bgp_communities_strip_internal() ")
-        self.functions.conf.append("int stripped_community;")
-        self.functions.conf.append("int stripped_lc;")
+        self.functions.conf.append("bool stripped_community;")
+        self.functions.conf.append("bool stripped_lc;")
+        self.functions.conf.append("bool stripped_lc_private;")
         self.functions.conf.append("{")
-        self.functions.conf.append("  stripped_community = 0;")
-        self.functions.conf.append("  stripped_lc = 0;")
+        self.functions.conf.append("  stripped_community = false;")
+        self.functions.conf.append("  stripped_lc = false;")
+        self.functions.conf.append("  stripped_lc_private = false;")
         self.functions.conf.append("  # Remove stripped communities")
         self.functions.conf.append("  if (bgp_community ~ BGP_COMMUNITY_STRIP) then {")
         self.functions.conf.append(
             '    print "[bgp_communities_strip_internal] Removing stripped communities from ", net;', debug=True
         )
         self.functions.conf.append("    bgp_community.delete(BGP_COMMUNITY_STRIP);")
-        self.functions.conf.append("    stripped_community = 1;")
+        self.functions.conf.append("    stripped_community = true;")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Remove stripped large communities")
         self.functions.conf.append("  if (bgp_large_community ~ BGP_LC_STRIP) then {")
@@ -412,19 +429,44 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             '    print "[bgp_communities_strip_internal] Removing stripped large communities from ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.delete(BGP_LC_STRIP);")
-        self.functions.conf.append("    stripped_lc = 1;")
+        self.functions.conf.append("    stripped_lc = true;")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if (stripped_community > 0) then {")
+        self.functions.conf.append("  # Remove stripped private large communities")
+        self.functions.conf.append("  if (bgp_large_community ~ BGP_LC_STRIP_PRIVATE) then {")
+        self.functions.conf.append(
+            '    print "[bgp_communities_strip_internal] Removing stripped private large communities from ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);")
+        self.functions.conf.append("    stripped_lc_private = true;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  if (stripped_community) then {")
         self.functions.conf.append(
             '    print "[bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_COMMUNITY);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if (stripped_lc > 0) then {")
+        self.functions.conf.append("  if (stripped_lc) then {")
         self.functions.conf.append(
             '    print "[bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;', debug=True
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  if (stripped_lc_private) then {")
+        self.functions.conf.append(
+            '    print "[bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE to ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Remove private large communities")
+        self.functions.conf.append("function bgp_remove_lc_private() ")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  # Remove private large communities")
+        self.functions.conf.append("  if (bgp_large_community ~ BGP_LC_STRIP_PRIVATE) then {")
+        self.functions.conf.append('    print "[bgp_strip_lc_private] Removing private large communities from ", net;', debug=True)
+        self.functions.conf.append("    bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
@@ -506,30 +548,21 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-        self.functions.conf.append("# Filter IPv4 prefix size")
-        self.functions.conf.append("function bgp_filter_size_v4() {")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_IMPORT_MAXLEN4) then {")
-        self.functions.conf.append('    print "[bgp_filter_size_v4] Adding BGP_FILTERED_PREFIX_LEN_TOO_LONG to ", net;', debug=True)
-        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_LONG);")
-        self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_IMPORT_MINLEN4) then {")
+        self.functions.conf.append("# Filter prefix size")
+        self.functions.conf.append("function bgp_filter_prefix_size(int prefix_maxlen; int prefix_minlen) {")
+        self.functions.conf.append("  if prefix_is_longer(prefix_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_size_v4] Adding BGP_FILTERED_PREFIX_LEN_TOO_SHORT to ", net;', debug=True
+            '    print "[bgp_filter_prefix_size] Prefix length >", prefix_maxlen,", '
+            'adding BGP_FILTERED_PREFIX_LEN_TOO_LONG to ", net;',
+            debug=True,
         )
-        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_SHORT);")
-        self.functions.conf.append("  }")
-        self.functions.conf.append("}")
-        self.functions.conf.append("")
-
-        self.functions.conf.append("# Filter IPv6 prefix size")
-        self.functions.conf.append("function bgp_filter_size_v6() {")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_IMPORT_MAXLEN6) then {")
-        self.functions.conf.append('    print "[bgp_filter_size_v6] Adding BGP_FILTERED_PREFIX_LEN_TOO_LONG to ", net;', debug=True)
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_LONG);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_IMPORT_MINLEN6) then {")
+        self.functions.conf.append("  if prefix_is_shorter(prefix_minlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_size_v6] Adding BGP_FILTERED_PREFIX_LEN_TOO_SHORT to ", net;', debug=True
+            '    print "[bgp_filter_prefix_size] Prefix length <", prefix_minlen,", '
+            'adding BGP_FILTERED_PREFIX_LEN_TOO_SHORT to ", net;',
+            debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_SHORT);")
         self.functions.conf.append("  }")
@@ -636,10 +669,20 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         self.functions.conf.append("# Filter bogon ASNs")
         self.functions.conf.append("function bgp_filter_asn_bogons() {")
-        self.functions.conf.append("  # Filter bogon ASNs")
         self.functions.conf.append("  if (bgp_path ~ BOGON_ASNS) then {")
         self.functions.conf.append('    print "[bgp_filter_asn_bogons] Adding BGP_LC_FILTERED_BOGON_ASN to ", net;', debug=True)
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_BOGON_ASN);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Filter private ASN's")
+        self.functions.conf.append("function bgp_filter_asn_private(int set allowed_asns) {")
+        self.functions.conf.append("  if (bgp_path != filter(bgp_path, allowed_asns)) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_asn_private] Adding BGP_LC_FILTERED_ASPATH_NOT_ALLOWED to ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ASPATH_NOT_ALLOWED);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
@@ -656,20 +699,21 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
-        self.functions.conf.append("# Filter long AS paths")
-        self.functions.conf.append("function bgp_filter_asn_long() {")
-        self.functions.conf.append("  if (bgp_path.len > BGP_ASPATH_MAXLEN) then {")
-        self.functions.conf.append('    print "[bgp_filter_asn_long] Adding BGP_LC_FILTERED_ASPATH_TOO_LONG to ", net;', debug=True)
+        self.functions.conf.append("# Filter AS-PATH length")
+        self.functions.conf.append("function bgp_filter_aspath_length(int aspath_maxlen; int aspath_minlen) {")
+        self.functions.conf.append("  if (bgp_path.len > aspath_maxlen) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_aspath_length] AS-PATH length >", aspath_maxlen, ", '
+            'adding BGP_LC_FILTERED_ASPATH_TOO_LONG to ", net;',
+            debug=True,
+        )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ASPATH_TOO_LONG);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("}")
-        self.functions.conf.append("")
-
-        self.functions.conf.append("# Filter short AS paths")
-        self.functions.conf.append("function bgp_filter_asn_short() {")
-        self.functions.conf.append("  if (bgp_path.len < BGP_ASPATH_MINLEN) then {")
+        self.functions.conf.append("  if (bgp_path.len < aspath_minlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_asn_short] Adding BGP_LC_FILTERED_ASPATH_TOO_SHORT to ", net;', debug=True
+            '    print "[bgp_filter_aspath_length] AS-PATH length <", aspath_minlen, ", '
+            'adding BGP_LC_FILTERED_ASPATH_TOO_SHORT to ", net;',
+            debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_ASPATH_TOO_SHORT);")
         self.functions.conf.append("  }")
@@ -677,31 +721,42 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# Filter too many communities")
-        self.functions.conf.append("function bgp_filter_community_length() {")
-        self.functions.conf.append("  if (bgp_community.len > BGP_COMMUNITY_MAXLEN) then {")
+        self.functions.conf.append("function bgp_filter_community_length(int community_maxlen; int ext_maxlen; int large_maxlen) {")
+        self.functions.conf.append("  if (bgp_community.len > community_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_community_length] Adding BGP_LC_FILTERED_TOO_MANY_COMMUNITIES to ", net, '
-            '" counted ", bgp_community.len;',
+            '    print "[bgp_filter_community_length] Community list length >", community_maxlen, ", '
+            'adding BGP_LC_FILTERED_TOO_MANY_COMMUNITIES to ", net, " counted ", bgp_community.len;',
             debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_TOO_MANY_COMMUNITIES);")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if (bgp_ext_community.len > BGP_EXTENDED_COMMUNITY_MAXLEN) then {")
+        self.functions.conf.append("  if (bgp_ext_community.len > ext_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_community_length] Adding BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES to ", net, '
-            '" counted ", bgp_ext_community.len;',
+            '    print "[bgp_filter_community_length] Extended community list length >", ext_maxlen, ", '
+            'adding BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES to ", net, " counted ", bgp_ext_community.len;',
             debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_TOO_MANY_EXTENDED_COMMUNITIES);")
         self.functions.conf.append("  }")
         self.functions.conf.append("")
-        self.functions.conf.append("  if (bgp_large_community.len > BGP_LARGE_COMMUNITY_MAXLEN) then {")
+        self.functions.conf.append("  if (bgp_large_community.len > large_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_filter_community_length] Adding BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES to ", net, '
-            '" counted ", bgp_large_community.len;',
+            '    print "[bgp_filter_community_length] Large community list length >", large_maxlen, ", '
+            ', adding BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES to ", net, " counted ", bgp_large_community.len;',
             debug=True,
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_TOO_MANY_LARGE_COMMUNITIES);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        self.functions.conf.append("# Filter prefixes without a large community relation set")
+        self.functions.conf.append("function bgp_filter_lc_no_relation() {")
+        self.functions.conf.append("  if (bgp_large_community !~ BGP_LC_RELATION) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_lc_no_relation] Adding BGP_LC_FILTERED_NO_RELATION_LC to ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_NO_RELATION_LC);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
@@ -770,7 +825,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# Can we export this IPv4 BGP route to the peeras?")
-        self.functions.conf.append("function bgp_can_export_v4(int peeras) {")
+        self.functions.conf.append("function bgp_can_export_v4(int peeras; int prefix_maxlen; int prefix_minlen) {")
         self.functions.conf.append("  # Check for NOEXPORT large community")
         self.functions.conf.append("  if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peeras) ~ bgp_large_community) then {")
         self.functions.conf.append(
@@ -780,15 +835,15 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Validate route before export")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_EXPORT_MAXLEN4) then {")
+        self.functions.conf.append("  if prefix_is_longer(prefix_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v4] Not exporting due to prefix length > BGP_PREFIX_EXPORT_MAXLEN4 for ", net;', debug=True
+            '    print "[bgp_can_export_v4] Not exporting due to prefix length >", prefix_maxlen, " for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_EXPORT_MINLEN4) then {")
+        self.functions.conf.append("  if prefix_is_shorter(prefix_minlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v4] Not exporting due to prefix length < BGP_PREFIX_EXPORT_MINLEN4 for ", net;', debug=True
+            '    print "[bgp_can_export_v4] Not exporting due to prefix length <", prefix_minlen, " for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
@@ -804,7 +859,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# Can we export this IPv6 BGP route to the peeras?")
-        self.functions.conf.append("function bgp_can_export_v6(int peeras) {")
+        self.functions.conf.append("function bgp_can_export_v6(int peeras; int prefix_maxlen; int prefix_minlen) {")
         self.functions.conf.append("  # Check for NOEXPORT large community")
         self.functions.conf.append("  if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peeras) ~ bgp_large_community) then {")
         self.functions.conf.append(
@@ -814,15 +869,15 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
         self.functions.conf.append("  # Validate route before export")
-        self.functions.conf.append("  if prefix_is_longer(BGP_PREFIX_EXPORT_MAXLEN6) then {")
+        self.functions.conf.append("  if prefix_is_longer(prefix_maxlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v6] Not exporting due to prefix length > BGP_PREFIX_EXPORT_MAXLEN6 for ", net;', debug=True
+            '    print "[bgp_can_export_v6] Not exporting due to prefix length >", prefix_maxlen," for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
-        self.functions.conf.append("  if prefix_is_shorter(BGP_PREFIX_EXPORT_MINLEN6) then {")
+        self.functions.conf.append("  if prefix_is_shorter(prefix_minlen) then {")
         self.functions.conf.append(
-            '    print "[bgp_can_export_v6] Not exporting due to prefix length < BGP_PREFIX_EXPORT_MINLEN6 for ", net;', debug=True
+            '    print "[bgp_can_export_v6] Not exporting due to prefix length <", prefix_minlen, " for ", net;', debug=True
         )
         self.functions.conf.append("    return false;")
         self.functions.conf.append("  }")
@@ -875,6 +930,30 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_ONE, peeras) ~ bgp_large_community) then {")
         self.functions.conf.append('    print "[bgp_prepend_lc] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True)
         self.functions.conf.append("    bgp_prepend(prepend_asn, 1);")
+        self.functions.conf.append("  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_ONE_2, peeras) ~ bgp_large_community) then {")
+        self.functions.conf.append('    print "[bgp_prepend_lc] Matched BGP_LC_FUNCTION_PREPEND_ONE_2 for ", net;', debug=True)
+        self.functions.conf.append("    bgp_prepend(prepend_asn, 1);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        # Replace AS-PATH
+        self.functions.conf.append("# Check if we need to replace the AS-PATH")
+        self.functions.conf.append("function bgp_replace_aspath()")
+        self.functions.conf.append("int path_len;")
+        self.functions.conf.append("{")
+        self.functions.conf.append("  # Check for replace AS-PATH large community action")
+        self.functions.conf.append("  if (BGP_LC_ACTION_REPLACE_ASPATH ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_replace_aspath] Replacing AS-PATH [", bgp_path,"] for ",' "net;",
+            debug=True,
+        )
+        self.functions.conf.append("    # Grab current path length")
+        self.functions.conf.append("    path_len = bgp_path.len;")
+        self.functions.conf.append("    # Empty the path, as we cannot assign a sequence")
+        self.functions.conf.append("    bgp_path.empty;")
+        self.functions.conf.append("    # Prepend our own ASN the number of times there was an ASN in the path")
+        self.functions.conf.append("    bgp_prepend(BGP_ASN, path_len - 1);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
@@ -1090,7 +1169,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append(
             "  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_ONE, location) ~ bgp_large_community) then {"
         )
-        self.functions.conf.append('    print "[bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True)
+        self.functions.conf.append(
+            '    print "[bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_ONE for ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_prepend(prepend_asn, 1);")
+        self.functions.conf.append(
+            "  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_ONE_2, location) ~ bgp_large_community) then {"
+        )
+        self.functions.conf.append(
+            '    print "[bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_ONE_2 for ", net;', debug=True
+        )
         self.functions.conf.append("    bgp_prepend(prepend_asn, 1);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
@@ -1580,53 +1668,53 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     # AS PATH LENGTHS
 
     @property
-    def aspath_minlen(self) -> int:
-        """Return the current value of aspath_minlen."""
-        return self.bgp_attributes.aspath_minlen
+    def aspath_import_minlen(self) -> int:
+        """Return the current value of aspath_import_minlen."""
+        return self.bgp_attributes.aspath_import_minlen
 
-    @aspath_minlen.setter
-    def aspath_minlen(self, aspath_minlen: int) -> None:
+    @aspath_import_minlen.setter
+    def aspath_import_minlen(self, aspath_import_minlen: int) -> None:
         """Set the AS path minlen."""
-        self.bgp_attributes.aspath_minlen = aspath_minlen
+        self.bgp_attributes.aspath_import_minlen = aspath_import_minlen
 
     @property
-    def aspath_maxlen(self) -> int:
-        """Return the current value of aspath_maxlen."""
-        return self.bgp_attributes.aspath_maxlen
+    def aspath_import_maxlen(self) -> int:
+        """Return the current value of aspath_import_maxlen."""
+        return self.bgp_attributes.aspath_import_maxlen
 
-    @aspath_maxlen.setter
-    def aspath_maxlen(self, aspath_maxlen: int) -> None:
+    @aspath_import_maxlen.setter
+    def aspath_import_maxlen(self, aspath_import_maxlen: int) -> None:
         """Set the AS path maxlen."""
-        self.bgp_attributes.aspath_maxlen = aspath_maxlen
+        self.bgp_attributes.aspath_import_maxlen = aspath_import_maxlen
 
     # COMMUNITY LENGTHS
 
     @property
-    def community_maxlen(self) -> int:
-        """Return the current value of community_maxlen."""
-        return self.bgp_attributes.community_maxlen
+    def community_import_maxlen(self) -> int:
+        """Return the current value of community_import_maxlen."""
+        return self.bgp_attributes.community_import_maxlen
 
-    @community_maxlen.setter
-    def community_maxlen(self, community_maxlen: int) -> None:
-        """Set the value of community_maxlen."""
-        self.bgp_attributes.community_maxlen = community_maxlen
-
-    @property
-    def extended_community_maxlen(self) -> int:
-        """Return the current value of extended_community_maxlen."""
-        return self.bgp_attributes.extended_community_maxlen
-
-    @extended_community_maxlen.setter
-    def extended_community_maxlen(self, extended_community_maxlen: int) -> None:
-        """Set the value of extended_community_maxlen."""
-        self.bgp_attributes.extended_community_maxlen = extended_community_maxlen
+    @community_import_maxlen.setter
+    def community_import_maxlen(self, community_import_maxlen: int) -> None:
+        """Set the value of community_import_maxlen."""
+        self.bgp_attributes.community_import_maxlen = community_import_maxlen
 
     @property
-    def large_community_maxlen(self) -> int:
-        """Return the current value of large_community_maxlen."""
-        return self.bgp_attributes.large_community_maxlen
+    def extended_community_import_maxlen(self) -> int:
+        """Return the current value of extended_community_import_maxlen."""
+        return self.bgp_attributes.extended_community_import_maxlen
 
-    @large_community_maxlen.setter
-    def large_community_maxlen(self, large_community_maxlen: int) -> None:
-        """Set the value of large_community_maxlen."""
-        self.bgp_attributes.large_community_maxlen = large_community_maxlen
+    @extended_community_import_maxlen.setter
+    def extended_community_import_maxlen(self, extended_community_import_maxlen: int) -> None:
+        """Set the value of extended_community_import_maxlen."""
+        self.bgp_attributes.extended_community_import_maxlen = extended_community_import_maxlen
+
+    @property
+    def large_community_import_maxlen(self) -> int:
+        """Return the current value of large_community_import_maxlen."""
+        return self.bgp_attributes.large_community_import_maxlen
+
+    @large_community_import_maxlen.setter
+    def large_community_import_maxlen(self, large_community_import_maxlen: int) -> None:
+        """Set the value of large_community_import_maxlen."""
+        self.bgp_attributes.large_community_import_maxlen = large_community_import_maxlen

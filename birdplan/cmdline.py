@@ -40,12 +40,12 @@ class BirdPlanCommandLine:
     _argparser: argparse.ArgumentParser
     _birdplan: BirdPlan
 
-    def __init__(self) -> None:
+    def __init__(self, test_mode: bool = False) -> None:
         """Instantiate object."""
 
         self._args = argparse.Namespace()
         self._argparser = argparse.ArgumentParser(add_help=False)
-        self._birdplan = BirdPlan()
+        self._birdplan = BirdPlan(test_mode=test_mode)
 
     def run(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
         self, raw_args: Optional[List[str]] = None

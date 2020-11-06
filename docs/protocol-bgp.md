@@ -109,7 +109,7 @@ bgp:
 
 # prefix_import_maxlen4
 
-Maximum IPv4 prefix length to import from a BGP peer without filtering. Defaults to `24`.
+Default maximum IPv4 prefix length to import from a BGP peer without filtering. Defaults to `24`.
 
 An example of this usage is below...
 ```yaml
@@ -123,7 +123,7 @@ bgp:
 
 # prefix_import_minlen4
 
-Minimum IPv4 prefix length to import from a BGP peer without filtering. Defaults to `8`.
+Default minimum IPv4 prefix length to import from a BGP peer without filtering. Defaults to `8`.
 
 An example of this usage is below...
 ```yaml
@@ -137,7 +137,7 @@ bgp:
 
 # prefix_export_maxlen4
 
-Maximum IPv4 prefix length to export to a BGP peer. Defaults to `24`.
+Default maximum IPv4 prefix length to export to a BGP peer. Defaults to `24`.
 
 An example of this usage is below...
 ```yaml
@@ -151,7 +151,7 @@ bgp:
 
 # prefix_export_minlen4
 
-Minimum IPv4 prefix length to export to a BGP peer. Defaults to `8`.
+Default minimum IPv4 prefix length to export to a BGP peer. Defaults to `8`.
 
 An example of this usage is below...
 ```yaml
@@ -165,7 +165,7 @@ bgp:
 
 # prefix_import_maxlen6
 
-Maximum IPv6 prefix length to import from a BGP peer without filtering. Defaults to `48`.
+Default maximum IPv6 prefix length to import from a BGP peer without filtering. Defaults to `48`.
 
 An example of this usage is below...
 ```yaml
@@ -179,7 +179,7 @@ bgp:
 
 # prefix_import_minlen6
 
-Minimum IPv6 prefix length to import from a BGP peer without filtering. Defaults to `16`.
+Default minimum IPv6 prefix length to import from a BGP peer without filtering. Defaults to `16`.
 
 An example of this usage is below...
 ```yaml
@@ -193,7 +193,7 @@ bgp:
 
 # prefix_export_maxlen6
 
-Maximum IPv6 prefix length to export to a BGP peer. Defaults to `48`.
+Default maximum IPv6 prefix length to export to a BGP peer. Defaults to `48`.
 
 An example of this usage is below...
 ```yaml
@@ -207,7 +207,7 @@ bgp:
 
 # prefix_export_minlen6
 
-Minimum IPv6 prefix length to export to a BGP peer. Defaults to `16`.
+Default minimum IPv6 prefix length to export to a BGP peer. Defaults to `16`.
 
 An example of this usage is below...
 ```yaml
@@ -219,9 +219,9 @@ bgp:
 ```
 
 
-# aspath_maxlen
+# aspath_import_maxlen
 
-Maximum AS-PATH length to allow from a BGP peer without filtering. Defaults to `100`.
+Default maximum AS-PATH length to allow from a BGP peer without filtering. Defaults to `100`.
 
 You probably only want to change this if you know exactly what you're doing!
 
@@ -230,14 +230,14 @@ An example of this usage is below...
 ...
 
 bgp:
-  aspath_maxlen: 90
+  aspath_import_maxlen: 90
 ...
 ```
 
 
-# aspath_minlen
+# aspath_import_minlen
 
-Minimum AS-PATH length to allow from a BGP peer without filtering. Defaults to `1`.
+Default minimum AS-PATH length to allow from a BGP peer without filtering. Defaults to `1`.
 
 You probably NEVER want to change this.
 
@@ -246,14 +246,14 @@ An example of this usage is below...
 ...
 
 bgp:
-  aspath_minlen: 2
+  aspath_import_minlen: 2
 ...
 ```
 
 
-# community_maxlen
+# community_import_maxlen
 
-Maximum number of communities before the prefix gets filtered. Defaults to `100`.
+Default maximum number of communities before the prefix gets filtered. Defaults to `100`.
 
 You probably only want to change this if you know exactly what you're doing!
 
@@ -262,14 +262,14 @@ An example of this usage is below...
 ...
 
 bgp:
-  community_maxlen: 90
+  community_import_maxlen: 90
 ...
 ```
 
 
-# extended_community_maxlen
+# extended_community_import_maxlen
 
-Maximum number of extended communities before the prefix gets filtered. Defaults to `100`.
+Default maximum number of extended communities before the prefix gets filtered. Defaults to `100`.
 
 You probably only want to change this if you know exactly what you're doing!
 
@@ -278,14 +278,14 @@ An example of this usage is below...
 ...
 
 bgp:
-  extended_community_maxlen: 90
+  extended_community_import_maxlen: 90
 ...
 ```
 
 
-# large_community_maxlen
+# large_community_import_maxlen
 
-Maximum number of large communities before the prefix gets filtered. Defaults to `100`.
+Default maximum number of large communities before the prefix gets filtered. Defaults to `100`.
 
 You probably only want to change this if you know exactly what you're doing!
 
@@ -294,7 +294,7 @@ An example of this usage is below...
 ...
 
 bgp:
-  large_community_maxlen: 90
+  large_community_import_maxlen: 90
 ...
 ```
 
@@ -739,6 +739,204 @@ bgp:
 ...
 ```
 
+
+# prefix_import_maxlen4
+
+Maximum IPv4 prefix length to import without filtering. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_import_maxlen4: 25
+...
+```
+
+
+# prefix_import_minlen4
+
+Minimum IPv4 prefix length to import without filtering. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_import_minlen4: 7
+...
+```
+
+
+# prefix_export_maxlen4
+
+Maximum IPv4 prefix length to export. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_export_maxlen4: 25
+...
+```
+
+
+# prefix_export_minlen4
+
+Minimum IPv4 prefix length to export. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_export_minlen4: 7
+...
+```
+
+
+# prefix_import_maxlen6
+
+Maximum IPv6 prefix length to import without filtering. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_import_maxlen6: 47
+...
+```
+
+
+# prefix_import_minlen6
+
+Minimum IPv6 prefix length to import without filtering. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_import_minlen6: 15
+...
+```
+
+
+# prefix_export_maxlen6
+
+Maximum IPv6 prefix length to export. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_export_maxlen6: 47
+...
+```
+
+
+# prefix_export_minlen6
+
+Minimum IPv6 prefix length to export. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  prefix_export_minlen6: 15
+...
+```
+
+
+# aspath_import_maxlen
+
+Maximum AS-PATH length to allow without filtering. Defaults to global setting.
+
+You probably only want to change this if you know exactly what you're doing!
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  aspath_import_maxlen: 90
+...
+```
+
+
+# aspath_import_minlen
+
+Minimum AS-PATH length to allow without filtering. Defaults to global setting.
+
+You probably NEVER want to change this.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  aspath_import_minlen: 2
+...
+```
+
+
+# community_import_maxlen
+
+Maximum number of communities before the prefix gets filtered. Defaults to global setting.
+
+You probably only want to change this if you know exactly what you're doing!
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  community_import_maxlen: 90
+...
+```
+
+
+# extended_community_import_maxlen
+
+Maximum number of extended communities before the prefix gets filtered. Defaults to global setting.
+
+You probably only want to change this if you know exactly what you're doing!
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  extended_community_import_maxlen: 90
+...
+```
+
+
+# large_community_import_maxlen
+
+Maximum number of large communities before the prefix gets filtered. Defaults to global setting.
+
+You probably only want to change this if you know exactly what you're doing!
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  large_community_import_maxlen: 90
+...
+```
+
+
+
+
+
+
+
 ## prepend
 
 This option controls AS-PATH prepending in various ways. The prepending count must be between 1 and 10.
@@ -822,7 +1020,7 @@ In addition to setting these as a boolean value, one can also add the following 
 
 Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
 
-* `bgp` will redistribute BGP routes. Automatically set to `True` for peer types of `rrclient`, `rrserver` and `rrserver-rrserver`.
+* `bgp` will redistribute BGP routes. Automatically set to `True` for peer types of `rrclient`, `rrserver` and `rrserver-rrserver`. This is a VERY dangerous setting as it does not by default filter outbound routes.
 * `bgp_own` will redistribute our own BGP routes based on an internal large community `OWN_ASN:3:1`. Automatically set to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
 * `bgp_customer` will redistribute our customers BGP routes based on an internal large community `OWN_ASN:3:2`. Automatically set to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
 * `bgp_peering` will redistribute peering session routes based on an internal large community `OWN_ASN:3:3`. Automatically set to `True` for peer types of `customer`.
@@ -844,6 +1042,43 @@ bgp:
         originated: True
 ...
 ```
+
+
+## replace_aspath
+
+Replace the advertised routes AS-PATH with our own ASN.
+
+This is only valid for peer types of `customer` and `internal`.
+
+This will result in a large community being added to the prefix, which will end up in the AS-PATH being replaced on all eBGP peers.
+
+All private ASN's will be replaced up to a limit of 10, any AS-PATH longer than this will be truncated.
+
+In addition to this functionality, the minimum and maximum prefix lengths we import and export are adjusted as follows. This allows a peer using this feature to advertise a /29 IPv4 and /64 IPv6 prefix to us.
+```
+prefix_import_minlen4 = 16
+prefix_import_maxlen4 = 29
+prefix_export_minlen4 = 16
+prefix_export_maxlen4 = 29
+prefix_import_maxlen6 = 64
+prefix_import_minlen6 = 32
+prefix_export_maxlen6 = 64
+prefix_export_minlen6 = 32
+```
+
+An example is below...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      replace_aspath: True
+...
+```
+
 
 ## source_address4
 

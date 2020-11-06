@@ -473,11 +473,9 @@ class BirdPlanBaseTestCase:
             file.write(raw_config)
 
         # Invoke by simulating the commandline...
-        birdplan_cmdline = BirdPlanCommandLine()
+        birdplan_cmdline = BirdPlanCommandLine(test_mode=True)
         # Disable logging for filelog
         logging.getLogger("filelock").setLevel(logging.ERROR)
-        # Set test mode
-        birdplan_cmdline.birdplan.birdconf.test_mode = True
 
         # Work out our commandline arguments
         cmdline_args = [
