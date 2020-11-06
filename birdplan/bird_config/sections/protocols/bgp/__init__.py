@@ -240,12 +240,13 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_STRIP = [ ")
         self.constants.conf.append("  (BGP_ASN, 1..3, *),")  # Strip route learned functions
         # Allow client traffic engineering: 4, 5, 6, 7, 8
-        self.constants.conf.append("  (BGP_ASN, 9..61, *),")  # Strip unused
-        self.constants.conf.append("  (BGP_ASN, 64..71, *),")  # Strip unused
+        self.constants.conf.append("  (BGP_ASN, 9..60, *),")  # Strip unused
+        self.constants.conf.append("  (BGP_ASN, 64..70, *),")  # Strip unused
         self.constants.conf.append("  (BGP_ASN, 74..65535, *),")  # Strip unsed + rest (incl. 1000 - info, 1101 - filter)
         # These functions should never be used on our own ASN
         self.constants.conf.append("  (BGP_ASN, 4, BGP_ASN),")
         self.constants.conf.append("  (BGP_ASN, 6, BGP_ASN),")
+        self.constants.conf.append("  (BGP_ASN, 61, BGP_ASN),")
         self.constants.conf.append("  (BGP_ASN, 62, BGP_ASN),")
         self.constants.conf.append("  (BGP_ASN, 63, BGP_ASN)")
         self.constants.conf.append("];")
@@ -280,9 +281,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_FUNCTION_NOEXPORT = 4;")
         self.constants.conf.append("define BGP_LC_FUNCTION_NOEXPORT_LOCATION = 5;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_ONE = 6;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_ONE_2 = 61;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_TWO = 62;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_THREE = 63;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_ONE = 7;")
+        self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_ONE_2 = 71;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_TWO = 72;")
         self.constants.conf.append("define BGP_LC_FUNCTION_PREPEND_LOCATION_THREE = 73;")
         self.constants.conf.append("define BGP_LC_FUNCTION_LOCALPREF = 8;")
@@ -927,6 +930,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_ONE, peeras) ~ bgp_large_community) then {")
         self.functions.conf.append('    print "[bgp_prepend_lc] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True)
         self.functions.conf.append("    bgp_prepend(prepend_asn, 1);")
+        self.functions.conf.append("  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_ONE_2, peeras) ~ bgp_large_community) then {")
+        self.functions.conf.append('    print "[bgp_prepend_lc] Matched BGP_LC_FUNCTION_PREPEND_ONE_2 for ", net;', debug=True)
+        self.functions.conf.append("    bgp_prepend(prepend_asn, 1);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
@@ -1163,7 +1169,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append(
             "  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_ONE, location) ~ bgp_large_community) then {"
         )
-        self.functions.conf.append('    print "[bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_ONE for ", net;', debug=True)
+        self.functions.conf.append(
+            '    print "[bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_ONE for ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_prepend(prepend_asn, 1);")
+        self.functions.conf.append(
+            "  } else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_ONE_2, location) ~ bgp_large_community) then {"
+        )
+        self.functions.conf.append(
+            '    print "[bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_ONE_2 for ", net;', debug=True
+        )
         self.functions.conf.append("    bgp_prepend(prepend_asn, 1);")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")

@@ -46,9 +46,11 @@ Brief overview of FUNCTION assignments...
 | 4 | ASN-based selective NOEXPORT [^lc-function-4] |
 | 5 | Location-based selective NOEXPORT [^lc-function-5] |
 | 6 | ASN-Based Selective AS Path Prepending (one) [^lc-function-6] |
+| 61 | ASN-Based Selective AS Path Prepending (one) - ENHANCED [^lc-function-6] |
 | 62 | ASN-Based Selective AS Path Prepending (two) - ENHANCED [^lc-function-6] |
 | 63 | ASN-Based Selective AS Path Prepending (three) - ENHANCED [^lc-function-6] |
 | 7 | Location-Based Selective AS Path Prepending (one) [^lc-function-7] |
+| 71 | Location-Based Selective AS Path Prepending (one) - ENHANCED [^lc-function-7] |
 | 72 | Location-Based Selective AS Path Prepending (two) - ENHANCED [^lc-function-7] |
 | 73 | Location-Based Selective AS Path Prepending (three) - ENHANCED [^lc-function-7] |
 | 8 | Manipulation of the LOCAL_PREF Attribute - ENHANCED [^lc-function-8] |
