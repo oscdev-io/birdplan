@@ -36,10 +36,10 @@ class BirdPlan:
     _state: Dict[str, Any]
     _state_file: Optional[str]
 
-    def __init__(self) -> None:
+    def __init__(self, test_mode: bool = False) -> None:
         """Initialize object."""
 
-        self._birdconf = BirdConfig()
+        self._birdconf = BirdConfig(test_mode=test_mode)
         self._config = {}
         self._state = {}
         self._state_file = None
