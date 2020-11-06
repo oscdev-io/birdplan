@@ -109,6 +109,11 @@ class TemplateBase(BirdPlanBaseTestCase):
             ],
         )
 
+        self._test_announce_routes(sim)
+
+    def _test_announce_routes(self, sim):
+        """Announce extra prefixes from ExaBGP to BIRD."""
+
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)

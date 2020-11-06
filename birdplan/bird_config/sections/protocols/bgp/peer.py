@@ -106,6 +106,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Check if we're actually replacing it?
             if peer_config["replace_aspath"]:
                 self.replace_aspath = True
+                self.prefix_import_minlen4 = 16
+                self.prefix_import_maxlen4 = 29
+                self.prefix_export_minlen4 = 16
+                self.prefix_export_maxlen4 = 29
+                self.prefix_import_maxlen6 = 64
+                self.prefix_import_minlen6 = 32
+                self.prefix_export_maxlen6 = 64
+                self.prefix_export_minlen6 = 32
 
         # If the peer type is of internal nature, but doesn't match our peer type, throw an exception
         if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):

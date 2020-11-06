@@ -1054,6 +1054,18 @@ This will result in a large community being added to the prefix, which will end 
 
 All private ASN's will be replaced up to a limit of 10, any AS-PATH longer than this will be truncated.
 
+In addition to this functionality, the minimum and maximum prefix lengths we import and export are adjusted as follows. This allows a peer using this feature to advertise a /29 IPv4 and /64 IPv6 prefix to us.
+```
+prefix_import_minlen4 = 16
+prefix_import_maxlen4 = 29
+prefix_export_minlen4 = 16
+prefix_export_maxlen4 = 29
+prefix_import_maxlen6 = 64
+prefix_import_minlen6 = 32
+prefix_export_maxlen6 = 64
+prefix_export_minlen6 = 32
+```
+
 An example is below...
 ```yaml
 ...
