@@ -28,8 +28,8 @@ class Template(TemplateBase):
     """BGP prefix too short test case template."""
 
     r1_template_peer_config = """
-      prefix_import_minlen4: 17
-      prefix_import_minlen6: 33
+  prefix_import_minlen4: 17
+  prefix_import_minlen6: 33
 """
     test_prefix_length4 = 16
     test_prefix_length6 = 32
