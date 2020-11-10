@@ -318,20 +318,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.has_ipv6 and self.prefix_limit6 and self.prefix_limit6 == "peeringdb":
             self.prefix_limit6 = self.peeringdb["info_prefixes6"]
 
-        # If this is a rrserver to rrserver peer, we need to by default redistribute the default route (if we have one)
-        if self.peer_type == "rrserver-rrserver":
-            self.route_policy_accept.default = True
-        # Work out what we're going to be accepting
-        if "accept" in peer_config:
-            for accept_type, accept_config in peer_config["accept"].items():
-                if accept_type != "default":
-                    raise BirdPlanError(
-                        f"BGP peer 'accept' configuration '{accept_type}' for peer '{self.name}' with type '{self.peer_type}' "
-                        " is invalid"
-                    )
-                # Set route policy accept
-                setattr(self.route_policy_accept, accept_type, accept_config)
-
         # Check for filters we need to setup
         if "filter" in peer_config:
             # Raise an exception if filters makes no sense for this peer type
@@ -346,6 +332,56 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     )
                 # Set filter policy
                 setattr(self.filter_policy, filter_type, filter_config)
+
+        # Check if we should be enabling blackholing by default
+        if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver") or (
+            self.peer_type == "customer" and self.filter_policy.prefixes
+        ):
+            self.route_policy_accept.blackhole = True
+
+        # If this is a rrserver to rrserver peer, we need to by default redistribute the default route (if we have one)
+        if self.peer_type == "rrserver-rrserver":
+            self.route_policy_accept.default = True
+        # Work out what we're going to be accepting
+        if "accept" in peer_config:
+            for accept_type, accept_config in peer_config["accept"].items():
+                if accept_type not in ("default", "blackhole"):
+                    raise BirdPlanError(
+                        f"BGP peer 'accept' configuration '{accept_type}' for peer '{self.name}' with type '{self.peer_type}' "
+                        " is invalid"
+                    )
+                # Set route policy accept
+                setattr(self.route_policy_accept, accept_type, accept_config)
+
+        # Check accept default is valid
+        if (
+            self.peer_type
+            not in (
+                "internal",
+                "rrclient",
+                "rrserver",
+                "rrserver-rrserver",
+                "transit",
+            )
+            and self.route_policy_accept.default
+        ):
+            raise BirdPlanError(
+                f"Having 'accept:default' set to True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+            )
+
+        # Check if blackholing can be enabled for this peer type
+        if (
+            self.peer_type not in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver")
+            and self.route_policy_accept.blackhole
+        ):
+            raise BirdPlanError(f"Having 'accept:blackhole' set for peer '{self.name}' with type '{self.peer_type}' makes no sense")
+
+        # Check if this is a customer with blackholing and without a prefix filter set
+        if self.peer_type == "customer" and self.route_policy_accept.blackhole and not self.filter_policy.prefixes:
+            raise BirdPlanError(
+                f"Having 'accept:blackhole' set for peer '{self.name}' with type '{self.peer_type}' and without 'filter:prefixes' "
+                "set makes no sense"
+            )
 
         # Check for prepending we need to setup
         if "prepend" in peer_config:
@@ -392,6 +428,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Setup our limits
         for attr_name in (
+            "blackhole_maxlen4",
+            "blackhole_minlen4",
+            "blackhole_maxlen6",
+            "blackhole_minlen6",
             "prefix_import_maxlen4",
             "prefix_import_minlen4",
             "prefix_export_maxlen4",
@@ -472,9 +512,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         """Return the IP versioned BGP import filter name."""
         return f"f_bgp{ipv}_AS{self.asn}_{self.name}_peer_bgp{ipv}_import"
 
-    def prefix_list_name(self, ipv: str) -> str:
+    def import_prefix_list_name(self, ipv: str) -> str:
         """Return our prefix list name."""
-        return f"bgp{ipv}_AS{self.asn}_{self.name}_prefixes"
+        return f"bgp{ipv}_AS{self.asn}_{self.name}_prefixes_import"
 
     def _setup_peer_tables(self) -> None:
         """Peering routing table setup."""
@@ -569,7 +609,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Output prefix definitions
         for ipv in ["4", "6"]:
-            self.conf.add(f"define {self.prefix_list_name(ipv)} = [")
             prefix_list = prefix_lists[ipv]
             prefix_list_irr = irr_prefixes[f"ipv{ipv}"]
             prefixes = []
@@ -583,13 +622,15 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 prefixes.extend(prefix_list_irr)
             # Join into one string, so we get the commas
             prefixes_str = ",\n".join(prefixes)
+
+            self.conf.add(f"define {self.import_prefix_list_name(ipv)} = [")
             # Loop with each line
             for line in prefixes_str.splitlines():
                 # Remove comma from the comments
                 if "#" in line:
                     line = line[:-1]
                 # Add line to our output
-                self.conf.add("  " + line)
+                self.conf.add(f"  {line}")
             self.conf.add("];")
             self.conf.add("")
 
@@ -599,12 +640,15 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Configure export filter to our main BGP table
         self.conf.add("# Export filter TO the main BGP table from the BGP peer table")
         self.conf.add(f"filter {self.filter_name_export_bgp((ipv))} {{")
-        # Check if we're accepting the route...
+        # If this is a filtered route, reject it
         self.conf.add("  if (bgp_large_community ~ [(BGP_ASN, BGP_LC_FUNCTION_FILTERED, *)]) then {")
         self.conf.add(f'    print "[{self.filter_name_export_bgp((ipv))}] Filtered ", net, " to main BGP table";', debug=True)
         self.conf.add("    reject;")
         self.conf.add("  }")
-        # Else reject
+        # Enable blackholing for customers and internal peers
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            self.conf.add("  bgp_blackhole_enable();")
+        # Finally accept the route
         self.conf.add(f'  print "[{self.filter_name_export_bgp((ipv))}] Exporting ", net, " to main BGP table";', debug=True)
         self.conf.add("  accept;")
         self.conf.add("};")
@@ -670,9 +714,18 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Rejections based on location-based large communities
         if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
+            # Check if this is a blackhole, if it is we shouldn't be exporting it
+            self.conf.add("  # Check if this is a blackhole route")
+            self.conf.add("  if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then {")
+            self.conf.add(
+                f'    print "[{func_name}] Rejecting ", net, " due to match on BGP_COMMUNITY_BLACKHOLE";',
+                debug=True,
+            )
+            self.conf.add("    reject;")
+            self.conf.add("  }")
             # Check if we have a ISO-3166 country code
             if self.location.iso3166:
-                self.conf.add("  # Check if we're not exporting this route based on the ISO-3166 location;")
+                self.conf.add("  # Check if we're not exporting this route based on the ISO-3166 location")
                 self.conf.add(
                     f"  if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT_LOCATION, {self.location.iso3166}) ~ bgp_large_community) then {{"
                 )
@@ -1000,20 +1053,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("# Import filter FROM the BGP peer TO the peer BGP table")
         self.conf.add(f"filter {func_name} {{")
 
-        # If this is the route from our peer, we need to check what type it is
+        # Configuration which goes below in the "if" statement
         type_lines = []
-
-        # Check accept default is valid
-        if self.route_policy_accept.default and self.peer_type not in (
-            "internal",
-            "rrclient",
-            "rrserver",
-            "rrserver-rrserver",
-            "transit",
-        ):
-            raise BirdPlanError(
-                f"Having 'accept[default]' as True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
-            )
 
         # Clients
         if self.peer_type == "customer":
@@ -1021,7 +1062,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append(f"    bgp_import_customer({self.asn}, {self.cost});")
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
+            # The bgp_filter_prefix size test will exclude blackholes from checks
             type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
+            # Check if we're going to accept a blackhole route
+            if self.route_policy_accept.blackhole:
+                type_lines.append(f"    {self._bgp_filter_blackhole_size(ipv)}")
+            else:
+                type_lines.append("    bgp_filter_blackhole();")
             # If we're replacing the ASN we only allow private ASN's in the AS-PATH
             if self.replace_aspath:
                 type_lines.append(f"    bgp_filter_asn_private([{self.asn}]);")
@@ -1040,6 +1087,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
             type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
+            type_lines.append("    bgp_filter_blackhole();")
             type_lines.append("    bgp_filter_asn_bogons();")
             type_lines.append(f"    {self._bgp_filter_aspath_length()}")
             type_lines.append("    bgp_filter_nexthop_not_peerip();")
@@ -1057,6 +1105,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             type_lines.append(f"    bgp_filter_default_v{ipv}();")
             type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
             type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
+            type_lines.append("    bgp_filter_blackhole();")
             type_lines.append("    bgp_filter_asn_bogons();")
             type_lines.append(f"    {self._bgp_filter_aspath_length()}")
             type_lines.append("    bgp_filter_asn_transit();")
@@ -1068,6 +1117,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 type_lines.append(f"    bgp_filter_default_v{ipv}();")
             if self.peer_type == "internal" and self.replace_aspath:
                 type_lines.append("    bgp_filter_asn_private(PRIVATE_ASNS);")
+            # Check if we're going to accept a blackhole route
+            if self.route_policy_accept.blackhole:
+                type_lines.append(f"    {self._bgp_filter_blackhole_size(ipv)}")
+            else:
+                type_lines.append("    bgp_filter_blackhole();")
         # Transit providers
         elif self.peer_type == "transit":
             type_lines.append("    bgp_communities_strip_all();")
@@ -1076,12 +1130,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 type_lines.append("    # Bypass bogon and size filters for the default route")
                 type_lines.append(f"    if (net != DEFAULT_ROUTE_V{ipv}) then {{")
                 type_lines.append(f"      bgp_filter_bogons_v{ipv}();")
-                type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
+                type_lines.append(f"      {self._bgp_filter_prefix_size(ipv)}")
                 type_lines.append("    }")
             else:
                 type_lines.append(f"    bgp_filter_default_v{ipv}();")
                 type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
                 type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
+            type_lines.append("    bgp_filter_blackhole();")
             type_lines.append("    bgp_filter_asn_bogons();")
             type_lines.append(f"    {self._bgp_filter_aspath_length()}")
             type_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
@@ -1104,7 +1159,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Check if we're filtering allowed prefixes
             if self.filter_policy.prefixes:
                 type_lines.append("    # Filter on the allowed prefixes")
-                type_lines.append(f"    bgp_filter_allow_prefixes({self.prefix_list_name(ipv)});")
+                type_lines.append(f"    bgp_filter_allow_prefixes({self.import_prefix_list_name(ipv)});")
         # For everything else it is a DENY list
         elif self.peer_type != "routecollector":
             # Check if we're filtering denied origin ASNs
@@ -1118,7 +1173,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Check if we're filtering allowed prefixes
             if self.filter_policy.prefixes:
                 type_lines.append("    # Filter on the allowed prefixes")
-                type_lines.append(f"    bgp_filter_deny_prefixes({self.prefix_list_name(ipv)});")
+                type_lines.append(f"    bgp_filter_deny_prefixes({self.import_prefix_list_name(ipv)});")
 
         # Quarantine mode...
         # NK: We don't quarantine route collectors as they are automagically filtered
@@ -1286,6 +1341,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         maxlen = getattr(self, f"prefix_import_maxlen{ipv}")
         minlen = getattr(self, f"prefix_import_minlen{ipv}")
         return f"bgp_filter_prefix_size({maxlen},{minlen});"
+
+    def _bgp_filter_blackhole_size(self, ipv: str) -> str:
+        """Return a BGP blackhole size filter for a specific IP version."""
+        maxlen = getattr(self, f"blackhole_maxlen{ipv}")
+        minlen = getattr(self, f"blackhole_minlen{ipv}")
+        return f"bgp_filter_blackhole_size({maxlen},{minlen});"
 
     def _bgp_filter_aspath_length(self) -> str:
         """Generate the BGP filter function for the AS-PATH lengths."""
@@ -1534,6 +1595,50 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def peeringdb(self) -> BGPPeerPeeringDB:
         """Return our peeringdb entry."""
         return self.peer_attributes.peeringdb
+
+    # IPV4 BLACKHOLE PREFIX LENGTHS
+
+    @property
+    def blackhole_maxlen4(self) -> int:
+        """Return the current value of blackhole_maxlen4."""
+        return self.peer_attributes.blackhole_maxlen4 or self.bgp_attributes.blackhole_maxlen4
+
+    @blackhole_maxlen4.setter
+    def blackhole_maxlen4(self, blackhole_maxlen4: int) -> None:
+        """Setter for blackhole_maxlen4."""
+        self.peer_attributes.blackhole_maxlen4 = blackhole_maxlen4
+
+    @property
+    def blackhole_minlen4(self) -> int:
+        """Return the current value of blackhole_minlen4."""
+        return self.peer_attributes.blackhole_minlen4 or self.bgp_attributes.blackhole_minlen4
+
+    @blackhole_minlen4.setter
+    def blackhole_minlen4(self, blackhole_minlen4: int) -> None:
+        """Setter for blackhole_minlen4."""
+        self.peer_attributes.blackhole_minlen4 = blackhole_minlen4
+
+    # IPV6 BLACKHOLE PREFIX LENGTHS
+
+    @property
+    def blackhole_maxlen6(self) -> int:
+        """Return the current value of blackhole_maxlen6."""
+        return self.peer_attributes.blackhole_maxlen6 or self.bgp_attributes.blackhole_maxlen6
+
+    @blackhole_maxlen6.setter
+    def blackhole_maxlen6(self, blackhole_maxlen6: int) -> None:
+        """Setter for blackhole_maxlen6."""
+        self.peer_attributes.blackhole_maxlen6 = blackhole_maxlen6
+
+    @property
+    def blackhole_minlen6(self) -> int:
+        """Return the current value of blackhole_minlen6."""
+        return self.peer_attributes.blackhole_minlen6 or self.bgp_attributes.blackhole_minlen6
+
+    @blackhole_minlen6.setter
+    def blackhole_minlen6(self, blackhole_minlen6: int) -> None:
+        """Setter for blackhole_minlen6."""
+        self.peer_attributes.blackhole_minlen6 = blackhole_minlen6
 
     # IPV4 IMPORT PREFIX LENGTHS
 

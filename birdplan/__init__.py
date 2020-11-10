@@ -570,6 +570,10 @@ class BirdPlan:
                 # Globals
                 "asn",
                 "graceful_shutdown",
+                "blackhole_maxlen4",
+                "blackhole_minlen4",
+                "blackhole_maxlen6",
+                "blackhole_minlen6",
                 "prefix_import_maxlen4",
                 "prefix_export_maxlen4",
                 "prefix_import_minlen4",
@@ -620,6 +624,10 @@ class BirdPlan:
         # Setup prefix lengths
         for item in [
             "graceful_shutdown",
+            "blackhole_maxlen4",
+            "blackhole_minlen4",
+            "blackhole_maxlen6",
+            "blackhole_minlen6",
             "prefix_import_maxlen4",
             "prefix_export_maxlen4",
             "prefix_import_minlen4",
@@ -734,6 +742,10 @@ class BirdPlan:
                 "outgoing_large_communities",
                 "cost",
                 "graceful_shutdown",
+                "blackhole_maxlen4",
+                "blackhole_minlen4",
+                "blackhole_maxlen6",
+                "blackhole_minlen6",
                 "prefix_import_maxlen4",
                 "prefix_import_minlen4",
                 "prefix_export_maxlen4",

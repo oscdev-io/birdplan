@@ -82,6 +82,14 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
         Route policy for acceptance of routes from the main BGP table into the master table.
     route_policy_import : BGPRoutePolicyImport
         Route policy for importing of routes from internal tables into our main BGP table.
+    blackhole_maxlen4 : Optional[int]
+        Blackhole maximum length for IPv4.
+    blackhole_minlen4 : Optional[int]
+        Blackhole minimum length for IPv4.
+    blackhole_maxlen6 : Optional[int]
+        Blackhole maximum length for IPv6.
+    blackhole_minlen6 : Optional[int]
+        Blackhole minimum length for IPv6.
     prefix_import_maxlen4 : int
         Prefix import maximum length for IPv4.
     prefix_import_minlen4 : int
@@ -117,6 +125,12 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
     route_policy_accept: BGPRoutePolicyAccept
     route_policy_import: BGPRoutePolicyImport
 
+    blackhole_maxlen4: int
+    blackhole_minlen4: int
+
+    blackhole_maxlen6: int
+    blackhole_minlen6: int
+
     prefix_import_maxlen4: int
     prefix_import_minlen4: int
 
@@ -147,6 +161,12 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
 
         self.route_policy_accept = BGPRoutePolicyAccept()
         self.route_policy_import = BGPRoutePolicyImport()
+
+        self.blackhole_maxlen4 = 32
+        self.blackhole_minlen4 = 24
+
+        self.blackhole_maxlen6 = 128
+        self.blackhole_minlen6 = 64
 
         self.prefix_import_maxlen4 = 24
         self.prefix_import_minlen4 = 8
