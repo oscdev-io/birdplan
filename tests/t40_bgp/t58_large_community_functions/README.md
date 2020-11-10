@@ -1,4 +1,4 @@
-# BGP large community function tests (outbound)
+# BGP large community function tests
 
 Router r1 should be receiving routes from e1 test cases and advertising to r2-r9.
 

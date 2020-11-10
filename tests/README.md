@@ -56,6 +56,8 @@
 
 [Community Stripping](t40_bgp/t50_community_stripping/README.md)
 
+[Community Functions](t40_bgp/t51_community_functions/README.md)
+
 [Location-based Large Communities](t40_bgp/t52_location_large_communities/README.md)
 
 [Incoming Large Communities](t40_bgp/t54_incoming_large_communities/README.md)
