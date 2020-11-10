@@ -159,7 +159,7 @@ Allowable internally and by `customer`.
 
 ## LOCAL_PREF Attribute Manipulation Communities
 
-Allowable internally and by `customer`.
+Allowable internally and by `customer`. The local_pref is only reduced in the case of a `customer`.
 
 | Community | Description |
 | --- | --- |
