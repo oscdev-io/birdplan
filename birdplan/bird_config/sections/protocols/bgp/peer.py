@@ -1054,94 +1054,94 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add(f"filter {func_name} {{")
 
         # Configuration which goes below in the "if" statement
-        type_lines = []
+        conf_lines = []
 
         # Clients
         if self.peer_type == "customer":
-            type_lines.append("    bgp_communities_strip_internal();")
-            type_lines.append(f"    bgp_import_customer({self.asn}, {self.cost});")
-            type_lines.append(f"    bgp_filter_default_v{ipv}();")
-            type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
+            conf_lines.append("    bgp_communities_strip_internal();")
+            conf_lines.append(f"    bgp_import_customer({self.asn}, {self.cost});")
+            conf_lines.append(f"    bgp_filter_default_v{ipv}();")
+            conf_lines.append(f"    bgp_filter_bogons_v{ipv}();")
             # The bgp_filter_prefix size test will exclude blackholes from checks
-            type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
+            conf_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
             # Check if we're going to accept a blackhole route
             if self.route_policy_accept.blackhole:
-                type_lines.append(f"    {self._bgp_filter_blackhole_size(ipv)}")
+                conf_lines.append(f"    {self._bgp_filter_blackhole_size(ipv)}")
             else:
-                type_lines.append("    bgp_filter_blackhole();")
+                conf_lines.append("    bgp_filter_blackhole();")
             # If we're replacing the ASN we only allow private ASN's in the AS-PATH
             if self.replace_aspath:
-                type_lines.append(f"    bgp_filter_asn_private([{self.asn}]);")
+                conf_lines.append(f"    bgp_filter_asn_private([{self.asn}]);")
             # Else, filter bogon ASN's
             else:
-                type_lines.append("    bgp_filter_asn_bogons();")
-            type_lines.append(f"    {self._bgp_filter_aspath_length()}")
-            type_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
-            type_lines.append("    bgp_filter_asn_transit();")
-            type_lines.append("    bgp_filter_nexthop_not_peerip();")
-            type_lines.append(f"    {self._bgp_filter_community_length()}")
+                conf_lines.append("    bgp_filter_asn_bogons();")
+            conf_lines.append(f"    {self._bgp_filter_aspath_length()}")
+            conf_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
+            conf_lines.append("    bgp_filter_asn_transit();")
+            conf_lines.append("    bgp_filter_nexthop_not_peerip();")
+            conf_lines.append(f"    {self._bgp_filter_community_length()}")
         # Peers
         elif self.peer_type == "peer":
-            type_lines.append("    bgp_communities_strip_all();")
-            type_lines.append(f"    bgp_import_peer({self.asn}, {self.cost});")
-            type_lines.append(f"    bgp_filter_default_v{ipv}();")
-            type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
-            type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
-            type_lines.append("    bgp_filter_blackhole();")
-            type_lines.append("    bgp_filter_asn_bogons();")
-            type_lines.append(f"    {self._bgp_filter_aspath_length()}")
-            type_lines.append("    bgp_filter_nexthop_not_peerip();")
-            type_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
-            type_lines.append("    bgp_filter_asn_transit();")
-            type_lines.append(f"    {self._bgp_filter_community_length()}")
+            conf_lines.append("    bgp_communities_strip_all();")
+            conf_lines.append(f"    bgp_import_peer({self.asn}, {self.cost});")
+            conf_lines.append(f"    bgp_filter_default_v{ipv}();")
+            conf_lines.append(f"    bgp_filter_bogons_v{ipv}();")
+            conf_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
+            conf_lines.append("    bgp_filter_blackhole();")
+            conf_lines.append("    bgp_filter_asn_bogons();")
+            conf_lines.append(f"    {self._bgp_filter_aspath_length()}")
+            conf_lines.append("    bgp_filter_nexthop_not_peerip();")
+            conf_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
+            conf_lines.append("    bgp_filter_asn_transit();")
+            conf_lines.append(f"    {self._bgp_filter_community_length()}")
         # Routecollector
         elif self.peer_type == "routecollector":
-            type_lines.append("    bgp_communities_strip_all();")
-            type_lines.append("    bgp_filter_routecollector();")
+            conf_lines.append("    bgp_communities_strip_all();")
+            conf_lines.append("    bgp_filter_routecollector();")
         # Routeserver
         elif self.peer_type == "routeserver":
-            type_lines.append("    bgp_communities_strip_all();")
-            type_lines.append(f"    bgp_import_routeserver({self.asn}, {self.cost});")
-            type_lines.append(f"    bgp_filter_default_v{ipv}();")
-            type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
-            type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
-            type_lines.append("    bgp_filter_blackhole();")
-            type_lines.append("    bgp_filter_asn_bogons();")
-            type_lines.append(f"    {self._bgp_filter_aspath_length()}")
-            type_lines.append("    bgp_filter_asn_transit();")
-            type_lines.append(f"    {self._bgp_filter_community_length()}")
+            conf_lines.append("    bgp_communities_strip_all();")
+            conf_lines.append(f"    bgp_import_routeserver({self.asn}, {self.cost});")
+            conf_lines.append(f"    bgp_filter_default_v{ipv}();")
+            conf_lines.append(f"    bgp_filter_bogons_v{ipv}();")
+            conf_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
+            conf_lines.append("    bgp_filter_blackhole();")
+            conf_lines.append("    bgp_filter_asn_bogons();")
+            conf_lines.append(f"    {self._bgp_filter_aspath_length()}")
+            conf_lines.append("    bgp_filter_asn_transit();")
+            conf_lines.append(f"    {self._bgp_filter_community_length()}")
         # Internal router peer types
         elif self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
-            type_lines.append("    bgp_filter_lc_no_relation();")
+            conf_lines.append("    bgp_filter_lc_no_relation();")
             if not self.route_policy_accept.default:
-                type_lines.append(f"    bgp_filter_default_v{ipv}();")
+                conf_lines.append(f"    bgp_filter_default_v{ipv}();")
             if self.peer_type == "internal" and self.replace_aspath:
-                type_lines.append("    bgp_filter_asn_private(PRIVATE_ASNS);")
+                conf_lines.append("    bgp_filter_asn_private(PRIVATE_ASNS);")
             # Check if we're going to accept a blackhole route
             if self.route_policy_accept.blackhole:
-                type_lines.append(f"    {self._bgp_filter_blackhole_size(ipv)}")
+                conf_lines.append(f"    {self._bgp_filter_blackhole_size(ipv)}")
             else:
-                type_lines.append("    bgp_filter_blackhole();")
+                conf_lines.append("    bgp_filter_blackhole();")
         # Transit providers
         elif self.peer_type == "transit":
-            type_lines.append("    bgp_communities_strip_all();")
-            type_lines.append(f"    bgp_import_transit({self.asn}, {self.cost});")
+            conf_lines.append("    bgp_communities_strip_all();")
+            conf_lines.append(f"    bgp_import_transit({self.asn}, {self.cost});")
             if self.route_policy_accept.default:
-                type_lines.append("    # Bypass bogon and size filters for the default route")
-                type_lines.append(f"    if (net != DEFAULT_ROUTE_V{ipv}) then {{")
-                type_lines.append(f"      bgp_filter_bogons_v{ipv}();")
-                type_lines.append(f"      {self._bgp_filter_prefix_size(ipv)}")
-                type_lines.append("    }")
+                conf_lines.append("    # Bypass bogon and size filters for the default route")
+                conf_lines.append(f"    if (net != DEFAULT_ROUTE_V{ipv}) then {{")
+                conf_lines.append(f"      bgp_filter_bogons_v{ipv}();")
+                conf_lines.append(f"      {self._bgp_filter_prefix_size(ipv)}")
+                conf_lines.append("    }")
             else:
-                type_lines.append(f"    bgp_filter_default_v{ipv}();")
-                type_lines.append(f"    bgp_filter_bogons_v{ipv}();")
-                type_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
-            type_lines.append("    bgp_filter_blackhole();")
-            type_lines.append("    bgp_filter_asn_bogons();")
-            type_lines.append(f"    {self._bgp_filter_aspath_length()}")
-            type_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
-            type_lines.append("    bgp_filter_nexthop_not_peerip();")
-            type_lines.append(f"    {self._bgp_filter_community_length()}")
+                conf_lines.append(f"    bgp_filter_default_v{ipv}();")
+                conf_lines.append(f"    bgp_filter_bogons_v{ipv}();")
+                conf_lines.append(f"    {self._bgp_filter_prefix_size(ipv)}")
+            conf_lines.append("    bgp_filter_blackhole();")
+            conf_lines.append("    bgp_filter_asn_bogons();")
+            conf_lines.append(f"    {self._bgp_filter_aspath_length()}")
+            conf_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
+            conf_lines.append("    bgp_filter_nexthop_not_peerip();")
+            conf_lines.append(f"    {self._bgp_filter_community_length()}")
         else:
             raise BirdPlanError(f"The BGP peer type '{self.peer_type}' is not supported")
 
@@ -1150,77 +1150,77 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.peer_type in ("customer", "peer"):
             # Check if we're filtering allowed origin ASNs
             if self.filter_policy.origin_asns:
-                type_lines.append("    # Filter on the allowed origin ASNs")
-                type_lines.append(f"    bgp_filter_allow_origin_asns({self.origin_asn_list_name});")
+                conf_lines.append("    # Filter on the allowed origin ASNs")
+                conf_lines.append(f"    bgp_filter_allow_origin_asns({self.origin_asn_list_name});")
             # Check if we're filtering allowed peer ASNs
             if self.filter_policy.peer_asns:
-                type_lines.append("    # Filter on the allowed peer ASNs")
-                type_lines.append(f"    bgp_filter_allow_peer_asns({self.peer_asn_list_name});")
+                conf_lines.append("    # Filter on the allowed peer ASNs")
+                conf_lines.append(f"    bgp_filter_allow_peer_asns({self.peer_asn_list_name});")
             # Check if we're filtering allowed prefixes
             if self.filter_policy.prefixes:
-                type_lines.append("    # Filter on the allowed prefixes")
-                type_lines.append(f"    bgp_filter_allow_prefixes({self.import_prefix_list_name(ipv)});")
+                conf_lines.append("    # Filter on the allowed prefixes")
+                conf_lines.append(f"    bgp_filter_allow_prefixes({self.import_prefix_list_name(ipv)});")
         # For everything else it is a DENY list
         elif self.peer_type != "routecollector":
             # Check if we're filtering denied origin ASNs
             if self.filter_policy.origin_asns:
-                type_lines.append("    # Filter on the denied origin ASNs")
-                type_lines.append(f"    bgp_filter_deny_origin_asns({self.origin_asn_list_name});")
+                conf_lines.append("    # Filter on the denied origin ASNs")
+                conf_lines.append(f"    bgp_filter_deny_origin_asns({self.origin_asn_list_name});")
             # Check if we're filtering denied peer ASNs
             if self.filter_policy.peer_asns:
-                type_lines.append("    # Filter on the denied peer ASNs")
-                type_lines.append(f"    bgp_filter_deny_peer_asns({self.peer_asn_list_name});")
+                conf_lines.append("    # Filter on the denied peer ASNs")
+                conf_lines.append(f"    bgp_filter_deny_peer_asns({self.peer_asn_list_name});")
             # Check if we're filtering allowed prefixes
             if self.filter_policy.prefixes:
-                type_lines.append("    # Filter on the allowed prefixes")
-                type_lines.append(f"    bgp_filter_deny_prefixes({self.import_prefix_list_name(ipv)});")
+                conf_lines.append("    # Filter on the allowed prefixes")
+                conf_lines.append(f"    bgp_filter_deny_prefixes({self.import_prefix_list_name(ipv)});")
 
         # Quarantine mode...
         # NK: We don't quarantine route collectors as they are automagically filtered
         if self.quarantined and self.peer_type != "routecollector":
             # Quarantine prefixes
-            type_lines.append("    # Quarantine all prefixes received")
-            type_lines.append("    bgp_quarantine_peer();")
+            conf_lines.append("    # Quarantine all prefixes received")
+            conf_lines.append("    bgp_quarantine_peer();")
 
         # Add location-based large communities
         if self.peer_type in ("customer", "peer", "routeserver", "transit"):
             # Check if we have a ISO-3166 country code
             if self.location.iso3166:
-                type_lines.append(f"    bgp_import_location_iso3166({self.location.iso3166});")
+                conf_lines.append(f"    bgp_import_location_iso3166({self.location.iso3166});")
             # Check if we have a UN.M49 country code
             if self.location.unm49:
-                type_lines.append(f"    bgp_import_location_unm49({self.location.unm49});")
+                conf_lines.append(f"    bgp_import_location_unm49({self.location.unm49});")
 
         # If this is a customer or internal peer type, check if we're doing replacement of the AS-PATH and add the action community
         if self.peer_type in ("customer", "internal"):
             if self.replace_aspath:
                 # Lastly add the large community to replace the ASN
-                type_lines.append(f'    print "[{func_name}] Adding LC action BGP_LC_ACTION_REPLACE_ASPATH to ", net;')
-                type_lines.append("    bgp_large_community.add(BGP_LC_ACTION_REPLACE_ASPATH);")
+                conf_lines.append(f'    print "[{func_name}] Adding LC action BGP_LC_ACTION_REPLACE_ASPATH to ", net;')
+                conf_lines.append("    bgp_large_community.add(BGP_LC_ACTION_REPLACE_ASPATH);")
 
         # Check if we are adding a large community to incoming routes
         if self.large_communities.incoming:
             # Loop with large communities and add to the prefix
             for large_community in sorted(self.large_communities.incoming):
                 if self.birdconfig_globals.debug:
-                    type_lines.append(f'    print "[{func_name}] Adding LC {large_community} to ", net;')
-                type_lines.append(f"    bgp_large_community.add({large_community});")
+                    conf_lines.append(f'    print "[{func_name}] Adding LC {large_community} to ", net;')
+                conf_lines.append(f"    bgp_large_community.add({large_community});")
 
         # Support for changing incoming local_pref
         if self.peer_type == "customer":
-            type_lines.append("    bgp_import_localpref();")
+            conf_lines.append("    bgp_import_localpref();")
 
         # Enable graceful_shutdown for this prefix
         if self.graceful_shutdown:
-            type_lines.append("    bgp_graceful_shutdown_enable();")
+            conf_lines.append("    bgp_graceful_shutdown_enable();")
         # Set local_pref to 0 (GRACEFUL_SHUTDOWN) for the peer in graceful_shutdown
-        type_lines.append("    bgp_graceful_shutdown();")
+        conf_lines.append("    bgp_graceful_shutdown();")
 
         # If we have lines from the above add them
-        if type_lines:
+        if conf_lines:
             self.conf.add("  # Process routes from our peer")
             self.conf.add(f'  if (proto = "{self.protocol_name(ipv)}") then {{')
-            self.conf.add(type_lines)
+            self.conf.add(conf_lines)
             self.conf.add("  }")
 
         self.conf.add("  accept;")
