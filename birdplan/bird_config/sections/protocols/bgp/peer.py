@@ -82,6 +82,23 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "type" not in peer_config:
             raise BirdPlanError(f"BGP peer '{self.name}' need a 'type' field")
         self.peer_type = peer_config["type"]
+        # Make sure it is valid
+        if self.peer_type not in (
+            "customer",
+            "internal",
+            "peer",
+            "routecollector",
+            "routeserver",
+            "rrclient",
+            "rrserver",
+            "rrserver-rrserver",
+            "transit",
+        ):
+            raise BirdPlanError(f"The BGP peer type '{self.peer_type}' is not supported")
+
+        # First of all check if we have a route reflector cluster ID, we need one to have a rrclient
+        if self.peer_type in ("rrclient", "rrserver-rrserver") and not self.bgp_attributes.rr_cluster_id:
+            raise BirdPlanError(f"The BGP peer type '{self.peer_type}' requires a BGP 'cluster_id' options to be specified")
 
         # Check if we have a peer asn
         if "asn" not in peer_config:
@@ -291,6 +308,18 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     f"Having 'redistribute:bgp_transit' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
 
+        # Check that we have static routes imported first
+        if self.route_policy_redistribute.connected and not self.bgp_attributes.route_policy_import.connected:
+            raise BirdPlanError(f"BGP needs connected routes to be imported before they can be redistributed to peer '{self.name}'")
+
+        # Check that we have static routes imported first
+        if self.route_policy_redistribute.kernel and not self.bgp_attributes.route_policy_import.kernel:
+            raise BirdPlanError(f"BGP needs kernel routes to be imported before they can be redistributed to peer '{self.name}'")
+
+        # Check that we have static routes imported first
+        if self.route_policy_redistribute.static and not self.bgp_attributes.route_policy_import.static:
+            raise BirdPlanError(f"BGP needs static routes to be imported before they can be redistributed to peer '{self.name}'")
+
         # If the peer is a customer or peer, check if we have a prefix limit, if not add it from peeringdb
         if self.peer_type in ("customer", "peer"):
             if self.has_ipv4 and ("prefix_limit4" not in peer_config):
@@ -354,34 +383,32 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 setattr(self.route_policy_accept, accept_type, accept_config)
 
         # Check accept default is valid
-        if (
-            self.peer_type
-            not in (
-                "internal",
-                "rrclient",
-                "rrserver",
-                "rrserver-rrserver",
-                "transit",
-            )
-            and self.route_policy_accept.default
+        if self.peer_type not in (
+            "internal",
+            "rrclient",
+            "rrserver",
+            "rrserver-rrserver",
+            "transit",
         ):
-            raise BirdPlanError(
-                f"Having 'accept:default' set to True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
-            )
+            if self.route_policy_accept.default:
+                raise BirdPlanError(
+                    f"Having 'accept:default' set to True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
 
         # Check if blackholing can be enabled for this peer type
-        if (
-            self.peer_type not in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver")
-            and self.route_policy_accept.blackhole
-        ):
-            raise BirdPlanError(f"Having 'accept:blackhole' set for peer '{self.name}' with type '{self.peer_type}' makes no sense")
+        if self.peer_type not in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            if self.route_policy_accept.blackhole:
+                raise BirdPlanError(
+                    f"Having 'accept:blackhole' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
 
         # Check if this is a customer with blackholing and without a prefix filter set
-        if self.peer_type == "customer" and self.route_policy_accept.blackhole and not self.filter_policy.prefixes:
-            raise BirdPlanError(
-                f"Having 'accept:blackhole' set for peer '{self.name}' with type '{self.peer_type}' and without 'filter:prefixes' "
-                "set makes no sense"
-            )
+        if self.peer_type == "customer":
+            if self.route_policy_accept.blackhole and not self.filter_policy.prefixes:
+                raise BirdPlanError(
+                    f"Having 'accept:blackhole' set for peer '{self.name}' with type '{self.peer_type}' and without "
+                    "'filter:prefixes' set makes no sense"
+                )
 
         # Check for prepending we need to setup
         if "prepend" in peer_config:
@@ -405,15 +432,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                             f"'{self.peer_type}' is invalid"
                         )
                     # Check that we're not doing something stupid
-                    if self.peer_type in ("peer", "routecollector", "routeserver", "transit") and prepend_type in (
-                        "default",
-                        "bgp_peering",
-                        "bgp_transit",
-                    ):
-                        raise BirdPlanError(
-                            f"Having 'prepend:{prepend_type}' specified for peer '{self.name}' with type '{self.peer_type}' "
-                            "makes no sense"
-                        )
+                    if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):
+                        if prepend_type in ("default", "bgp_peering", "bgp_transit"):
+                            raise BirdPlanError(
+                                f"Having 'prepend:{prepend_type}' specified for peer '{self.name}' with type '{self.peer_type}' "
+                                "makes no sense"
+                            )
                     # Grab the prepend attribute
                     prepend_attr = getattr(self.prepend, prepend_type)
                     # Set prepend count
@@ -669,18 +693,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("  accept_route = false;")
         self.conf.add("  bypass_bgp_redistribution_checks = false;")
 
-        # Check that we have static routes imported first
-        if self.route_policy_redistribute.connected and not self.bgp_attributes.route_policy_import.connected:
-            raise BirdPlanError("BGP needs connected routes to be imported before they can be redistributed to a peer")
-
-        # Check that we have static routes imported first
-        if self.route_policy_redistribute.kernel and not self.bgp_attributes.route_policy_import.kernel:
-            raise BirdPlanError("BGP needs kernel routes to be imported before they can be redistributed to a peer")
-
-        # Check that we have static routes imported first
-        if self.route_policy_redistribute.static and not self.bgp_attributes.route_policy_import.static:
-            raise BirdPlanError("BGP needs static routes to be imported before they can be redistributed to a peer")
-
         # Override exports if this is a customer peer and we don't export to customers
         if self.peer_type == "customer":
             self.conf.add("  # Check for large community to prevent export to customers")
@@ -818,11 +830,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Do not redistribute the default route, no matter where we get it from
         if self.route_policy_redistribute.default:
-            # Make sure this is an allowed peer type for the default route to be exported
-            if self.peer_type not in ["customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"]:
-                raise BirdPlanError(
-                    f"Having 'redistribute[default]' as True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
-                )
             # Proceed with exporting...
             self.conf.add("  # Accept the default route as we're redistributing, but only if, its been accepted above")
             self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv} && accept_route) then {{")
@@ -1142,8 +1149,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             conf_lines.append(f"    bgp_filter_asn_invalid({self.asn});")
             conf_lines.append("    bgp_filter_nexthop_not_peerip();")
             conf_lines.append(f"    {self._bgp_filter_community_length()}")
-        else:
-            raise BirdPlanError(f"The BGP peer type '{self.peer_type}' is not supported")
 
         # Flip around the meaning of filters depending on peer type
         # For customer and peer, it is an ALLOW list
@@ -1258,19 +1263,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f'  password "{self.password}";')
 
         # Handle route reflector clients
-        if self.peer_type == "rrclient":
-            # First of all check if we have a route reflector cluster ID, we need one to have a rrclient
-            if not self.bgp_attributes.rr_cluster_id:
-                raise BirdPlanError("BGP route reflectors require a 'cluster_id' set if they have 'rrclient' peers")
-            # Set this peer as a route reflector client
-            self.conf.add("  rr client;")
-            self.conf.add(f"  rr cluster id {self.bgp_attributes.rr_cluster_id};")
-
-        # Handle route reflector server-to-server
-        if self.peer_type == "rrserver-rrserver":
-            # First of all check if we have a route reflector cluster ID, we need one to have a rrserver-rrserver peer
-            if not self.bgp_attributes.rr_cluster_id:
-                raise BirdPlanError("BGP route reflectors require a 'cluster_id' if they have 'rrserver-rrserver' peers")
+        if self.peer_type in ("rrclient", "rrserver-rrserver"):
             # Set this peer as a route reflector client
             self.conf.add("  rr client;")
             self.conf.add(f"  rr cluster id {self.bgp_attributes.rr_cluster_id};")
