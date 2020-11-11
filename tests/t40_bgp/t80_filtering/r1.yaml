@@ -20,3 +20,4 @@ bgp:
       error_wait_time: 2,5
 @PEER_CONFIG@
 @TEMPLATE_PEER_CONFIG@
+@PEER_EXTRA_CONFIG@

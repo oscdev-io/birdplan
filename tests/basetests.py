@@ -423,6 +423,7 @@ class BirdPlanBaseTestCase:
             "extra_config",
             "global_config",
             "peer_config",
+            "peer_extra_config",
             "template_extra_config",
             "template_global_config",
             "template_peer_config",

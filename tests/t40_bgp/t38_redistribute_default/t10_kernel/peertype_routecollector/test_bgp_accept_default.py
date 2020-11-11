@@ -30,7 +30,7 @@ class Test(PeerTypeConfig, Template):
 
     routers_config_exception = {
         "r1": r"Having 'redistribute:default' set for peer 'r2' with type 'routecollector' makes no sense",
-        "r2": r"Having 'accept\[default\]' as True for peer 'r1' with type 'routecollector' makes no sense",
+        "r2": r"Having 'accept:default' set to True for peer 'r1' with type 'routecollector' makes no sense",
     }
 
     def _test_setup_specific(self, sim, tmpdir):

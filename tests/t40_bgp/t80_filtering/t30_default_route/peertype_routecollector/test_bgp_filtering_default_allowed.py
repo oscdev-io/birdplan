@@ -28,4 +28,6 @@ from ....config.peertype_routecollector.e1r1 import PeerTypeConfig
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
 
-    routers_config_exception = {"r1": r"Having 'accept\[default\]' as True for peer 'e1' with type 'routecollector' makes no sense"}
+    routers_config_exception = {
+        "r1": r"Having 'accept:default' set to True for peer 'e1' with type 'routecollector' makes no sense"
+    }

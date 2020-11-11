@@ -27,7 +27,7 @@ from .template_base import TemplateBase
 class Template(TemplateBase):
     """BGP redistribute connected test case template."""
 
-    routers_config_exception = {"r1": r"BGP needs connected routes to be imported before they can be redistributed to a peer"}
+    routers_config_exception = {"r1": r"BGP needs connected routes to be imported before they can be redistributed to peer 'r2'"}
 
     r1_template_peer_config = """
       redistribute:
