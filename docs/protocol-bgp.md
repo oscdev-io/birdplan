@@ -38,6 +38,61 @@ bgp:
   asn: 65000
 ```
 
+# blackhole_maxlen4
+
+Default maximum IPv4 blackhole length to import from a BGP peer without filtering. Defaults to `32`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  blackhole_maxlen4: 25
+...
+```
+
+
+# blackhole_minlen4
+
+Default minimum IPv4 blackhole length to import from a BGP peer without filtering. Defaults to `24`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  blackhole_minlen4: 7
+...
+```
+
+
+# blackhole_maxlen6
+
+Default maximum IPv6 blackhole length to import from a BGP peer without filtering. Defaults to `32`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  blackhole_maxlen6: 25
+...
+```
+
+
+# blackhole_minlen6
+
+Default minimum IPv6 blackhole length to import from a BGP peer without filtering. Defaults to `26`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  blackhole_minlen6: 7
+...
+```
+
 
 ## graceful_shutdown
 
@@ -341,6 +396,8 @@ The `accept` key contains a dictionary of routes we will accept. Namely...
 
 * `default` - Allows us to accept a default route from the BGP peer. The default is `False` for everything but a `rrserver-rrserver` peer.
 An exception will be raised if this is set to `True` for peers of type `customer`, `peer` and `routeserver`.
+* `blackhole` - Allows us to accept a blackhole advertisement from the BGP peer. This is only valid for peer types `customer`, `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`. The default is `True` for peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` and `True` when peer type `customer` has `filter:prefixes` set.
+
 
 Below is a configuration example...
 ```yaml
@@ -355,6 +412,40 @@ bgp:
 ...
 ```
 
+
+# blackhole_maxlen4
+
+Maximum IPv4 blackhole length to import without filtering. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      blackhole_maxlen4: 32
+...
+```
+
+
+# blackhole_minlen4
+
+Minimum IPv4 blackhole length to import without filtering. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      blackhole_minlen4: 24
+...
+```
 
 
 ## connect_delay_time
@@ -469,6 +560,18 @@ In the context of peer types `customer` and `peer` the above forms the ALLOW lis
 In the context of peer types `transit` and `routeserver` the above forms the DENY list. Everything specified will be filtered.
 
 In the context of peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` and `routecollector` the above makes no sense. But will form a DENY list.
+
+Examples of `prefixes` filter:
+* `192.168.0.0/22+` - Matches /22 or any subset of the /22
+* `192.168.0.0/24` - Matches exactly /24 (but does not work with blackholing)
+
+Currently only the above two methods of specifying IP ranges are accepted.
+
+The prefix sizes are controlled by the blackhole and prefix length options, so one does not specify the min and max sizes here.
+
+If one does not use a `+` at the end of the line, it will prevent blackholing from working correctly as we need to permit prefixes
+smaller than the range assigned to the client.
+
 
 An example is however below...
 ```yaml
@@ -747,9 +850,12 @@ Maximum IPv4 prefix length to import without filtering. Defaults to global setti
 An example of this usage is below...
 ```yaml
 ...
-
 bgp:
-  prefix_import_maxlen4: 25
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prefix_import_maxlen4: 25
 ...
 ```
 
@@ -763,7 +869,11 @@ An example of this usage is below...
 ...
 
 bgp:
-  prefix_import_minlen4: 7
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prefix_import_minlen4: 7
 ...
 ```
 
@@ -777,7 +887,11 @@ An example of this usage is below...
 ...
 
 bgp:
-  prefix_export_maxlen4: 25
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prefix_export_maxlen4: 25
 ...
 ```
 
@@ -791,7 +905,11 @@ An example of this usage is below...
 ...
 
 bgp:
-  prefix_export_minlen4: 7
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prefix_export_minlen4: 7
 ...
 ```
 
@@ -805,7 +923,11 @@ An example of this usage is below...
 ...
 
 bgp:
-  prefix_import_maxlen6: 47
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prefix_import_maxlen6: 47
 ...
 ```
 
@@ -819,7 +941,11 @@ An example of this usage is below...
 ...
 
 bgp:
-  prefix_import_minlen6: 15
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prefix_import_minlen6: 15
 ...
 ```
 
@@ -833,7 +959,11 @@ An example of this usage is below...
 ...
 
 bgp:
-  prefix_export_maxlen6: 47
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prefix_export_maxlen6: 47
 ...
 ```
 
@@ -847,7 +977,11 @@ An example of this usage is below...
 ...
 
 bgp:
-  prefix_export_minlen6: 15
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prefix_export_minlen6: 15
 ...
 ```
 
@@ -863,7 +997,11 @@ An example of this usage is below...
 ...
 
 bgp:
-  aspath_import_maxlen: 90
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      aspath_import_maxlen: 90
 ...
 ```
 
@@ -879,7 +1017,11 @@ An example of this usage is below...
 ...
 
 bgp:
-  aspath_import_minlen: 2
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      aspath_import_minlen: 2
 ...
 ```
 
@@ -895,7 +1037,11 @@ An example of this usage is below...
 ...
 
 bgp:
-  community_import_maxlen: 90
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      community_import_maxlen: 90
 ...
 ```
 
@@ -911,7 +1057,11 @@ An example of this usage is below...
 ...
 
 bgp:
-  extended_community_import_maxlen: 90
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      extended_community_import_maxlen: 90
 ...
 ```
 
@@ -927,14 +1077,13 @@ An example of this usage is below...
 ...
 
 bgp:
-  large_community_import_maxlen: 90
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      large_community_import_maxlen: 90
 ...
 ```
-
-
-
-
-
 
 
 ## prepend
@@ -949,11 +1098,14 @@ This will result in our own ASN being prepended for the number of times specifie
 
 An example of this is below...
 ```yaml
+...
+bgp:
   peers:
     peer1:
       asn: 65000
       description: Some peer
       prepend: 2
+...
 ```
 
 **The second method is we can use a dict to do fine grained prepending based on route type:**
@@ -976,6 +1128,8 @@ Internal route types...
 
 An example of this is below...
 ```yaml
+...
+bgp:
   peers:
     peer1:
       asn: 65000
@@ -983,6 +1137,7 @@ An example of this is below...
       prepend:
         static: 2
         bgp_customer: 2
+...
 ```
 
 
@@ -993,7 +1148,6 @@ Quarantine all the peer routes by filtering them out and blocking transversal in
 An example of quarantining a peer can be found below...
 ```yaml
 ...
-
 bgp:
   peers:
     peer1:
@@ -1053,18 +1207,6 @@ This is only valid for peer types of `customer` and `internal`.
 This will result in a large community being added to the prefix, which will end up in the AS-PATH being replaced on all eBGP peers.
 
 All private ASN's will be replaced up to a limit of 10, any AS-PATH longer than this will be truncated.
-
-In addition to this functionality, the minimum and maximum prefix lengths we import and export are adjusted as follows. This allows a peer using this feature to advertise a /29 IPv4 and /64 IPv6 prefix to us.
-```
-prefix_import_minlen4 = 16
-prefix_import_maxlen4 = 29
-prefix_export_minlen4 = 16
-prefix_export_maxlen4 = 29
-prefix_import_maxlen6 = 64
-prefix_import_minlen6 = 32
-prefix_export_maxlen6 = 64
-prefix_export_minlen6 = 32
-```
 
 An example is below...
 ```yaml

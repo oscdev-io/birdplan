@@ -28,6 +28,33 @@ These are globals which can be overridden in configuration.
 | PREFIX_EXPORT_MAXLEN6 | 48 | Maximum IPv6 CIDR length to export |
 | PREFIX_EXPORT_MINLEN6 | 16 | Minimum IPv6 CIDR length to export |
 
+When using the `replace_aspath` feature, the minimum and maximum prefix lengths we import and export are adjusted as follows. This allows a peer using this feature to advertise a /29 IPv4 and /64 IPv6 prefix to us.
+
+| Constant | Size | Description |
+| --- | --- | --- |
+| PREFIX_IMPORT_MAXLEN4 | 29 | Maximum IPv4 CIDR length to import |
+| PREFIX_IMPORT_MINLEN4 | 16 | Minimum IPv4 CIDR length to import |
+| PREFIX_EXPORT_MAXLEN4 | 29 | Maximum IPv4 CIDR length to export |
+| PREFIX_EXPORT_MINLEN4 | 16 | Minimum IPv4 CIDR length to export |
+| PREFIX_IMPORT_MAXLEN6 | 64 | Maximum IPv6 CIDR length to import |
+| PREFIX_IMPORT_MINLEN6 | 32 | Minimum IPv6 CIDR length to import |
+| PREFIX_EXPORT_MAXLEN6 | 64 | Maximum IPv6 CIDR length to export |
+| PREFIX_EXPORT_MINLEN6 | 32 | Minimum IPv6 CIDR length to export |
+
+
+# Communities
+
+Communities supported are the following...
+
+## Blackhole 65535:666
+
+The blackhole community 65535:666 is supported for both `internal` and `customer` peer types.
+
+In terms of a `customer` peer type the permissable prefix size is between /32 and /24, and is restricted to the allowed prefix list.
+
+In terms of a `internal` peer type the permissable prefix size is between /32 and /24 and is not restricted.
+
+
 # Large Communities
 
 Large communities are in the form of (OWN_ASN, FUNCTION, XXX) and are described below.
@@ -132,7 +159,7 @@ Allowable internally and by `customer`.
 
 ## LOCAL_PREF Attribute Manipulation Communities
 
-Allowable internally and by `customer`.
+Allowable internally and by `customer`. The local_pref is only reduced in the case of a `customer`.
 
 | Community | Description |
 | --- | --- |
@@ -179,6 +206,9 @@ Internally set, not allowable from any BGP peer type.
 | (OWN_ASN, 1101, 21) | Peer AS filtered (not in filter list) |
 | (OWN_ASN, 1101, 22) | AS path not allowed |
 | (OWN_ASN, 1101, 23) | No relation large community set |
+| (OWN_ASN, 1101, 24) | Blackhole length too long |
+| (OWN_ASN, 1101, 25) | Blackhole length too short |
+| (OWN_ASN, 1101, 26) | Blackhole not allowed |
 
 ## Action Communities
 

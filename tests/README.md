@@ -56,15 +56,15 @@
 
 [Community Stripping](t40_bgp/t50_community_stripping/README.md)
 
+[Community Functions](t40_bgp/t51_community_functions/README.md)
+
 [Location-based Large Communities](t40_bgp/t52_location_large_communities/README.md)
 
 [Incoming Large Communities](t40_bgp/t54_incoming_large_communities/README.md)
 
 [Outgoing Large Communities](t40_bgp/t56_outgoing_large_communities/README.md)
 
-[Large Community Functions (inbound)](t40_bgp/t58_large_community_functions_inbound/README.md)
-
-[Large Community Functions (outbound)](t40_bgp/t59_large_community_functions_outbound/README.md)
+[Large Community Functions](t40_bgp/t58_large_community_functions/README.md)
 
 [Prepending](t40_bgp/t60_prepending/README.md)
 

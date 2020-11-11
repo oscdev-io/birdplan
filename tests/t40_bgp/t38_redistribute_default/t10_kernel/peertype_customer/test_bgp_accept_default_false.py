@@ -28,4 +28,4 @@ from ....config.peertype_customer.r1r2 import PeerTypeConfig
 class Test(PeerTypeConfig, Template):
     """BGP test case for redistribution of kernel default routes, with accept:default set to false."""
 
-    routers_config_exception = {"r2": r"Having 'accept\[default\]' as True for peer 'r1' with type 'customer' makes no sense"}
+    routers_config_exception = {"r2": r"Having 'accept:default' set to True for peer 'r1' with type 'customer' makes no sense"}

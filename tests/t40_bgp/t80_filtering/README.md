@@ -25,6 +25,31 @@ In terms of test "test_bgp_filtering_as_path_too_short_peer":
 - ExaBGP e1 should export a prefix with too few ASNs in the AS-PATH, in this case none, with custom peer length configuration.
 
 
+## Tests for BGP blackholing
+
+In terms of test "test_bgp_blackhole_not_in_prefix_list":
+- ExaBGP e1 should export a prefix which is not in the `filter:prefixes` list.
+
+In terms of test "test_bgp_blackhole_too_long":
+- ExaBGP e1 should export a prefix which has a blackhole community set and has a length that is too long.
+
+In terms of test "test_bgp_filtering_as_path_too_long_global":
+- ExaBGP e1 should export a prefix which has a blackhole community set and has a length that is too long, with custom global length configuration.
+
+In terms of test "test_bgp_filtering_as_path_too_long_peer":
+- ExaBGP e1 should export a prefix which has a blackhole community set and has a length that is too long, with custom peer length configuration.
+
+In terms of test "test_bgp_blackhole_too_short":
+- ExaBGP e1 should export a prefix which has a blackhole community set and has a length that is too short.
+
+In terms of test "test_bgp_filtering_as_path_too_short_global":
+- ExaBGP e1 should export a prefix which has a blackhole community set and has a length that is too short, with custom global length configuration.
+
+In terms of test "test_bgp_filtering_as_path_too_short_peer":
+- ExaBGP e1 should export a prefix which has a blackhole community set and has a length that is too short, with custom peer length configuration.
+
+
+
 ## Tests for BGP prefix length filtering
 
 In terms of test "test_bgp_filtering_prefix_too_long":

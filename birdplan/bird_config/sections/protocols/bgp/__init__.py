@@ -75,6 +75,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             self.extended_community_import_maxlen = 25
             self.large_community_import_maxlen = 25
 
+            self.blackhole_maxlen4 = 31
+            self.blackhole_maxlen6 = 127
+
             self.prefix_import_minlen4 = 16
             self.prefix_export_minlen4 = 16
             self.prefix_import_maxlen6 = 64
@@ -271,6 +274,8 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         self.constants.conf.append("# Well known communities")
         self.constants.conf.append("define BGP_COMMUNITY_GRACEFUL_SHUTDOWN = (65535, 0);")
+        self.constants.conf.append("define BGP_COMMUNITY_BLACKHOLE = (65535, 666);")
+        self.constants.conf.append("define BGP_COMMUNITY_NOEXPORT = (65535, 65281);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community functions")
@@ -347,6 +352,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_FILTERED_PEER_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 21);")
         self.constants.conf.append("define BGP_LC_FILTERED_ASPATH_NOT_ALLOWED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 22);")
         self.constants.conf.append("define BGP_LC_FILTERED_NO_RELATION_LC = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 23);")
+        self.constants.conf.append("define BGP_LC_FILTERED_BLACKHOLE_LEN_TOO_LONG = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 24);")
+        self.constants.conf.append("define BGP_LC_FILTERED_BLACKHOLE_LEN_TOO_SHORT = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 25);")
+        self.constants.conf.append("define BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 26);")
         self.constants.conf.append("")
         self.constants.conf.append("# Large community actions")
         self.constants.conf.append("define BGP_LC_ACTION_REPLACE_ASPATH = (BGP_ASN, BGP_LC_FUNCTION_ACTION, 1);")
@@ -548,8 +556,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
+        # bgp_filter_prefix_size
         self.functions.conf.append("# Filter prefix size")
         self.functions.conf.append("function bgp_filter_prefix_size(int prefix_maxlen; int prefix_minlen) {")
+        self.functions.conf.append("  # If this is a blackhole prefix then just return, it will be caught later")
+        self.functions.conf.append("  if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then return false;")
+        self.functions.conf.append("  # Check prefix length is within the range we allow")
         self.functions.conf.append("  if prefix_is_longer(prefix_maxlen) then {")
         self.functions.conf.append(
             '    print "[bgp_filter_prefix_size] Prefix length >", prefix_maxlen,", '
@@ -558,6 +570,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         )
         self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_LONG);")
         self.functions.conf.append("  }")
+        self.functions.conf.append("  # Check prefix length is within the range we allow")
         self.functions.conf.append("  if prefix_is_shorter(prefix_minlen) then {")
         self.functions.conf.append(
             '    print "[bgp_filter_prefix_size] Prefix length <", prefix_minlen,", '
@@ -569,6 +582,45 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
+        # bgp_filter_blackhole_size
+        self.functions.conf.append("# Filter blackhole size")
+        self.functions.conf.append("function bgp_filter_blackhole_size(int blackhole_maxlen; int blackhole_minlen) {")
+        self.functions.conf.append("  # If this is not a blackhole prefix then just return")
+        self.functions.conf.append("  if (BGP_COMMUNITY_BLACKHOLE !~ bgp_community) then return false;")
+        self.functions.conf.append("  # Check prefix is not longer than what we allow")
+        self.functions.conf.append("  if prefix_is_longer(blackhole_maxlen) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_prefix_size] Blackhole length >", blackhole_maxlen,", '
+            'adding BGP_FILTERED_BLACKHOLE_LEN_TOO_LONG to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_LEN_TOO_LONG);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  # Check prefix is not shorter than what we allow")
+        self.functions.conf.append("  if prefix_is_shorter(blackhole_minlen) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_prefix_size] Blackhole length <", blackhole_minlen,", '
+            'adding BGP_FILTERED_BLACKHOLE_LEN_TOO_SHORT to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_LEN_TOO_SHORT);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        # bgp_filter_blackhole
+        self.functions.conf.append("# Filter IPv4 bogons")
+        self.functions.conf.append("function bgp_filter_blackhole() {")
+        self.functions.conf.append("  if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_filter_blackhole] Adding BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED to ", net;', debug=True
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED);")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        # bgp_filter_bogons_v4
         self.functions.conf.append("# Filter IPv4 bogons")
         self.functions.conf.append("function bgp_filter_bogons_v4() {")
         self.functions.conf.append("  if is_bogon4() then {")
@@ -578,6 +630,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
+        # bgp_filter_bogons_v6
         self.functions.conf.append("# Filter IPv6 bogons")
         self.functions.conf.append("function bgp_filter_bogons_v6() {")
         self.functions.conf.append("  if is_bogon6() then {")
@@ -823,6 +876,20 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
         self.functions.conf.append("")
+
+        self.functions.conf.append("# Blackhole")
+        self.functions.conf.append("function bgp_blackhole_enable() {")
+        self.functions.conf.append('  print "[bgp_blackhole_enable] Enabling blackhole for ", net;', debug=True)
+        self.functions.conf.append("  # Check if the route contains a blackhole community")
+        self.functions.conf.append("  if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then {")
+        self.functions.conf.append("    # Set destination as blackhole")
+        self.functions.conf.append("    dest = RTD_BLACKHOLE;")
+        self.functions.conf.append("    # Make sure we have our NOEXPORT community set")
+        self.functions.conf.append("    if (BGP_COMMUNITY_NOEXPORT !~ bgp_community) then {")
+        self.functions.conf.append("      bgp_community.add(BGP_COMMUNITY_NOEXPORT);")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
 
         self.functions.conf.append("# Can we export this IPv4 BGP route to the peeras?")
         self.functions.conf.append("function bgp_can_export_v4(int peeras; int prefix_maxlen; int prefix_minlen) {")
@@ -1576,6 +1643,50 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     def originated_routes(self) -> BGPOriginatedRoutes:
         """Return our originated routes."""
         return self._originated_routes
+
+    # IPV4 BLACKHOLE PREFIX LENGTHS
+
+    @property
+    def blackhole_maxlen4(self) -> int:
+        """Return the current value of blackhole_maxlen4."""
+        return self.bgp_attributes.blackhole_maxlen4
+
+    @blackhole_maxlen4.setter
+    def blackhole_maxlen4(self, blackhole_maxlen4: int) -> None:
+        """Setter for blackhole_maxlen4."""
+        self.bgp_attributes.blackhole_maxlen4 = blackhole_maxlen4
+
+    @property
+    def blackhole_minlen4(self) -> int:
+        """Return the current value of blackhole_minlen4."""
+        return self.bgp_attributes.blackhole_minlen4
+
+    @blackhole_minlen4.setter
+    def blackhole_minlen4(self, blackhole_minlen4: int) -> None:
+        """Setter for blackhole_minlen4."""
+        self.bgp_attributes.blackhole_minlen4 = blackhole_minlen4
+
+    # IPV6 BLACKHOLE PREFIX LENGTHS
+
+    @property
+    def blackhole_maxlen6(self) -> int:
+        """Return the current value of blackhole_maxlen6."""
+        return self.bgp_attributes.blackhole_maxlen6
+
+    @blackhole_maxlen6.setter
+    def blackhole_maxlen6(self, blackhole_maxlen6: int) -> None:
+        """Setter for blackhole_maxlen6."""
+        self.bgp_attributes.blackhole_maxlen6 = blackhole_maxlen6
+
+    @property
+    def blackhole_minlen6(self) -> int:
+        """Return the current value of blackhole_minlen6."""
+        return self.bgp_attributes.blackhole_minlen6
+
+    @blackhole_minlen6.setter
+    def blackhole_minlen6(self, blackhole_minlen6: int) -> None:
+        """Setter for blackhole_minlen6."""
+        self.bgp_attributes.blackhole_minlen6 = blackhole_minlen6
 
     # IPV4 IMPORT PREFIX LENGTHS
 
