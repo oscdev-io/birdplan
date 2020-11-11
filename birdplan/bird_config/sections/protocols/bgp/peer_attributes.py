@@ -197,6 +197,7 @@ class BGPPeerRoutePolicyAccept:  # pylint: disable=too-few-public-methods
     blackhole : Union[List[str], bool]
         Accept blackhole routes. Defaults to `False`, unless the peertype is a `customer` and filter:prefixes is set or
         peertype is `internal`.
+
     """
 
     default: bool
