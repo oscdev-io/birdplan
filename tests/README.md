@@ -70,6 +70,8 @@
 
 [Filtering (inbound)](t40_bgp/t80_filtering_inbound/README.md)
 
+[Filtering (outbound)](t40_bgp/t81_filtering_outbound/README.md)
+
 [Graceful Shutdown](t40_bgp/t90_graceful_shutdown/README.md)
 
 [Commandline Quarantine](t40_bgp/t98_quarantine/README.md)
