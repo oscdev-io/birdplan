@@ -68,7 +68,9 @@
 
 [Prepending](t40_bgp/t60_prepending/README.md)
 
-[Filtering](t40_bgp/t80_filtering/README.md)
+[Filtering (inbound)](t40_bgp/t80_filtering_inbound/README.md)
+
+[Filtering (outbound)](t40_bgp/t81_filtering_outbound/README.md)
 
 [Graceful Shutdown](t40_bgp/t90_graceful_shutdown/README.md)
 
