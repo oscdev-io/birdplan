@@ -193,7 +193,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("  65535, # RFC 7300 Last 16 bit ASN")
         self.constants.conf.append("  65536..65551, # RFC 5398 and documentation/example ASNs")
         self.constants.conf.append("  65552..131071, # RFC IANA reserved ASNs")
-        self.constants.conf.append("  4200000000..4294967294, # RFC 6996 Private ASNs")
+        if self.birdconfig_globals.test_mode:
+            self.constants.conf.append("  # EXCLUDING DUE TO TESTING: 4200000000..4294967294, # RFC 6996 Private ASNs")
+            self.constants.conf.append("  4200000000..4294900000, # RFC 6996 Private ASNs - ADJUSTED FOR TESTING")
+        else:
+            self.constants.conf.append("  4200000000..4294967294, # RFC 6996 Private ASNs")
         self.constants.conf.append("  4294967295 # RFC 7300 Last 32 bit ASN")
         self.constants.conf.append("];")
         self.constants.conf.append("")
@@ -201,9 +205,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define PRIVATE_ASNS = [")
         if self.birdconfig_globals.test_mode:
             self.constants.conf.append("  # EXCLUDING DUE TO TESTING: 64512..65534, # RFC 6996 Private ASNs")
+            self.constants.conf.append("  # EXCLUDING DUE TO TESTING: 4200000000..4294967294, # RFC 6996 Private ASNs")
+            self.constants.conf.append("  4200000000..4294900000 # RFC 6996 Private ASNs - ADJUSTED FOR TESTING")
         else:
             self.constants.conf.append("  64512..65534, # RFC 6996 Private ASNs")
-        self.constants.conf.append("  4200000000..4294967294 # RFC 6996 Private ASNs")
+            self.constants.conf.append("  4200000000..4294967294 # RFC 6996 Private ASNs")
         self.constants.conf.append("];")
         self.constants.conf.append("")
 
@@ -259,9 +265,13 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_STRIP_ALL = [ (BGP_ASN, *, *) ];")
         self.constants.conf.append("define BGP_LC_STRIP_PRIVATE = [")
         # Don't strip the lower private ASN range during testing
-        if not self.birdconfig_globals.test_mode:
+        if self.birdconfig_globals.test_mode:
+            self.constants.conf.append("  # EXCLUDING DUE TO TESTING: (64512..65534, *, *)")
+            self.constants.conf.append("  # EXCLUDING DUE TO TESTING: (4200000000..4294967294, *, *)")
+            self.constants.conf.append("  (4200000000..4294900000, *, *) # ADJUSTED FOR TESTING")
+        else:
             self.constants.conf.append("  (64512..65534, *, *),")
-        self.constants.conf.append("  (4200000000..4294967294, *, *)")
+            self.constants.conf.append("  (4200000000..4294967294, *, *)")
         self.constants.conf.append("];")
 
         self.constants.conf.append("# BGP Route Preferences")

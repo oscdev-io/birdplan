@@ -38,6 +38,9 @@ def pytest_addoption(parser):
     """Add commandline options."""
 
     parser.addoption("--write-expected", action="store_true", default=False, help="Write out expected test results.")
+    parser.addoption(
+        "--enable-performance-test", action="store_true", default=False, help="WARNING: This will spawn 2,500 BIRD routers"
+    )
 
 
 #
@@ -91,6 +94,12 @@ def fixture_tmpdir(tmpdir_factory):
 def fixture_testpath(request):
     """Test file path."""
     return str(request.node.fspath)
+
+
+@pytest.fixture()
+def enable_performance_test(pytestconfig):
+    """Get the --enable-performance-test option."""
+    return pytestconfig.getoption("--enable-performance-test")
 
 
 #

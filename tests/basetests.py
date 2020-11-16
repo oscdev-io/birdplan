@@ -23,6 +23,7 @@
 
 from typing import Any, Dict, List, Optional, Tuple
 import importlib
+import inspect
 import logging
 import os
 import re
@@ -117,40 +118,13 @@ class BirdPlanBaseTestCase:
             sim.add_node(BirdRouterNode(name=router, configfile=f"{tmpdir}/bird.conf.{router}"))
 
         # Loop with our ExaBGP's and create the nodes
+        self._configure_exabgps(sim, tmpdir)
         for exabgp in self.exabgps:
-            # Grab ExaBGP's ASN
-            exabgp_asn = getattr(self, f"{exabgp}_asn")
-
-            # Work out config file name, going 2 levels up in the test directory
-            exabgp_config_file = None
-            for conffile_path in [
-                # With ASN appended
-                f"{sim.test_dir}/exabgp.conf.{exabgp}.as{exabgp_asn}",
-                # Without ASN appended
-                f"{sim.test_dir}/exabgp.conf.{exabgp}",
-                # Parent directory with ASN appended
-                f"{os.path.dirname(sim.test_dir)}/exabgp.conf.{exabgp}.as{exabgp_asn}",
-                # Parent directory without ASN appended
-                f"{os.path.dirname(sim.test_dir)}/exabgp.conf.{exabgp}",
-                # Parent parent directory with ASN appended
-                f"{os.path.dirname(os.path.dirname(sim.test_dir))}/exabgp.conf.{exabgp}.as{exabgp_asn}",
-                # Parent parent directory without ASN appended
-                f"{os.path.dirname(os.path.dirname(sim.test_dir))}/exabgp.conf.{exabgp}",
-            ]:
-                if os.path.exists(conffile_path):
-                    exabgp_config_file = conffile_path
-                    break
-            # If we didn't get a configuration file that exists, then raise an exception
-            if not exabgp_config_file:
-                raise RuntimeError("No ExaBGP configuration file found")
-
             # Add ExaBGP node
-            sim.add_node(ExaBGPRouterNode(name=exabgp, configfile=exabgp_config_file))
-            # Add config file to our simulation so we get a report for it
-            sim.add_conffile(f"CONFFILE({exabgp})", exabgp_config_file)
+            sim.add_node(ExaBGPRouterNode(name=exabgp, configfile=f"{tmpdir}/exabgp.conf.{exabgp}"))
             # Work out the log file name and add it to our simulation so we get a report for it too
-            exalogfile = sim.node(exabgp).logfile
-            sim.add_logfile(f"LOGFILE({exabgp}) => {exalogfile}", sim.node(exabgp).logfile)
+            exabgp_logfile = sim.node(exabgp).logfile
+            sim.add_logfile(f"EXABGP_LOGFILE({exabgp}) => {exabgp_logfile}", exabgp_logfile)
 
         # Loop with switches to create
         for switch in self.switches:
@@ -403,6 +377,82 @@ class BirdPlanBaseTestCase:
 
         return configured_routers
 
+    def _configure_exabgps(self, sim: Simulation, tmpdir: str) -> List[str]:
+        """Create our configuration files."""
+
+        # Loop with each ExaBGP
+        for exabgp in self.exabgps:
+            # Grab ExaBGP's ASN
+            exabgp_asn = getattr(self, f"{exabgp}_asn")
+
+            # Grab the configuration filename we're going to be using
+            exabgp_conffile = f"{tmpdir}/exabgp.conf.{exabgp}"
+
+            # Loop with supported attributes that translate into macros
+            internal_macros = {}
+            for attr in [
+                "exabgp_config",
+                "exabgp_config_neighbor1",
+                "exabgp_config_neighbor2",
+                "template_exabgp_config",
+                "template_exabgp_config_neighbor1",
+                "template_exabgp_config_neighbor2",
+            ]:
+                # Router specific lookup for an attribute to add a macro for
+                router_attr = f"{exabgp}_{attr}"
+                if hasattr(self, router_attr):
+                    symbol = getattr(self, router_attr)
+                    if callable(symbol):
+                        symbol_signature = inspect.signature(symbol)
+                        if len(symbol_signature.parameters) == 1:
+                            value = symbol(sim)
+                        else:
+                            value = symbol()
+                    else:
+                        value = symbol
+                else:
+                    value = ""
+                # Add our macro
+                internal_macros[f"@{attr.upper()}@"] = value
+
+            # Work out config file name, going 2 levels up in the test directory
+            exabgp_config_file = None
+            for conffile_path in [
+                # With ASN appended
+                f"{sim.test_dir}/exabgp.conf.{exabgp}.as{exabgp_asn}",
+                # Without ASN appended
+                f"{sim.test_dir}/exabgp.conf.{exabgp}",
+                # Parent directory with ASN appended
+                f"{os.path.dirname(sim.test_dir)}/exabgp.conf.{exabgp}.as{exabgp_asn}",
+                # Parent directory without ASN appended
+                f"{os.path.dirname(sim.test_dir)}/exabgp.conf.{exabgp}",
+                # Parent parent directory with ASN appended
+                f"{os.path.dirname(os.path.dirname(sim.test_dir))}/exabgp.conf.{exabgp}.as{exabgp_asn}",
+                # Parent parent directory without ASN appended
+                f"{os.path.dirname(os.path.dirname(sim.test_dir))}/exabgp.conf.{exabgp}",
+            ]:
+                if os.path.exists(conffile_path):
+                    exabgp_config_file = conffile_path
+                    break
+            # If we didn't get a configuration file that exists, then raise an exception
+            if not exabgp_config_file:
+                raise RuntimeError("No ExaBGP configuration file found")
+
+            # Read in configuration file
+            with open(exabgp_config_file, "r") as file:
+                raw_config = file.read()
+            # Check if we're replacing macros in our configuration file
+            for macro, value in internal_macros.items():
+                if isinstance(value, int):
+                    value = f"{value}"
+                raw_config = raw_config.replace(macro, value)
+            # Write out new BirdPlan file with macros replaced
+            with open(exabgp_conffile, "w") as file:
+                file.write(raw_config)
+
+            # Add config file to our simulation so we get a report for it
+            sim.add_conffile(f"EXABGP_CONFFILE({exabgp})", exabgp_conffile)
+
     def _birdplan_run(  # pylint: disable=too-many-arguments,too-many-locals
         self, sim: Simulation, tmpdir: str, router: str, args: List[str]
     ) -> Any:
@@ -514,12 +564,15 @@ class BirdPlanBaseTestCase:
 
         return result
 
-    def _birdc(self, sim: Simulation, router: str, query: str) -> Any:
+    def _birdc(self, sim: Simulation, router: str, query: str, add_report: bool = True) -> Any:
         """Birdc helper."""
         # Grab the output from birdc
         birdc_output = sim.node(router).birdc(query)
-        # Add report
-        sim.add_report_obj(f"BIRDC({router})[{query}]", birdc_output)
+
+        # Check if we need to add the report
+        if add_report:
+            sim.add_report_obj(f"BIRDC({router})[{query}]", birdc_output)
+
         # Return the output from birdc
         return birdc_output
 

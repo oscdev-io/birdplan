@@ -113,13 +113,19 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     f"Having 'replace_aspath' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
             # Make sure the ASN is private and not public
-            if not (
-                (not self.birdconfig_globals.test_mode and self.asn >= 64512 and self.asn <= 65534)
-                or (self.asn >= 4200000000 and self.asn <= 4294967294)
-            ):
-                raise BirdPlanError(
-                    f"Having 'replace_aspath' set for peer '{self.name}' with a non-private ASN {self.asn} makes no sense"
-                )
+            if self.birdconfig_globals.test_mode:
+                # In test mode the only private ASN range is 4294900001 to 4294967294
+                if not (self.asn >= 4200000000 and self.asn <= 4294900000):
+                    raise BirdPlanError(
+                        f"Having 'replace_aspath' set for peer '{self.name}' with a non-private ASN {self.asn} makes no sense"
+                    )
+            # We're not in test mode...
+            else:
+                # Make sure we're within the full set of private ASN ranges
+                if not ((self.asn >= 64512 and self.asn <= 65534) or (self.asn >= 4200000000 and self.asn <= 4294967294)):
+                    raise BirdPlanError(
+                        f"Having 'replace_aspath' set for peer '{self.name}' with a non-private ASN {self.asn} makes no sense"
+                    )
             # Check if we're actually replacing it?
             if peer_config["replace_aspath"]:
                 self.replace_aspath = True
