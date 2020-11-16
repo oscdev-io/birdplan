@@ -23,7 +23,7 @@ test_job:
   - pip install git+https://oscdev.io/software/birdclient.git
   - pip install git+https://oscdev.io/software/nsnetsim.git
   # Run tests
-  - python setup.py test
+  - python setup.py test --addopt "-v"
 
 prepare_release:
   stage: prepare_release
