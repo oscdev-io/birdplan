@@ -251,7 +251,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Allow client traffic engineering: 4, 5, 6, 7, 8
         self.constants.conf.append("  (BGP_ASN, 9..60, *),")  # Strip unused
         self.constants.conf.append("  (BGP_ASN, 64..70, *),")  # Strip unused
-        self.constants.conf.append("  (BGP_ASN, 74..65535, *),")  # Strip unsed + rest (incl. 1000 - info, 1101 - filter)
+        self.constants.conf.append("  (BGP_ASN, 74..4294967295, *),")  # Strip unsed + rest (incl. 1000 - info, 1101 - filter)
         # These functions should never be used on our own ASN
         self.constants.conf.append("  (BGP_ASN, 4, BGP_ASN),")
         self.constants.conf.append("  (BGP_ASN, 6, BGP_ASN),")
