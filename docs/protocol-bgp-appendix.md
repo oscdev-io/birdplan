@@ -212,8 +212,9 @@ Internally set, not allowable from any BGP peer type.
 
 ## Action Communities
 
-Internally set, not allowable from any BGP peer type.
+Internally set, only allowable from `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
 
 | Community | Description |
 | --- | --- |
 | (OWN_ASN, 1200, 1) | Replace AS-PATH with our own ASN |
+| (OWN_ASN, 1200, 2) | Blackhole action for originated routes |

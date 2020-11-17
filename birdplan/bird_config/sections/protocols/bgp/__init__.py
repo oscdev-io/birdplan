@@ -251,7 +251,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Allow client traffic engineering: 4, 5, 6, 7, 8
         self.constants.conf.append("  (BGP_ASN, 9..60, *),")  # Strip unused
         self.constants.conf.append("  (BGP_ASN, 64..70, *),")  # Strip unused
-        self.constants.conf.append("  (BGP_ASN, 74..65535, *),")  # Strip unsed + rest (incl. 1000 - info, 1101 - filter)
+        self.constants.conf.append("  (BGP_ASN, 74..4294967295, *),")  # Strip unsed + rest (incl. 1000 - info, 1101 - filter)
         # These functions should never be used on our own ASN
         self.constants.conf.append("  (BGP_ASN, 4, BGP_ASN),")
         self.constants.conf.append("  (BGP_ASN, 6, BGP_ASN),")
@@ -368,6 +368,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("")
         self.constants.conf.append("# Large community actions")
         self.constants.conf.append("define BGP_LC_ACTION_REPLACE_ASPATH = (BGP_ASN, BGP_LC_FUNCTION_ACTION, 1);")
+        self.constants.conf.append("define BGP_LC_ACTION_BLACKHOLE_ORIGINATE = (BGP_ASN, BGP_LC_FUNCTION_ACTION, 2);")
         self.constants.conf.append("")
 
     def _configure_constants_functions(self) -> None:  # pylint: disable=too-many-statements
@@ -498,6 +499,14 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         )
         self.functions.conf.append("  # Tag route as a our own (originated and static) route")
         self.functions.conf.append("  bgp_large_community.add(BGP_LC_RELATION_OWN);")
+        self.functions.conf.append("  # Add our internal blackhole action to originated routes")
+        self.functions.conf.append('  if ((proto = "bgp_originate4" || proto = "bgp_originate6") && dest = RTD_BLACKHOLE) then {')
+        self.functions.conf.append(
+            '  print "[bgp_import_own] Adding BGP_LC_ACTION_BLACKHOLE_ORIGINATE to ", net;',
+            debug=True,
+        )
+        self.functions.conf.append("    bgp_large_community.add(BGP_LC_ACTION_BLACKHOLE_ORIGINATE);")
+        self.functions.conf.append("  }")
         self.functions.conf.append("  # Set local preference")
         self.functions.conf.append("  bgp_local_pref = BGP_PREF_OWN - local_pref_cost;")
         self.functions.conf.append("}")
@@ -619,7 +628,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         # bgp_filter_blackhole
-        self.functions.conf.append("# Filter IPv4 bogons")
+        self.functions.conf.append("# Filter blackhole routes")
         self.functions.conf.append("function bgp_filter_blackhole() {")
         self.functions.conf.append("  if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then {")
         self.functions.conf.append(
@@ -898,6 +907,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("    if (BGP_COMMUNITY_NOEXPORT !~ bgp_community) then {")
         self.functions.conf.append("      bgp_community.add(BGP_COMMUNITY_NOEXPORT);")
         self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+
+        self.functions.conf.append("# Origination blackhole action")
+        self.functions.conf.append("function bgp_blackhole_lc_originate() {")
+        self.functions.conf.append('  print "[bgp_blackhole_lc_originate] Enabling origination blackhole for ", net;', debug=True)
+        self.functions.conf.append("  # Check if the route contains a the blackhole large community")
+        self.functions.conf.append("  if (BGP_LC_ACTION_BLACKHOLE_ORIGINATE ~ bgp_large_community) then {")
+        self.functions.conf.append("    # Set destination as blackhole")
+        self.functions.conf.append("    dest = RTD_BLACKHOLE;")
         self.functions.conf.append("  }")
         self.functions.conf.append("}")
 

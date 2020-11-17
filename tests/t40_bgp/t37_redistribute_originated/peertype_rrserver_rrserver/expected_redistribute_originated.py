@@ -6,7 +6,7 @@
 r1_t_bgp_originate4 = {
     "100.101.0.0/24": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate4",
@@ -18,7 +18,7 @@ r1_t_bgp_originate4 = {
 r1_t_bgp_originate6 = {
     "fc00:101::/48": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate6",
@@ -38,7 +38,7 @@ r2_t_bgp6_AS65000_r1_peer = {}
 r1_t_bgp4 = {
     "100.101.0.0/24": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate4",
@@ -52,7 +52,7 @@ r2_t_bgp4 = {}
 r1_t_bgp6 = {
     "fc00:101::/48": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate6",
@@ -66,7 +66,7 @@ r2_t_bgp6 = {}
 r1_master4 = {
     "100.101.0.0/24": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate4",
@@ -117,7 +117,7 @@ r1_master6 = {
     ],
     "fc00:101::/48": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate6",
@@ -150,7 +150,7 @@ r2_master6 = {
 r1_t_kernel4 = {
     "100.101.0.0/24": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate4",
@@ -164,7 +164,7 @@ r2_t_kernel4 = {}
 r1_t_kernel6 = {
     "fc00:101::/48": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate6",
