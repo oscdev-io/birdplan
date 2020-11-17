@@ -1079,21 +1079,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("")
 
         self.functions.conf.append("# BGP connected route prepending")
-        self.functions.conf.append("function bgp_prepend_connected4(int peeras; int prepend_count)")
+        self.functions.conf.append("function bgp_prepend_connected(int peeras; int prepend_count)")
         self.functions.conf.append("{")
-        self.functions.conf.append('  if (proto = "direct4_bgp") then {')
+        self.functions.conf.append('  if (proto = "direct4_bgp" || proto = "direct6_bgp") then {')
         self.functions.conf.append(
-            '    print "[bgp_prepend_connected4] Prepending AS-PATH for type CONNECTED ", prepend_count, "x to ", net;',
-            debug=True,
-        )
-        self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")
-        self.functions.conf.append("  }")
-        self.functions.conf.append("}")
-        self.functions.conf.append("function bgp_prepend_connected6(int peeras; int prepend_count)")
-        self.functions.conf.append("{")
-        self.functions.conf.append('  if (proto = "direct6_bgp") then {')
-        self.functions.conf.append(
-            '    print "[bgp_prepend_connected6] Prepending AS-PATH for type CONNECTED ", prepend_count, "x to ", net;',
+            '    print "[bgp_prepend_connected] Prepending AS-PATH for type CONNECTED ", prepend_count, "x to ", net;',
             debug=True,
         )
         self.functions.conf.append("    bgp_prepend(peeras, prepend_count);")

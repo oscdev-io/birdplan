@@ -996,7 +996,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.prepend.default.own_asn:
             self.conf.add(f"    bgp_prepend_default{ipv}(BGP_ASN, {self.prepend.default.own_asn});")
         if self.prepend.connected.own_asn:
-            self.conf.add(f"    bgp_prepend_connected{ipv}(BGP_ASN, {self.prepend.connected.own_asn});")
+            self.conf.add(f"    bgp_prepend_connected(BGP_ASN, {self.prepend.connected.own_asn});")
         if self.prepend.static.own_asn:
             self.conf.add(f"    bgp_prepend_static{ipv}(BGP_ASN, {self.prepend.static.own_asn});")
         if self.prepend.kernel.own_asn:
