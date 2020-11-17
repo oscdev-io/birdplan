@@ -151,6 +151,9 @@ bgp:
 
 Origination of BGP prefixes, generally we set these to `blackhole` to avoid TTL loops.
 
+When the destination is set as a `blackhole`, an additional large community (OWN_ASN, 1200, 2) will be added. This will result
+in all iBGP peers blackholing the originated range.
+
 Origination can be specified as per below example...
 ```yaml
 ...
@@ -1168,9 +1171,6 @@ for peer type `rrserver-rrserver` which defaults to `True`.
 * `static` will redistribute static routes in our global static configuration. Defaults to `False`.
 * `kernel` will redistribute kernel routes. Defaults to `False`.
 * `originated` will redistribute originated routes. Defaults to `False`.
-
-In addition to setting these as a boolean value, one can also add the following items to a dictionary...
-* `large_communities` will add additional large communities when exporting routes of this type
 
 Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
 

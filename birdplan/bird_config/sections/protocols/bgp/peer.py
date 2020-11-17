@@ -678,6 +678,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Enable blackholing for customers and internal peers
         if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
             self.conf.add("  bgp_blackhole_enable();")
+        # Enable blackhole large community origination for internal peers
+        if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            self.conf.add("  bgp_blackhole_lc_originate();")
         # Finally accept the route
         self.conf.add(f'  print "[{self.filter_name_export_bgp((ipv))}] Exporting ", net, " to main BGP table";', debug=True)
         self.conf.add("  accept;")
