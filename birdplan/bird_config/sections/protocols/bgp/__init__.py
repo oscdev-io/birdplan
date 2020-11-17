@@ -639,6 +639,343 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
+        # bgp_reject_noexport_customer
+        self.functions.conf.append("# Reject EXPORT_NOCUSTOMER customer routes")
+        self.functions.conf.append("function bgp_reject_noexport_customer() {")
+        self.functions.conf.append("  # Check for large community to prevent export to customers")
+        self.functions.conf.append("  if (BGP_LC_EXPORT_NOCUSTOMER ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_reject_noexport_customer] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOCUSTOMER";',
+            debug=True,
+        )
+        self.functions.conf.append("    reject;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+        # bgp_reject_noexport_peer
+        self.functions.conf.append("# Reject EXPORT_NOPEER routes")
+        self.functions.conf.append("function bgp_reject_noexport_peer() {")
+        self.functions.conf.append("  # Check for large community to prevent export to peers")
+        self.functions.conf.append("  if (BGP_LC_EXPORT_NOPEER ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_reject_noexport_peer] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOPEER";',
+            debug=True,
+        )
+        self.functions.conf.append("    reject;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+        # bgp_reject_noexport_transit
+        self.functions.conf.append("# Reject EXPORT_NOTRANSIT routes")
+        self.functions.conf.append("function bgp_reject_noexport_transit() {")
+        self.functions.conf.append("  # Check for large community to prevent export to transit")
+        self.functions.conf.append("  if (BGP_LC_EXPORT_NOTRANSIT ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_reject_noexport_transit] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOTRANSIT";',
+            debug=True,
+        )
+        self.functions.conf.append("    reject;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+        # bgp_reject_noexport_location
+        self.functions.conf.append("# Reject NOEXPORT_LOCATION routes")
+        self.functions.conf.append("function bgp_reject_noexport_location(int location) {")
+        self.functions.conf.append("  # Check for large community to prevent export to a location")
+        self.functions.conf.append("  if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT_LOCATION, location) ~ bgp_large_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_reject_noexport_location] Rejecting ", net, " due to match on '
+            'BGP_LC_FUNCTION_NOEXPORT_LOCATION with location ", location;',
+            debug=True,
+        )
+        self.functions.conf.append("    reject;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        # bgp_redistribute_connected
+        self.functions.conf.append("# Check for redistribution of connected routes for BGP")
+        self.functions.conf.append("# - Reject routes that are not redistributable")
+        self.functions.conf.append("# - Return true when routes are redistributable")
+        self.functions.conf.append("# - Return false otherwise")
+        self.functions.conf.append("function bgp_redistribute_connected(bool redistribute) {")
+        self.functions.conf.append("  # Check for connected routes")
+        self.functions.conf.append('  if (proto = "direct4_bgp" || proto = "direct6_bgp") then {')
+        self.functions.conf.append("    if (redistribute) then {")
+        self.functions.conf.append(
+            f'      print "[bgp_redistribute_connected] Accepting ", net, " due to direct route match '
+            '(redistribute connected)";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("    } else {")
+        self.functions.conf.append(
+            f'      print "[bgp_redistribute_connected] Rejecting ", net, " due to direct route match '
+            '(no redistribute connected)";',
+            debug=True,
+        )
+        self.functions.conf.append("      reject;")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  return false;")
+        self.functions.conf.append("}")
+        # bgp_redistribute_static
+        self.functions.conf.append("# Check for redistribution of static routes for BGP")
+        self.functions.conf.append("# - Reject routes that are not redistributable")
+        self.functions.conf.append("# - Return true when routes are redistributable")
+        self.functions.conf.append("# - Return false otherwise")
+        self.functions.conf.append("function bgp_redistribute_static(bool redistribute) {")
+        self.functions.conf.append("  # Check for static routes")
+        self.functions.conf.append('  if (proto = "static4" || proto = "static6") then {')
+        self.functions.conf.append("    if (redistribute) then {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_static] Accepting ", net, " due to static route match ' '(redistribute static)";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("    } else {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_static] Rejecting ", net, " due to static route match ' '(no redistribute static)";',
+            debug=True,
+        )
+        self.functions.conf.append("      reject;")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  return false;")
+        self.functions.conf.append("}")
+        # bgp_redistribute_kernel
+        self.functions.conf.append("# Check for redistribution of kernel routes for BGP")
+        self.functions.conf.append("# - Reject routes that are not redistributable")
+        self.functions.conf.append("# - Return true when routes are redistributable")
+        self.functions.conf.append("# - Return false otherwise")
+        self.functions.conf.append("function bgp_redistribute_kernel(bool redistribute) {")
+        self.functions.conf.append("  # Check for kernel routes")
+        self.functions.conf.append("  if (source = RTS_INHERIT) then {")
+        self.functions.conf.append("    if (redistribute) then {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_kernel] Accepting ", net, " due to kernel route match ' '(redistribute kernel)";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("    } else {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_kernel] Rejecting ", net, " due to kernel route match ' '(no redistribute kernel)";',
+            debug=True,
+        )
+        self.functions.conf.append("      reject;")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  return false;")
+        self.functions.conf.append("}")
+        # bgp_redistribute_originated
+        self.functions.conf.append("# Check for redistribution of originated routes for BGP")
+        self.functions.conf.append("# - Reject routes that are not redistributable")
+        self.functions.conf.append("# - Return true when routes are redistributable")
+        self.functions.conf.append("# - Return false otherwise")
+        self.functions.conf.append("function bgp_redistribute_originated(bool redistribute) {")
+        self.functions.conf.append("  # Check for originated routes")
+        self.functions.conf.append('  if (proto = "bgp_originate4" || proto = "bgp_originate6") then {')
+        self.functions.conf.append("    if (redistribute) then {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_originated] Accepting ", net, " due to originated route match '
+            '(redistribute originated)";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("    } else {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_originated] Rejecting ", net, " due to originated route match '
+            '(no redistribute originated)";',
+            debug=True,
+        )
+        self.functions.conf.append("      reject;")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  return false;")
+        self.functions.conf.append("}")
+        # bgp_redistribute_default4
+        self.functions.conf.append("# Check for redistribution of default IPv4 routes for BGP")
+        self.functions.conf.append("# - Reject routes that are not redistributable")
+        self.functions.conf.append("# - Return true when routes are redistributable and accepted")
+        self.functions.conf.append("# - Return false otherwise")
+        self.functions.conf.append("function bgp_redistribute_default4(bool redistribute; bool accepted) {")
+        self.functions.conf.append("  # Check for accepted default routes")
+        self.functions.conf.append("  if (net = DEFAULT_ROUTE_V4 && accepted) then {")
+        self.functions.conf.append("    if (redistribute) then {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_default] Accepting ", net, " due to default route match '
+            '(redistribute default) and accepted";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("    } else {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_default] Rejecting ", net, " due to default route match";',
+            debug=True,
+        )
+        self.functions.conf.append("      reject;")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  return false;")
+        self.functions.conf.append("}")
+        # bgp_redistribute_default6
+        self.functions.conf.append("# Check for redistribution of default IPv6 routes for BGP")
+        self.functions.conf.append("# - Reject routes that are not redistributable")
+        self.functions.conf.append("# - Return true when routes are redistributable and accepted")
+        self.functions.conf.append("# - Return false otherwise")
+        self.functions.conf.append("function bgp_redistribute_default6(bool redistribute; bool accepted) {")
+        self.functions.conf.append("  # Check for accepted default routes")
+        self.functions.conf.append("  if (net = DEFAULT_ROUTE_V6 && accepted) then {")
+        self.functions.conf.append("    if (redistribute) then {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_default] Accepting ", net, " due to default route match '
+            '(redistribute default) and accepted";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("    } else {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_default] Rejecting ", net, " due to default route match";',
+            debug=True,
+        )
+        self.functions.conf.append("      reject;")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  return false;")
+        self.functions.conf.append("}")
+        # bgp_redistribute_bgp
+        self.functions.conf.append("# Check for redistribution of all BGP routes")
+        self.functions.conf.append("# - Return true when routes match RTS_BGP")
+        self.functions.conf.append("# - Return false otherwise")
+        self.functions.conf.append("function bgp_redistribute_bgp() {")
+        self.functions.conf.append("  # Check for BGP routes")
+        self.functions.conf.append("  if (source = RTS_BGP) then {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_bgp] Accepting ", net, " due to RTS_BGP route match (redistribute BGP)";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  return false;")
+        self.functions.conf.append("}")
+        # bgp_redistribute_bgp_own
+        self.functions.conf.append("# Check for redistribution of our own routes for BGP")
+        self.functions.conf.append("# - Reject routes that are not exportable")
+        self.functions.conf.append("# - Return true when routes match BGP_LC_RELATION_OWN and are exportable")
+        self.functions.conf.append("# - Return false otherwise")
+        self.functions.conf.append("function bgp_redistribute_bgp_own(bool exportable) {")
+        self.functions.conf.append("  # Check for exportable own routes")
+        self.functions.conf.append("  if (BGP_LC_RELATION_OWN ~ bgp_large_community) then {")
+        self.functions.conf.append("    if (exportable) then {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_bgp_own] Accepting ", net, " due to BGP_LC_RELATION_OWN route match '
+            '(redistribute own) and exportable";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("    } else {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_bgp_own] Rejecting ", net, " due to match on BGP_LC_RELATION_OWN";',
+            debug=True,
+        )
+        self.functions.conf.append("      reject;")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  return false;")
+        self.functions.conf.append("}")
+        # bgp_redistribute_bgp_customer
+        self.functions.conf.append("# Check for redistribution of customer routes for BGP")
+        self.functions.conf.append("# - Reject routes that are not exportable")
+        self.functions.conf.append("# - Return true when routes match BGP_LC_RELATION_CUSTOMER and are exportable")
+        self.functions.conf.append("# - Return false otherwise")
+        self.functions.conf.append("function bgp_redistribute_bgp_customer(bool exportable) {")
+        self.functions.conf.append("  # Check for exportable customer routes")
+        self.functions.conf.append("  if (BGP_LC_RELATION_CUSTOMER ~ bgp_large_community) then {")
+        self.functions.conf.append("    if (exportable) then {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_bgp_customer] Accepting ", net, " due to BGP_LC_RELATION_CUSTOMER route match '
+            '(redistribute customer) and exportable";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("    } else {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_bgp_customer] Rejecting ", net, " due to match on BGP_LC_RELATION_CUSTOMER";',
+            debug=True,
+        )
+        self.functions.conf.append("      reject;")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  return false;")
+        self.functions.conf.append("}")
+        # bgp_redistribute_bgp_peer
+        self.functions.conf.append("# Check for redistribution of peering routes for BGP")
+        self.functions.conf.append("# - Reject routes that are not exportable")
+        self.functions.conf.append("# - Return true when routes match BGP_LC_RELATION_PEER and are exportable")
+        self.functions.conf.append("# - Return false otherwise")
+        self.functions.conf.append("function bgp_redistribute_bgp_peering(bool exportable) {")
+        self.functions.conf.append("  # Check for exportable peering routes")
+        self.functions.conf.append("  if (BGP_LC_RELATION_PEER ~ bgp_large_community) then {")
+        self.functions.conf.append("    if (exportable) then {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_bgp_peering] Accepting ", net, " due to BGP_LC_RELATION_PEER route match '
+            '(redistribute peering) and exportable";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("    } else {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_bgp_peering] Rejecting ", net, " due to match on BGP_LC_RELATION_PEER";',
+            debug=True,
+        )
+        self.functions.conf.append("      reject;")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  # Check for exportable routeserver routes")
+        self.functions.conf.append("  if (BGP_LC_RELATION_ROUTESERVER ~ bgp_large_community) then {")
+        self.functions.conf.append("    if (exportable) then {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_bgp_peering] Accepting ", net, " due to BGP_LC_RELATION_ROUTESERVER route match '
+            '(redistribute peering) and exportable";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("    } else {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_bgp_peering] Rejecting ", net, " due to match on BGP_LC_RELATION_ROUTESERVER";',
+            debug=True,
+        )
+        self.functions.conf.append("      reject;")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  return false;")
+        self.functions.conf.append("}")
+        # bgp_redistribute_bgp_transit
+        self.functions.conf.append("# Check for redistribution of transit routes for BGP")
+        self.functions.conf.append("# - Reject routes that are not exportable")
+        self.functions.conf.append("# - Return true when routes match BGP_LC_RELATION_TRANSIT and are exportable")
+        self.functions.conf.append("# - Return false otherwise")
+        self.functions.conf.append("function bgp_redistribute_bgp_transit(bool exportable) {")
+        self.functions.conf.append("  # Check for exportable transit routes")
+        self.functions.conf.append("  if (BGP_LC_RELATION_TRANSIT ~ bgp_large_community) then {")
+        self.functions.conf.append("    if (exportable) then {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_bgp_transit] Accepting ", net, " due to BGP_LC_RELATION_TRANSIT route match '
+            '(redistribute transit) and exportable";',
+            debug=True,
+        )
+        self.functions.conf.append("      return true;")
+        self.functions.conf.append("    } else {")
+        self.functions.conf.append(
+            '      print "[bgp_redistribute_bgp_transit] Rejecting ", net, " due to match on BGP_LC_RELATION_TRANSIT";',
+            debug=True,
+        )
+        self.functions.conf.append("      reject;")
+        self.functions.conf.append("    }")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("  return false;")
+        self.functions.conf.append("}")
+
         # bgp_filter_bogons_v4
         self.functions.conf.append("# Filter IPv4 bogons")
         self.functions.conf.append("function bgp_filter_bogons_v4() {")

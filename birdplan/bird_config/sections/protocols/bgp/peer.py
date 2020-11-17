@@ -698,40 +698,18 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add(f"filter {func_name}")
         self.conf.add("bool accept_route;")
         self.conf.add("bool bypass_bgp_redistribution_checks;")
+        self.conf.add("bool exportable;")
         self.conf.add("{")
         self.conf.add("  accept_route = false;")
         self.conf.add("  bypass_bgp_redistribution_checks = false;")
 
-        # Override exports if this is a customer peer and we don't export to customers
+        # Check for peer types we're not exporting to
         if self.peer_type == "customer":
-            self.conf.add("  # Check for large community to prevent export to customers")
-            self.conf.add("  if (BGP_LC_EXPORT_NOCUSTOMER ~ bgp_large_community) then {")
-            self.conf.add(
-                f'    print "[{func_name}] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOCUSTOMER";',
-                debug=True,
-            )
-            self.conf.add("    reject;")
-            self.conf.add("  }")
-        # Override exports if this is a peer, routecollector or routeserver and we don't export to peers
+            self.conf.add("  bgp_reject_noexport_customer();")
         if self.peer_type in ("peer", "routecollector", "routeserver"):
-            self.conf.add(f"  # Check for large community to prevent export to {self.peer_type}")
-            self.conf.add("  if (BGP_LC_EXPORT_NOPEER ~ bgp_large_community) then {")
-            self.conf.add(
-                f'    print "[{func_name}] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOPEER";',
-                debug=True,
-            )
-            self.conf.add("    reject;")
-            self.conf.add("  }")
-        # Override exports if this is a transit and we don't export to transits
+            self.conf.add("  bgp_reject_noexport_peer();")
         if self.peer_type == "transit":
-            self.conf.add("  # Check for large community to prevent export to transit")
-            self.conf.add("  if (BGP_LC_EXPORT_NOTRANSIT ~ bgp_large_community) then {")
-            self.conf.add(
-                f'    print "[{func_name}] Rejecting ", net, " due to match on BGP_LC_EXPORT_NOTRANSIT";',
-                debug=True,
-            )
-            self.conf.add("    reject;")
-            self.conf.add("  }")
+            self.conf.add("  bgp_reject_noexport_transit();")
 
         # Rejections based on location-based large communities
         if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
@@ -747,209 +725,53 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Check if we have a ISO-3166 country code
             if self.location.iso3166:
                 self.conf.add("  # Check if we're not exporting this route based on the ISO-3166 location")
-                self.conf.add(
-                    f"  if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT_LOCATION, {self.location.iso3166}) ~ bgp_large_community) then {{"
-                )
-                self.conf.add(
-                    f'    print "[{func_name}] Rejecting ", net, " due to match on '
-                    f'BGP_LC_FUNCTION_NOEXPORT_LOCATION location {self.location.iso3166}";',
-                    debug=True,
-                )
-                self.conf.add("    reject;")
-                self.conf.add("  }")
+                self.conf.add(f"  bgp_reject_noexport_location({self.location.iso3166});")
 
-        # Redistribute connected
+        # Check for connected route redistribution
         if self.route_policy_redistribute.connected:
-            self.conf.add("  # Redistribute connected routes")
-            self.conf.add(f'  if (proto = "direct{ipv}_bgp") then {{')
-            self.conf.add(
-                f'    print "[{func_name}] Accepting ", net, " due to match on direct{ipv}_bgp (redistribute connected)";',
-                debug=True,
-            )
-            self.conf.add("    accept_route = true;")
-            self.conf.add("  }")
+            self.conf.add("  if bgp_redistribute_connected(true) then accept_route = true;")
         else:
-            self.conf.add("  # Do not redistribute connected routes")
-            self.conf.add(f'  if (proto = "direct{ipv}_bgp") then {{')
-            self.conf.add(
-                f'    print "[{func_name}] Rejecting ", net, " due to match on direct{ipv}_bgp (no redistribute connected)";',
-                debug=True,
-            )
-            self.conf.add("    reject;")
-            self.conf.add("  }")
-        # Redistribute static routes
+            self.conf.add("  bgp_redistribute_connected(false);")
+        # Check for static route redistribution
         if self.route_policy_redistribute.static:
-            self.conf.add("  # Redistribute static routes")
-            self.conf.add(f'  if (proto = "static{ipv}") then {{')
-            self.conf.add(
-                f'    print "[{func_name}] Accepting ", net, " due to match on proto static{ipv} (redistribute static)";',
-                debug=True,
-            )
-            self.conf.add("    accept_route = true;")
-            self.conf.add("  }")
+            self.conf.add("  if bgp_redistribute_static(true) then accept_route = true;")
         else:
-            self.conf.add("  # Do not redistribute static routes")
-            self.conf.add(f'  if (proto = "static{ipv}") then {{')
-            self.conf.add(
-                f'    print "[{func_name}] Rejecting ", net, " due to match on proto static{ipv} (no redistribute static)";',
-                debug=True,
-            )
-            self.conf.add("    reject;")
-            self.conf.add("  }")
-        # Redistribute kernel routes
+            self.conf.add("  bgp_redistribute_static(false);")
+        # Check for kernel route redistribution
         if self.route_policy_redistribute.kernel:
-            self.conf.add("  # Redistribute kernel routes")
-            self.conf.add("  if (source = RTS_INHERIT) then {")
-            self.conf.add(
-                f'    print "[{func_name}] Accepting ", net, " due to match on RTS_INHERIT (redistribute kernel)";',
-                debug=True,
-            )
-            self.conf.add("    accept_route = true;")
-            self.conf.add("  }")
+            self.conf.add("  if bgp_redistribute_kernel(true) then accept_route = true;")
         else:
-            self.conf.add("  # Do not redistribute kernel routes")
-            self.conf.add("  if (source = RTS_INHERIT) then {")
-            self.conf.add(
-                f'    print "[{func_name}] Rejecting ", net, " due to match on RTS_INHERIT (no redistribute kernel)";',
-                debug=True,
-            )
-            self.conf.add("    reject;")
-            self.conf.add("  }")
-        # Redistribute originated routes
+            self.conf.add("  bgp_redistribute_kernel(false);")
+        # Check for originated route redistribution
         if self.route_policy_redistribute.originated:
-            self.conf.add("  # Redistribute originated routes")
-            self.conf.add(f'  if (proto = "bgp_originate{ipv}") then {{')
-            self.conf.add(
-                f'    print "[{func_name}] Accepting ", net, " due to match on proto bgp_originate{ipv} '
-                '(redistribute originated)";',
-                debug=True,
-            )
-            self.conf.add("    accept_route = true;")
-            self.conf.add("  }")
+            self.conf.add("  if bgp_redistribute_originated(true) then accept_route = true;")
         else:
-            self.conf.add("  # Do not redistribute originated routes")
-            self.conf.add(f'  if (proto = "bgp_originate{ipv}") then {{')
-            self.conf.add(
-                f'    print "[{func_name}] Rejecting ", net, " due to match on proto bgp_originate{ipv} '
-                '(no redistribute originated)";',
-                debug=True,
-            )
-            self.conf.add("    reject;")
-            self.conf.add("  }")
+            self.conf.add("  bgp_redistribute_originated(false);")
 
         # Do not redistribute the default route, no matter where we get it from
         if self.route_policy_redistribute.default:
-            # Proceed with exporting...
-            self.conf.add("  # Accept the default route as we're redistributing, but only if, its been accepted above")
-            self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv} && accept_route) then {{")
-            self.conf.add(
-                f'    print "[{func_name}] Accepting default route ", net, " due to match on '
-                ' accept_route=true (redistribute default)";',
-                debug=True,
-            )
-            self.conf.add("    bypass_bgp_redistribution_checks = true;")
-        # Else explicitly reject it
+            self.conf.add(f"  if bgp_redistribute_default{ipv}(true, accept_route) then bypass_bgp_redistribution_checks = true;")
         else:
-            self.conf.add("  # Reject the default route as we are not redistributing it")
-            self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self.conf.add(f'    print "[{func_name}] Rejecting default route ", net, " export";')
-            self.conf.add("    reject;")
-        self.conf.add("  }")
+            self.conf.add(f"  bgp_redistribute_default{ipv}(false, accept_route);")
 
         # Start of BGP type checks ...
         self.conf.add("  # BGP route type tests...")
         self.conf.add("  if (!bypass_bgp_redistribution_checks) then {")
+        self.conf.add("    # Check if the route is exportable, we need this in the redistribution checks below")
+        self.conf.add(f"    exportable = {self._bgp_can_export(ipv)};")
 
-        # Redistribute BGP routes
+        # Check redistribution for internal BGP route types
         if self.route_policy_redistribute.bgp:
-            self.conf.add("    # Redistribute BGP routes (which is everything in our table)")
-            self.conf.add("    if (source = RTS_BGP) then {")
-            self.conf.add(f'      print "[{func_name}] Accepting ", net, " due to match on RTS_BGP";', debug=True)
-            self.conf.add("      accept_route = true;")
-            self.conf.add("    }")
-
-        # Redistribute our own BGP routes
+            self.conf.add("  if bgp_redistribute_bgp() then accept_route = true;")
         if self.route_policy_redistribute.bgp_own:
-            self.conf.add("    # Redistribute our own BGP routes")
-            self.conf.add("    if (BGP_LC_RELATION_OWN ~ bgp_large_community) then {")
-            self.conf.add(f"      if !{self._bgp_can_export(ipv)} then {{")
-            self.conf.add(
-                f'        print "[{func_name}] Cannot export ", net, " with match on BGP_LC_RELATION_OWN";',
-                debug=True,
-            )
-            self.conf.add("        reject;")
-            self.conf.add("      }")
-            self.conf.add(
-                f'      print "[{func_name}] Accepting ", net, " due to match on BGP_LC_RELATION_OWN";',
-                debug=True,
-            )
-            self.conf.add("      accept_route = true;")
-            self.conf.add("    }")
-        # Redistribute customer BGP routes
+            self.conf.add("  if bgp_redistribute_bgp_own(exportable) then accept_route = true;")
         if self.route_policy_redistribute.bgp_customer:
-            self.conf.add("    # Redistribute customer BGP routes")
-            self.conf.add("    if (BGP_LC_RELATION_CUSTOMER ~ bgp_large_community) then {")
-            self.conf.add(f"      if !{self._bgp_can_export(ipv)} then {{")
-            self.conf.add(
-                f'        print "[{func_name}] Cannot export ", net, " with match on BGP_LC_RELATION_CUSTOMER";',
-                debug=True,
-            )
-            self.conf.add("        reject;")
-            self.conf.add("      }")
-            self.conf.add(
-                f'      print "[{func_name}] Accepting ", net, " due to match on BGP_LC_RELATION_CUSTOMER";',
-                debug=True,
-            )
-            self.conf.add("      accept_route = true;")
-            self.conf.add("    }")
-        # Redistribute peering BGP routes
+            self.conf.add("  if bgp_redistribute_bgp_customer(exportable) then accept_route = true;")
         if self.route_policy_redistribute.bgp_peering:
-            self.conf.add("    # Redistribute peering BGP routes")
-            self.conf.add("    if (BGP_LC_RELATION_PEER ~ bgp_large_community) then {")
-            self.conf.add(f"      if !{self._bgp_can_export(ipv)} then {{")
-            self.conf.add(
-                f'      print "[{func_name}] Cannot export ", net, " with match on BGP_LC_RELATION_PEER";',
-                debug=True,
-            )
-            self.conf.add("        reject;")
-            self.conf.add("      }")
-            self.conf.add(
-                f'      print "[{func_name}] Accepting ", net, " due to match on BGP_LC_RELATION_PEER";',
-                debug=True,
-            )
-            self.conf.add("      accept_route = true;")
-            self.conf.add("    }")
-            self.conf.add("    if (BGP_LC_RELATION_ROUTESERVER ~ bgp_large_community) then {")
-            self.conf.add(f"      if !{self._bgp_can_export(ipv)} then {{")
-            self.conf.add(
-                f'        print "[{func_name}] Cannot export ", net, " with match on BGP_LC_RELATION_ROUTESERVER";',
-                debug=True,
-            )
-            self.conf.add("        reject;")
-            self.conf.add("      }")
-            self.conf.add(
-                f'      print "[{func_name}] Accepting ", net, " due to match on BGP_LC_RELATION_ROUTESERVER";',
-                debug=True,
-            )
-            self.conf.add("      accept_route = true;")
-            self.conf.add("    }")
-        # Redistribute transit BGP routes
+            self.conf.add("  if bgp_redistribute_bgp_peering(exportable) then accept_route = true;")
         if self.route_policy_redistribute.bgp_transit:
-            self.conf.add("    # Redistribute transit BGP routes")
-            self.conf.add("    if (BGP_LC_RELATION_TRANSIT ~ bgp_large_community) then {")
-            self.conf.add(f"      if !{self._bgp_can_export(ipv)} then {{")
-            self.conf.add(
-                f'        print "[{func_name}] Cannot export ", net, " with match on BGP_LC_RELATION_TRANSIT";',
-                debug=True,
-            )
-            self.conf.add("        reject;")
-            self.conf.add("      }")
-            self.conf.add(
-                f'      print "[{func_name}] Accepting ", net, " due to match on BGP_LC_RELATION_TRANSIT";',
-                debug=True,
-            )
-            self.conf.add("      accept_route = true;")
-            self.conf.add("    }")
+            self.conf.add("  if bgp_redistribute_bgp_transit(exportable) then accept_route = true;")
+
         # End of BGP type tests
         self.conf.add("  }")
 
