@@ -286,6 +286,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_COMMUNITY_GRACEFUL_SHUTDOWN = (65535, 0);")
         self.constants.conf.append("define BGP_COMMUNITY_BLACKHOLE = (65535, 666);")
         self.constants.conf.append("define BGP_COMMUNITY_NOEXPORT = (65535, 65281);")
+        self.constants.conf.append("define BGP_COMMUNITY_NOADVERTISE = (65535, 65282);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community functions")
@@ -639,6 +640,18 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.functions.conf.append("}")
         self.functions.conf.append("")
 
+        # bgp_reject_blackholes
+        self.functions.conf.append("# Reject blackhole routes")
+        self.functions.conf.append("function bgp_reject_blackholes() {")
+        self.functions.conf.append("  if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_reject_blackholes] Rejecting blackhole ", net, " due to match on BGP_COMMUNITY_BLACKHOLE";', debug=True
+        )
+        self.functions.conf.append("    reject;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
         # bgp_reject_noexport_customer
         self.functions.conf.append("# Reject EXPORT_NOCUSTOMER customer routes")
         self.functions.conf.append("function bgp_reject_noexport_customer() {")
@@ -687,6 +700,30 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             '    print "[bgp_reject_noexport_location] Rejecting ", net, " due to match on '
             'BGP_LC_FUNCTION_NOEXPORT_LOCATION with location ", location;',
             debug=True,
+        )
+        self.functions.conf.append("    reject;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+
+        # bgp_reject_noadvertise
+        self.functions.conf.append("# Reject NOADVERTISE routes")
+        self.functions.conf.append("function bgp_reject_noadvertise() {")
+        self.functions.conf.append("  if (BGP_COMMUNITY_NOADVERTISE ~ bgp_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_reject_noadvertise] Rejecting NOADVERTISE ", net, " due to match on BGP_COMMUNITY_NOADVERTISE";',
+            debug=True,
+        )
+        self.functions.conf.append("    reject;")
+        self.functions.conf.append("  }")
+        self.functions.conf.append("}")
+        self.functions.conf.append("")
+        # bgp_reject_noexport
+        self.functions.conf.append("# Reject NOEXPORT routes")
+        self.functions.conf.append("function bgp_reject_noexport() {")
+        self.functions.conf.append("  if (BGP_COMMUNITY_NOEXPORT ~ bgp_community) then {")
+        self.functions.conf.append(
+            '    print "[bgp_reject_noexport] Rejecting NOEXPORT ", net, " due to match on BGP_COMMUNITY_NOEXPORT";', debug=True
         )
         self.functions.conf.append("    reject;")
         self.functions.conf.append("  }")

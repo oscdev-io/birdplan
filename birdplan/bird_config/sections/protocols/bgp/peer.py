@@ -703,6 +703,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("  accept_route = false;")
         self.conf.add("  bypass_bgp_redistribution_checks = false;")
 
+        # Reject NOADVERTISE
+        self.conf.add("  bgp_reject_noadvertise();")
+
+        # Reject NOEXPORT
+        if self.peer_type in ("customer", "peer", "routecollector", "routeserver", "transit"):
+            self.conf.add("  bgp_reject_noexport();")
+
         # Check for peer types we're not exporting to
         if self.peer_type == "customer":
             self.conf.add("  bgp_reject_noexport_customer();")
@@ -713,15 +720,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Rejections based on location-based large communities
         if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
-            # Check if this is a blackhole, if it is we shouldn't be exporting it
-            self.conf.add("  # Check if this is a blackhole route")
-            self.conf.add("  if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then {")
-            self.conf.add(
-                f'    print "[{func_name}] Rejecting ", net, " due to match on BGP_COMMUNITY_BLACKHOLE";',
-                debug=True,
-            )
-            self.conf.add("    reject;")
-            self.conf.add("  }")
             # Check if we have a ISO-3166 country code
             if self.location.iso3166:
                 self.conf.add("  # Check if we're not exporting this route based on the ISO-3166 location")
