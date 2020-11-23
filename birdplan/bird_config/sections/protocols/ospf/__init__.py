@@ -20,6 +20,7 @@
 
 from typing import Any, Dict, List
 from .ospf_attributes import OSPFAttributes, OSPFRoutePolicyAccept, OSPFRoutePolicyRedistribute
+from .ospf_functions import OSPFFunctions
 from ..direct import ProtocolDirect
 from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from ..base import SectionProtocolBase
@@ -45,6 +46,8 @@ class ProtocolOSPF(SectionProtocolBase):
     _interfaces: OSPFInterfaces
 
     _ospf_attributes: OSPFAttributes
+    # OSPF functions
+    _ospf_functions: OSPFFunctions
 
     def __init__(
         self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
@@ -57,6 +60,8 @@ class ProtocolOSPF(SectionProtocolBase):
         self._interfaces = {}
 
         self._ospf_attributes = OSPFAttributes()
+        # Setup OSPF functions
+        self._ospf_functions = OSPFFunctions(self.birdconfig_globals, self.functions)
 
     def configure(self) -> None:
         """Configure the OSPF protocol."""
@@ -65,6 +70,8 @@ class ProtocolOSPF(SectionProtocolBase):
         # If we don't have any configuration, just abort
         if not self.areas:
             return
+
+        self.functions.conf.append(self.ospf_functions, deferred=True)
 
         self.tables.conf.append("# OSPF Tables")
         self.tables.conf.append("ipv4 table t_ospf4;")
@@ -203,32 +210,31 @@ class ProtocolOSPF(SectionProtocolBase):
 
     def _ospf_export_filter(self, ipv: str) -> None:
         """OSPF export filter setup."""
+        # Set our filter name
+        filter_name = f"f_ospf_export{ipv}"
 
-        self.conf.add(f"filter f_ospf_export{ipv} {{")
+        # Configure OSPF export filter
+        self.conf.add("# OSPF export filter")
+        self.conf.add(f"filter {filter_name}")
+        self.conf.add("string filter_name;")
+        self.conf.add("{")
+        self.conf.add(f'  filter_name = "{filter_name}";')
         # Redistribute the default route
         if not self.route_policy_redistribute.default:
             self.conf.add("  # Reject redistribution of the default route")
-            self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self.conf.add("    reject;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.reject_default_route()};")
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add("  # Redistribute connected")
-            self.conf.add(f'  if (proto = "direct{ipv}_ospf") then {{')
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.ospf_functions.accept_connected_route()};")
         # Redistribute static routes
         if self.route_policy_redistribute.static:
             self.conf.add("  # Redistribute static routes")
-            self.conf.add("  if (source = RTS_STATIC) then {")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.accept_static_route()};")
         # Redistribute kernel routes
         if self.route_policy_redistribute.kernel:
             self.conf.add("  # Redistribute kernel routes")
-            self.conf.add("  if (source = RTS_INHERIT) then {")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.accept_kernel_route()};")
         # Else reject
         self.conf.add("  reject;")
         self.conf.add("};")
@@ -236,8 +242,14 @@ class ProtocolOSPF(SectionProtocolBase):
 
     def _ospf_import_filter(self, ipv: str) -> None:
         """OSPF import filter setup."""
-        # Configure import4 filter
-        self.conf.add(f"filter f_ospf_import{ipv} {{")
+        # Set our filter name
+        filter_name = f"f_ospf_import{ipv}"
+
+        # Configure OSPF import filter
+        self.conf.add("# OSPF import filter")
+        self.conf.add(f"filter {filter_name}")
+        self.conf.add("string filter_name;")
+        self.conf.add("{")
         # Accept all inbound routes into the t_ospf4 table
         self.conf.add("  # Import all OSPF routes by default")
         self.conf.add("  accept;")
@@ -246,20 +258,22 @@ class ProtocolOSPF(SectionProtocolBase):
 
     def _ospf_to_master_export_filter(self, ipv: str) -> None:
         """OSPF to master export filter setup."""
+        # Set our filter name
+        filter_name = f"f_ospf{ipv}_master{ipv}_export"
+
         # Configure export filter to master table
-        self.conf.add(f"filter f_ospf{ipv}_master{ipv}_export {{")
+        self.conf.add("# OSPF export filter to master table")
+        self.conf.add(f"filter {filter_name}")
+        self.conf.add("string filter_name;")
+        self.conf.add("{")
+        self.conf.add(f'  filter_name = "{filter_name}";')
         # Check if we accept the default route, if not block it
         if not self.route_policy_accept.default:
             self.conf.add("  # Do not export default route to master (no accept:default)")
-            self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self.conf.add("    reject;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.reject_default_route()};")
         # Accept only OSPF routes into the master table
         self.conf.add("  # Only export OSPF routes to the master table")
-        # NK: We cannot seem to filter out the device routes
-        self.conf.add("  if (source ~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2]) then {")
-        self.conf.add("    accept;")
-        self.conf.add("  }")
+        self.conf.add(f"  {self.functions.accept_ospf_route()};")
         # Default to reject
         self.conf.add("  # Reject everything else;")
         self.conf.add("  reject;")
@@ -268,32 +282,31 @@ class ProtocolOSPF(SectionProtocolBase):
 
     def _ospf_to_master_import_filter(self, ipv: str) -> None:
         """OSPF to master import filter setup."""
-        # Configure import filter to master table
-        self.conf.add(f"filter f_ospf{ipv}_master{ipv}_import {{")
+        # Set our filter name
+        filter_name = f"f_ospf{ipv}_master{ipv}_import"
+
+        # Configure import filter from master table
+        self.conf.add("# OSPF import filter from master table")
+        self.conf.add(f"filter {filter_name}")
+        self.conf.add("string filter_name;")
+        self.conf.add("{")
+        self.conf.add(f'  filter_name = "{filter_name}";')
         # Redistribute the default route
         if not self.route_policy_redistribute.default:
             self.conf.add("  # Deny import of default route into OSPF (no redistribute_default)")
-            self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self.conf.add("    reject;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.reject_default_route()};")
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add("  # Import connected routes into OSPF (redistribute_connected)")
-            self.conf.add(f'  if (proto = "direct{ipv}_ospf") then {{')
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.ospf_functions.accept_connected_route()};")
         # Redistribute static routes
         if self.route_policy_redistribute.static:
             self.conf.add("  # Import RTS_STATIC routes into OSPF (redistribute_static)")
-            self.conf.add("  if (source = RTS_STATIC) then {")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.accept_static_route()};")
         # Redistribute kernel routes
         if self.route_policy_redistribute.kernel:
             self.conf.add("  # Import RTS_INHERIT routes (kernel routes) into OSPF (redistribute_kernel)")
-            self.conf.add("  if (source = RTS_INHERIT) then {")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.accept_kernel_route()};")
         # Else accept
         self.conf.add("  reject;")
         self.conf.add("};")
@@ -313,6 +326,11 @@ class ProtocolOSPF(SectionProtocolBase):
     def ospf_attributes(self) -> OSPFAttributes:
         """Return our OSPF protocol attributes."""
         return self._ospf_attributes
+
+    @property
+    def ospf_functions(self) -> OSPFFunctions:
+        """Return our OSPF protocol functions."""
+        return self._ospf_functions
 
     @property
     def route_policy_accept(self) -> OSPFRoutePolicyAccept:

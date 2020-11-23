@@ -205,3 +205,68 @@ class SectionFunctions(SectionBase):
                     return true;
                 return false;
             }"""
+
+    @bird_function("reject_default_route")
+    def reject_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD reject_default_route function."""
+
+        return f"""\
+            # Reject the default route
+            function reject_default_route(string filter_name) {{
+                if !{self.is_default()} then return false;
+                if DEBUG then print filter_name,
+                    " [reject_default_route] Rejecting default route ", net;
+                reject;
+            }}"""
+
+    @bird_function("accept_static_route")
+    def accept_static_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_static_route function."""
+
+        return """\
+            # Accept static route
+            function accept_static_route(string filter_name) {
+                if (source != RTS_STATIC) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_static_Route] Accepting static route ", net;
+                accept;
+            }"""
+
+    @bird_function("accept_kernel_route")
+    def accept_kernel_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_kernel_route function."""
+
+        return """\
+            # Accept kernel route
+            function accept_kernel_route(string filter_name) {
+                if (source != RTS_INHERIT) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_kernel_route] Accepting kernel route ", net;
+                accept;
+            }"""
+
+    @bird_function("accept_ospf_route")
+    def accept_ospf_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_ospf_route function."""
+
+        return """\
+            # Accept OSPF route
+            function accept_ospf_route(string filter_name) {
+                if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2]) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_ospf_route] Accepting OSPF route ", net;
+                accept;
+            }"""
+
+    @bird_function("accept_rip_route")
+    def accept_rip_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_rip_route function."""
+
+        return """\
+            # Accept RIP route
+            function accept_rip_route(string filter_name) {
+                if (source != RTS_RIP) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_rip_route] Accepting RIP route ", net;
+                accept;
+            }"""
