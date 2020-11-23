@@ -995,7 +995,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  {self.bgp_functions.import_transit(self.asn, self.cost)};")
             if self.route_policy_accept.default:
                 self.conf.add("  # Bypass bogon and size filters for the default route")
-                self.conf.add("  if (!is_default()) then {")
+                self.conf.add(f"  if !{self.functions.is_default()} then {{")
                 self.conf.add(f"    {self.bgp_functions.filter_bogons()};")
                 self.conf.add(f"    {self._bgp_filter_prefix_size()};")
                 self.conf.add("  }")
