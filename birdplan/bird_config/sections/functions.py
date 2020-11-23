@@ -18,7 +18,9 @@
 
 """BIRD functions configuration."""
 
-from typing import Any, Callable, List
+from collections import OrderedDict
+import textwrap
+from typing import Any, Callable, Dict, List
 
 from ...bird_config.globals import BirdConfigGlobals
 from .base import SectionBase
@@ -129,68 +131,77 @@ class SectionFunctions(SectionBase):
 
     _section: str = "Global Functions"
 
-    _need_functions: bool
+    bird_functions: Dict[str, str]
 
     def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize the object."""
         super().__init__(birdconfig_globals)
 
-        # Add functions to output
-        self._need_functions = False
+        self.bird_functions = OrderedDict()
 
     def configure(self) -> None:
         """Configure global constants."""
         super().configure()
 
         # Check if we're adding functions
-        if self.need_functions:
-            self._configure_functions()
+        for _, content in self.bird_functions.items():
+            self.conf.add(textwrap.dedent(content))
+            self.conf.add("")
 
-    def _configure_functions(self) -> None:
-        """Configure functions."""
-        self.conf.add('# Match a prefix longer than "size".')
-        self.conf.add("function prefix_is_longer(int size) {")
-        self.conf.add("  if (net.len > size) then {")
-        self.conf.add('    print "[prefix_is_longer] Matched ", net, " against size ", size;', debug=True)
-        self.conf.add("    return true;")
-        self.conf.add("  } else {")
-        self.conf.add("    return false;")
-        self.conf.add("  }")
-        self.conf.add("}")
-        self.conf.add("")
-        self.conf.add('# Match a prefix shorter than "size".')
-        self.conf.add("function prefix_is_shorter(int size) {")
-        self.conf.add("  if (net.len < size) then {")
-        self.conf.add('    print "[prefix_is_shorter] Matched ", net, " against size ", size;', debug=True)
-        self.conf.add("    return true;")
-        self.conf.add("  } else {")
-        self.conf.add("    return false;")
-        self.conf.add("  }")
-        self.conf.add("}")
-        self.conf.add("")
-        self.conf.add("# Match on IP bogons")
-        self.conf.add("function is_bogon() {")
-        self.conf.add("  if ((net.type = NET_IP4 && net ~ BOGONS_V4) || (net.type = NET_IP6 && net ~ BOGONS_V6)) then {")
-        self.conf.add('    print "[is_bogon] Matched ", net;', debug=True)
-        self.conf.add("    return true;")
-        self.conf.add("  } else {")
-        self.conf.add("    return false;")
-        self.conf.add("  }")
-        self.conf.add("}")
-        self.conf.add("# Match a default route")
-        self.conf.add("function is_default() {")
-        self.conf.add("  if (net.type = NET_IP4 && net = DEFAULT_ROUTE_V4) then return true;")
-        self.conf.add("  if (net.type = NET_IP6 && net = DEFAULT_ROUTE_V6) then return true;")
-        self.conf.add("  return false;")
-        self.conf.add("}")
-        self.conf.add("")
+    @bird_function("prefix_is_longer")
+    def prefix_is_longer(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD prefix_is_longer function."""
 
-    @property
-    def need_functions(self) -> bool:
-        """Return if functions should be added to our output constants block."""
-        return self._need_functions
+        return """\
+            # Match a prefix longer than "size"
+            function prefix_is_longer(string filter_name; int size) {
+                if (net.len > size) then {
+                    if DEBUG then print filter_name,
+                        " [prefix_is_longer] Matched ", net, " against size ", size;
+                    return true;
+                } else {
+                    return false;
+                }
+            }"""
 
-    @need_functions.setter
-    def need_functions(self, need_functions: bool) -> None:
-        """Set if functions should be added to our output constants block."""
-        self._need_functions = need_functions
+    @bird_function("prefix_is_shorter")
+    def prefix_is_shorter(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD prefix_is_shorter function."""
+
+        return """\
+            # Match a prefix shorter than "size"
+            function prefix_is_shorter(string filter_name; int size) {
+                if (net.len < size) then {
+                    if DEBUG then print filter_name,
+                        " [prefix_is_shorter] Matched ", net, " against size ", size;
+                    return true;
+                }
+                return false;
+            }"""
+
+    @bird_function("is_bogon")
+    def is_bogon(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD is_bogon function."""
+
+        return """\
+            # Match on IP bogons
+            function is_bogon(string filter_name) {
+                if ((net.type = NET_IP4 && net ~ BOGONS_V4) || (net.type = NET_IP6 && net ~ BOGONS_V6)) then {
+                    if DEBUG then print filter_name,
+                        " [is_bogon] Matched ", net;
+                    return true;
+                }
+                return false;
+            }"""
+
+    @bird_function("is_default")
+    def is_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD is_default function."""
+
+        return """\
+            # Match a default route
+            function is_default(string filter_name) {
+                if ((net.type = NET_IP4 && net = DEFAULT_ROUTE_V4) || (net.type = NET_IP6 && net = DEFAULT_ROUTE_V6)) then
+                    return true;
+                return false;
+            }"""

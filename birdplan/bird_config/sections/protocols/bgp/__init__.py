@@ -71,7 +71,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Setup BGP attributes
         self._bgp_attributes = BGPAttributes()
         # Setup BGP functions
-        self._bgp_functions = BGPFunctions(birdconfig_globals)
+        self._bgp_functions = BGPFunctions(self.birdconfig_globals, self.functions)
 
         # For test mode we need to slightly adjust our prefix lengths that we permit
         if self.birdconfig_globals.test_mode:
@@ -543,7 +543,6 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.bgp_attributes.asn = asn
         # Enable bogon constants
         self.constants.need_bogons = True
-        self.functions.need_functions = True
 
     @property
     def graceful_shutdown(self) -> bool:

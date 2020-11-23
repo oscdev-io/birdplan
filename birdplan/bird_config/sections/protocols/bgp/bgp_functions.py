@@ -20,21 +20,24 @@ from collections import OrderedDict
 import textwrap
 from typing import Any, Dict
 from ...base import SectionBase
-from ...functions import BirdVariable, bird_function
+from ...functions import BirdVariable, SectionFunctions, bird_function
 from .....bird_config.globals import BirdConfigGlobals
 
 
-class BGPFunctions(SectionBase):
+class BGPFunctions(SectionBase):  # pylint: disable=too-many-public-methods
     """BGP functions configuration."""
 
     _section: str = "BGP Functions"
 
+    _functions: SectionFunctions
+
     bird_functions: Dict[str, str]
 
-    def __init__(self, birdconfig_globals: BirdConfigGlobals):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals, functions: SectionFunctions):
         """Initialize the object."""
         super().__init__(birdconfig_globals)
 
+        self._functions = functions
         self.bird_functions = OrderedDict()
 
     def configure(self) -> None:
@@ -234,7 +237,7 @@ class BGPFunctions(SectionBase):
     def export_ok(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_export_ok function."""
 
-        return """\
+        return f"""\
             # Can we export this route to the peer_asn?
             function bgp_export_ok(
                 string filter_name; int peer_asn;
@@ -243,42 +246,42 @@ class BGPFunctions(SectionBase):
             )
             int prefix_maxlen;
             int prefix_minlen;
-            {
+            {{
                 # Work out what prefix lenghts we're going to use
-                if (net.type = NET_IP4) then {
+                if (net.type = NET_IP4) then {{
                     prefix_maxlen = ipv4_maxlen;
                     prefix_minlen = ipv4_minlen;
-                }
-                if (net.type = NET_IP6) then {
+                }}
+                if (net.type = NET_IP6) then {{
                     prefix_maxlen = ipv6_maxlen;
                     prefix_minlen = ipv6_minlen;
-                }
+                }}
                 # Check for NOEXPORT large community
-                if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) ~ bgp_large_community) then {
+                if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) ~ bgp_large_community) then {{
                     if DEBUG then print filter_name,
                         " [bgp_export_ok] Not exporting due to BGP_LC_FUNCTION_NOEXPORT for AS", peer_asn ," for ", net;
                     return false;
-                }
+                }}
                 # Validate route before export
-                if prefix_is_longer(prefix_maxlen) then {
+                if {self.functions.prefix_is_longer(BirdVariable("prefix_maxlen"))} then {{
                     if DEBUG then print filter_name,
                         " [bgp_export_ok] Not exporting due to prefix length >", prefix_maxlen," for ", net;
                     return false;
-                }
-                if prefix_is_shorter(prefix_minlen) then {
+                }}
+                if {self.functions.prefix_is_shorter(BirdVariable("prefix_minlen"))} then {{
                     if DEBUG then print filter_name,
                         " [bgp_export_ok] Not exporting due to prefix length <", prefix_minlen, " for ", net;
                     return false;
-                }
+                }}
                 # Check if this is a bogon
-                if (is_bogon()) then {
+                if {self.functions.is_bogon()} then {{
                     if DEBUG then print filter_name,
                         " [bgp_export_ok] Not exporting due to ", net, " being a bogon";
                     return false;
-                }
+                }}
                 # If all above tests are ok, then we can
                 return true;
-            }"""
+            }}"""
 
     @bird_function("bgp_accept")
     def accept(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -326,15 +329,15 @@ class BGPFunctions(SectionBase):
     def filter_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_filter_default function."""
 
-        return """\
+        return f"""\
             # Filter default route
-            function bgp_filter_default(string filter_name) {
-                if (!is_default()) then return false;
+            function bgp_filter_default(string filter_name) {{
+                if !{self.functions.is_default()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_filter_default] Adding BGP_LC_FILTERED_DEFAULT_NOT_ALLOWED to ", net;
                 bgp_large_community.add(BGP_LC_FILTERED_DEFAULT_NOT_ALLOWED);
                 accept;
-            }"""
+            }}"""
 
     @bird_function("bgp_filter_nexthop_not_peerip")
     def filter_nexthop_not_peerip(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -374,14 +377,14 @@ class BGPFunctions(SectionBase):
     def filter_bogons(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_filter_bogons function."""
 
-        return """\
+        return f"""\
             # Filter bogons
-            function bgp_filter_bogons(string filter_name) {
-                if (!is_bogon()) then return false;
+            function bgp_filter_bogons(string filter_name) {{
+                if !{self.functions.is_bogon()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_filter_bogons] Adding BGP_FILTERED_BOGON to ", net;
                 bgp_large_community.add(BGP_LC_FILTERED_BOGON);
-            }"""
+            }}"""
 
     @bird_function("bgp_filter_asn_bogons")
     def filter_asn_bogons(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -452,7 +455,7 @@ class BGPFunctions(SectionBase):
     def filter_blackhole_size(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_filter_blackhole_size function."""
 
-        return """\
+        return f"""\
             # Filter blackhole size
             function bgp_filter_blackhole_size(
                 string filter_name;
@@ -461,39 +464,39 @@ class BGPFunctions(SectionBase):
             )
             int prefix_maxlen;
             int prefix_minlen;
-            {
+            {{
                 # Work out what prefix lenghts we're going to use
-                if (net.type = NET_IP4) then {
+                if (net.type = NET_IP4) then {{
                     prefix_maxlen = ipv4_maxlen;
                     prefix_minlen = ipv4_minlen;
-                }
-                if (net.type = NET_IP6) then {
+                }}
+                if (net.type = NET_IP6) then {{
                     prefix_maxlen = ipv6_maxlen;
                     prefix_minlen = ipv6_minlen;
-                }
+                }}
                 # If this is not a blackhole prefix then just return
                 if (BGP_COMMUNITY_BLACKHOLE !~ bgp_community) then return false;
                 # Check prefix is not longer than what we allow
-                if prefix_is_longer(prefix_maxlen) then {
+                if {self.functions.prefix_is_longer(BirdVariable("prefix_maxlen"))} then {{
                     if DEBUG then print filter_name,
                         " [bgp_filter_prefix_size] Blackhole length >", prefix_maxlen,
                         ", adding BGP_FILTERED_BLACKHOLE_LEN_TOO_LONG to ", net;
                     bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_LEN_TOO_LONG);
-                }
+                }}
                 # Check prefix is not shorter than what we allow
-                if prefix_is_shorter(prefix_minlen) then {
+                if {self.functions.prefix_is_shorter(BirdVariable("prefix_minlen"))} then {{
                     if DEBUG then print filter_name,
                         " [bgp_filter_prefix_size] Blackhole length <", prefix_minlen,
                         ", adding BGP_FILTERED_BLACKHOLE_LEN_TOO_SHORT to ", net;
                     bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_LEN_TOO_SHORT);
-                }
-            }"""
+                }}
+            }}"""
 
     @bird_function("bgp_filter_prefix_size")
     def filter_prefix_size(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_filter_prefix_size function."""
 
-        return """\
+        return f"""\
             # Filter prefix size
             function bgp_filter_prefix_size(
                 string filter_name;
@@ -502,33 +505,33 @@ class BGPFunctions(SectionBase):
             )
             int prefix_maxlen;
             int prefix_minlen;
-            {
+            {{
                 # Work out what prefix lenghts we're going to use
-                if (net.type = NET_IP4) then {
+                if (net.type = NET_IP4) then {{
                     prefix_maxlen = ipv4_maxlen;
                     prefix_minlen = ipv4_minlen;
-                }
-                if (net.type = NET_IP6) then {
+                }}
+                if (net.type = NET_IP6) then {{
                     prefix_maxlen = ipv6_maxlen;
                     prefix_minlen = ipv6_minlen;
-                }
+                }}
                 # If this is a blackhole prefix then just return, it will be caught later
                 if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then return false;
                 # Check prefix length is within the range we allow
-                if prefix_is_longer(prefix_maxlen) then {
+                if {self.functions.prefix_is_longer(BirdVariable("prefix_maxlen"))} then {{
                     if DEBUG then print filter_name,
                         " [bgp_filter_prefix_size] Prefix length >", prefix_maxlen,
                         ", adding BGP_FILTERED_PREFIX_LEN_TOO_LONG to ", net;
                     bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_LONG);
-                }
+                }}
                 # Check prefix length is within the range we allow
-                if prefix_is_shorter(prefix_minlen) then {
+                if {self.functions.prefix_is_shorter(BirdVariable("prefix_minlen"))} then {{
                     if DEBUG then print filter_name,
                         " [bgp_filter_prefix_size] Prefix length <", prefix_minlen,
                         ", adding BGP_FILTERED_PREFIX_LEN_TOO_SHORT to ", net;
                     bgp_large_community.add(BGP_LC_FILTERED_PREFIX_LEN_TOO_SHORT);
-                }
-            }"""
+                }}
+            }}"""
 
     @bird_function("bgp_filter_community_lengths")
     def filter_community_lengths(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -744,25 +747,25 @@ class BGPFunctions(SectionBase):
     def redistribute_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_redistribute_default function."""
 
-        return """\
+        return f"""\
             # Check for redistribution of default IPv4 routes for BGP
             # - Reject routes that are not redistributable
             # - Return true when routes are redistributable and accepted
             # - Return false otherwise
-            function bgp_redistribute_default(string filter_name; bool redistribute; bool accepted) {
+            function bgp_redistribute_default(string filter_name; bool redistribute; bool accepted) {{
                 # If this is not a default route or is not accepted, return false
-                if (!is_default() || !accepted) then return false;
-                if (redistribute) then {
+                if (!{self.functions.is_default()} || !accepted) then return false;
+                if (redistribute) then {{
                     if DEBUG then print filter_name,
                         " [bgp_redistribute_default] Accepting ", net, " due to default route match",
                         " (redistribute default) and accepted";
                     return true;
-                }
+                }}
                 if DEBUG then print filter_name,
                     " [bgp_redistribute_default] Rejecting ", net, " due to default route match",
                     " (no redistribute default)";
                 reject;
-            }"""
+            }}"""
 
     @bird_function("bgp_redistribute_bgp")
     def redistribute_bgp(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -945,13 +948,13 @@ class BGPFunctions(SectionBase):
     def lc_add_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_lc_add_default function."""
 
-        return """\
-            function bgp_lc_add_default(string filter_name; lc large_community) {
-                if (!is_default()) then return false;
+        return f"""\
+            function bgp_lc_add_default(string filter_name; lc large_community) {{
+                if !{self.functions.is_default()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_default] Adding large community ", large_community, " for type DEFAULT to ", net;
                 bgp_large_community.add(large_community);
-            }"""
+            }}"""
 
     @bird_function("bgp_lc_add_connected")
     def lc_add_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -969,39 +972,38 @@ class BGPFunctions(SectionBase):
     def lc_add_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_lc_add_static function."""
 
-        return """\
-            function bgp_lc_add_static(string filter_name; lc large_community) {
-                if ((proto != "static4" && proto != "static6") || is_default()) then return false;
+        return f"""\
+            function bgp_lc_add_static(string filter_name; lc large_community) {{
+                if ((proto != "static4" && proto != "static6") || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_static] Adding large community ", large_community, " for type STATIC to ", net;
                 bgp_large_community.add(large_community);
-            }"""
+            }}"""
 
     @bird_function("bgp_lc_add_kernel")
     def lc_add_kernel(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_lc_add_kernel function."""
 
-        return """\
-            function bgp_lc_add_kernel(string filter_name; lc large_community)
-            {
-                if (source != RTS_INHERIT || is_default()) then return false;
+        return f"""\
+            function bgp_lc_add_kernel(string filter_name; lc large_community) {{
+                if (source != RTS_INHERIT || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_kernel] Adding large community ", large_community, " for type KERNEL to ", net;
                 bgp_large_community.add(large_community);
-            }"""
+            }}"""
 
     @bird_function("bgp_lc_add_originated")
     def lc_add_originated(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_lc_add_originated function."""
 
-        return """\
+        return f"""\
             # BGP originated route large community adding
-            function bgp_lc_add_originated(string filter_name; lc large_community) {
-                if ((proto != "bgp_originate4" && proto != "bgp_originate6") || is_default()) then return false;
+            function bgp_lc_add_originated(string filter_name; lc large_community) {{
+                if ((proto != "bgp_originate4" && proto != "bgp_originate6") || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_originate] Adding large community ", large_community, " for type ORIGINATED to ", net;
                 bgp_large_community.add(large_community);
-            }"""
+            }}"""
 
     @bird_function("bgp_lc_add_bgp")
     def lc_add_bgp(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -1095,7 +1097,7 @@ class BGPFunctions(SectionBase):
 
         return f"""\
             function bgp_prepend_default(string filter_name; int peer_asn; int prepend_count) {{
-                if (!is_default()) then return false;
+                if !{self.functions.is_default()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_default] Prepending AS-PATH for type DEFAULT ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
@@ -1120,7 +1122,7 @@ class BGPFunctions(SectionBase):
 
         return f"""\
             function bgp_prepend_static(string filter_name; int peer_asn; int prepend_count) {{
-                if ((proto != "static4" && proto != "static6") || is_default()) then return false;
+                if ((proto != "static4" && proto != "static6") || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_static] Prepending AS-PATH for type STATIC ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
@@ -1132,7 +1134,7 @@ class BGPFunctions(SectionBase):
 
         return f"""\
             function bgp_prepend_kernel(string filter_name; int peer_asn; int prepend_count) {{
-                if (source != RTS_INHERIT || is_default()) then return false;
+                if (source != RTS_INHERIT || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_kernel] Prepending AS-PATH for type KERNEL ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
@@ -1144,7 +1146,7 @@ class BGPFunctions(SectionBase):
 
         return f"""\
             function bgp_prepend_originated(string filter_name; int peer_asn; int prepend_count) {{
-                if ((proto != "bgp_originate4" && proto != "bgp_originate6") || is_default()) then return false;
+                if ((proto != "bgp_originate4" && proto != "bgp_originate6") || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_originate] Prepending AS-PATH for type ORIGINATED ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
@@ -1525,3 +1527,8 @@ class BGPFunctions(SectionBase):
                     bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE);
                 }
             }"""
+
+    @property
+    def functions(self) -> SectionFunctions:
+        """Return the functions section."""
+        return self._functions
