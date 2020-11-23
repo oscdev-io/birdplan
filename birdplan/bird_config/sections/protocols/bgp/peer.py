@@ -942,9 +942,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Else, filter bogon ASN's
             else:
                 self.conf.add(f"  {self.bgp_functions.filter_asn_bogons()};")
-            self.conf.add(
-                f"  {self.bgp_functions.filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
-            )
+            self.conf.add(f"  {self.bgp_functions.filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};")
             self.conf.add(f"  {self.bgp_functions.filter_asn_invalid(self.asn)};")
             self.conf.add(f"  {self.bgp_functions.filter_asn_transit()};")
             self.conf.add(f"  {self.bgp_functions.filter_nexthop_not_peerip()};")
