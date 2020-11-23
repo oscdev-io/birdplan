@@ -16,13 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""OSPF protocol specific functions class."""
+
 from typing import Any
 from ..base_protocol_functions import ProtocolFunctionsBase
 from ...functions import bird_function
 
 
 class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods
-    """OSPF functions configuration."""
+    """OSPF protocol specific functions class."""
 
     _section: str = "OSPF Functions"
 

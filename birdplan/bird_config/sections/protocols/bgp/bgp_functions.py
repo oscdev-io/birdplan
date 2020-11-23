@@ -16,13 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""BGP protocol specific functions class."""
+
 from typing import Any
 from ..base_protocol_functions import ProtocolFunctionsBase
 from ...functions import BirdVariable, SectionFunctions, bird_function
 
 
 class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods
-    """BGP functions configuration."""
+    """BGP protocol specific functions class."""
 
     _section: str = "BGP Functions"
 
