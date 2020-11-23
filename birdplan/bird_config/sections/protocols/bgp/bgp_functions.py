@@ -18,6 +18,8 @@
 
 """BGP protocol specific functions class."""
 
+# pylint: disable=too-many-lines
+
 from typing import Any
 from ..base_protocol_functions import ProtocolFunctionsBase
 from ...functions import BirdVariable, SectionFunctions, bird_function
