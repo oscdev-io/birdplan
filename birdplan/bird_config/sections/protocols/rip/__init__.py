@@ -20,8 +20,9 @@
 
 from typing import Dict, List, Union
 from .rip_attributes import RIPAttributes, RIPRoutePolicyAccept, RIPRoutePolicyRedistribute
+from .rip_functions import RIPFunctions
 from ..direct import ProtocolDirect
-from ..pipe import ProtocolPipe
+from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from ..base import SectionProtocolBase
 from ...constants import SectionConstants
 from ...functions import SectionFunctions
@@ -41,6 +42,8 @@ class ProtocolRIP(SectionProtocolBase):
     _rip_interfaces: RIPInterfaces
 
     _rip_attributes: RIPAttributes
+    # RIP functions
+    _rip_functions: RIPFunctions
 
     def __init__(
         self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
@@ -52,6 +55,8 @@ class ProtocolRIP(SectionProtocolBase):
         self._rip_interfaces = {}
 
         self._rip_attributes = RIPAttributes()
+        # Setup RIP functions
+        self._rip_functions = RIPFunctions(self.birdconfig_globals, self.functions)
 
     def configure(self) -> None:
         """Configure the RIP protocol."""
@@ -61,26 +66,17 @@ class ProtocolRIP(SectionProtocolBase):
         if not self.interfaces:
             return
 
+        self.functions.conf.append(self.rip_functions, deferred=True)
+
         self.tables.conf.append("# RIP Tables")
         self.tables.conf.append("ipv4 table t_rip4;")
         self.tables.conf.append("ipv6 table t_rip6;")
         self.tables.conf.append("")
 
-        # RIP export filters
-        self._rip_export_filter("4")
-        self._rip_export_filter("6")
-
-        # RIP import filters
-        self._rip_import_filter("4")
-        self._rip_import_filter("6")
-
-        # RIP to master export filters
-        self._rip_to_master_export_filter("4")
-        self._rip_to_master_export_filter("6")
-
-        # RIP to master import filters
-        self._rip_to_master_import_filter("4")
-        self._rip_to_master_import_filter("6")
+        self._rip_export_filter()
+        self._rip_import_filter()
+        self._rip_to_master_export_filter()
+        self._rip_to_master_import_filter()
 
         # Setup the protocol
         self._setup_protocol("4")
@@ -91,8 +87,8 @@ class ProtocolRIP(SectionProtocolBase):
             birdconfig_globals=self.birdconfig_globals,
             table_from="rip",
             table_to="master",
-            table_export_filtered=True,
-            table_import_filtered=True,
+            export_filter_type=ProtocolPipeFilterType.UNVERSIONED,
+            import_filter_type=ProtocolPipeFilterType.UNVERSIONED,
         )
         self.conf.add(rip_master_pipe)
 
@@ -180,111 +176,120 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add(f"  ipv{ipv} {{")
         self.conf.add(f"    table t_rip{ipv};")
         self.conf.add("")
-        self.conf.add(f"    export filter f_rip_export{ipv};")
-        self.conf.add(f"    import filter f_rip_import{ipv};")
+        self.conf.add("    export filter f_rip_export;")
+        self.conf.add("    import filter f_rip_import;")
         self.conf.add("")
         self.conf.add("  };")
         self.conf.add("")
         self.conf.add(self._interface_config())
         self.conf.add("};")
 
-    def _rip_export_filter(self, ipv: str) -> None:
+    def _rip_export_filter(self) -> None:
         """RIP export filter setup."""
-        self.conf.add(f"filter f_rip_export{ipv} {{")
+
+        # Set our filter name
+        filter_name = "f_rip_export"
+
+        # Configure RIP export filter
+        self.conf.add("# RIP export filter")
+        self.conf.add(f"filter {filter_name}")
+        self.conf.add("string filter_name;")
+        self.conf.add("{")
+        self.conf.add(f'  filter_name = "{filter_name}";')
         # Redistribute the default route
         if not self.route_policy_redistribute.default:
             self.conf.add("  # Reject redistribution of the default route")
-            self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self.conf.add("    reject;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.reject_default_route()};")
+
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add("  # Redistribute connected")
-            self.conf.add(f'  if (proto = "direct{ipv}_rip") then {{')
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.rip_functions.accept_connected_route()};")
         # Redistribute static routes
         if self.route_policy_redistribute.static:
             self.conf.add("  # Redistribute static routes")
-            self.conf.add("  if (source = RTS_STATIC) then {")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.accept_static_route()};")
         # Redistribute kernel routes
         if self.route_policy_redistribute.kernel:
             self.conf.add("  # Redistribute kernel routes")
-            self.conf.add("  if (source = RTS_INHERIT) then {")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.accept_kernel_route()};")
         # Redistribute RIP routes
         if self.route_policy_redistribute.rip:
             self.conf.add("  # Redistribute RIP routes")
-            self.conf.add("  if (source = RTS_RIP) then {")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.accept_rip_route()};")
         # Else reject
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
 
-    def _rip_import_filter(self, ipv: str) -> None:
+    def _rip_import_filter(self) -> None:
         """RIP import filter setup."""
-        # Configure import filter
-        self.conf.add(f"filter f_rip_import{ipv} {{")
+        # Set our filter name
+        filter_name = "f_rip_import"
+
+        # Configure RIP import filter
+        self.conf.add("# RIP import filter")
+        self.conf.add(f"filter {filter_name}")
+        self.conf.add("string filter_name;")
+        self.conf.add("{")
+        self.conf.add(f'  filter_name = "{filter_name}";')
         # Accept all inbound routes into the table
         self.conf.add("  # Import all RIP routes by default")
         self.conf.add("  accept;")
         self.conf.add("};")
         self.conf.add("")
 
-    def _rip_to_master_export_filter(self, ipv: str) -> None:
+    def _rip_to_master_export_filter(self) -> None:
         """RIP to master export filter setup."""
-        # Configure export filter to master4
-        self.conf.add(f"filter f_rip{ipv}_master{ipv}_export {{")
+        # Set our filter name
+        filter_name = "f_rip_master_export"
+
+        # Configure export filter to master table
+        self.conf.add("# RIP export filter to master table")
+        self.conf.add(f"filter {filter_name}")
+        self.conf.add("string filter_name;")
+        self.conf.add("{")
+        self.conf.add(f'  filter_name = "{filter_name}";')
         # Check if we accept the default route, if not block it
         if not self.route_policy_accept.default:
             self.conf.add("  # Do not export default route to master (no accept:default)")
-            self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self.conf.add("    reject;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.reject_default_route()};")
         # Accept only RIP routes into the master table
         self.conf.add("  # Only export RIP routes to the master table")
-        self.conf.add("  if (source = RTS_RIP) then {")
-        self.conf.add("    accept;")
-        self.conf.add("  }")
+        self.conf.add(f"  {self.functions.accept_rip_route()};")
         # Default to reject
         self.conf.add("  # Reject everything else;")
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
 
-    def _rip_to_master_import_filter(self, ipv: str) -> None:
+    def _rip_to_master_import_filter(self) -> None:
         """RIP to master import filter setup."""
-        # Configure import filter to master table
-        self.conf.add(f"filter f_rip{ipv}_master{ipv}_import {{")
+        # Set our filter name
+        filter_name = "f_rip_master_import"
+
+        # Configure import filter from master table
+        self.conf.add("# RIP import filter from master table")
+        self.conf.add(f"filter {filter_name}")
+        self.conf.add("string filter_name;")
+        self.conf.add("{")
+        self.conf.add(f'  filter_name = "{filter_name}";')
         # Redistribute the default route
         if not self.route_policy_redistribute.default:
             self.conf.add("  # Deny import of default route into RIP (no redistribute_default)")
-            self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self.conf.add("    reject;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.reject_default_route()};")
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add("  # Import routes from our own direct table into RIP (redistribute_connected)")
-            self.conf.add(f'  if (proto = "direct{ipv}_rip") then {{')
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.rip_functions.accept_connected_route()};")
         # Redistribute static routes
         if self.route_policy_redistribute.static:
             self.conf.add("  # Import RTS_STATIC routes into RIP (redistribute_static)")
-            self.conf.add("  if (source = RTS_STATIC) then {")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.accept_static_route()};")
         # Redistribute kernel routes
         if self.route_policy_redistribute.kernel:
             self.conf.add("  # Import RTS_INHERIT routes (kernel routes) into RIP (redistribute_kernel)")
-            self.conf.add("  if (source = RTS_INHERIT) then {")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.functions.accept_kernel_route()};")
         # Else accept
         self.conf.add("  reject;")
         self.conf.add("};")
@@ -299,6 +304,11 @@ class ProtocolRIP(SectionProtocolBase):
     def rip_attributes(self) -> RIPAttributes:
         """Return our RIP protocol attributes."""
         return self._rip_attributes
+
+    @property
+    def rip_functions(self) -> RIPFunctions:
+        """Return our RIP protocol functions."""
+        return self._rip_functions
 
     @property
     def route_policy_accept(self) -> RIPRoutePolicyAccept:

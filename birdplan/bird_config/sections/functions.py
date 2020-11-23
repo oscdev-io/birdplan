@@ -18,8 +18,112 @@
 
 """BIRD functions configuration."""
 
-from birdplan.bird_config.globals import BirdConfigGlobals
+from collections import OrderedDict
+import textwrap
+from typing import Any, Callable, Dict, List
+
+from ...bird_config.globals import BirdConfigGlobals
 from .base import SectionBase
+
+
+class BirdVariable(str):
+    """BIRD constant class."""
+
+
+class bird_function:  # pylint: disable=invalid-name,too-few-public-methods
+    r'''
+    BIRD function decorator class.
+
+    This decorator is used to decorate a BIRD function returned in Python.
+
+    When the decorated function is used, a reference to the function is stored and when the configuration is
+    generated the function is called and the output included in the configuration functions section.
+
+    An example of a decorated function is below...
+    ```
+        @bird_function("bgp_some_function")
+        def bgp_func(self) -> str:  # pylint: disable=no-self-use
+            """Test function."""
+
+            return """\
+                # Some BIRD function
+                function bgp_some_function(string filter_name; bool capable; int peer_asn; int type_asn) {
+                    ...
+                }
+            }"""
+    ```
+
+    This would be used in BIRD configuration like this...
+    ```
+        conf.append(f"if {obj.bgpfunc('hello world')} then print 'hello there';")
+    ```
+
+    Parameters
+    ----------
+    bird_func_name : str
+        BIRD function name.
+
+    '''
+
+    bird_func_name: str
+
+    def __init__(self, bird_func_name: str):
+        """Initialize object."""
+        # Lets keep track of our BIRD function name
+        self.bird_func_name = bird_func_name
+
+    def __call__(self, func: Callable[..., str]) -> Callable[..., str]:
+        """Return the wrapper."""
+
+        def wrapped_function(*args: Any, **kwargs: Any) -> str:
+            """My decorator."""
+            # Grab the parent object
+            parent_object = args[0]
+            # Make sure it has a bird_functions attribute
+            if hasattr(parent_object, "bird_functions"):
+                # Check if this function exists...
+                if self.bird_func_name not in parent_object.bird_functions:
+                    # If not add it to the function list
+                    parent_object.bird_functions[self.bird_func_name] = func(*args)
+            else:
+                raise RuntimeError("Decorator 'bird_function' used on a class method without a 'bird_functions' attribute")
+
+            bird_args: List[str] = []
+            # Check if we're not outputting the filter_name
+            needs_filter_name = not kwargs.get("no_filter_name", False)
+            if needs_filter_name:
+                bird_args.append(BirdVariable("filter_name"))
+            # Loop with python arguments and translate into BIRD arguments
+            for arg in args[1:]:
+                value = ""
+                # Check for unquaoted BIRD variables
+                if isinstance(arg, BirdVariable):
+                    value = arg
+                # Check for a boolean
+                elif isinstance(arg, bool):
+                    if arg:
+                        value = "true"
+                    else:
+                        value = "false"
+                # Check for a number
+                elif isinstance(arg, int):
+                    value = f"{arg}"
+                # Check if this is a string
+                elif isinstance(arg, str):
+                    value = f'"{arg}"'
+                # Everything else is not implemented atm
+                else:
+                    raise NotImplementedError(f"Unknown type for '{self.bird_func_name}' value '{arg}'")
+                # Add BIRD argument
+                bird_args.append(value)
+
+            # Build the list of BIRD arguments in a string
+            bird_args_str = ", ".join(bird_args)
+            # Return the BIRD function call
+            return f"{self.bird_func_name}({bird_args_str})"
+
+        # Finally return the wrapped function
+        return wrapped_function
 
 
 class SectionFunctions(SectionBase):
@@ -27,72 +131,142 @@ class SectionFunctions(SectionBase):
 
     _section: str = "Global Functions"
 
-    _need_functions: bool
+    bird_functions: Dict[str, str]
 
     def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize the object."""
         super().__init__(birdconfig_globals)
 
-        # Add functions to output
-        self._need_functions = False
+        self.bird_functions = OrderedDict()
 
     def configure(self) -> None:
         """Configure global constants."""
         super().configure()
 
         # Check if we're adding functions
-        if self.need_functions:
-            self._configure_functions()
+        for _, content in self.bird_functions.items():
+            self.conf.add(textwrap.dedent(content))
+            self.conf.add("")
 
-    def _configure_functions(self) -> None:
-        """Configure functions."""
-        self.conf.add('# Match a prefix longer than "size".')
-        self.conf.add("function prefix_is_longer(int size) {")
-        self.conf.add("  if (net.len > size) then {")
-        self.conf.add('    print "[prefix_is_longer] Matched ", net, " against size ", size;', debug=True)
-        self.conf.add("    return true;")
-        self.conf.add("  } else {")
-        self.conf.add("    return false;")
-        self.conf.add("  }")
-        self.conf.add("}")
-        self.conf.add("")
-        self.conf.add('# Match a prefix shorter than "size".')
-        self.conf.add("function prefix_is_shorter(int size) {")
-        self.conf.add("  if (net.len < size) then {")
-        self.conf.add('    print "[prefix_is_shorter] Matched ", net, " against size ", size;', debug=True)
-        self.conf.add("    return true;")
-        self.conf.add("  } else {")
-        self.conf.add("    return false;")
-        self.conf.add("  }")
-        self.conf.add("}")
-        self.conf.add("")
-        self.conf.add("# Match on bogons for IPv4")
-        self.conf.add("function is_bogon4() {")
-        self.conf.add("  if (net ~ BOGONS_V4) then {")
-        self.conf.add('    print "[is_bogon4] Matched ", net;', debug=True)
-        self.conf.add("    return true;")
-        self.conf.add("  } else {")
-        self.conf.add("    return false;")
-        self.conf.add("  }")
-        self.conf.add("}")
-        self.conf.add("")
-        self.conf.add("# Match on bogons for IPv6")
-        self.conf.add("function is_bogon6() {")
-        self.conf.add("  if (net ~ BOGONS_V6) then {")
-        self.conf.add('    print "[is_bogon6] Matched ", net;', debug=True)
-        self.conf.add("    return true;")
-        self.conf.add("  } else {")
-        self.conf.add("    return false;")
-        self.conf.add("  }")
-        self.conf.add("}")
-        self.conf.add("")
+    @bird_function("prefix_is_longer")
+    def prefix_is_longer(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD prefix_is_longer function."""
 
-    @property
-    def need_functions(self) -> bool:
-        """Return if functions should be added to our output constants block."""
-        return self._need_functions
+        return """\
+            # Match a prefix longer than "size"
+            function prefix_is_longer(string filter_name; int size) {
+                if (net.len > size) then {
+                    if DEBUG then print filter_name,
+                        " [prefix_is_longer] Matched ", net, " against size ", size;
+                    return true;
+                } else {
+                    return false;
+                }
+            }"""
 
-    @need_functions.setter
-    def need_functions(self, need_functions: bool) -> None:
-        """Set if functions should be added to our output constants block."""
-        self._need_functions = need_functions
+    @bird_function("prefix_is_shorter")
+    def prefix_is_shorter(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD prefix_is_shorter function."""
+
+        return """\
+            # Match a prefix shorter than "size"
+            function prefix_is_shorter(string filter_name; int size) {
+                if (net.len < size) then {
+                    if DEBUG then print filter_name,
+                        " [prefix_is_shorter] Matched ", net, " against size ", size;
+                    return true;
+                }
+                return false;
+            }"""
+
+    @bird_function("is_bogon")
+    def is_bogon(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD is_bogon function."""
+
+        return """\
+            # Match on IP bogons
+            function is_bogon(string filter_name) {
+                if ((net.type = NET_IP4 && net ~ BOGONS_V4) || (net.type = NET_IP6 && net ~ BOGONS_V6)) then {
+                    if DEBUG then print filter_name,
+                        " [is_bogon] Matched ", net;
+                    return true;
+                }
+                return false;
+            }"""
+
+    @bird_function("is_default")
+    def is_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD is_default function."""
+
+        return """\
+            # Match a default route
+            function is_default(string filter_name) {
+                if ((net.type = NET_IP4 && net = DEFAULT_ROUTE_V4) || (net.type = NET_IP6 && net = DEFAULT_ROUTE_V6)) then
+                    return true;
+                return false;
+            }"""
+
+    @bird_function("reject_default_route")
+    def reject_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD reject_default_route function."""
+
+        return f"""\
+            # Reject the default route
+            function reject_default_route(string filter_name) {{
+                if !{self.is_default()} then return false;
+                if DEBUG then print filter_name,
+                    " [reject_default_route] Rejecting default route ", net;
+                reject;
+            }}"""
+
+    @bird_function("accept_static_route")
+    def accept_static_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_static_route function."""
+
+        return """\
+            # Accept static route
+            function accept_static_route(string filter_name) {
+                if (source != RTS_STATIC) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_static_Route] Accepting static route ", net;
+                accept;
+            }"""
+
+    @bird_function("accept_kernel_route")
+    def accept_kernel_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_kernel_route function."""
+
+        return """\
+            # Accept kernel route
+            function accept_kernel_route(string filter_name) {
+                if (source != RTS_INHERIT) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_kernel_route] Accepting kernel route ", net;
+                accept;
+            }"""
+
+    @bird_function("accept_ospf_route")
+    def accept_ospf_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_ospf_route function."""
+
+        return """\
+            # Accept OSPF route
+            function accept_ospf_route(string filter_name) {
+                if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2]) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_ospf_route] Accepting OSPF route ", net;
+                accept;
+            }"""
+
+    @bird_function("accept_rip_route")
+    def accept_rip_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_rip_route function."""
+
+        return """\
+            # Accept RIP route
+            function accept_rip_route(string filter_name) {
+                if (source != RTS_RIP) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_rip_route] Accepting RIP route ", net;
+                accept;
+            }"""

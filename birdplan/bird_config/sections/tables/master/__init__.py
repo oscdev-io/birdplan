@@ -21,7 +21,7 @@
 from birdplan.bird_config.globals import BirdConfigGlobals
 from .master_attributes import MasterTableAttributes, MasterTableRoutePolicyExport
 from ...base import SectionBase
-from ...protocols.pipe import ProtocolPipe
+from ...protocols.pipe import ProtocolPipe, ProtocolPipeFilterType
 
 
 class TableMaster(SectionBase):
@@ -53,8 +53,8 @@ class TableMaster(SectionBase):
             birdconfig_globals=self.birdconfig_globals,
             table_from="master",
             table_to="kernel",
-            table_export_filtered=True,
-            table_import_filtered=True,
+            export_filter_type=ProtocolPipeFilterType.VERSIONED,
+            import_filter_type=ProtocolPipeFilterType.VERSIONED,
         )
         self.conf.add(kernel_master_pipe)
 

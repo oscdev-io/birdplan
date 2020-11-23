@@ -40,6 +40,14 @@ class SectionConstants(SectionBase):
         """Configure global constants."""
         super().configure()
 
+        # Check if we're in debug mode or not
+        if self.birdconfig_globals.debug:
+            self.conf.add("# We're in DEBUG mode")
+            self.conf.add("define DEBUG = true;")
+        else:
+            self.conf.add("# We're not in DEBUG mode")
+            self.conf.add("define DEBUG = false;")
+
         self._configure_defaults()
         # Check if we're adding bogons constants
         if self.need_bogons:
