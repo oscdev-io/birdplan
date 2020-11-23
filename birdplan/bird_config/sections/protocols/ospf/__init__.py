@@ -78,25 +78,12 @@ class ProtocolOSPF(SectionProtocolBase):
         self.tables.conf.append("ipv6 table t_ospf6;")
         self.tables.conf.append("")
 
-        # OSPF export filters
-        self._ospf_export_filter("4")
-        self._ospf_export_filter("6")
-
-        # OSPF import filters
-        self._ospf_import_filter("4")
-        self._ospf_import_filter("6")
-
-        # OSPF to master export filters
-        self._ospf_to_master_export_filter("4")
-        self._ospf_to_master_export_filter("6")
-
-        # OSPF to master import filters
-        self._ospf_to_master_import_filter("4")
-        self._ospf_to_master_import_filter("6")
+        self._ospf_export_filter()
+        self._ospf_import_filter()
+        self._ospf_to_master_export_filter()
+        self._ospf_to_master_import_filter()
 
         # OSPF protocol configuration
-        # FIXME - assigned but not used?  # pylint:disable=fixme
-        # area_lines = self._area_config()
         self._setup_protocol("4")
         self._setup_protocol("6")
 
@@ -105,8 +92,8 @@ class ProtocolOSPF(SectionProtocolBase):
             birdconfig_globals=self.birdconfig_globals,
             table_from="ospf",
             table_to="master",
-            export_filter_type=ProtocolPipeFilterType.VERSIONED,
-            import_filter_type=ProtocolPipeFilterType.VERSIONED,
+            export_filter_type=ProtocolPipeFilterType.UNVERSIONED,
+            import_filter_type=ProtocolPipeFilterType.UNVERSIONED,
         )
         self.conf.add(ospf_master_pipe)
 
@@ -199,8 +186,8 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add(f"  ipv{ipv} {{")
         self.conf.add(f"    table t_ospf{ipv};")
         self.conf.add("")
-        self.conf.add(f"    export filter f_ospf_export{ipv};")
-        self.conf.add(f"    import filter f_ospf_import{ipv};")
+        self.conf.add("    export filter f_ospf_export;")
+        self.conf.add("    import filter f_ospf_import;")
         self.conf.add("")
         self.conf.add("  };")
         self.conf.add("")
@@ -208,10 +195,10 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _ospf_export_filter(self, ipv: str) -> None:
+    def _ospf_export_filter(self) -> None:
         """OSPF export filter setup."""
         # Set our filter name
-        filter_name = f"f_ospf_export{ipv}"
+        filter_name = "f_ospf_export"
 
         # Configure OSPF export filter
         self.conf.add("# OSPF export filter")
@@ -240,10 +227,10 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _ospf_import_filter(self, ipv: str) -> None:
+    def _ospf_import_filter(self) -> None:
         """OSPF import filter setup."""
         # Set our filter name
-        filter_name = f"f_ospf_import{ipv}"
+        filter_name = "f_ospf_import"
 
         # Configure OSPF import filter
         self.conf.add("# OSPF import filter")
@@ -256,10 +243,10 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _ospf_to_master_export_filter(self, ipv: str) -> None:
+    def _ospf_to_master_export_filter(self) -> None:
         """OSPF to master export filter setup."""
         # Set our filter name
-        filter_name = f"f_ospf{ipv}_master{ipv}_export"
+        filter_name = "f_ospf_master_export"
 
         # Configure export filter to master table
         self.conf.add("# OSPF export filter to master table")
@@ -280,10 +267,10 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _ospf_to_master_import_filter(self, ipv: str) -> None:
+    def _ospf_to_master_import_filter(self) -> None:
         """OSPF to master import filter setup."""
         # Set our filter name
-        filter_name = f"f_ospf{ipv}_master{ipv}_import"
+        filter_name = "f_ospf_master_import"
 
         # Configure import filter from master table
         self.conf.add("# OSPF import filter from master table")

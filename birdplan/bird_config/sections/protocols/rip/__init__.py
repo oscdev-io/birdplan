@@ -73,21 +73,10 @@ class ProtocolRIP(SectionProtocolBase):
         self.tables.conf.append("ipv6 table t_rip6;")
         self.tables.conf.append("")
 
-        # RIP export filters
-        self._rip_export_filter("4")
-        self._rip_export_filter("6")
-
-        # RIP import filters
-        self._rip_import_filter("4")
-        self._rip_import_filter("6")
-
-        # RIP to master export filters
-        self._rip_to_master_export_filter("4")
-        self._rip_to_master_export_filter("6")
-
-        # RIP to master import filters
-        self._rip_to_master_import_filter("4")
-        self._rip_to_master_import_filter("6")
+        self._rip_export_filter()
+        self._rip_import_filter()
+        self._rip_to_master_export_filter()
+        self._rip_to_master_import_filter()
 
         # Setup the protocol
         self._setup_protocol("4")
@@ -98,8 +87,8 @@ class ProtocolRIP(SectionProtocolBase):
             birdconfig_globals=self.birdconfig_globals,
             table_from="rip",
             table_to="master",
-            export_filter_type=ProtocolPipeFilterType.VERSIONED,
-            import_filter_type=ProtocolPipeFilterType.VERSIONED,
+            export_filter_type=ProtocolPipeFilterType.UNVERSIONED,
+            import_filter_type=ProtocolPipeFilterType.UNVERSIONED,
         )
         self.conf.add(rip_master_pipe)
 
@@ -187,19 +176,19 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add(f"  ipv{ipv} {{")
         self.conf.add(f"    table t_rip{ipv};")
         self.conf.add("")
-        self.conf.add(f"    export filter f_rip_export{ipv};")
-        self.conf.add(f"    import filter f_rip_import{ipv};")
+        self.conf.add("    export filter f_rip_export;")
+        self.conf.add("    import filter f_rip_import;")
         self.conf.add("")
         self.conf.add("  };")
         self.conf.add("")
         self.conf.add(self._interface_config())
         self.conf.add("};")
 
-    def _rip_export_filter(self, ipv: str) -> None:
+    def _rip_export_filter(self) -> None:
         """RIP export filter setup."""
 
         # Set our filter name
-        filter_name = f"f_rip_export{ipv}"
+        filter_name = "f_rip_export"
 
         # Configure RIP export filter
         self.conf.add("# RIP export filter")
@@ -233,10 +222,10 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _rip_import_filter(self, ipv: str) -> None:
+    def _rip_import_filter(self) -> None:
         """RIP import filter setup."""
         # Set our filter name
-        filter_name = f"f_rip_import{ipv}"
+        filter_name = "f_rip_import"
 
         # Configure RIP import filter
         self.conf.add("# RIP import filter")
@@ -250,10 +239,10 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _rip_to_master_export_filter(self, ipv: str) -> None:
+    def _rip_to_master_export_filter(self) -> None:
         """RIP to master export filter setup."""
         # Set our filter name
-        filter_name = f"f_rip{ipv}_master{ipv}_export"
+        filter_name = "f_rip_master_export"
 
         # Configure export filter to master table
         self.conf.add("# RIP export filter to master table")
@@ -274,10 +263,10 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
-    def _rip_to_master_import_filter(self, ipv: str) -> None:
+    def _rip_to_master_import_filter(self) -> None:
         """RIP to master import filter setup."""
         # Set our filter name
-        filter_name = f"f_rip{ipv}_master{ipv}_import"
+        filter_name = "f_rip_master_import"
 
         # Configure import filter from master table
         self.conf.add("# RIP import filter from master table")
