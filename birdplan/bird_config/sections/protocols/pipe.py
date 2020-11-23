@@ -18,12 +18,27 @@
 
 """BIRD pipe protocol configuration."""
 
+from enum import Enum
 from typing import Callable, List, Union
 from ..base import SectionBase
 from ...globals import BirdConfigGlobals
 
 
 PipeTableNameType = Union[str, Callable[[str], str]]
+
+
+class ProtocolPipeFilterType(Enum):
+    """
+    Pipe protocol filter name type.
+
+    NO_FILTER   - No filter will be applied.
+    VERSIONED   - Filter will be IP versioned.
+    UNVERSIONED - Filter will not be IP versioned.
+
+    """
+    NO_FILTER = 0
+    VERSIONED = 1
+    UNVERSIONED = 2
 
 
 # This class cannot be a decendant of the SectionProtocolBase class or we'll have circular imports
@@ -36,8 +51,8 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
     _table_to: PipeTableNameType
     _table_export: str
     _table_import: str
-    _table_export_filtered: bool
-    _table_import_filtered: bool
+    _export_filter_type: ProtocolPipeFilterType
+    _import_filter_type: ProtocolPipeFilterType
 
     # IP versions we're creating a pipe for
     _ipversions: List[str]
@@ -50,8 +65,8 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
         name: str = "",
         table_export: str = "none",
         table_import: str = "none",
-        table_export_filtered: bool = False,
-        table_import_filtered: bool = False,
+        export_filter_type: ProtocolPipeFilterType = ProtocolPipeFilterType.NO_FILTER,
+        import_filter_type: ProtocolPipeFilterType = ProtocolPipeFilterType.NO_FILTER,
         has_ipv4: bool = True,
         has_ipv6: bool = True,
     ):
@@ -68,8 +83,8 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
         self._table_to = table_to
         self._table_export = table_export
         self._table_import = table_import
-        self._table_export_filtered = table_export_filtered
-        self._table_import_filtered = table_import_filtered
+        self._export_filter_type = export_filter_type
+        self._import_filter_type = import_filter_type
 
         # Are we excluding anything?
         self._ipversions = []
@@ -91,15 +106,19 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
             self.conf.add("")
 
             # Check if we're doing export filtering
-            if self.table_export_filtered:
+            if self.export_filter_type == ProtocolPipeFilterType.VERSIONED:
                 self.conf.add(f"  export filter f_{self.table_from(ipv)}_{self.table_to(ipv)}_export;")
+            elif self.export_filter_type == ProtocolPipeFilterType.UNVERSIONED:
+                self.conf.add(f"  export filter f_{self.table_from()}_{self.table_to()}_export;")
             # If not add per normal
             else:
                 self.conf.add(f"  export {self.table_export};")
 
             # Check if we're doing import filtering
-            if self.table_import_filtered:
+            if self.import_filter_type == ProtocolPipeFilterType.VERSIONED:
                 self.conf.add(f"  import filter f_{self.table_from(ipv)}_{self.table_to(ipv)}_import;")
+            elif self.import_filter_type == ProtocolPipeFilterType.UNVERSIONED:
+                self.conf.add(f"  import filter f_{self.table_from()}_{self.table_to()}_import;")
             # If not add per normal
             else:
                 self.conf.add(f"  import {self.table_import};")
@@ -107,7 +126,7 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
             self.conf.add("};")
             self.conf.add("")
 
-    def table_from(self, ipv: str) -> str:
+    def table_from(self, ipv: str = "") -> str:
         """Return table_from with IP version included."""
 
         # If the table is callable, call it and get the name
@@ -123,7 +142,7 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
 
         return table_from
 
-    def table_to(self, ipv: str) -> str:
+    def table_to(self, ipv: str = "") -> str:
         """Return table_to with IP version included."""
 
         # If the table is callable, call it and get the name
@@ -171,11 +190,11 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
         return self._table_import
 
     @property
-    def table_export_filtered(self) -> bool:
+    def export_filter_type(self) -> ProtocolPipeFilterType:
         """Return that state of us exporting the table filtered."""
-        return self._table_export_filtered
+        return self._export_filter_type
 
     @property
-    def table_import_filtered(self) -> bool:
+    def import_filter_type(self) -> ProtocolPipeFilterType:
         """Return that state of us importing the table filtered."""
-        return self._table_import_filtered
+        return self._import_filter_type

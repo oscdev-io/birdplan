@@ -25,7 +25,7 @@ from .bgp_attributes import BGPAttributes, BGPRoutePolicyAccept, BGPRoutePolicyI
 from .bgp_functions import BGPFunctions
 from .peer import ProtocolBGPPeer
 from .typing import BGPPeerConfig
-from ..pipe import ProtocolPipe
+from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from ..direct import ProtocolDirect
 from ..base import SectionProtocolBase
 from ...constants import SectionConstants
@@ -116,8 +116,8 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             birdconfig_globals=self.birdconfig_globals,
             table_from="bgp",
             table_to="master",
-            table_export_filtered=True,
-            table_import_filtered=True,
+            export_filter_type=ProtocolPipeFilterType.VERSIONED,
+            import_filter_type=ProtocolPipeFilterType.VERSIONED,
         )
         self.conf.add(bgp_master_pipe)
 
@@ -145,7 +145,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
                 table_from="bgp",
                 table_to="direct",
                 table_export="none",
-                table_import_filtered=True,
+                import_filter_type=ProtocolPipeFilterType.VERSIONED,
             )
             self.conf.add(bgp_direct_pipe)
 

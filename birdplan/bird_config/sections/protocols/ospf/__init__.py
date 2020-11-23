@@ -21,7 +21,7 @@
 from typing import Any, Dict, List
 from .ospf_attributes import OSPFAttributes, OSPFRoutePolicyAccept, OSPFRoutePolicyRedistribute
 from ..direct import ProtocolDirect
-from ..pipe import ProtocolPipe
+from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from ..base import SectionProtocolBase
 from ...constants import SectionConstants
 from ...functions import SectionFunctions
@@ -98,8 +98,8 @@ class ProtocolOSPF(SectionProtocolBase):
             birdconfig_globals=self.birdconfig_globals,
             table_from="ospf",
             table_to="master",
-            table_export_filtered=True,
-            table_import_filtered=True,
+            export_filter_type=ProtocolPipeFilterType.VERSIONED,
+            import_filter_type=ProtocolPipeFilterType.VERSIONED,
         )
         self.conf.add(ospf_master_pipe)
 

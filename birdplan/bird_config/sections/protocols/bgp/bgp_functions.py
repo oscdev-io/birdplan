@@ -78,7 +78,7 @@ class BGPFunctions(SectionBase):
             # Import customer routes
             function bgp_import_customer(string filter_name; int peer_asn; int local_pref_cost) {
                 if DEBUG then print filter_name,
-                    " [bgp_import_customer] Adding BGP_LC_RELATION_CUSTOMER to ", net, " with local pref",
+                    " [bgp_import_customer] Adding BGP_LC_RELATION_CUSTOMER to ", net, " with local pref ",
                     BGP_PREF_CUSTOMER - local_pref_cost;
                 # Tag route as a customer route
                 bgp_large_community.add(BGP_LC_RELATION_CUSTOMER);
@@ -128,7 +128,7 @@ class BGPFunctions(SectionBase):
             # Import routeserver routes
             function bgp_import_routeserver(string filter_name; int peer_asn; int local_pref_cost) {
                 if DEBUG then print filter_name,
-                    " [bgp_import_routeserver] Adding BGP_LC_RELATION_ROUTESERVER to ", net, " with local pref",
+                    " [bgp_import_routeserver] Adding BGP_LC_RELATION_ROUTESERVER to ", net, " with local pref ",
                     BGP_PREF_ROUTESERVER - local_pref_cost;
                 # Tag route as a routeserver route
                 bgp_large_community.add(BGP_LC_RELATION_ROUTESERVER);
@@ -236,7 +236,23 @@ class BGPFunctions(SectionBase):
 
         return """\
             # Can we export this route to the peer_asn?
-            function bgp_export_ok(string filter_name; int peer_asn; int prefix_maxlen; int prefix_minlen) {
+            function bgp_export_ok(
+                string filter_name; int peer_asn;
+                int ipv4_maxlen; int ipv4_minlen;
+                int ipv6_maxlen; int ipv6_minlen
+            )
+            int prefix_maxlen;
+            int prefix_minlen;
+            {
+                # Work out what prefix lenghts we're going to use
+                if (net.type = NET_IP4) then {
+                    prefix_maxlen = ipv4_maxlen;
+                    prefix_minlen = ipv4_minlen;
+                }
+                if (net.type = NET_IP6) then {
+                    prefix_maxlen = ipv6_maxlen;
+                    prefix_minlen = ipv6_minlen;
+                }
                 # Check for NOEXPORT large community
                 if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) ~ bgp_large_community) then {
                     if DEBUG then print filter_name,
@@ -254,7 +270,8 @@ class BGPFunctions(SectionBase):
                         " [bgp_export_ok] Not exporting due to prefix length <", prefix_minlen, " for ", net;
                     return false;
                 }
-                if ((net.type = NET_IP4 && is_bogon4()) || (net.type = NET_IP6 && is_bogon6())) then {
+                # Check if this is a bogon
+                if (is_bogon()) then {
                     if DEBUG then print filter_name,
                         " [bgp_export_ok] Not exporting due to ", net, " being a bogon";
                     return false;
@@ -311,13 +328,8 @@ class BGPFunctions(SectionBase):
 
         return """\
             # Filter default route
-            function bgp_filter_default(string filter_name)
-            bool filter_route;
-            {
-                filter_route = false;
-                if (net.type = NET_IP4 && net = DEFAULT_ROUTE_V4) then filter_route = true;
-                if (net.type = NET_IP6 && net = DEFAULT_ROUTE_V6) then filter_route = true;
-                if (!filter_route) then return false;
+            function bgp_filter_default(string filter_name) {
+                if (!is_default()) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_filter_default] Adding BGP_LC_FILTERED_DEFAULT_NOT_ALLOWED to ", net;
                 bgp_large_community.add(BGP_LC_FILTERED_DEFAULT_NOT_ALLOWED);
@@ -364,13 +376,8 @@ class BGPFunctions(SectionBase):
 
         return """\
             # Filter bogons
-            function bgp_filter_bogons(string filter_name)
-            bool filter_route;
-            {
-                filter_route = false;
-                if (net.type = NET_IP4 && is_bogon4()) then filter_route = true;
-                if (net.type = NET_IP6 && is_bogon6()) then filter_route = true;
-                if (!filter_route) then return false;
+            function bgp_filter_bogons(string filter_name) {
+                if (!is_bogon()) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_filter_bogons] Adding BGP_FILTERED_BOGON to ", net;
                 bgp_large_community.add(BGP_LC_FILTERED_BOGON);
@@ -447,20 +454,36 @@ class BGPFunctions(SectionBase):
 
         return """\
             # Filter blackhole size
-            function bgp_filter_blackhole_size(string filter_name; int blackhole_maxlen; int blackhole_minlen) {
+            function bgp_filter_blackhole_size(
+                string filter_name;
+                int ipv4_maxlen; int ipv4_minlen;
+                int ipv6_maxlen; int ipv6_minlen
+            )
+            int prefix_maxlen;
+            int prefix_minlen;
+            {
+                # Work out what prefix lenghts we're going to use
+                if (net.type = NET_IP4) then {
+                    prefix_maxlen = ipv4_maxlen;
+                    prefix_minlen = ipv4_minlen;
+                }
+                if (net.type = NET_IP6) then {
+                    prefix_maxlen = ipv6_maxlen;
+                    prefix_minlen = ipv6_minlen;
+                }
                 # If this is not a blackhole prefix then just return
                 if (BGP_COMMUNITY_BLACKHOLE !~ bgp_community) then return false;
                 # Check prefix is not longer than what we allow
-                if prefix_is_longer(blackhole_maxlen) then {
+                if prefix_is_longer(prefix_maxlen) then {
                     if DEBUG then print filter_name,
-                        " [bgp_filter_prefix_size] Blackhole length >", blackhole_maxlen,
+                        " [bgp_filter_prefix_size] Blackhole length >", prefix_maxlen,
                         ", adding BGP_FILTERED_BLACKHOLE_LEN_TOO_LONG to ", net;
                     bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_LEN_TOO_LONG);
                 }
                 # Check prefix is not shorter than what we allow
-                if prefix_is_shorter(blackhole_minlen) then {
+                if prefix_is_shorter(prefix_minlen) then {
                     if DEBUG then print filter_name,
-                        " [bgp_filter_prefix_size] Blackhole length <", blackhole_minlen,
+                        " [bgp_filter_prefix_size] Blackhole length <", prefix_minlen,
                         ", adding BGP_FILTERED_BLACKHOLE_LEN_TOO_SHORT to ", net;
                     bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_LEN_TOO_SHORT);
                 }
@@ -472,7 +495,23 @@ class BGPFunctions(SectionBase):
 
         return """\
             # Filter prefix size
-            function bgp_filter_prefix_size(string filter_name; int prefix_maxlen; int prefix_minlen) {
+            function bgp_filter_prefix_size(
+                string filter_name;
+                int ipv4_maxlen; int ipv4_minlen;
+                int ipv6_maxlen; int ipv6_minlen
+            )
+            int prefix_maxlen;
+            int prefix_minlen;
+            {
+                # Work out what prefix lenghts we're going to use
+                if (net.type = NET_IP4) then {
+                    prefix_maxlen = ipv4_maxlen;
+                    prefix_minlen = ipv4_minlen;
+                }
+                if (net.type = NET_IP6) then {
+                    prefix_maxlen = ipv6_maxlen;
+                    prefix_minlen = ipv6_minlen;
+                }
                 # If this is a blackhole prefix then just return, it will be caught later
                 if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then return false;
                 # Check prefix length is within the range we allow
@@ -620,19 +659,17 @@ class BGPFunctions(SectionBase):
             # - Return false otherwise
             function bgp_redistribute_connected(string filter_name; bool redistribute) {
                 # Check for connected routes
-                if (proto = "direct4_bgp" || proto = "direct6_bgp") then {
-                    if (redistribute) then {
-                        if DEBUG then print filter_name,
-                            " [bgp_redistribute_connected] Accepting ", net, " due to direct route match",
-                            " (redistribute connected)";
-                        return true;
-                    }
+                if (proto != "direct4_bgp" && proto != "direct6_bgp") then return false;
+                if (redistribute) then {
                     if DEBUG then print filter_name,
-                        " [bgp_redistribute_connected] Rejecting ", net, " due to direct route match",
-                        " (no redistribute connected)";
-                    reject;
+                        " [bgp_redistribute_connected] Accepting ", net, " due to direct route match",
+                        " (redistribute connected)";
+                    return true;
                 }
-                return false;
+                if DEBUG then print filter_name,
+                    " [bgp_redistribute_connected] Rejecting ", net, " due to direct route match",
+                    " (no redistribute connected)";
+                reject;
             }"""
 
     @bird_function("bgp_redistribute_static")
@@ -646,17 +683,15 @@ class BGPFunctions(SectionBase):
             # - Return false otherwise
             function bgp_redistribute_static(string filter_name; bool redistribute) {
                 # Check for static routes
-                if (proto = "static4" || proto = "static6") then {
-                    if (redistribute) then {
-                        if DEBUG then print filter_name,
-                            " [bgp_redistribute_static] Accepting ", net, " due to static route match (redistribute static)";
-                        return true;
-                    }
+                if (proto != "static4" && proto != "static6") then return false;
+                if (redistribute) then {
                     if DEBUG then print filter_name,
-                        " [bgp_redistribute_static] Rejecting ", net, " due to static route match (no redistribute static)";
-                    reject;
+                        " [bgp_redistribute_static] Accepting ", net, " due to static route match (redistribute static)";
+                    return true;
                 }
-                return false;
+                if DEBUG then print filter_name,
+                    " [bgp_redistribute_static] Rejecting ", net, " due to static route match (no redistribute static)";
+                reject;
             }"""
 
     @bird_function("bgp_redistribute_kernel")
@@ -670,17 +705,15 @@ class BGPFunctions(SectionBase):
             # - Return false otherwise
             function bgp_redistribute_kernel(string filter_name; bool redistribute) {
                 # Check for kernel routes
-                if (source = RTS_INHERIT) then {
-                    if (redistribute) then {
-                        if DEBUG then print filter_name,
-                            " [bgp_redistribute_kernel] Accepting ", net, " due to kernel route match (redistribute kernel)";
-                        return true;
-                    }
+                if (source != RTS_INHERIT) then return false;
+                if (redistribute) then {
                     if DEBUG then print filter_name,
-                        " [bgp_redistribute_kernel] Rejecting ", net, " due to kernel route match (no redistribute kernel)";
-                    reject;
+                        " [bgp_redistribute_kernel] Accepting ", net, " due to kernel route match (redistribute kernel)";
+                    return true;
                 }
-                return false;
+                if DEBUG then print filter_name,
+                    " [bgp_redistribute_kernel] Rejecting ", net, " due to kernel route match (no redistribute kernel)";
+                reject;
             }"""
 
     @bird_function("bgp_redistribute_originated")
@@ -694,19 +727,17 @@ class BGPFunctions(SectionBase):
             # - Return false otherwise
             function bgp_redistribute_originated(string filter_name; bool redistribute) {
                 # Check for originated routes
-                if (proto = "bgp_originate4" || proto = "bgp_originate6") then {
-                    if (redistribute) then {
-                        if DEBUG then print filter_name,
-                            " [bgp_redistribute_originated] Accepting ", net, " due to originated route match ",
-                            " (redistribute originated)";
-                        return true;
-                    }
+                if (proto != "bgp_originate4" && proto != "bgp_originate6") then return false;
+                if (redistribute) then {
                     if DEBUG then print filter_name,
-                        " [bgp_redistribute_originated] Rejecting ", net, " due to originated route match ",
-                        " (no redistribute originated)";
-                    reject;
+                        " [bgp_redistribute_originated] Accepting ", net, " due to originated route match ",
+                        " (redistribute originated)";
+                    return true;
                 }
-                return false;
+                if DEBUG then print filter_name,
+                    " [bgp_redistribute_originated] Rejecting ", net, " due to originated route match ",
+                    " (no redistribute originated)";
+                reject;
             }"""
 
     @bird_function("bgp_redistribute_default")
@@ -719,9 +750,8 @@ class BGPFunctions(SectionBase):
             # - Return true when routes are redistributable and accepted
             # - Return false otherwise
             function bgp_redistribute_default(string filter_name; bool redistribute; bool accepted) {
-                # Check for accepted default routes
-                if (net.type = NET_IP4 && (net != DEFAULT_ROUTE_V4 || !accepted)) then return false;
-                if (net.type = NET_IP6 && (net != DEFAULT_ROUTE_V6 || !accepted)) then return false;
+                # If this is not a default route or is not accepted, return false
+                if (!is_default() || !accepted) then return false;
                 if (redistribute) then {
                     if DEBUG then print filter_name,
                         " [bgp_redistribute_default] Accepting ", net, " due to default route match",
@@ -916,13 +946,8 @@ class BGPFunctions(SectionBase):
         """BIRD bgp_lc_add_default function."""
 
         return """\
-            function bgp_lc_add_default(string filter_name; lc large_community)
-            bool add_lc;
-            {
-                add_lc = false;
-                if (net.type = NET_IP4 && net = DEFAULT_ROUTE_V4) then add_lc = true;
-                if (net.type = NET_IP6 && net = DEFAULT_ROUTE_V6) then add_lc = true;
-                if (!add_lc) then return false;
+            function bgp_lc_add_default(string filter_name; lc large_community) {
+                if (!is_default()) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_default] Adding large community ", large_community, " for type DEFAULT to ", net;
                 bgp_large_community.add(large_community);
@@ -945,13 +970,8 @@ class BGPFunctions(SectionBase):
         """BIRD bgp_lc_add_static function."""
 
         return """\
-            function bgp_lc_add_static(string filter_name; lc large_community)
-            bool add_lc;
-            {
-                add_lc = false;
-                if (net.type = NET_IP4 && proto = "static4" && net != DEFAULT_ROUTE_V4) then add_lc = true;
-                if (net.type = NET_IP6 && proto = "static6" && net != DEFAULT_ROUTE_V6) then add_lc = true;
-                if (!add_lc) then return false;
+            function bgp_lc_add_static(string filter_name; lc large_community) {
+                if ((proto != "static4" && proto != "static6") || is_default()) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_static] Adding large community ", large_community, " for type STATIC to ", net;
                 bgp_large_community.add(large_community);
@@ -963,14 +983,8 @@ class BGPFunctions(SectionBase):
 
         return """\
             function bgp_lc_add_kernel(string filter_name; lc large_community)
-            bool add_lc;
             {
-                add_lc = false;
-                if (source = RTS_INHERIT) then {
-                    if (net.type = NET_IP4 && net != DEFAULT_ROUTE_V4) then add_lc = true;
-                    if (net.type = NET_IP6 && net != DEFAULT_ROUTE_V6) then add_lc = true;
-                }
-                if (!add_lc) then return false;
+                if (source != RTS_INHERIT || is_default()) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_kernel] Adding large community ", large_community, " for type KERNEL to ", net;
                 bgp_large_community.add(large_community);
@@ -982,13 +996,8 @@ class BGPFunctions(SectionBase):
 
         return """\
             # BGP originated route large community adding
-            function bgp_lc_add_originated(string filter_name; lc large_community)
-            bool add_lc;
-            {
-                add_lc = false;
-                if (net.type = NET_IP4 && proto = "bgp_originate4" && net != DEFAULT_ROUTE_V4) then add_lc = true;
-                if (net.type = NET_IP6 && proto = "bgp_originate6" && net != DEFAULT_ROUTE_V6) then add_lc = true;
-                if (!add_lc) then return false;
+            function bgp_lc_add_originated(string filter_name; lc large_community) {
+                if ((proto != "bgp_originate4" && proto != "bgp_originate6") || is_default()) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_originate] Adding large community ", large_community, " for type ORIGINATED to ", net;
                 bgp_large_community.add(large_community);
@@ -1085,13 +1094,8 @@ class BGPFunctions(SectionBase):
         """BIRD bgp_prepend_default function."""
 
         return f"""\
-            function bgp_prepend_default(string filter_name; int peer_asn; int prepend_count)
-            bool do_prepend;
-            {{
-                do_prepend = false;
-                if (net.type = NET_IP4 && net = DEFAULT_ROUTE_V4) then do_prepend = true;
-                if (net.type = NET_IP6 && net = DEFAULT_ROUTE_V6) then do_prepend = true;
-                if (!do_prepend) then return false;
+            function bgp_prepend_default(string filter_name; int peer_asn; int prepend_count) {{
+                if (!is_default()) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_default] Prepending AS-PATH for type DEFAULT ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
@@ -1104,7 +1108,7 @@ class BGPFunctions(SectionBase):
         return f"""\
             # BGP connected route prepending
             function bgp_prepend_connected(string filter_name; int peer_asn; int prepend_count) {{
-                if (proto != "direct4_bgp" && proto != "direct6_bgp") then  return false;
+                if (proto != "direct4_bgp" && proto != "direct6_bgp") then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_connected] Prepending AS-PATH for type CONNECTED ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
@@ -1115,13 +1119,8 @@ class BGPFunctions(SectionBase):
         """BIRD bgp_prepend_static function."""
 
         return f"""\
-            function bgp_prepend_static(string filter_name; int peer_asn; int prepend_count)
-            bool add_prepend;
-            {{
-                add_prepend = false;
-                if (net.type = NET_IP4 && proto = "static4" && net != DEFAULT_ROUTE_V4) then add_prepend = true;
-                if (net.type = NET_IP6 && proto = "static6" && net != DEFAULT_ROUTE_V6) then add_prepend = true;
-                if (!add_prepend) then return false;
+            function bgp_prepend_static(string filter_name; int peer_asn; int prepend_count) {{
+                if ((proto != "static4" && proto != "static6") || is_default()) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_static] Prepending AS-PATH for type STATIC ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
@@ -1132,15 +1131,8 @@ class BGPFunctions(SectionBase):
         """BIRD bgp_prepend_kernel function."""
 
         return f"""\
-            function bgp_prepend_kernel(string filter_name; int peer_asn; int prepend_count)
-            bool add_prepend;
-            {{
-                add_prepend = false;
-                if (source = RTS_INHERIT) then {{
-                    if (net.type = NET_IP4 && net != DEFAULT_ROUTE_V4) then add_prepend = true;
-                    if (net.type = NET_IP6 && net != DEFAULT_ROUTE_V6) then add_prepend = true;
-                }}
-                if (!add_prepend) then return false;
+            function bgp_prepend_kernel(string filter_name; int peer_asn; int prepend_count) {{
+                if (source != RTS_INHERIT || is_default()) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_kernel] Prepending AS-PATH for type KERNEL ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
@@ -1151,13 +1143,8 @@ class BGPFunctions(SectionBase):
         """BIRD bgp_prepend_originated function."""
 
         return f"""\
-            function bgp_prepend_originated(string filter_name; int peer_asn; int prepend_count)
-            bool add_prepend;
-            {{
-                add_prepend = false;
-                if (net.type = NET_IP4 && proto = "bgp_originate4" && net != DEFAULT_ROUTE_V4) then add_prepend = true;
-                if (net.type = NET_IP6 && proto = "bgp_originate6" && net != DEFAULT_ROUTE_V6) then add_prepend = true;
-                if (!add_prepend) then return false;
+            function bgp_prepend_originated(string filter_name; int peer_asn; int prepend_count) {{
+                if ((proto != "bgp_originate4" && proto != "bgp_originate6") || is_default()) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_originate] Prepending AS-PATH for type ORIGINATED ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
@@ -1268,13 +1255,13 @@ class BGPFunctions(SectionBase):
                 }}
             }}"""
 
-    @bird_function("bgp_prepend_location")
-    def prepend_location(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    @bird_function("bgp_prepend_lc_location")
+    def prepend_lc_location(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_prepend_location function."""
 
         return f"""\
-            # BGP location based prepending
-            function bgp_prepend_location(string filter_name; int location)
+            # BGP large community location based prepending
+            function bgp_prepend_lc_location(string filter_name; int location)
             int prepend_asn;
             {{
                 # Make sure we use the right ASN when prepending, and not 0 if bgp_path is empty
@@ -1286,21 +1273,21 @@ class BGPFunctions(SectionBase):
                 # If we are prepending three times
                 if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_THREE, location) ~ bgp_large_community) then {{
                     if DEBUG then print filter_name,
-                        " [bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_THREE for ", net;
+                        " [bgp_prepend_lc_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_THREE for ", net;
                     {self.prepend(BirdVariable("prepend_asn"), 3)};
                 # If we are prepending two times
                 }} else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_TWO, location) ~ bgp_large_community) then {{
                     if DEBUG then print filter_name,
-                        " [bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_TWO for ", net;
+                        " [bgp_prepend_lc_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_TWO for ", net;
                     {self.prepend(BirdVariable("prepend_asn"), 2)};
                 # If we are prepending one time
                 }} else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_ONE, location) ~ bgp_large_community) then {{
                     if DEBUG then print filter_name,
-                        " [bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_ONE for ", net;
+                        " [bgp_prepend_lc_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_ONE for ", net;
                     {self.prepend(BirdVariable("prepend_asn"), 1)};
                 }} else if ((BGP_ASN, BGP_LC_FUNCTION_PREPEND_LOCATION_ONE_2, location) ~ bgp_large_community) then {{
                     if DEBUG then print filter_name,
-                        " [bgp_prepend_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_ONE_2 for ", net;
+                        " [bgp_prepend_lc_location] Matched BGP_LC_FUNCTION_PREPEND_LOCATION_ONE_2 for ", net;
                     {self.prepend(BirdVariable("prepend_asn"), 1)};
                 }}
             }}"""

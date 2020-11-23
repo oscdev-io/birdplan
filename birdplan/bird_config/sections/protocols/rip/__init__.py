@@ -21,7 +21,7 @@
 from typing import Dict, List, Union
 from .rip_attributes import RIPAttributes, RIPRoutePolicyAccept, RIPRoutePolicyRedistribute
 from ..direct import ProtocolDirect
-from ..pipe import ProtocolPipe
+from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from ..base import SectionProtocolBase
 from ...constants import SectionConstants
 from ...functions import SectionFunctions
@@ -91,8 +91,8 @@ class ProtocolRIP(SectionProtocolBase):
             birdconfig_globals=self.birdconfig_globals,
             table_from="rip",
             table_to="master",
-            table_export_filtered=True,
-            table_import_filtered=True,
+            export_filter_type=ProtocolPipeFilterType.VERSIONED,
+            import_filter_type=ProtocolPipeFilterType.VERSIONED,
         )
         self.conf.add(rip_master_pipe)
 
