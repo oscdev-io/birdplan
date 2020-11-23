@@ -389,22 +389,23 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
                 routes["6"].append("%s %s" % (prefix, info))
             else:
                 raise BirdPlanError(f"The BGP originate route '{prefix}' is odd")
-        # Loop with IPv4 and IPv6
+
         self.tables.conf.append("# BGP Origination Tables")
+
+        filter_name = "f_bgp_originate_import"
+        self.conf.add(f"filter {filter_name}")
+        self.conf.add("string filter_name;")
+        self.conf.add("{")
+        self.conf.add(f'  filter_name = "{filter_name}";')
+        self.conf.add("  # Origination import")
+        self.conf.add(f"  {self.bgp_functions.import_own(20)};")
+        self.conf.add("  accept;")
+        self.conf.add("};")
+        self.conf.add("")
+
+        # Loop with IPv4 and IPv6
         for ipv in ["4", "6"]:
             self.tables.conf.append(f"ipv{ipv} table t_bgp_originate{ipv};")
-
-            # FIXME - use common filter for both now?
-            filter_name = f"f_bgp_originate{ipv}_import"
-            self.conf.add(f"filter {filter_name}")
-            self.conf.add("string filter_name;")
-            self.conf.add("{")
-            self.conf.add(f'  filter_name = "{filter_name}";')
-            self.conf.add("  # Origination import")
-            self.conf.add(f"  {self.bgp_functions.import_own(20)};")
-            self.conf.add("  accept;")
-            self.conf.add("};")
-            self.conf.add("")
 
             self.conf.add(f"protocol static bgp_originate{ipv} {{")
             self.conf.add(f'  description "BGP route origination for IPv{ipv}";')
