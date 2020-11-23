@@ -16,38 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
-import textwrap
-from typing import Any, Dict
-from ...base import SectionBase
+from typing import Any
+from ..base_protocol_functions import ProtocolFunctionsBase
 from ...functions import BirdVariable, SectionFunctions, bird_function
-from .....bird_config.globals import BirdConfigGlobals
 
 
-class BGPFunctions(SectionBase):  # pylint: disable=too-many-public-methods
+class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods
     """BGP functions configuration."""
 
     _section: str = "BGP Functions"
-
-    _functions: SectionFunctions
-
-    bird_functions: Dict[str, str]
-
-    def __init__(self, birdconfig_globals: BirdConfigGlobals, functions: SectionFunctions):
-        """Initialize the object."""
-        super().__init__(birdconfig_globals)
-
-        self._functions = functions
-        self.bird_functions = OrderedDict()
-
-    def configure(self) -> None:
-        """Configure global constants."""
-        super().configure()
-
-        # Check if we're adding functions
-        for _, content in self.bird_functions.items():
-            self.conf.add(textwrap.dedent(content))
-            self.conf.add("")
 
     @bird_function("bgp_graceful_shutdown")
     def graceful_shutdown(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument

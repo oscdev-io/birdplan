@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""BIRD protocol specific functions base class."""
+
 from collections import OrderedDict
 import textwrap
 from typing import Dict
@@ -25,7 +27,7 @@ from ....bird_config.globals import BirdConfigGlobals
 
 
 class ProtocolFunctionsBase(SectionBase):  # pylint: disable=too-many-public-methods
-    """Protocol functions configuration."""
+    """BIRD protocol specific functions base class."""
 
     _functions: SectionFunctions
 
