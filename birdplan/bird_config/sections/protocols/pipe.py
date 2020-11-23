@@ -36,6 +36,7 @@ class ProtocolPipeFilterType(Enum):
     UNVERSIONED - Filter will not be IP versioned.
 
     """
+
     NO_FILTER = 0
     VERSIONED = 1
     UNVERSIONED = 2
