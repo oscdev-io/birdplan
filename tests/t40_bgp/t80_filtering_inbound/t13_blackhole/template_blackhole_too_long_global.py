@@ -28,8 +28,8 @@ class Template(TemplateBase):
     """BGP blackhole too long test case template."""
 
     r1_template_global_config = """
-  blackhole_maxlen4: 30
-  blackhole_maxlen6: 126
+  blackhole_import_maxlen4: 30
+  blackhole_import_maxlen6: 126
 """
 
     test_blackhole_length4 = 31

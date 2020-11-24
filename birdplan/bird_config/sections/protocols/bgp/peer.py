@@ -462,10 +462,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Setup our limits
         for attr_name in (
-            "blackhole_maxlen4",
-            "blackhole_minlen4",
-            "blackhole_maxlen6",
-            "blackhole_minlen6",
+            "blackhole_import_maxlen4",
+            "blackhole_import_minlen4",
+            "blackhole_export_maxlen4",
+            "blackhole_export_minlen4",
+            "blackhole_import_maxlen6",
+            "blackhole_import_minlen6",
+            "blackhole_export_maxlen6",
+            "blackhole_export_minlen6",
             "prefix_import_maxlen4",
             "prefix_import_minlen4",
             "prefix_export_maxlen4",
@@ -1196,7 +1200,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def _bgp_filter_blackhole_size(self) -> str:
         """Return a BGP blackhole size filter for a specific IP version."""
         return self.bgp_functions.filter_blackhole_size(
-            self.blackhole_maxlen4, self.blackhole_minlen4, self.blackhole_maxlen6, self.blackhole_minlen6
+            self.blackhole_import_maxlen4,
+            self.blackhole_import_minlen4,
+            self.blackhole_import_maxlen6,
+            self.blackhole_import_minlen6,
         )
 
     def _bgp_filter_community_lengths(self) -> str:
@@ -1446,49 +1453,93 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         """Return our peeringdb entry."""
         return self.peer_attributes.peeringdb
 
-    # IPV4 BLACKHOLE PREFIX LENGTHS
+    # IPV4 BLACKHOLE IMPORT PREFIX LENGTHS
 
     @property
-    def blackhole_maxlen4(self) -> int:
-        """Return the current value of blackhole_maxlen4."""
-        return self.peer_attributes.blackhole_maxlen4 or self.bgp_attributes.blackhole_maxlen4
+    def blackhole_import_maxlen4(self) -> int:
+        """Return the current value of blackhole_import_maxlen4."""
+        return self.peer_attributes.blackhole_import_maxlen4 or self.bgp_attributes.blackhole_import_maxlen4
 
-    @blackhole_maxlen4.setter
-    def blackhole_maxlen4(self, blackhole_maxlen4: int) -> None:
-        """Setter for blackhole_maxlen4."""
-        self.peer_attributes.blackhole_maxlen4 = blackhole_maxlen4
-
-    @property
-    def blackhole_minlen4(self) -> int:
-        """Return the current value of blackhole_minlen4."""
-        return self.peer_attributes.blackhole_minlen4 or self.bgp_attributes.blackhole_minlen4
-
-    @blackhole_minlen4.setter
-    def blackhole_minlen4(self, blackhole_minlen4: int) -> None:
-        """Setter for blackhole_minlen4."""
-        self.peer_attributes.blackhole_minlen4 = blackhole_minlen4
-
-    # IPV6 BLACKHOLE PREFIX LENGTHS
+    @blackhole_import_maxlen4.setter
+    def blackhole_import_maxlen4(self, blackhole_import_maxlen4: int) -> None:
+        """Setter for blackhole_import_maxlen4."""
+        self.peer_attributes.blackhole_import_maxlen4 = blackhole_import_maxlen4
 
     @property
-    def blackhole_maxlen6(self) -> int:
-        """Return the current value of blackhole_maxlen6."""
-        return self.peer_attributes.blackhole_maxlen6 or self.bgp_attributes.blackhole_maxlen6
+    def blackhole_import_minlen4(self) -> int:
+        """Return the current value of blackhole_import_minlen4."""
+        return self.peer_attributes.blackhole_import_minlen4 or self.bgp_attributes.blackhole_import_minlen4
 
-    @blackhole_maxlen6.setter
-    def blackhole_maxlen6(self, blackhole_maxlen6: int) -> None:
-        """Setter for blackhole_maxlen6."""
-        self.peer_attributes.blackhole_maxlen6 = blackhole_maxlen6
+    @blackhole_import_minlen4.setter
+    def blackhole_import_minlen4(self, blackhole_import_minlen4: int) -> None:
+        """Setter for blackhole_import_minlen4."""
+        self.peer_attributes.blackhole_import_minlen4 = blackhole_import_minlen4
+
+    # IPV4 BLACKHOLE EXPORT PREFIX LENGTHS
 
     @property
-    def blackhole_minlen6(self) -> int:
-        """Return the current value of blackhole_minlen6."""
-        return self.peer_attributes.blackhole_minlen6 or self.bgp_attributes.blackhole_minlen6
+    def blackhole_export_maxlen4(self) -> int:
+        """Return the current value of blackhole_export_maxlen4."""
+        return self.peer_attributes.blackhole_export_maxlen4 or self.bgp_attributes.blackhole_export_maxlen4
 
-    @blackhole_minlen6.setter
-    def blackhole_minlen6(self, blackhole_minlen6: int) -> None:
-        """Setter for blackhole_minlen6."""
-        self.peer_attributes.blackhole_minlen6 = blackhole_minlen6
+    @blackhole_export_maxlen4.setter
+    def blackhole_export_maxlen4(self, blackhole_export_maxlen4: int) -> None:
+        """Setter for blackhole_export_maxlen4."""
+        self.peer_attributes.blackhole_export_maxlen4 = blackhole_export_maxlen4
+
+    @property
+    def blackhole_export_minlen4(self) -> int:
+        """Return the current value of blackhole_export_minlen4."""
+        return self.peer_attributes.blackhole_export_minlen4 or self.bgp_attributes.blackhole_export_minlen4
+
+    @blackhole_export_minlen4.setter
+    def blackhole_export_minlen4(self, blackhole_export_minlen4: int) -> None:
+        """Setter for blackhole_export_minlen4."""
+        self.peer_attributes.blackhole_export_minlen4 = blackhole_export_minlen4
+
+    # IPV6 BLACKHOLE IMPORT PREFIX LENGTHS
+
+    @property
+    def blackhole_import_maxlen6(self) -> int:
+        """Return the current value of blackhole_import_maxlen6."""
+        return self.peer_attributes.blackhole_import_maxlen6 or self.bgp_attributes.blackhole_import_maxlen6
+
+    @blackhole_import_maxlen6.setter
+    def blackhole_import_maxlen6(self, blackhole_import_maxlen6: int) -> None:
+        """Setter for blackhole_import_maxlen6."""
+        self.peer_attributes.blackhole_import_maxlen6 = blackhole_import_maxlen6
+
+    @property
+    def blackhole_import_minlen6(self) -> int:
+        """Return the current value of blackhole_import_minlen6."""
+        return self.peer_attributes.blackhole_import_minlen6 or self.bgp_attributes.blackhole_import_minlen6
+
+    @blackhole_import_minlen6.setter
+    def blackhole_import_minlen6(self, blackhole_import_minlen6: int) -> None:
+        """Setter for blackhole_import_minlen6."""
+        self.peer_attributes.blackhole_import_minlen6 = blackhole_import_minlen6
+
+    # IPV6 BLACKHOLE EXPORT PREFIX LENGTHS
+
+    @property
+    def blackhole_export_maxlen6(self) -> int:
+        """Return the current value of blackhole_export_maxlen6."""
+        return self.peer_attributes.blackhole_export_maxlen6 or self.bgp_attributes.blackhole_export_maxlen6
+
+    @blackhole_export_maxlen6.setter
+    def blackhole_export_maxlen6(self, blackhole_export_maxlen6: int) -> None:
+        """Setter for blackhole_export_maxlen6."""
+        self.peer_attributes.blackhole_export_maxlen6 = blackhole_export_maxlen6
+
+    @property
+    def blackhole_export_minlen6(self) -> int:
+        """Return the current value of blackhole_export_minlen6."""
+        return self.peer_attributes.blackhole_export_minlen6 or self.bgp_attributes.blackhole_export_minlen6
+
+    @blackhole_export_minlen6.setter
+    def blackhole_export_minlen6(self, blackhole_export_minlen6: int) -> None:
+        """Setter for blackhole_export_minlen6."""
+        self.peer_attributes.blackhole_export_minlen6 = blackhole_export_minlen6
 
     # IPV4 IMPORT PREFIX LENGTHS
 

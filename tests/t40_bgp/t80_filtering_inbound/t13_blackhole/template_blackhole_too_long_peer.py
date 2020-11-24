@@ -36,7 +36,7 @@ class Template(TemplateBase):
         return (
             super().r1_template_peer_config()
             + """
-      blackhole_maxlen4: 30
-      blackhole_maxlen6: 126
+      blackhole_import_maxlen4: 30
+      blackhole_import_maxlen6: 126
 """
         )

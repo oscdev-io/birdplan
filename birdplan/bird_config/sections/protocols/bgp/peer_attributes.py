@@ -402,13 +402,21 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         BGP peer filtering options.
     peeringdb: Optional[BGPPeerPeeringDB]
         BGP peer peeringdb entry.
-    blackhole_maxlen4 : Optional[int]
+    blackhole_import_maxlen4 : Optional[int]
         Blackhole maximum length for IPv4.
-    blackhole_minlen4 : Optional[int]
+    blackhole_import_minlen4 : Optional[int]
         Blackhole minimum length for IPv4.
-    blackhole_maxlen6 : Optional[int]
+    blackhole_export_maxlen4 : Optional[int]
+        Blackhole maximum length for IPv4.
+    blackhole_export_minlen4 : Optional[int]
+        Blackhole minimum length for IPv4.
+    blackhole_import_maxlen6 : Optional[int]
         Blackhole maximum length for IPv6.
-    blackhole_minlen6 : Optional[int]
+    blackhole_import_minlen6 : Optional[int]
+        Blackhole minimum length for IPv6.
+    blackhole_export_maxlen6 : Optional[int]
+        Blackhole maximum length for IPv6.
+    blackhole_export_minlen6 : Optional[int]
         Blackhole minimum length for IPv6.
     prefix_import_maxlen4 : Optional[int]
         Prefix import maximum length for IPv4.
@@ -482,11 +490,17 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     _peeringdb: Optional[BGPPeerPeeringDB]
 
-    blackhole_maxlen4: Optional[int]
-    blackhole_minlen4: Optional[int]
+    blackhole_import_maxlen4: Optional[int]
+    blackhole_import_minlen4: Optional[int]
 
-    blackhole_maxlen6: Optional[int]
-    blackhole_minlen6: Optional[int]
+    blackhole_export_maxlen4: Optional[int]
+    blackhole_export_minlen4: Optional[int]
+
+    blackhole_import_maxlen6: Optional[int]
+    blackhole_import_minlen6: Optional[int]
+
+    blackhole_export_maxlen6: Optional[int]
+    blackhole_export_minlen6: Optional[int]
 
     prefix_import_maxlen4: Optional[int]
     prefix_import_minlen4: Optional[int]
@@ -554,11 +568,17 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
         self._peeringdb = None
 
-        self.blackhole_maxlen4 = None
-        self.blackhole_minlen4 = None
+        self.blackhole_import_maxlen4 = None
+        self.blackhole_import_minlen4 = None
 
-        self.blackhole_maxlen6 = None
-        self.blackhole_minlen6 = None
+        self.blackhole_export_maxlen4 = None
+        self.blackhole_export_minlen4 = None
+
+        self.blackhole_import_maxlen6 = None
+        self.blackhole_import_minlen6 = None
+
+        self.blackhole_export_maxlen6 = None
+        self.blackhole_export_minlen6 = None
 
         self.prefix_import_maxlen4 = None
         self.prefix_import_minlen4 = None
