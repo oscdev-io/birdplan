@@ -21,13 +21,10 @@
 
 """BGP basic test case template."""
 
-from .template_bgp import Template as TemplateBase
+from .template_base import TemplateBase
 
 
 class Template(TemplateBase):
     """BGP basic test case template."""
 
-    r1_template_global_config = """
-export_kernel:
-  bgp: False
-"""
+    setup_ipv6 = True

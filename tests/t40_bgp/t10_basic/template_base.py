@@ -32,6 +32,31 @@ class TemplateBase(BirdPlanBaseTestCase):
 
     e1_large_communities = ""
 
+    setup_ipv4 = False
+    setup_ipv6 = False
+
+    def r1_template_peer_config(self):
+        """Return dynamic config."""
+
+        output = ""
+        if self.setup_ipv4:
+            output = (
+                output
+                + """\
+      neighbor4: 100.64.0.2
+      source_address4: 100.64.0.1
+"""
+            )
+        if self.setup_ipv6:
+            output = (
+                output
+                + """\
+      neighbor6: fc00:100::2
+      source_address6: fc00:100::1
+"""
+            )
+        return output
+
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
@@ -49,6 +74,7 @@ class TemplateBase(BirdPlanBaseTestCase):
             "e1",
             ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 " f"large-community [ {large_communities} ]"],
         )
+
         self._exabgpcli(
             sim,
             "e1",
@@ -61,11 +87,13 @@ class TemplateBase(BirdPlanBaseTestCase):
 
     def test_bird_tables_bgp4_peer(self, sim):
         """Test BIRD BGP4 peer table."""
-        self._test_bird_routers_table_bgp_peers(4, sim)
+        if self.setup_ipv4:
+            self._test_bird_routers_table_bgp_peers(4, sim)
 
     def test_bird_tables_bgp6_peer(self, sim):
         """Test BIRD BGP6 peer table."""
-        self._test_bird_routers_table_bgp_peers(6, sim)
+        if self.setup_ipv6:
+            self._test_bird_routers_table_bgp_peers(6, sim)
 
     def test_bird_tables_bgp4(self, sim):
         """Test BIRD t_bgp4 table."""
