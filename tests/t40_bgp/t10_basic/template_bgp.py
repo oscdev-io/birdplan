@@ -26,3 +26,6 @@ from .template_base import TemplateBase
 
 class Template(TemplateBase):
     """BGP basic test case template."""
+
+    setup_ipv4 = True
+    setup_ipv6 = True

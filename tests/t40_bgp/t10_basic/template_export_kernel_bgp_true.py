@@ -21,7 +21,7 @@
 
 """BGP basic test case template."""
 
-from .template_base import TemplateBase
+from .template_bgp import Template as TemplateBase
 
 
 class Template(TemplateBase):

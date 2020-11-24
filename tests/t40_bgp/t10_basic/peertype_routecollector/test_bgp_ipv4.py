@@ -19,15 +19,11 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP basic test case template."""
+"""Basic BGP test case."""
 
-from .template_bgp import Template as TemplateBase
+from ..template_bgp_ipv4 import Template
+from ...config.peertype_routecollector.e1r1 import PeerTypeConfig
 
 
-class Template(TemplateBase):
-    """BGP basic test case template."""
-
-    r1_template_global_config = """
-export_kernel:
-  bgp: False
-"""
+class Test(PeerTypeConfig, Template):
+    """Basic BGP test case."""
