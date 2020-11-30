@@ -207,35 +207,6 @@ class BGPPeerRoutePolicyAccept:  # pylint: disable=too-few-public-methods
         self.blackhole = False
 
 
-class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
-    """
-    BGP route policy for importing of routes internally.
-
-    Attributes
-    ----------
-    connected : Dict[str, bool]
-        Import connected routes into the main BGP table. This attribute is indexed by interface name with a boolean option.
-        The interface name can be an exact interface match, or a wildcard with a *.
-    kernel : bool
-        Import kernel routes into the main BGP table. Defaults to `False`.
-    static : bool
-        Import static routes into the main BGP table. Defaults to `False`.
-
-    """
-
-    connected: Dict[str, bool]
-    kernel: bool
-    static: bool
-
-    route_policy_accept: BGPPeerRoutePolicyAccept
-
-    def __init__(self) -> None:
-        """Initialize object."""
-        self.connected = {}
-        self.kernel = False
-        self.static = False
-
-
 class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
     """
     BGP filter policy for incoming routes from the BGP peer.
