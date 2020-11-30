@@ -57,6 +57,7 @@ bgp:
       connect_retry_time: 2
       error_wait_time: 2,5
       type: routecollector
+@TEMPLATE_EXTRA_CONFIG@
 
     r6:
       asn: 65005
@@ -69,6 +70,7 @@ bgp:
       connect_retry_time: 2
       error_wait_time: 2,5
       type: routeserver
+@TEMPLATE_EXTRA_CONFIG@
 
     r7:
       asn: 65000
@@ -117,6 +119,7 @@ bgp:
       connect_retry_time: 2
       error_wait_time: 2,5
       type: transit
+@TEMPLATE_EXTRA_CONFIG@
 
     e1:
       asn: @PEER_ASN@
@@ -130,3 +133,4 @@ bgp:
       error_wait_time: 2,5
       type: @PEER_TYPE@
 @PEER_CONFIG@
+@TEMPLATE_PEER_CONFIG@

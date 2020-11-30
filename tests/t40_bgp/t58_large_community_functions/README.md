@@ -47,6 +47,15 @@ In terms of test set "t60_localpref_minus_2":
 In terms of test set "t60_localpref_minus_3":
   - ExaBGP e1 should advertise a route with a large community that should result in reducing the local preference by 3.
 
+In terms of test set "t70_blackhole_asn":
+  - ExaBGP e1 should advertise blackhole routes with a large community blackhole function that should result in a blackhole route being advertised to iBGP, routeserver, routecollector and transit peers with the respective ASN.
+
+In terms of test set "t72_blackhole_routeserver":
+  - ExaBGP e1 should advertise a blackhole route with a large community blackhole function that should result in a blackhole route being advertised to routeserver peers.
+
+In terms of test set "t74_blackhole_transit":
+  - ExaBGP e1 should advertise a blackhole route with a large community blackhole function that should result in a blackhole route being advertised to transit peers.
+
 ## Diagram
 
 ```plantuml

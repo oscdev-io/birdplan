@@ -38,7 +38,9 @@ bgp:
   asn: 65000
 ```
 
-# blackhole_maxlen4
+
+
+# blackhole_import_maxlen4
 
 Default maximum IPv4 blackhole length to import from a BGP peer without filtering. Defaults to `32`.
 
@@ -47,12 +49,12 @@ An example of this usage is below...
 ...
 
 bgp:
-  blackhole_maxlen4: 25
+  blackhole_import_maxlen4: 25
 ...
 ```
 
 
-# blackhole_minlen4
+# blackhole_import_minlen4
 
 Default minimum IPv4 blackhole length to import from a BGP peer without filtering. Defaults to `24`.
 
@@ -61,12 +63,40 @@ An example of this usage is below...
 ...
 
 bgp:
-  blackhole_minlen4: 7
+  blackhole_import_minlen4: 7
 ...
 ```
 
 
-# blackhole_maxlen6
+# blackhole_export_maxlen4
+
+Default maximum IPv4 blackhole length to export to a BGP peer. Defaults to `32`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  blackhole_export_maxlen4: 25
+...
+```
+
+
+# blackhole_export_minlen4
+
+Default minimum IPv4 blackhole length to export to a BGP peer. Defaults to `24`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  blackhole_export_minlen4: 7
+...
+```
+
+
+# blackhole_import_maxlen6
 
 Default maximum IPv6 blackhole length to import from a BGP peer without filtering. Defaults to `32`.
 
@@ -75,12 +105,12 @@ An example of this usage is below...
 ...
 
 bgp:
-  blackhole_maxlen6: 25
+  blackhole_import_maxlen6: 25
 ...
 ```
 
 
-# blackhole_minlen6
+# blackhole_import_minlen6
 
 Default minimum IPv6 blackhole length to import from a BGP peer without filtering. Defaults to `26`.
 
@@ -89,7 +119,35 @@ An example of this usage is below...
 ...
 
 bgp:
-  blackhole_minlen6: 7
+  blackhole_import_minlen6: 7
+...
+```
+
+
+# blackhole_export_maxlen6
+
+Default maximum IPv6 blackhole length to export to a BGP peer. Defaults to `32`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  blackhole_export_maxlen6: 25
+...
+```
+
+
+# blackhole_export_minlen6
+
+Default minimum IPv6 blackhole length to export to a BGP peer. Defaults to `26`.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  blackhole_export_minlen6: 7
 ...
 ```
 
@@ -415,8 +473,56 @@ bgp:
 ...
 ```
 
+# blackhole_community
 
-# blackhole_maxlen4
+Set the peers blackhole community. When this option is specified blackhole routes with the large community action
+`(OWN_ASN, 666, XXX)` will result in the blackhole route being propagated to the specified peer(s).
+
+The only peer type supported for this option is `transit`, `routeserver` and `routecollector`.
+
+This value of this option can either be:
+  - a normal community in the format of 'XXXX:YYYY'; or
+  - a large community in the format of 'XXXX:YYYY:ZZZZ'; or
+  - boolean of `True` or `False`, in this case the well-known community `(65535, 666)` will be propagated if `True`.
+
+Below is a configuration example using a normal community...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      blackhole_community: 65000:100
+...
+```
+
+Below is a configuration example using a large community...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      blackhole_community: 65000:100:100
+...
+```
+
+Below is a configuration example using a boolean...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      blackhole_community: True
+...
+```
+
+
+# blackhole_import_maxlen4
 
 Maximum IPv4 blackhole length to import without filtering. Defaults to global setting.
 
@@ -428,12 +534,12 @@ bgp:
     peer1:
       asn: 65000
       description: Some peer
-      blackhole_maxlen4: 32
+      blackhole_import_maxlen4: 32
 ...
 ```
 
 
-# blackhole_minlen4
+# blackhole_import_minlen4
 
 Minimum IPv4 blackhole length to import without filtering. Defaults to global setting.
 
@@ -446,7 +552,111 @@ bgp:
     peer1:
       asn: 65000
       description: Some peer
-      blackhole_minlen4: 24
+      blackhole_import_minlen4: 24
+...
+```
+
+# blackhole_export_maxlen4
+
+Maximum IPv4 blackhole length to export. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      blackhole_export_maxlen4: 32
+...
+```
+
+
+# blackhole_export_minlen4
+
+Minimum IPv4 blackhole length to export. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      blackhole_export_minlen4: 24
+...
+```
+
+
+# blackhole_import_maxlen6
+
+Maximum IPv6 blackhole length to import without filtering. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      blackhole_import_maxlen6: 128
+...
+```
+
+
+# blackhole_import_minlen6
+
+Minimum IPv6 blackhole length to import without filtering. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      blackhole_import_minlen6: 64
+...
+```
+
+
+# blackhole_export_maxlen6
+
+Maximum IPv6 blackhole length to export. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      blackhole_export_maxlen6: 128
+...
+```
+
+
+# blackhole_export_minlen6
+
+Minimum IPv6 blackhole length to export. Defaults to global setting.
+
+An example of this usage is below...
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      blackhole_export_minlen6: 64
 ...
 ```
 

@@ -264,6 +264,56 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return true;
             }}"""
 
+    @bird_function("bgp_export_blackhole_ok")
+    def export_blackhole_ok(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_export_blackhole_ok function."""
+
+        return f"""\
+            # Can we export this route to the peer_asn?
+            function bgp_export_blackhole_ok(
+                string filter_name; int peer_asn;
+                int ipv4_maxlen; int ipv4_minlen;
+                int ipv6_maxlen; int ipv6_minlen
+            )
+            int prefix_maxlen;
+            int prefix_minlen;
+            {{
+                # Work out what prefix lenghts we're going to use
+                if (net.type = NET_IP4) then {{
+                    prefix_maxlen = ipv4_maxlen;
+                    prefix_minlen = ipv4_minlen;
+                }}
+                if (net.type = NET_IP6) then {{
+                    prefix_maxlen = ipv6_maxlen;
+                    prefix_minlen = ipv6_minlen;
+                }}
+                # Check for NOEXPORT large community
+                if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) ~ bgp_large_community) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_export_blackhole_ok] Not exporting due to BGP_LC_FUNCTION_NOEXPORT for AS", peer_asn ," for ", net;
+                    return false;
+                }}
+                # Validate route before export
+                if {self.functions.prefix_is_longer(BirdVariable("prefix_maxlen"))} then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_export_blackhole_ok] Not exporting due to prefix length >", prefix_maxlen," for ", net;
+                    return false;
+                }}
+                if {self.functions.prefix_is_shorter(BirdVariable("prefix_minlen"))} then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_export_blackhole_ok] Not exporting due to prefix length <", prefix_minlen, " for ", net;
+                    return false;
+                }}
+                # Check if this is a bogon
+                if {self.functions.is_bogon()} then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_export_blackhole_ok] Not exporting due to ", net, " being a bogon";
+                    return false;
+                }}
+                # If all above tests are ok, then we can
+                return true;
+            }}"""
+
     @bird_function("bgp_accept")
     def accept(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_accept function."""
@@ -873,13 +923,13 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }"""
 
-    @bird_function("bgp_strip_communities_all")
-    def strip_communities_all(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_strip_communities_all function."""
+    @bird_function("bgp_communities_strip_all")
+    def communities_strip_all(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_communities_strip_all function."""
 
         return """\
             # Strip all communities we could interpret internally
-            function bgp_strip_communities_all(string filter_name)
+            function bgp_communities_strip_all(string filter_name)
             bool stripped_community;
             bool stripped_lc;
             bool stripped_lc_private;
@@ -890,39 +940,103 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 # Sanitize communities
                 if (bgp_community ~ BGP_COMMUNITY_STRIP_ALL) then {
                     if DEBUG then print filter_name,
-                        " [bgp_strip_communities_all] Sanitizing communities for ", net;
+                        " [bgp_communities_strip_all] Sanitizing communities for ", net;
                     bgp_community.delete(BGP_COMMUNITY_STRIP_ALL);
                     stripped_community = true;
                 }
                 # Sanitize large communities
                 if (bgp_large_community ~ BGP_LC_STRIP_ALL) then {
                     if DEBUG then print filter_name,
-                        " [bgp_strip_communities_all] Sanitizing large communities for ", net;
+                        " [bgp_communities_strip_all] Sanitizing large communities for ", net;
                     bgp_large_community.delete(BGP_LC_STRIP_ALL);
                     stripped_lc = true;
                 }
                 # Sanitize private large communities
                 if (bgp_large_community ~ BGP_LC_STRIP_PRIVATE) then {
                     if DEBUG then print filter_name,
-                        " [bgp_strip_communities_all] Sanitizing private large communities for ", net;
+                        " [bgp_communities_strip_all] Sanitizing private large communities for ", net;
                     bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);
                     stripped_lc_private = true;
                 }
                 if (stripped_community) then {
                     if DEBUG then print filter_name,
-                        " [bgp_strip_communities_all] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;
+                        " [bgp_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;
                     bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_COMMUNITY);
                 }
                 if (stripped_lc) then {
                     if DEBUG then print filter_name,
-                        " [bgp_strip_communities_all] Adding BGP_LC_INFORMATION_STRIPPED_LC to ", net;
+                        " [bgp_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_LC to ", net;
                     bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC);
                 }
                 if (stripped_lc_private) then {
                     if DEBUG then print filter_name,
-                        " [bgp_strip_communities_all] Adding BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE to ", net;
+                        " [bgp_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE to ", net;
                     bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE);
                 }
+            }"""
+
+    @bird_function("bgp_communities_strip_internal")
+    def communities_strip_internal(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_communities_strip_internal function."""
+
+        return """\
+            # Strip internal communities
+            function bgp_communities_strip_internal(string filter_name)
+            bool stripped_community;
+            bool stripped_lc;
+            bool stripped_lc_private;
+            {
+                stripped_community = false;
+                stripped_lc = false;
+                stripped_lc_private = false;
+                # Remove stripped communities
+                if (bgp_community ~ BGP_COMMUNITY_STRIP) then {
+                    if DEBUG then print filter_name,
+                        " [bgp_communities_strip_internal] Removing stripped communities from ", net;
+                    bgp_community.delete(BGP_COMMUNITY_STRIP);
+                    stripped_community = true;
+                }
+                # Remove stripped large communities
+                if (bgp_large_community ~ BGP_LC_STRIP) then {
+                    if DEBUG then print filter_name,
+                        " [bgp_communities_strip_internal] Removing stripped large communities from ", net;
+                    bgp_large_community.delete(BGP_LC_STRIP);
+                    stripped_lc = true;
+                }
+                # Remove stripped private large communities
+                if (bgp_large_community ~ BGP_LC_STRIP_PRIVATE) then {
+                    if DEBUG then print filter_name,
+                        " [bgp_communities_strip_internal] Removing stripped private large communities from ", net;
+                    bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);
+                    stripped_lc_private = true;
+                }
+                if (stripped_community) then {
+                    if DEBUG then print filter_name,
+                        " [bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;
+                    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_COMMUNITY);
+                }
+                if (stripped_lc) then {
+                    if DEBUG then print filter_name,
+                        " [bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;
+                    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC);
+                }
+                if (stripped_lc_private) then {
+                    if DEBUG then print filter_name,
+                        " [bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE to ", net;
+                    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE);
+                }
+            }"""
+
+    @bird_function("bgp_community_add_blackhole")
+    def community_add_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_community_add_blackhole function."""
+
+        return """\
+            # Add a community to a blackhole route (the check for a blackhole route needs to be done before calling this function)
+            function bgp_community_add_blackhole(string filter_name; pair community) {
+                if DEBUG then print filter_name,
+                    " [bgp_community_add_blackhole] Adding community ", community, " for type BLACKHOLE to ", net;
+                bgp_community.add(community);
             }"""
 
     @bird_function("bgp_lc_add_default")
@@ -1050,6 +1164,19 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if (BGP_LC_RELATION_TRANSIT !~ bgp_large_community) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_bgp_transit] Adding large community ", large_community, " for type BGP_TRANSIT to ", net;
+                bgp_large_community.add(large_community);
+            }"""
+
+    @bird_function("bgp_lc_add_blackhole")
+    def lc_add_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_lc_add_blackhole function."""
+
+        return """\
+            # Add a large community to a blackhole route (the check for a blackhole route needs to be done before calling this
+            # function)
+            function bgp_lc_add_blackhole(string filter_name; lc large_community) {
+                if DEBUG then print filter_name,
+                    " [bgp_lc_add_blackhole] Adding large community ", large_community, " for type BLACKHOLE to ", net;
                 bgp_large_community.add(large_community);
             }"""
 
@@ -1455,58 +1582,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if DEBUG then print filter_name,
                     " [bgp_strip_lc_private] Removing private large communities from ", net;
                 bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);
-            }"""
-
-    @bird_function("bgp_communities_strip_internal")
-    def communities_strip_internal(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_communities_strip_internal function."""
-
-        return """\
-            # Strip internal communities
-            function bgp_communities_strip_internal(string filter_name)
-            bool stripped_community;
-            bool stripped_lc;
-            bool stripped_lc_private;
-            {
-                stripped_community = false;
-                stripped_lc = false;
-                stripped_lc_private = false;
-                # Remove stripped communities
-                if (bgp_community ~ BGP_COMMUNITY_STRIP) then {
-                    if DEBUG then print filter_name,
-                        " [bgp_communities_strip_internal] Removing stripped communities from ", net;
-                    bgp_community.delete(BGP_COMMUNITY_STRIP);
-                    stripped_community = true;
-                }
-                # Remove stripped large communities
-                if (bgp_large_community ~ BGP_LC_STRIP) then {
-                    if DEBUG then print filter_name,
-                        " [bgp_communities_strip_internal] Removing stripped large communities from ", net;
-                    bgp_large_community.delete(BGP_LC_STRIP);
-                    stripped_lc = true;
-                }
-                # Remove stripped private large communities
-                if (bgp_large_community ~ BGP_LC_STRIP_PRIVATE) then {
-                    if DEBUG then print filter_name,
-                        " [bgp_communities_strip_internal] Removing stripped private large communities from ", net;
-                    bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);
-                    stripped_lc_private = true;
-                }
-                if (stripped_community) then {
-                    if DEBUG then print filter_name,
-                        " [bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;
-                    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_COMMUNITY);
-                }
-                if (stripped_lc) then {
-                    if DEBUG then print filter_name,
-                        " [bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ", net;
-                    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC);
-                }
-                if (stripped_lc_private) then {
-                    if DEBUG then print filter_name,
-                        " [bgp_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE to ", net;
-                    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE);
-                }
             }"""
 
     @property

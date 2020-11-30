@@ -54,6 +54,7 @@ In terms of a `customer` peer type the permissable prefix size is between /32 an
 
 In terms of a `internal` peer type the permissable prefix size is between /32 and /24 and is not restricted.
 
+This can be combined with the large community function (OWN_ASN, 666, XXX) to propagate export to peer types `transit`, `routeserver`, `routecollector` that support blackholing.
 
 # Large Communities
 
@@ -81,6 +82,7 @@ Brief overview of FUNCTION assignments...
 | 72 | Location-Based Selective AS Path Prepending (two) - ENHANCED [^lc-function-7] |
 | 73 | Location-Based Selective AS Path Prepending (three) - ENHANCED [^lc-function-7] |
 | 8 | Manipulation of the LOCAL_PREF Attribute - ENHANCED [^lc-function-8] |
+| 666 | Blackhole options |
 | 1000 | Route information |
 | 1101 | Route filtered |
 | 1200 | Actions |
@@ -167,6 +169,22 @@ Allowable internally and by `customer`. The local_pref is only reduced in the ca
 | (OWN_ASN, 8, 2) | Decrease local_pref by 2 |
 | (OWN_ASN, 8, 3) | Decrease local_pref by 3 |
 
+
+## Blackhole Communities
+
+Allowable internally and by `customer`.
+
+This large community function only works if `transit` and `routeserver` peer types support blackhole communities and they were
+configured with option `blackhole_community`. If this option was not specified the route will just get dropped and not advertised (as normal).
+
+If the `transit` or `routeserver` peer type was configured with `blackhole_community`, then the route will be advertised as a
+blackhole using the community configured.
+
+| Community | Description |
+| --- | --- |
+| (OWN_ASN, 666, PEER_ASN) | Advertise to transit PEER_ASN |
+| (OWN_ASN, 666, 65412) | Advertise to all transit providers |
+| (OWN_ASN, 666, 65413) | Advertise to all routeservers |
 
 ## Route Information Communities
 

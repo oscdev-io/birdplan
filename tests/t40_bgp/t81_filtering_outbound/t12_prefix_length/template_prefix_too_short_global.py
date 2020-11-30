@@ -27,7 +27,7 @@ from .template_base_too_short import TemplateBase
 class Template(TemplateBase):
     """BGP prefix too short test case template."""
 
-    r1_template_peer_config = """
+    r1_template_global_config = """
   prefix_export_minlen4: 17
   prefix_export_minlen6: 33
 """

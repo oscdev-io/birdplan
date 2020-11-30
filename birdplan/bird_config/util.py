@@ -19,10 +19,10 @@
 """Bird configuration utility functions."""
 
 
-def sanitize_large_community(large_community: str) -> str:
+def sanitize_community(community: str) -> str:
     """Sanitize a string representation of a large community."""
     # Split on :
-    large_community_components = large_community.split(":")
+    community_components = community.split(":")
     # Re-join using , and add brackets
-    large_community_str = "(%s)" % ",".join(large_community_components)
-    return large_community_str
+    community_str = "(%s)" % ",".join(community_components)
+    return community_str

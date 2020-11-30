@@ -82,30 +82,38 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
         Route policy for acceptance of routes from the main BGP table into the master table.
     route_policy_import : BGPRoutePolicyImport
         Route policy for importing of routes from internal tables into our main BGP table.
-    blackhole_maxlen4 : Optional[int]
-        Blackhole maximum length for IPv4.
-    blackhole_minlen4 : Optional[int]
-        Blackhole minimum length for IPv4.
-    blackhole_maxlen6 : Optional[int]
-        Blackhole maximum length for IPv6.
-    blackhole_minlen6 : Optional[int]
-        Blackhole minimum length for IPv6.
+    blackhole_import_maxlen4 : int
+        Blackhole maximum length for IPv4 to import.
+    blackhole_import_minlen4 : int
+        Blackhole minimum length for IPv4 to import.
+    blackhole_export_maxlen4 : int
+        Blackhole maximum length for IPv4 to export.
+    blackhole_export_minlen4 : int
+        Blackhole minimum length for IPv4 to export.
+    blackhole_import_maxlen6 : int
+        Blackhole maximum length for IPv6 to import.
+    blackhole_import_minlen6 : int
+        Blackhole minimum length for IPv6 to import.
+    blackhole_export_maxlen6 : int
+        Blackhole maximum length for IPv6 to export.
+    blackhole_export_minlen6 : int
+        Blackhole minimum length for IPv6 to export.
     prefix_import_maxlen4 : int
-        Prefix import maximum length for IPv4.
+        Prefix maximum length for IPv4 to import.
     prefix_import_minlen4 : int
-        Prefix import minimum length for IPv4.
+        Prefix minimum length for IPv4 to import.
     prefix_export_maxlen4 : int
-        Prefix export maximum length for IPv4.
+        Prefix maximum length for IPv4 to export.
     prefix_export_minlen4 : int
-        Prefix export minimum length for IPv4.
+        Prefix minimum length for IPv4 to export.
     prefix_import_maxlen6 : int
-        Prefix import maximum length for IPv6.
+        Prefix maximum length for IPv6 to import.
     prefix_import_minlen6 : int
-        Prefix import minimum length for IPv6.
+        Prefix minimum length for IPv6 to import.
     prefix_export_maxlen6 : int
-        Prefix export maximum length for IPv6.
+        Prefix maximum length for IPv6 to export.
     prefix_export_minlen6 : int
-        Prefix export minimum length for IPv6.
+        Prefix minimum length for IPv6 to export.
     aspath_import_maxlen : int
         AS-PATH maximum length.
     aspath_import_minlen : int
@@ -125,11 +133,17 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
     route_policy_accept: BGPRoutePolicyAccept
     route_policy_import: BGPRoutePolicyImport
 
-    blackhole_maxlen4: int
-    blackhole_minlen4: int
+    blackhole_import_maxlen4: int
+    blackhole_import_minlen4: int
 
-    blackhole_maxlen6: int
-    blackhole_minlen6: int
+    blackhole_export_maxlen4: int
+    blackhole_export_minlen4: int
+
+    blackhole_import_maxlen6: int
+    blackhole_import_minlen6: int
+
+    blackhole_export_maxlen6: int
+    blackhole_export_minlen6: int
 
     prefix_import_maxlen4: int
     prefix_import_minlen4: int
@@ -162,11 +176,17 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
         self.route_policy_accept = BGPRoutePolicyAccept()
         self.route_policy_import = BGPRoutePolicyImport()
 
-        self.blackhole_maxlen4 = 32
-        self.blackhole_minlen4 = 24
+        self.blackhole_import_maxlen4 = 32
+        self.blackhole_import_minlen4 = 24
 
-        self.blackhole_maxlen6 = 128
-        self.blackhole_minlen6 = 64
+        self.blackhole_export_maxlen4 = 32
+        self.blackhole_export_minlen4 = 24
+
+        self.blackhole_import_maxlen6 = 128
+        self.blackhole_import_minlen6 = 64
+
+        self.blackhole_export_maxlen6 = 128
+        self.blackhole_export_minlen6 = 64
 
         self.prefix_import_maxlen4 = 24
         self.prefix_import_minlen4 = 8
