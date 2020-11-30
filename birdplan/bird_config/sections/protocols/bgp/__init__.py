@@ -110,18 +110,18 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self._configure_originated_routes()
 
         # BGP to master export filters
-        self._setup_bgp_to_master_export_filters()
+        self._setup_bgp_to_master_export_filter()
 
         # BGP to master import filters
-        self._setup_bgp_to_master_import_filters()
+        self._setup_bgp_to_master_import_filter()
 
         # Configure pipe from BGP to the master routing table
         bgp_master_pipe = ProtocolPipe(
             birdconfig_globals=self.birdconfig_globals,
             table_from="bgp",
             table_to="master",
-            export_filter_type=ProtocolPipeFilterType.VERSIONED,
-            import_filter_type=ProtocolPipeFilterType.VERSIONED,
+            export_filter_type=ProtocolPipeFilterType.UNVERSIONED,
+            import_filter_type=ProtocolPipeFilterType.UNVERSIONED,
         )
         self.conf.add(bgp_master_pipe)
 
@@ -142,14 +142,14 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             )
             self.conf.add(bgp_direct_protocol)
             # Add pipe
-            self._setup_bgp_to_direct_import_filters()
+            self._setup_bgp_to_direct_import_filter()
             bgp_direct_pipe = ProtocolPipe(
                 self.birdconfig_globals,
                 name="bgp",
                 table_from="bgp",
                 table_to="direct",
                 table_export="none",
-                import_filter_type=ProtocolPipeFilterType.VERSIONED,
+                import_filter_type=ProtocolPipeFilterType.UNVERSIONED,
             )
             self.conf.add(bgp_direct_pipe)
 
@@ -442,50 +442,49 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         )
         self.conf.add(originate_pipe)
 
-    def _bgp_to_master_export_filter(self, ipv: str) -> None:
-        """BGP to master filter."""
+    def _setup_bgp_to_master_export_filter(self) -> None:
+        """BGP main table to master export filters setup."""
 
         # Configure export filter to master
+        filter_name = "f_bgp_master_export"
         self.conf.add("# Export filter FROM BGP table TO master table")
-        self.conf.add(f"filter f_bgp{ipv}_master{ipv}_export {{")
+        self.conf.add(f"filter {filter_name}")
+        self.conf.add("string filter_name;")
+        self.conf.add("{")
+        self.conf.add(f'  filter_name = "{filter_name}";')
         # Check if we accept the default route, if not block it
         if not self.route_policy_accept.default:
             self.conf.add("  # Do not export default routes to the master")
-            self.conf.add(f"  if (net = DEFAULT_ROUTE_V{ipv}) then {{")
-            self.conf.add("    reject;")
-            self.conf.add("  }")
+            self.conf.add(f"  if {self.functions.is_default()} then reject;")
         # Accept BGP routes into the master routing table
         self.conf.add("  # Export BGP routes to the master table")
-        self.conf.add("  if (source = RTS_BGP) then {")
-        self.conf.add("    accept;")
-        self.conf.add("  }")
+        self.conf.add("  if (source = RTS_BGP) then accept;")
         # Accept BGP routes into the master routing table
         self.conf.add("  # Export originated routes to the master table")
-        self.conf.add(f'  if (proto = "bgp_originate{ipv}") then {{')
-        self.conf.add("    accept;")
-        self.conf.add("  }")
+        self.conf.add(f"  if {self.bgp_functions.is_originated()} then accept;")
         # Default to reject
         self.conf.add("  # Reject everything else;")
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
 
-    def _bgp_to_master_import_filter(self, ipv: str) -> None:
+    def _setup_bgp_to_master_import_filter(self) -> None:
+        """BGP main table to master import filters setup."""
         # Configure import filter to master
-        filter_name = f"f_bgp{ipv}_master{ipv}_import"
+        filter_name = "f_bgp_master_import"
         self.conf.add("# Import filter FROM master table TO BGP table")
         self.conf.add(f"filter {filter_name}")
         self.conf.add("string filter_name;")
         self.conf.add("{")
         self.conf.add(f'  filter_name = "{filter_name}";')
-        # Redistribute kernel routes
+        # BGP importation of kernel routes
         if self.route_policy_import.kernel:
             self.conf.add("  # Import kernel routes into BGP")
             self.conf.add("  if (source = RTS_INHERIT) then {")
             self.conf.add(f"    {self.bgp_functions.import_own(5)};")
             self.conf.add("    accept;")
             self.conf.add("  }")
-        # Redistribute kernel routes
+        # BGP importation of static routes
         if self.route_policy_import.static:
             self.conf.add("  # Import static routes into BGP")
             self.conf.add("  if (source = RTS_STATIC) then {")
@@ -497,10 +496,10 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add("};")
         self.conf.add("")
 
-    def _bgp_to_direct_import_filter(self, ipv: str) -> None:
-        # Configure import filter to direct
+    def _setup_bgp_to_direct_import_filter(self) -> None:
+        """BGP main table to direct import filters setup."""
 
-        filter_name = f"f_bgp{ipv}_direct{ipv}_import"
+        filter_name = "f_bgp_direct_import"
         self.conf.add("# Import filter FROM master table TO BGP table")
         self.conf.add(f"filter {filter_name}")
         self.conf.add("string filter_name;")
@@ -511,21 +510,6 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add("  accept;")
         self.conf.add("};")
         self.conf.add("")
-
-    def _setup_bgp_to_master_export_filters(self) -> None:
-        """BGP main table to master export filters setup."""
-        self._bgp_to_master_export_filter("4")
-        self._bgp_to_master_export_filter("6")
-
-    def _setup_bgp_to_master_import_filters(self) -> None:
-        """BGP main table to master import filters setup."""
-        self._bgp_to_master_import_filter("4")
-        self._bgp_to_master_import_filter("6")
-
-    def _setup_bgp_to_direct_import_filters(self) -> None:
-        """BGP main table to direct import filters setup."""
-        self._bgp_to_direct_import_filter("4")
-        self._bgp_to_direct_import_filter("6")
 
     # PROPERTIES
 
