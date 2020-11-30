@@ -63,6 +63,7 @@ bgp:
       error_wait_time: 2,5
       type: routecollector
 @TEMPLATE_ALLPEER_CONFIG@
+@TEMPLATE_EXTRA_CONFIG@
 
     r6:
       asn: 65005
@@ -76,6 +77,7 @@ bgp:
       error_wait_time: 2,5
       type: routeserver
 @TEMPLATE_ALLPEER_CONFIG@
+@TEMPLATE_EXTRA_CONFIG@
 
     r7:
       asn: 65000
@@ -128,6 +130,7 @@ bgp:
       error_wait_time: 2,5
       type: transit
 @TEMPLATE_ALLPEER_CONFIG@
+@TEMPLATE_EXTRA_CONFIG@
 
     e1:
       asn: @PEER_ASN@

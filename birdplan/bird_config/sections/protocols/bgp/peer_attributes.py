@@ -490,6 +490,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     _peeringdb: Optional[BGPPeerPeeringDB]
 
+    blackhole_community: Optional[Union[List[str], bool]]
+
     blackhole_import_maxlen4: Optional[int]
     blackhole_import_minlen4: Optional[int]
 
@@ -567,6 +569,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.filter_policy = BGPPeerFilterPolicy()
 
         self._peeringdb = None
+
+        self.blackhole_community = None
 
         self.blackhole_import_maxlen4 = None
         self.blackhole_import_minlen4 = None

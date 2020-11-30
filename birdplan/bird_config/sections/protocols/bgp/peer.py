@@ -20,7 +20,7 @@
 
 # pylint: disable=too-many-lines
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from .bgp_attributes import BGPAttributes
 from .bgp_functions import BGPFunctions
@@ -220,7 +220,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 )
             # Add incoming large communities
             for large_community in sorted(peer_config["incoming_large_communities"]):
-                self.large_communities.incoming.append(util.sanitize_large_community(large_community))
+                self.large_communities.incoming.append(util.sanitize_community(large_community))
         # Check if we are adding large communities to outgoing routes
         if "outgoing_large_communities" in peer_config:
             # Add outgoing large community configuration
@@ -256,11 +256,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     large_community_attr = getattr(self.large_communities.outgoing, large_community_type)
                     # Then append them...
                     for large_community in sorted(large_community_config):
-                        large_community_attr.append(util.sanitize_large_community(large_community))
+                        large_community_attr.append(util.sanitize_community(large_community))
             # If its just a number set the count
             else:
                 for large_community in sorted(peer_config["outgoing_large_communities"]):
-                    self.large_communities.outgoing.bgp.append(util.sanitize_large_community(large_community))
+                    self.large_communities.outgoing.bgp.append(util.sanitize_community(large_community))
 
         # Turn on passive mode for route reflectors and customers
         if self.peer_type in ("customer", "rrclient"):
@@ -459,6 +459,44 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Check if we're quarantined
         if "quarantine" in peer_config and peer_config["quarantine"]:
             self.quarantined = True
+
+        # Check if we have a blackhole community
+        if "blackhole_community" in peer_config:
+            if self.peer_type not in ("routeserver", "routecollector", "transit"):
+                raise BirdPlanError(
+                    f"Having 'blackhole_community' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            # List of communities to add...
+            communities = []
+            # Check if this is a plain string community
+            if isinstance(peer_config["blackhole_community"], str):
+                communities.append(peer_config["blackhole_community"])
+            # Check if this is a list of communities
+            elif isinstance(peer_config["blackhole_community"], list):
+                communities.extend(peer_config["blackhole_community"])
+            # Finally if this is not a boolean, then its unsupported
+            elif isinstance(peer_config["blackhole_community"], bool):
+                self.blackhole_community = peer_config["blackhole_community"]
+            else:
+                raise BirdPlanError(
+                    f"Option 'blackhole_community' specified for peer '{self.name}' with type '{self.peer_type}' "
+                    f"has an invalid type"
+                )
+            # If we have communities, this can be a list or a single item in the list
+            if communities:
+                # Initialize our configuration list
+                self.blackhole_community = []
+                # Loop with each community
+                for community in communities:
+                    # Check how many :'s we have
+                    component_count = community.count(":")
+                    if component_count < 1 or component_count > 2:
+                        raise BirdPlanError(
+                            f"Option 'blackhole_community' specified for peer '{self.name}' with type '{self.peer_type}' "
+                            f"has an invalid value '{community}'"
+                        )
+                    # Add to our configuration
+                    self.blackhole_community.append(util.sanitize_community(community))
 
         # Setup our limits
         for attr_name in (
@@ -717,14 +755,42 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("string filter_name;")
         self.conf.add("bool accept_route;")
         self.conf.add("bool bypass_bgp_redistribution_checks;")
+        self.conf.add("bool is_blackhole;")
         self.conf.add("bool exportable;")
         self.conf.add("{")
         self.conf.add(f'  filter_name = "{filter_name}";')
         self.conf.add("  accept_route = false;")
         self.conf.add("  bypass_bgp_redistribution_checks = false;")
+        self.conf.add("  is_blackhole = false;")
+        self.conf.add("")
 
         # Reject NOADVERTISE
         self.conf.add(f"  {self.bgp_functions.reject_noadvertise()};")
+
+        # Do not export blackhole routes to customers or peers
+        if self.peer_type in ("customer", "peer"):
+            self.conf.add(f"  {self.bgp_functions.reject_blackholes()};")
+
+        # Blackhole support for routeservers
+        if self.peer_type in ("routeserver", "routecollector"):
+            # If the peer accepts blackhole communites, check if we're going to be exporting this blackhole
+            if self.blackhole_community:
+                self.conf.add("  # Peer is blackhole community capable")
+                self.conf.add(f"  if {self.bgp_functions.allow_blackholes(True, self.asn, 65413)} then")
+                self.conf.add("    is_blackhole = true;")
+            else:
+                self.conf.add("  # Peer is not blackhole community capable")
+                self.conf.add(f"  {self.bgp_functions.allow_blackholes(False, self.asn, 65413)};")
+        # Blackhole support for transit
+        elif self.peer_type == "transit":
+            # If the peer accepts blackhole communites, check if we're going to be exporting this blackhole
+            if self.blackhole_community:
+                self.conf.add("  # Peer is blackhole community capable")
+                self.conf.add(f"  if {self.bgp_functions.allow_blackholes(True, self.asn, 65412)} then")
+                self.conf.add("    is_blackhole = true;")
+            else:
+                self.conf.add("  # Peer is not blackhole community capable")
+                self.conf.add(f"  {self.bgp_functions.allow_blackholes(False, self.asn, 65412)};")
 
         # Reject NOEXPORT
         if self.peer_type in ("customer", "peer", "routecollector", "routeserver", "transit"):
@@ -779,7 +845,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("  # BGP route type tests...")
         self.conf.add("  if (!bypass_bgp_redistribution_checks) then {")
         self.conf.add("    # Check if the route is exportable, we need this in the redistribution checks below")
-        self.conf.add(f"    exportable = {self._bgp_export_ok()};")
+        self.conf.add("     if !is_blackhole then {")
+        self.conf.add(f"       exportable = {self._bgp_export_ok()};")
+        self.conf.add("     } else {")
+        self.conf.add(f"       exportable = {self._bgp_export_blackhole_ok()};")
+        self.conf.add("     }")
 
         # Check redistribution for internal BGP route types
         if self.route_policy_redistribute.bgp:
@@ -881,6 +951,21 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # If we have graceful_shutdown set, add the community
         if self.graceful_shutdown:
             self.conf.add(f"    {self.bgp_functions.graceful_shutdown()};")
+        # Check if we need to do any blackhole manipulation
+        if self.blackhole_community and isinstance(self.blackhole_community, list):
+            self.conf.add("    # If this is a blackhole route, then add the communities")
+            self.conf.add("    if is_blackhole then {")
+            self.conf.add("      bgp_community.delete([BGP_COMMUNITY_BLACKHOLE]);")
+            # Loop with the communities we have to add
+            for community in self.blackhole_community:
+                # Get community component count so we can see if its a normal or large community
+                component_count = community.count(",")
+                if component_count == 1:
+                    self.conf.add(f"      {self.bgp_functions.community_add_blackhole(BirdVariable(community))};")
+                elif component_count == 2:
+                    self.conf.add(f"      {self.bgp_functions.lc_add_blackhole(BirdVariable(community))};")
+            self.conf.add("    }")
+
         # Finally accept
         self.conf.add("    # Finally accept")
         self.conf.add(f'    print "[{filter_name}] Accepting ", net, " to peer";', debug=True)
@@ -953,7 +1038,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  {self._bgp_filter_community_lengths()};")
         # Peers
         elif self.peer_type == "peer":
-            self.conf.add(f"  {self.bgp_functions.strip_communities_all()};")
+            self.conf.add(f"  {self.bgp_functions.communities_strip_all()};")
             self.conf.add(f"  {self.bgp_functions.import_peer(self.asn, self.cost)};")
             self.conf.add(f"  {self.bgp_functions.filter_default()};")
             self.conf.add(f"  {self.bgp_functions.filter_bogons()};")
@@ -967,11 +1052,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  {self._bgp_filter_community_lengths()};")
         # Routecollector
         elif self.peer_type == "routecollector":
-            self.conf.add(f"  {self.bgp_functions.strip_communities_all()};")
+            self.conf.add(f"  {self.bgp_functions.communities_strip_all()};")
             self.conf.add(f"  {self.bgp_functions.import_routecollector()};")
         # Routeserver
         elif self.peer_type == "routeserver":
-            self.conf.add(f"  {self.bgp_functions.strip_communities_all()};")
+            self.conf.add(f"  {self.bgp_functions.communities_strip_all()};")
             self.conf.add(f"  {self.bgp_functions.import_routeserver(self.asn, self.cost)};")
             self.conf.add(f"  {self.bgp_functions.filter_default()};")
             self.conf.add(f"  {self.bgp_functions.filter_bogons()};")
@@ -995,7 +1080,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.conf.add(f"  {self.bgp_functions.filter_blackhole()};")
         # Transit providers
         elif self.peer_type == "transit":
-            self.conf.add(f"  {self.bgp_functions.strip_communities_all()};")
+            self.conf.add(f"  {self.bgp_functions.communities_strip_all()};")
             self.conf.add(f"  {self.bgp_functions.import_transit(self.asn, self.cost)};")
             if self.route_policy_accept.default:
                 self.conf.add("  # Bypass bogon and size filters for the default route")
@@ -1189,6 +1274,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         """Generate the BGP can export function with relevant arguments to see if we can export a prefix."""
         return self.bgp_functions.export_ok(
             self.asn, self.prefix_export_maxlen4, self.prefix_export_minlen4, self.prefix_export_maxlen6, self.prefix_export_minlen6
+        )
+
+    def _bgp_export_blackhole_ok(self) -> str:
+        """Generate the BGP can export function with relevant arguments to see if we can export a blackhole prefix."""
+        return self.bgp_functions.export_blackhole_ok(
+            self.asn,
+            self.blackhole_export_maxlen4,
+            self.blackhole_export_minlen4,
+            self.blackhole_export_maxlen6,
+            self.blackhole_export_minlen6,
         )
 
     def _bgp_filter_prefix_size(self) -> str:
@@ -1452,6 +1547,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def peeringdb(self) -> BGPPeerPeeringDB:
         """Return our peeringdb entry."""
         return self.peer_attributes.peeringdb
+
+    @property
+    def blackhole_community(self) -> Optional[Union[bool, List[str]]]:
+        """Return the current value of blackhole_community."""
+        return self.peer_attributes.blackhole_community
+
+    @blackhole_community.setter
+    def blackhole_community(self, blackhole_community: Union[List[str], bool]) -> None:
+        """Set the blackhole community."""
+        self.peer_attributes.blackhole_community = blackhole_community
 
     # IPV4 BLACKHOLE IMPORT PREFIX LENGTHS
 

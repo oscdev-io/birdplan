@@ -750,6 +750,7 @@ class BirdPlan:
                 "outgoing_large_communities",
                 "cost",
                 "graceful_shutdown",
+                "blackhole_community",
                 "blackhole_import_maxlen4",
                 "blackhole_import_minlen4",
                 "blackhole_export_maxlen4",
