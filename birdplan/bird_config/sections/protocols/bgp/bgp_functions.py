@@ -30,6 +30,17 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
     _section: str = "BGP Functions"
 
+    @bird_function("bgp_is_originated")
+    def is_originated(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_is_originated function."""
+
+        return """\
+            # Check if this is an originated route
+            function bgp_is_originated(string filter_name) {
+                if (proto = "bgp_originate4" || proto = "bgp_originate6") then return true;
+                return false;
+            }"""
+
     @bird_function("bgp_graceful_shutdown")
     def graceful_shutdown(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_graceful_shutdown function."""
@@ -74,23 +85,23 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
     def import_own(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_import_own function."""
 
-        return """\
+        return f"""\
             # Import own routes
-            function bgp_import_own(string filter_name; int local_pref_cost) {
+            function bgp_import_own(string filter_name; int local_pref_cost) {{
                 if DEBUG then print filter_name,
                     " [bgp_import_own] Adding BGP_LC_RELATION_OWN to ", net, " with local pref ",
                     BGP_PREF_OWN - local_pref_cost;
                 # Tag route as a our own (originated and static) route
                 bgp_large_community.add(BGP_LC_RELATION_OWN);
                 # Add our internal blackhole action to originated routes
-                if ((proto = "bgp_originate4" || proto = "bgp_originate6") && dest = RTD_BLACKHOLE) then {
+                if ({self.is_originated()} && dest = RTD_BLACKHOLE) then {{
                     if DEBUG then print filter_name,
                         " [bgp_import_own] Adding BGP_LC_ACTION_BLACKHOLE_ORIGINATE to ", net;
                     bgp_large_community.add(BGP_LC_ACTION_BLACKHOLE_ORIGINATE);
-                }
+                }}
                 # Set local preference
                 bgp_local_pref = BGP_PREF_OWN - local_pref_cost;
-            }"""
+            }}"""
 
     @bird_function("bgp_import_routecollector")
     def import_routecollector(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -754,25 +765,25 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
     def redistribute_originated(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_redistribute_originated function."""
 
-        return """\
+        return f"""\
             # Check for redistribution of originated routes for BGP
             # - Reject routes that are not redistributable
             # - Return true when routes are redistributable
             # - Return false otherwise
-            function bgp_redistribute_originated(string filter_name; bool redistribute) {
+            function bgp_redistribute_originated(string filter_name; bool redistribute) {{
                 # Check for originated routes
-                if (proto != "bgp_originate4" && proto != "bgp_originate6") then return false;
-                if (redistribute) then {
+                if !{self.is_originated()} then return false;
+                if (redistribute) then {{
                     if DEBUG then print filter_name,
                         " [bgp_redistribute_originated] Accepting ", net, " due to originated route match ",
                         " (redistribute originated)";
                     return true;
-                }
+                }}
                 if DEBUG then print filter_name,
                     " [bgp_redistribute_originated] Rejecting ", net, " due to originated route match ",
                     " (no redistribute originated)";
                 reject;
-            }"""
+            }}"""
 
     @bird_function("bgp_redistribute_default")
     def redistribute_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -1094,7 +1105,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         return f"""\
             # BGP originated route large community adding
             function bgp_lc_add_originated(string filter_name; lc large_community) {{
-                if ((proto != "bgp_originate4" && proto != "bgp_originate6") || {self.functions.is_default()}) then return false;
+                if (!{self.is_originated()} || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_originate] Adding large community ", large_community, " for type ORIGINATED to ", net;
                 bgp_large_community.add(large_community);
@@ -1254,7 +1265,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             function bgp_prepend_originated(string filter_name; int peer_asn; int prepend_count) {{
-                if ((proto != "bgp_originate4" && proto != "bgp_originate6") || {self.functions.is_default()}) then return false;
+                if (!{self.is_originated()} || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_originate] Prepending AS-PATH for type ORIGINATED ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
