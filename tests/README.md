@@ -40,6 +40,8 @@
 
 [Basic](t40_bgp/t10_basic/README.md)
 
+[Import Connected](t40_bgp/t20_import_connected/README.md)
+
 [Redistribute Connected](t40_bgp/t30_redistribute_connected/README.md)
 
 [Redistribute Kernel](t40_bgp/t34_redistribute_kernel/README.md)

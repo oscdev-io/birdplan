@@ -4,8 +4,7 @@ debug: True
 
 bgp:
   asn: @ASN@
-  import:
-    connected: True
+@TEMPLATE_GLOBAL_CONFIG@
 @GLOBAL_CONFIG@
   peers:
     r2:
