@@ -269,12 +269,16 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,
         Redistribute connected routes to the peer BGP table. Defaults to `False`.
     default : bool
         Redistribute the default route to the peer BGP table. Defaults to `False`.
-    originated : bool
-        Redistribute originated routes to the peer BGP table. Defaults to `False`.
     kernel : bool
         Redistribute kernel routes to the peer BGP table. Defaults to `False`.
+    kernel_blackhole : bool
+        Redistribute kernel blackhole routes to the peer BGP table. Defaults to `False`.
+    originated : bool
+        Redistribute originated routes to the peer BGP table. Defaults to `False`.
     static : bool
         Redistribute static routes to the peer BGP table. Defaults to `False`.
+    static_blackhole : bool
+        Redistribute static blackhole routes to the peer BGP table. Defaults to `False`.
     bgp: bool
         Redistribute all BGP routes to the peer BGP table. Defaults to `False`.
     bgp_own: bool
@@ -291,8 +295,10 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,
     connected: bool
     default: bool
     kernel: bool
+    kernel_blackhole: bool
     originated: bool
     static: bool
+    static_blackhole: bool
     bgp: bool
     bgp_own: bool
     bgp_customer: bool
@@ -304,8 +310,10 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,
         self.connected = False
         self.default = False
         self.kernel = False
+        self.kernel_blackhole = False
         self.originated = False
         self.static = False
+        self.static_blackhole = False
         self.bgp = False
         self.bgp_own = False
         self.bgp_customer = False

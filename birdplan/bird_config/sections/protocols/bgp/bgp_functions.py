@@ -723,12 +723,13 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return """\
             # Check for redistribution of static routes for BGP
+            # - Exclude blackhole routes
             # - Reject routes that are not redistributable
             # - Return true when routes are redistributable
             # - Return false otherwise
             function bgp_redistribute_static(string filter_name; bool redistribute) {
-                # Check for static routes
                 if (proto != "static4" && proto != "static6") then return false;
+                if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then return false;
                 if (redistribute) then {
                     if DEBUG then print filter_name,
                         " [bgp_redistribute_static] Accepting ", net, " due to static route match (redistribute static)";
@@ -739,18 +740,44 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }"""
 
+    @bird_function("bgp_redistribute_static_blackhole")
+    def redistribute_static_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_redistribute_static_blackhole function."""
+
+        return """\
+            # Check for redistribution of static blackhole routes for BGP
+            # - Only blackhole routes
+            # - Reject routes that are not redistributable
+            # - Return true when routes are redistributable
+            # - Return false otherwise
+            function bgp_redistribute_static_blackhole(string filter_name; bool redistribute) {
+                if (proto != "static4" && proto != "static6") then return false;
+                if (BGP_COMMUNITY_BLACKHOLE !~ bgp_community) then return false;
+                if (redistribute) then {
+                    if DEBUG then print filter_name,
+                        " [bgp_redistribute_static_blackhole] Accepting ", net,
+                        " due to static blackhole route match (redistribute static)";
+                    return true;
+                }
+                if DEBUG then print filter_name,
+                    " [bgp_redistribute_static_blackhole] Rejecting ", net,
+                    " due to static blackhole route match (no redistribute static)";
+                reject;
+            }"""
+
     @bird_function("bgp_redistribute_kernel")
     def redistribute_kernel(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_redistribute_kernel function."""
 
         return """\
             # Check for redistribution of kernel routes for BGP
+            # - Exclude blackhole routes
             # - Reject routes that are not redistributable
             # - Return true when routes are redistributable
             # - Return false otherwise
             function bgp_redistribute_kernel(string filter_name; bool redistribute) {
-                # Check for kernel routes
                 if (source != RTS_INHERIT) then return false;
+                if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then return false;
                 if (redistribute) then {
                     if DEBUG then print filter_name,
                         " [bgp_redistribute_kernel] Accepting ", net, " due to kernel route match (redistribute kernel)";
@@ -758,6 +785,31 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 }
                 if DEBUG then print filter_name,
                     " [bgp_redistribute_kernel] Rejecting ", net, " due to kernel route match (no redistribute kernel)";
+                reject;
+            }"""
+
+    @bird_function("bgp_redistribute_kernel_blackhole")
+    def redistribute_kernel_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_redistribute_kernel_blackhole function."""
+
+        return """\
+            # Check for redistribution of kernel routes for BGP
+            # - Only blackhole routes
+            # - Reject routes that are not redistributable
+            # - Return true when routes are redistributable
+            # - Return false otherwise
+            function bgp_redistribute_kernel_blackhole(string filter_name; bool redistribute) {
+                if (source != RTS_INHERIT) then return false;
+                if (BGP_COMMUNITY_BLACKHOLE !~ bgp_community) then return false;
+                if (redistribute) then {
+                    if DEBUG then print filter_name,
+                        " [bgp_redistribute_kernel_blackhole] Accepting ", net,
+                        " due to kernel blackhole route match (redistribute kernel)";
+                    return true;
+                }
+                if DEBUG then print filter_name,
+                    " [bgp_redistribute_kernel_blackhole] Rejecting ", net,
+                    " due to kernel blackhole route match (no redistribute kernel)";
                 reject;
             }"""
 

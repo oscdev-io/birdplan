@@ -49,6 +49,10 @@ class TemplateBase(BirdPlanBaseTestCase):
         sim.node("r1").run_ip(["route", "add", "100.103.0.0/24", "dev", "eth1"])
         sim.node("r1").run_ip(["route", "add", "fc00:103::/48", "dev", "eth1"])
 
+        # Add link kernel blackhole routes
+        sim.node("r1").run_ip(["route", "add", "blackhole", "100.104.0.0/24"])
+        sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:104::/48"])
+
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)

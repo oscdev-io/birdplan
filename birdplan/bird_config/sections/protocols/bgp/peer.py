@@ -287,8 +287,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 if redistribute_type not in (
                     "default",
                     "connected",
-                    "static",
                     "kernel",
+                    "kernel_blackhole",
+                    "static",
+                    "static_blackhole",
                     "originated",
                     "bgp",
                     "bgp_own",
@@ -816,16 +818,26 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  if {self.bgp_functions.redistribute_connected(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.redistribute_connected(False)};")
-        # Check for static route redistribution
-        if self.route_policy_redistribute.static:
-            self.conf.add(f"  if {self.bgp_functions.redistribute_static(True)} then accept_route = true;")
-        else:
-            self.conf.add(f"  {self.bgp_functions.redistribute_static(False)};")
         # Check for kernel route redistribution
         if self.route_policy_redistribute.kernel:
             self.conf.add(f"  if {self.bgp_functions.redistribute_kernel(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.redistribute_kernel(False)};")
+        # Check for kernel blackhole route redistribution
+        if self.route_policy_redistribute.kernel_blackhole:
+            self.conf.add(f"  if {self.bgp_functions.redistribute_kernel_blackhole(True)} then accept_route = true;")
+        else:
+            self.conf.add(f"  {self.bgp_functions.redistribute_kernel_blackhole(False)};")
+        # Check for static route redistribution
+        if self.route_policy_redistribute.static:
+            self.conf.add(f"  if {self.bgp_functions.redistribute_static(True)} then accept_route = true;")
+        else:
+            self.conf.add(f"  {self.bgp_functions.redistribute_static(False)};")
+        # Check for static blackhole route redistribution
+        if self.route_policy_redistribute.static_blackhole:
+            self.conf.add(f"  if {self.bgp_functions.redistribute_static_blackhole(True)} then accept_route = true;")
+        else:
+            self.conf.add(f"  {self.bgp_functions.redistribute_static_blackhole(False)};")
         # Check for originated route redistribution
         if self.route_policy_redistribute.originated:
             self.conf.add(f"  if {self.bgp_functions.redistribute_originated(True)} then accept_route = true;")

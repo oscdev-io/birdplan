@@ -6,6 +6,7 @@ bgp:
   asn: @ASN@
   import:
     kernel: True
+    kernel_blackhole: True
 @GLOBAL_CONFIG@
   peers:
     r2:

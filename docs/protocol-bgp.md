@@ -183,11 +183,15 @@ bgp:
 The `import` key contains a dictionary of the routes to import into the main BGP table.
 
 * `connected` routes are kernel device routes for the interfaces listed. A list of interfaces must be provided. This can be a pattern
-like `eth*`.
+like `eth*`. Connected routes are not imported by default..
 
-* `kernel` routes are those statically added to the kernel.
+* `kernel` routes are those statically added to the kernel, excluding blackhole routes. The default for this option is `false`.
 
-* `static` routes are those setup in the static protocol.
+* `kernel_blackhole` routes are those statically added to the kernel which are blackhole routes. This option is independant of the `kernel` option above and will only import blackhole routes. The default for this option is `false`.
+
+* `static` routes are those setup in the static protocol, excluding blackhole routes. The default for this option is `false`.
+
+* `static_blackhole` routes are those setup in the static protocol which are blackhole routes. This option is independant of the `static` option above and will only import blackhole routes. The default for this option is `false`.
 
 
 One can specify the ASN as per below...
@@ -1378,8 +1382,10 @@ Types of routes to redistribute to the peer, valid options are detailed below...
 * `default` will redistribute the default route, the type of route also needs to be redistributed. eg. `static`. Defaults to `False` except
 for peer type `rrserver-rrserver` which defaults to `True`.
 * `connected` will redistribute connected routes. Defaults to `False`.
-* `static` will redistribute static routes in our global static configuration. Defaults to `False`.
 * `kernel` will redistribute kernel routes. Defaults to `False`.
+* `kernel_blackhole` will redistribute kernel blackhole routes. Defaults to `False`.
+* `static` will redistribute static routes in our global static configuration. Defaults to `False`.
+* `static_blackhole` will redistribute static blackhole routes in our global static configuration. Defaults to `False`.
 * `originated` will redistribute originated routes. Defaults to `False`.
 
 Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)

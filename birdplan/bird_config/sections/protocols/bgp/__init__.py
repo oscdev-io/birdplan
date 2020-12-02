@@ -480,15 +480,33 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # BGP importation of kernel routes
         if self.route_policy_import.kernel:
             self.conf.add("  # Import kernel routes into BGP")
-            self.conf.add("  if (source = RTS_INHERIT) then {")
+            self.conf.add("  if (source = RTS_INHERIT && dest != RTD_BLACKHOLE) then {")
             self.conf.add(f"    {self.bgp_functions.import_own(5)};")
+            self.conf.add("    accept;")
+            self.conf.add("  }")
+        # BGP importation of kernel blackhole routes
+        if self.route_policy_import.kernel_blackhole:
+            self.conf.add("  # Import kernel blackhole routes into BGP")
+            self.conf.add("  if (source = RTS_INHERIT && dest = RTD_BLACKHOLE) then {")
+            self.conf.add(f"    {self.bgp_functions.import_own(5)};")
+            self.conf.add("    bgp_community.add(BGP_COMMUNITY_BLACKHOLE);")
+            self.conf.add("    bgp_community.add(BGP_COMMUNITY_NOEXPORT);")
             self.conf.add("    accept;")
             self.conf.add("  }")
         # BGP importation of static routes
         if self.route_policy_import.static:
             self.conf.add("  # Import static routes into BGP")
-            self.conf.add("  if (source = RTS_STATIC) then {")
+            self.conf.add("  if (source = RTS_STATIC && dest != RTD_BLACKHOLE) then {")
             self.conf.add(f"    {self.bgp_functions.import_own(10)};")
+            self.conf.add("    accept;")
+            self.conf.add("  }")
+        # BGP importation of static blackhole routes
+        if self.route_policy_import.static_blackhole:
+            self.conf.add("  # Import static blackhole routes into BGP")
+            self.conf.add("  if (source = RTS_STATIC && dest = RTD_BLACKHOLE) then {")
+            self.conf.add(f"    {self.bgp_functions.import_own(10)};")
+            self.conf.add("    bgp_community.add(BGP_COMMUNITY_BLACKHOLE);")
+            self.conf.add("    bgp_community.add(BGP_COMMUNITY_NOEXPORT);")
             self.conf.add("    accept;")
             self.conf.add("  }")
         # Else accept
