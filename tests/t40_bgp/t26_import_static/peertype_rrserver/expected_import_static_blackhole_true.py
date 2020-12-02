@@ -58,7 +58,11 @@ r2_t_bgp6_AS65000_r1_peer = {}
 r1_t_bgp4 = {
     "100.104.0.0/24": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "attributes": {
+                "BGP.community": [(65535, 666), (65535, 65281)],
+                "BGP.large_community": [(65000, 3, 1)],
+                "BGP.local_pref": 940,
+            },
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "static4",
@@ -72,7 +76,11 @@ r2_t_bgp4 = {}
 r1_t_bgp6 = {
     "fc00:104::/48": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "attributes": {
+                "BGP.community": [(65535, 666), (65535, 65281)],
+                "BGP.large_community": [(65000, 3, 1)],
+                "BGP.local_pref": 940,
+            },
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "static6",
