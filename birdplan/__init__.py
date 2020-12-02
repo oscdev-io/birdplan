@@ -615,9 +615,9 @@ class BirdPlan:
 
         # Loop with accept items
         for accept, accept_config in self.config["bgp"]["accept"].items():
-            # Allow accept of the default route
-            if accept == "default":
-                self.birdconf.protocols.bgp.route_policy_accept.default = accept_config
+            # Check if we need to accept some kinds of routes
+            if accept in ("default", "blackhole"):
+                setattr(self.birdconf.protocols.bgp.route_policy_accept, accept, accept_config)
             # If we don't understand this 'accept' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in bgp:accept")

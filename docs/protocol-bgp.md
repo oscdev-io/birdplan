@@ -11,6 +11,7 @@ Remember to set the `router_id`, see [Configuration](configuration.md).
 The `accept` key contains a dictionary of routes we will accept into the master table from our BGP table. Namely...
 
 * `default` - Allows us to accept a default route from BGP. The default is `False`.
+* `blackhole` - Allows us to accept a blackhole route from BGP. The default is `True`.
 
 Below is a configuration example...
 ```yaml
@@ -477,7 +478,7 @@ bgp:
 ...
 ```
 
-# blackhole_community
+## blackhole_community
 
 Set the peers blackhole community. When this option is specified blackhole routes with the large community action
 `(OWN_ASN, 666, XXX)` will result in the blackhole route being propagated to the specified peer(s).
@@ -526,7 +527,7 @@ bgp:
 ```
 
 
-# blackhole_import_maxlen4
+## blackhole_import_maxlen4
 
 Maximum IPv4 blackhole length to import without filtering. Defaults to global setting.
 
@@ -543,7 +544,7 @@ bgp:
 ```
 
 
-# blackhole_import_minlen4
+## blackhole_import_minlen4
 
 Minimum IPv4 blackhole length to import without filtering. Defaults to global setting.
 
@@ -560,7 +561,7 @@ bgp:
 ...
 ```
 
-# blackhole_export_maxlen4
+## blackhole_export_maxlen4
 
 Maximum IPv4 blackhole length to export. Defaults to global setting.
 
@@ -577,7 +578,7 @@ bgp:
 ```
 
 
-# blackhole_export_minlen4
+## blackhole_export_minlen4
 
 Minimum IPv4 blackhole length to export. Defaults to global setting.
 
@@ -595,7 +596,7 @@ bgp:
 ```
 
 
-# blackhole_import_maxlen6
+## blackhole_import_maxlen6
 
 Maximum IPv6 blackhole length to import without filtering. Defaults to global setting.
 
@@ -612,7 +613,7 @@ bgp:
 ```
 
 
-# blackhole_import_minlen6
+## blackhole_import_minlen6
 
 Minimum IPv6 blackhole length to import without filtering. Defaults to global setting.
 
@@ -630,7 +631,7 @@ bgp:
 ```
 
 
-# blackhole_export_maxlen6
+## blackhole_export_maxlen6
 
 Maximum IPv6 blackhole length to export. Defaults to global setting.
 
@@ -647,7 +648,7 @@ bgp:
 ```
 
 
-# blackhole_export_minlen6
+## blackhole_export_minlen6
 
 Minimum IPv6 blackhole length to export. Defaults to global setting.
 

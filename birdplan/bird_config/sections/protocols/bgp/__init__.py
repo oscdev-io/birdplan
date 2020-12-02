@@ -454,12 +454,22 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add(f'  filter_name = "{filter_name}";')
         # Check if we accept the default route, if not block it
         if not self.route_policy_accept.default:
-            self.conf.add("  # Do not export default routes to the master")
-            self.conf.add(f"  if {self.functions.is_default()} then reject;")
+            self.conf.add("  # Do not export default routes to the master table")
+            self.conf.add(f"  if {self.functions.is_default()} then {{")
+            self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " to master table (not accepting default routes)";')
+            self.conf.add("    reject;")
+            self.conf.add("  }")
+        # Check if we accept blackhole routes, if not block it
+        if not self.route_policy_accept.blackhole:
+            self.conf.add("  # Do not export blackhole routes to the master table")
+            self.conf.add(f"  if {self.bgp_functions.is_blackhole()} then {{")
+            self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " to master table (not accepting blackhole routes)";')
+            self.conf.add("    reject;")
+            self.conf.add("  }")
         # Accept BGP routes into the master routing table
         self.conf.add("  # Export BGP routes to the master table")
         self.conf.add("  if (source = RTS_BGP) then accept;")
-        # Accept BGP routes into the master routing table
+        # Accept BGP originated routes into the master routing table
         self.conf.add("  # Export originated routes to the master table")
         self.conf.add(f"  if {self.bgp_functions.is_originated()} then accept;")
         # Default to reject
