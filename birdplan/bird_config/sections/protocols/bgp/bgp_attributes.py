@@ -31,17 +31,20 @@ class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
         Accept default route. Defaults to `False`.
     blackhole : bool
         Accept blackhole routes. Defaults to `True`.
+    originated : bool
+        Accept originated routes. Defaults to `True`.
 
     """
 
     default: bool
     blackhole: bool
+    originated: bool
 
     def __init__(self) -> None:
         """Initialize object."""
         self.default = False
         self.blackhole = True
-
+        self.originated = True
 
 class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
     """

@@ -470,8 +470,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add("  # Export BGP routes to the master table")
         self.conf.add("  if (source = RTS_BGP) then accept;")
         # Accept BGP originated routes into the master routing table
-        self.conf.add("  # Export originated routes to the master table")
-        self.conf.add(f"  if {self.bgp_functions.is_originated()} then accept;")
+        if self.route_policy_accept.originated:
+            self.conf.add("  # Accept originated routes into the master table")
+            self.conf.add(f"  if {self.bgp_functions.is_originated()} then accept;")
         # Default to reject
         self.conf.add("  # Reject everything else;")
         self.conf.add("  reject;")
