@@ -46,6 +46,7 @@ class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
         self.blackhole = True
         self.originated = True
 
+
 class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
     """
     BGP route policy for importing of routes internally.
