@@ -228,6 +228,13 @@ bgp:
     - 'fc00:101::/48 blackhole'
 ```
 
+Attributes can also be added to originated routes for instance...
+```yaml
+bird:
+  originate:
+    - '100.101.0.0/24 blackhole { bgp_large_community.add(65000, 111, 222) }'
+```
+
 
 # prefix_import_maxlen4
 

@@ -16,3 +16,11 @@ bird:
     - '10.0.1.0/24 via 192.168.0.4'
     - '10.0.2.0/24 via 192.168.0.5'
 ```
+
+Attributes can also be added to static routes for instance...
+```yaml
+bird:
+  router_id: 0.0.0.2
+  static:
+    - '10.0.2.0/24 blackhole { bgp_large_community.add(65000, 666, 65412) }'
+```
