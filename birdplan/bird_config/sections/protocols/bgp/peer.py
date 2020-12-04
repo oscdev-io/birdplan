@@ -411,14 +411,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.peer_type not in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
             if self.route_policy_accept.blackhole:
                 raise BirdPlanError(
-                    f"Having 'accept:blackhole' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                    f"Having 'accept:blackhole' set to True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
 
         # Check if this is a customer with blackholing and without a prefix filter set
         if self.peer_type == "customer":
             if self.route_policy_accept.blackhole and not self.filter_policy.prefixes:
                 raise BirdPlanError(
-                    f"Having 'accept:blackhole' set for peer '{self.name}' with type '{self.peer_type}' and without "
+                    f"Having 'accept:blackhole' set to True for peer '{self.name}' with type '{self.peer_type}' and without "
                     "'filter:prefixes' set makes no sense"
                 )
 

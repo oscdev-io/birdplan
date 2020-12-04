@@ -825,7 +825,7 @@ class BirdPlan:
                 peer["accept"] = {}
                 # Loop with acceptance items
                 for accept, accept_config in config_value.items():
-                    if accept in ["default"]:
+                    if accept in ["blackhole", "default"]:
                         peer["accept"][accept] = accept_config
                     # If we don't understand this 'accept' entry, throw an error
                     else:
