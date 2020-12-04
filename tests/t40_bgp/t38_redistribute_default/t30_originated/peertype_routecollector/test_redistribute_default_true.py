@@ -29,7 +29,7 @@ class Test(PeerTypeConfig, Template):
     """BGP test case for redistribution of static default routes, with redistribute:default set to true."""
 
     routers_config_exception = {
-        "r1": r"Having 'redistribute:default' set for peer 'r2' with type 'routecollector' makes no sense",
+        "r1": r"Having 'redistribute:default' set to True for peer 'r2' with type 'routecollector' makes no sense",
         "r2": r"Having 'accept:default' set to True for peer 'r1' with type 'routecollector' makes no sense",
     }
 

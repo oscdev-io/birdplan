@@ -305,19 +305,21 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Check things we are not supposed to be redistributing to external peers
             if self.route_policy_redistribute.default:
                 raise BirdPlanError(
-                    f"Having 'redistribute:default' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                    f"Having 'redistribute:default' set to True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
             if self.route_policy_redistribute.bgp:
                 raise BirdPlanError(
-                    f"Having 'redistribute:bgp' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                    f"Having 'redistribute:bgp' set to True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
             if self.route_policy_redistribute.bgp_peering:
                 raise BirdPlanError(
-                    f"Having 'redistribute:bgp_peering' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                    f"Having 'redistribute:bgp_peering' set to True for peer '{self.name}' "
+                    f"with type '{self.peer_type}' makes no sense"
                 )
             if self.route_policy_redistribute.bgp_transit:
                 raise BirdPlanError(
-                    f"Having 'redistribute:bgp_transit' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                    f"Having 'redistribute:bgp_transit' set to True for peer '{self.name}' "
+                    f"with type '{self.peer_type}' makes no sense"
                 )
 
         # Check that we have static routes imported first
