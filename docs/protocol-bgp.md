@@ -1397,6 +1397,11 @@ Internal redistribution options and how they are used... (do not use unless you 
 * `bgp_peering` will redistribute peering session routes based on an internal large community `OWN_ASN:3:3`. Automatically set to `True` for peer types of `customer`.
 * `bgp_transit` will redistribute transit routes based on an internal large community `OWN_ASN:3:4`. Automatically set to `True` for peer types of `customer`.
 
+NB: Peers using peer type `rrserver-rrserver` will by default redistribute default routes should they be received via BGP, but will not by default
+redistribute default routes if received via `kernel`, `static` or `originated` sources. For these sources to be redistributed you need to configure
+`redistribute:default` as `True`.
+
+
 An example of using redistribute can be found below...
 ```yaml
 ...

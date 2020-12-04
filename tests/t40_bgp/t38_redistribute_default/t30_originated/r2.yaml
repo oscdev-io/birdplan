@@ -4,6 +4,8 @@ debug: True
 
 bgp:
   asn: @ASN@
+  accept:
+    default: True
 @GLOBAL_CONFIG@
 @TEMPLATE_GLOBAL_CONFIG@
   peers:
@@ -18,5 +20,7 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
+      accept:
+        default: True
 @PEER_CONFIG@
 @TEMPLATE_PEER_CONFIG@

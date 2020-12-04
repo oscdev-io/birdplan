@@ -22,7 +22,7 @@
 """BGP test case for redistribution of kernel default routes, with default settings for redistribute:default."""
 
 from ..template_redistribute_default import Template
-from ....config.peertype_customer.r1r2 import PeerTypeConfig
+from ....config.peertype_customer.transit.r1r2 import PeerTypeConfig
 
 
 class Test(PeerTypeConfig, Template):

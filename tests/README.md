@@ -46,6 +46,10 @@
 
 [Import Static](t40_bgp/t26_import_static/README.md)
 
+[Accept Originated](t40_bgp/t28_accept_originated/README.md)
+
+[Accept Default](t40_bgp/t29_accept_default/README.md)
+
 [Redistribute Connected](t40_bgp/t30_redistribute_connected/README.md)
 
 [Redistribute Kernel](t40_bgp/t34_redistribute_kernel/README.md)
