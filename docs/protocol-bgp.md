@@ -12,6 +12,7 @@ The `accept` key contains a dictionary of routes we will accept into the master 
 
 * `default` - Allows us to accept a default route from BGP. The default is `False`.
 * `blackhole` - Allows us to accept a blackhole route from BGP. The default is `True`.
+* `originated` - Allows us to accept originated routes from the BGP table. The default is `True`.
 
 Below is a configuration example...
 ```yaml
