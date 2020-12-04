@@ -42,13 +42,13 @@
 
 [Import Connected](t40_bgp/t20_import_connected/README.md)
 
-[Import Kernel](t40_bgp/t24_import_kernel/README.md)
+[Import Kernel](t40_bgp/t22_import_kernel/README.md)
 
-[Import Static](t40_bgp/t26_import_static/README.md)
+[Import Static](t40_bgp/t24_import_static/README.md)
 
-[Accept Originated](t40_bgp/t28_accept_originated/README.md)
+[Accept Originated](t40_bgp/t26_accept_originated/README.md)
 
-[Accept Default](t40_bgp/t29_accept_default/README.md)
+[Accept Default](t40_bgp/t28_accept_default/README.md)
 
 [Redistribute Connected](t40_bgp/t30_redistribute_connected/README.md)
 
