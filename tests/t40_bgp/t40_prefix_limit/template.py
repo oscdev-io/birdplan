@@ -42,33 +42,31 @@ class Template(BirdPlanBaseTestCase):
     def test_announce_routes(self, sim):
         """Announce a prefix from ExaBGP to BIRD."""
 
+        # Add large communities for peer types that require them
+        large_communities = ""
+        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            large_communities = "65000:3:1"
+
         self._exabgpcli(
             sim,
             "e1",
-            ["neighbor 100.64.0.1 announce route 100.64.104.0/21 next-hop 100.64.0.2 split /24"],
+            [
+                "neighbor 100.64.0.1 announce route 100.64.104.0/21 next-hop 100.64.0.2 split /24 "
+                f"large-community [{large_communities}]"
+            ],
         )
         self._exabgpcli(
             sim,
             "e1",
-            ["neighbor fc00:100::1 announce route fc00:104::/45 next-hop fc00:100::2 split /48"],
+            [
+                "neighbor fc00:100::1 announce route fc00:104::/45 next-hop fc00:100::2 split /48 "
+                f"large-community [{large_communities}]"
+            ],
         )
 
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)
-
-    def test_bird_route_limit_exceeded(self, sim):
-        """Check logs to see if we reached the prefix limit."""
-
-        # Skip over configuration exceptions for this test
-        if "r1" in self.routers_config_exception and self.routers_config_exception:
-            return
-
-        route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp4_AS6500[01]_e1: Route limit exceeded, shutting down")
-        assert route_limit_exceeded, "Failed to shut down IPv4 connection when route limit exceeded"
-
-        route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp6_AS6500[01]_e1: Route limit exceeded, shutting down")
-        assert route_limit_exceeded, "Failed to shut down IPv6 connection when route limit exceeded"
 
     def test_bird_tables_bgp4_peer(self, sim):
         """Test BIRD BGP4 peer table."""
@@ -109,3 +107,16 @@ class Template(BirdPlanBaseTestCase):
     def test_os_rib_inet6(self, sim):
         """Test OS RIB for inet6."""
         self._test_os_rib("inet6", sim)
+
+    def test_bird_route_limit_exceeded(self, sim):
+        """Check logs to see if we reached the prefix limit."""
+
+        # Skip over configuration exceptions for this test
+        if "r1" in self.routers_config_exception and self.routers_config_exception:
+            return
+
+        route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp4_AS6500[01]_e1: Route limit exceeded, shutting down")
+        assert route_limit_exceeded, "Failed to shut down IPv4 connection when route limit exceeded"
+
+        route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp6_AS6500[01]_e1: Route limit exceeded, shutting down")
+        assert route_limit_exceeded, "Failed to shut down IPv6 connection when route limit exceeded"
