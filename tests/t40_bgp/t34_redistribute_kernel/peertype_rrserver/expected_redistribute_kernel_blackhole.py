@@ -43,7 +43,7 @@ r1_t_bgp4 = {
             "type": ["inherit", "univ"],
         }
     ],
-    "100.104.0.0/24": [
+    "100.104.0.0/31": [
         {
             "attributes": {
                 "BGP.community": [(65535, 666), (65535, 65281)],
@@ -93,7 +93,7 @@ r1_t_bgp6 = {
             "type": ["inherit", "univ"],
         }
     ],
-    "fc00:104::/48": [
+    "fc00:104::/127": [
         {
             "attributes": {
                 "BGP.community": [(65535, 666), (65535, 65281)],
@@ -133,7 +133,7 @@ r1_master4 = {
             "type": ["inherit", "univ"],
         }
     ],
-    "100.104.0.0/24": [
+    "100.104.0.0/31": [
         {
             "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
             "pref": 10,
@@ -204,7 +204,7 @@ r1_master6 = {
             "type": ["inherit", "univ"],
         }
     ],
-    "fc00:104::/48": [
+    "fc00:104::/127": [
         {
             "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
             "pref": 10,
@@ -257,7 +257,7 @@ r1_t_kernel4 = {
             "type": ["inherit", "univ"],
         }
     ],
-    "100.104.0.0/24": [
+    "100.104.0.0/31": [
         {
             "attributes": {"Kernel.metric": "0", "Kernel.source": "3"},
             "pref": 10,
@@ -291,7 +291,7 @@ r1_t_kernel6 = {
             "type": ["inherit", "univ"],
         }
     ],
-    "fc00:104::/48": [
+    "fc00:104::/127": [
         {
             "attributes": {"Kernel.metric": "1024", "Kernel.source": "3"},
             "pref": 10,
@@ -308,7 +308,7 @@ r1_inet = [
     {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.1", "protocol": "kernel", "scope": "link"},
     {"dev": "eth1", "dst": "100.101.0.0/24", "flags": [], "gateway": "192.168.1.2"},
     {"dev": "eth1", "dst": "100.103.0.0/24", "flags": [], "scope": "link"},
-    {"dst": "100.104.0.0/24", "flags": [], "type": "blackhole"},
+    {"dst": "100.104.0.0/31", "flags": [], "type": "blackhole"},
     {"dev": "eth1", "dst": "192.168.1.0/24", "flags": [], "prefsrc": "192.168.1.1", "protocol": "kernel", "scope": "link"},
 ]
 
@@ -318,7 +318,7 @@ r1_inet6 = [
     {"dev": "eth0", "dst": "fc00:100::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
     {"dev": "eth1", "dst": "fc00:101::/48", "flags": [], "gateway": "fc01::2", "metric": 1024, "pref": "medium"},
     {"dev": "eth1", "dst": "fc00:103::/48", "flags": [], "metric": 1024, "pref": "medium"},
-    {"dev": "lo", "dst": "fc00:104::/48", "flags": [], "metric": 1024, "pref": "medium", "type": "blackhole"},
+    {"dev": "lo", "dst": "fc00:104::/127", "flags": [], "metric": 1024, "pref": "medium", "type": "blackhole"},
     {"dev": "eth1", "dst": "fc01::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
     {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
     {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},

@@ -13,7 +13,7 @@ r1_t_static4 = {
             "type": ["static", "univ"],
         }
     ],
-    "100.104.0.0/24": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
+    "100.104.0.0/31": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
 }
 
 r1_t_static6 = {
@@ -26,11 +26,11 @@ r1_t_static6 = {
             "type": ["static", "univ"],
         }
     ],
-    "fc00:104::/48": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
+    "fc00:104::/127": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
 }
 
 r1_t_bgp4_AS65000_r2_peer = {
-    "100.104.0.0/24": [
+    "100.104.0.0/31": [
         {
             "attributes": {
                 "BGP.community": [(65535, 666), (65535, 65281)],
@@ -46,7 +46,7 @@ r1_t_bgp4_AS65000_r2_peer = {
 }
 
 r2_t_bgp4_AS65000_r1_peer = {
-    "100.104.0.0/24": [
+    "100.104.0.0/31": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -68,7 +68,7 @@ r2_t_bgp4_AS65000_r1_peer = {
 }
 
 r1_t_bgp6_AS65000_r2_peer = {
-    "fc00:104::/48": [
+    "fc00:104::/127": [
         {
             "attributes": {
                 "BGP.community": [(65535, 666), (65535, 65281)],
@@ -84,12 +84,12 @@ r1_t_bgp6_AS65000_r2_peer = {
 }
 
 r2_t_bgp6_AS65000_r1_peer = {
-    "fc00:104::/48": [
+    "fc00:104::/127": [
         {
             "attributes": {
                 "BGP.as_path": [],
                 "BGP.community": [(65535, 666), (65535, 65281)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 1101, 25)],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 940,
                 "BGP.next_hop": ["fc00:100::1"],
                 "BGP.origin": "IGP",
@@ -116,7 +116,7 @@ r1_t_bgp4 = {
             "type": ["static", "univ"],
         }
     ],
-    "100.104.0.0/24": [
+    "100.104.0.0/31": [
         {
             "attributes": {
                 "BGP.community": [(65535, 666), (65535, 65281)],
@@ -132,7 +132,7 @@ r1_t_bgp4 = {
 }
 
 r2_t_bgp4 = {
-    "100.104.0.0/24": [
+    "100.104.0.0/31": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -164,7 +164,7 @@ r1_t_bgp6 = {
             "type": ["static", "univ"],
         }
     ],
-    "fc00:104::/48": [
+    "fc00:104::/127": [
         {
             "attributes": {
                 "BGP.community": [(65535, 666), (65535, 65281)],
@@ -179,7 +179,27 @@ r1_t_bgp6 = {
     ],
 }
 
-r2_t_bgp6 = {}
+r2_t_bgp6 = {
+    "fc00:104::/127": [
+        {
+            "attributes": {
+                "BGP.as_path": [],
+                "BGP.community": [(65535, 666), (65535, 65281)],
+                "BGP.large_community": [(65000, 3, 1)],
+                "BGP.local_pref": 940,
+                "BGP.next_hop": ["fc00:100::1"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": True,
+            "bgp_type": "i",
+            "from": "fc00:100::1",
+            "pref": 100,
+            "prefix_type": "blackhole",
+            "protocol": "bgp6_AS65000_r1",
+            "type": ["BGP", "univ"],
+        }
+    ]
+}
 
 r1_master4 = {
     "100.101.0.0/24": [
@@ -191,7 +211,7 @@ r1_master4 = {
             "type": ["static", "univ"],
         }
     ],
-    "100.104.0.0/24": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
+    "100.104.0.0/31": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
     "100.64.0.0/24": [
         {
             "nexthops": [{"interface": "eth0"}],
@@ -213,7 +233,7 @@ r1_master4 = {
 }
 
 r2_master4 = {
-    "100.104.0.0/24": [
+    "100.104.0.0/31": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -262,7 +282,7 @@ r1_master6 = {
             "type": ["static", "univ"],
         }
     ],
-    "fc00:104::/48": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
+    "fc00:104::/127": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
     "fc01::/64": [
         {
             "nexthops": [{"interface": "eth1"}],
@@ -283,7 +303,26 @@ r2_master6 = {
             "protocol": "direct6",
             "type": ["device", "univ"],
         }
-    ]
+    ],
+    "fc00:104::/127": [
+        {
+            "attributes": {
+                "BGP.as_path": [],
+                "BGP.community": [(65535, 666), (65535, 65281)],
+                "BGP.large_community": [(65000, 3, 1)],
+                "BGP.local_pref": 940,
+                "BGP.next_hop": ["fc00:100::1"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": True,
+            "bgp_type": "i",
+            "from": "fc00:100::1",
+            "pref": 100,
+            "prefix_type": "blackhole",
+            "protocol": "bgp6_AS65000_r1",
+            "type": ["BGP", "univ"],
+        }
+    ],
 }
 
 r1_t_kernel4 = {
@@ -296,11 +335,11 @@ r1_t_kernel4 = {
             "type": ["static", "univ"],
         }
     ],
-    "100.104.0.0/24": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
+    "100.104.0.0/31": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
 }
 
 r2_t_kernel4 = {
-    "100.104.0.0/24": [
+    "100.104.0.0/31": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -331,27 +370,47 @@ r1_t_kernel6 = {
             "type": ["static", "univ"],
         }
     ],
-    "fc00:104::/48": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
+    "fc00:104::/127": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
 }
 
-r2_t_kernel6 = {}
+r2_t_kernel6 = {
+    "fc00:104::/127": [
+        {
+            "attributes": {
+                "BGP.as_path": [],
+                "BGP.community": [(65535, 666), (65535, 65281)],
+                "BGP.large_community": [(65000, 3, 1)],
+                "BGP.local_pref": 940,
+                "BGP.next_hop": ["fc00:100::1"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": True,
+            "bgp_type": "i",
+            "from": "fc00:100::1",
+            "pref": 100,
+            "prefix_type": "blackhole",
+            "protocol": "bgp6_AS65000_r1",
+            "type": ["BGP", "univ"],
+        }
+    ]
+}
 
 r1_inet = [
     {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.1", "protocol": "kernel", "scope": "link"},
     {"dev": "eth1", "dst": "100.101.0.0/24", "flags": [], "gateway": "192.168.1.2", "metric": 600, "protocol": "bird"},
-    {"dst": "100.104.0.0/24", "flags": [], "metric": 600, "protocol": "bird", "type": "blackhole"},
+    {"dst": "100.104.0.0/31", "flags": [], "metric": 600, "protocol": "bird", "type": "blackhole"},
     {"dev": "eth1", "dst": "192.168.1.0/24", "flags": [], "prefsrc": "192.168.1.1", "protocol": "kernel", "scope": "link"},
 ]
 
 r2_inet = [
     {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.2", "protocol": "kernel", "scope": "link"},
-    {"dst": "100.104.0.0/24", "flags": [], "metric": 600, "protocol": "bird", "type": "blackhole"},
+    {"dst": "100.104.0.0/31", "flags": [], "metric": 600, "protocol": "bird", "type": "blackhole"},
 ]
 
 r1_inet6 = [
     {"dev": "eth0", "dst": "fc00:100::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
     {"dev": "eth1", "dst": "fc00:101::/48", "flags": [], "gateway": "fc01::2", "metric": 600, "pref": "medium", "protocol": "bird"},
-    {"dev": "lo", "dst": "fc00:104::/48", "flags": [], "metric": 600, "pref": "medium", "protocol": "bird", "type": "blackhole"},
+    {"dev": "lo", "dst": "fc00:104::/127", "flags": [], "metric": 600, "pref": "medium", "protocol": "bird", "type": "blackhole"},
     {"dev": "eth1", "dst": "fc01::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
     {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
     {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
@@ -359,5 +418,6 @@ r1_inet6 = [
 
 r2_inet6 = [
     {"dev": "eth0", "dst": "fc00:100::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
+    {"dev": "lo", "dst": "fc00:104::/127", "flags": [], "metric": 600, "pref": "medium", "protocol": "bird", "type": "blackhole"},
     {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
 ]
