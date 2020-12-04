@@ -124,7 +124,8 @@ class BirdPlanBaseTestCase:
             sim.add_node(ExaBGPRouterNode(name=exabgp, configfile=f"{tmpdir}/exabgp.conf.{exabgp}"))
             # Work out the log file name and add it to our simulation so we get a report for it too
             exabgp_logfile = sim.node(exabgp).logfile
-            sim.add_logfile(f"EXABGP_LOGFILE({exabgp}) => {exabgp_logfile}", exabgp_logfile)
+            # sim.add_logfile(f"EXABGP_LOGFILE({exabgp}) => {exabgp_logfile}", exabgp_logfile)
+            sim.add_logfile(f"EXABGP_LOGFILE({exabgp})", exabgp_logfile)
 
         # Loop with switches to create
         for switch in self.switches:
@@ -174,7 +175,7 @@ class BirdPlanBaseTestCase:
             # Grab BIRD status
             status_output = sim.node(router).birdc_show_status()
             # Add status to the reprot
-            sim.add_report_obj(f"STATUS({router})", status_output)
+            sim.add_report_obj(f"BIRD_STATUS({router})", status_output)
 
             # Grab router ID
             router_id = router[1:]
@@ -278,7 +279,7 @@ class BirdPlanBaseTestCase:
         received_data = self._bird_route_table(sim, router, table_name, expect_count=expect_count, expect_content=expect_content)
         # Add report
         report = f"{table_variable_name} = " + pprint.pformat(received_data)
-        sim.add_report_obj(f"BIRD({router})[{table_name}]", report)
+        sim.add_report_obj(f"BIRD_TABLE({router})[{table_name}]", report)
         # Add variable so we can keep track of its expected content for later
         sim.add_variable(table_variable_name, report)
 
@@ -556,7 +557,7 @@ class BirdPlanBaseTestCase:
         # Add test report sections
         sim.add_conffile(f"BIRDPLAN_CONFFILE({router})", birdplan_file)
         sim.add_conffile(f"BIRD_CONFFILE({router})", bird_conffile)
-        sim.add_logfile(f"LOGFILE({router})", bird_logfile)
+        sim.add_logfile(f"BIRD_LOGFILE({router})", bird_logfile)
 
         # Add the birdplan configuration object to the simulation
         if args[0] == "configure":
@@ -608,7 +609,7 @@ class BirdPlanBaseTestCase:
     def _bird_log_matches(self, sim: Simulation, router: str, matches: str) -> bool:
         """Check if the BIRD log file contains a string."""
 
-        logname = f"LOGFILE({router})"
+        logname = f"BIRD_LOGFILE({router})"
         # Make sure the log name exists
         if logname not in sim.logfiles:
             raise RuntimeError(f"Log name not found: {logname}")
