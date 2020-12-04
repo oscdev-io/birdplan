@@ -48,7 +48,9 @@
 
 [Accept Originated](t40_bgp/t26_accept_originated/README.md)
 
-[Accept Default](t40_bgp/t28_accept_default/README.md)
+[Accept Default](t40_bgp/t27_accept_default/README.md)
+
+[Accept Blackhole](t40_bgp/t28_accept_blackhole/README.md)
 
 [Redistribute Connected](t40_bgp/t30_redistribute_connected/README.md)
 
