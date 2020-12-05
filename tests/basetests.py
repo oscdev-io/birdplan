@@ -275,16 +275,56 @@ class BirdPlanBaseTestCase:
         if isinstance(expected_data, dict):
             expect_count = len(expected_data) or None
 
-        # Grab the routers table from BIRD
-        received_data = self._bird_route_table(sim, router, table_name, expect_count=expect_count, expect_content=expect_content)
+        # Save the start time
+        time_start = time.time()
+
+        # Start with a blank result
+        expect_timeout = 10
+        result = []
+        while True:
+
+            # Grab the routers table from BIRD
+            result = self._bird_route_table(sim, router, table_name)
+            result_len = len(result)
+
+            count_matches = False
+            content_matches = False
+
+            # If we're not expecting a count of table entries, we match
+            if expect_count is None:
+                count_matches = True
+            # If expect_count is 0, we need to wait until its 0
+            elif expect_count == 0 and result_len == expect_count:
+                count_matches = True
+            # If we are expecting a count, check to see if we have at least the number we need
+            elif (result_len >= expect_count > 0):
+                count_matches = True
+
+            # If we don't have a content match, we match
+            if not expect_content:
+                content_matches = True
+            # Else check that the result contains the content we're looking for
+            elif expect_content in f"{result}":
+                content_matches = True
+
+            # Check if have what we expected
+            if count_matches and content_matches:
+                break
+
+            # If not, check to see if we've exceeded our timeout
+            if time.time() - time_start > expect_timeout:
+                break
+
+            time.sleep(0.5)
+
         # Add report
-        report = f"{table_variable_name} = " + pprint.pformat(received_data)
+        report = f"{table_variable_name} = " + pprint.pformat(result)
         sim.add_report_obj(f"BIRD_TABLE({router})[{table_name}]", report)
         # Add variable so we can keep track of its expected content for later
         sim.add_variable(table_variable_name, report)
 
         # Return the two chunks of data for later assertion
-        return (received_data, expected_data)
+        return (result, expected_data)
 
     def _test_os_rib(self, table_name: str, sim):
         """Test OS routing table."""
@@ -307,17 +347,41 @@ class BirdPlanBaseTestCase:
             # Grab table data
             expected_data = self._get_expected_data_item(expected_module, table_variable_name)
 
-            # Grab the RIB table from the OS
-            received_data = sim.node(router).run_ip(["--family", table_name, "route", "list"])
+            # Save the start time
+            time_start = time.time()
+
+            # Grab expected count and start with blank result
+            expect_count = len(expected_data)
+            expect_timeout = 10
+            result = []
+            while True:
+                # Grab the RIB table from the OS
+                result = sim.node(router).run_ip(["--family", table_name, "route", "list"])
+
+                # If we're not expecting a count of table entries, we match
+                if expect_count is None:
+                    break
+                # If expect_count is 0, we need to wait until its 0
+                if expect_count == 0 and len(result) == expect_count:
+                    break
+                # If we are expecting a count, check to see if we have at least the number we need
+                if (len(result) >= expect_count > 0):
+                    break
+
+                # If not, check to see if we've exceeded our timeout
+                if time.time() - time_start > expect_timeout:
+                    break
+
+                time.sleep(0.5)
 
             # Add report
-            report = f"{table_variable_name} = " + pprint.pformat(received_data, width=132, compact=True)
+            report = f"{table_variable_name} = " + pprint.pformat(result, width=132, compact=True)
             sim.add_report_obj(f"OS_RIB({router})[{table_name}]", report)
             # Add variable so we can keep track of its expected content for later
             sim.add_variable(table_variable_name, report)
 
             # Save both tables for the assert test below
-            assert_data[router] = (received_data, expected_data)
+            assert_data[router] = (result, expected_data)
 
         # Loop with the results and assert
         for router, data in assert_data.items():
