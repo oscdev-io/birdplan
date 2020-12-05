@@ -297,7 +297,7 @@ class BirdPlanBaseTestCase:
             elif expect_count == 0 and result_len == expect_count:
                 count_matches = True
             # If we are expecting a count, check to see if we have at least the number we need
-            elif (result_len >= expect_count > 0):
+            elif result_len >= expect_count > 0:
                 count_matches = True
 
             # If we don't have a content match, we match
@@ -365,7 +365,7 @@ class BirdPlanBaseTestCase:
                 if expect_count == 0 and len(result) == expect_count:
                     break
                 # If we are expecting a count, check to see if we have at least the number we need
-                if (len(result) >= expect_count > 0):
+                if len(result) >= expect_count > 0:
                     break
 
                 # If not, check to see if we've exceeded our timeout
