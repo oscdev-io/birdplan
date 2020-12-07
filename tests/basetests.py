@@ -351,7 +351,9 @@ class BirdPlanBaseTestCase:
             time_start = time.time()
 
             # Grab expected count and start with blank result
-            expect_count = len(expected_data)
+            expect_count = None
+            if isinstance(expected_data, dict):
+                expect_count = len(expected_data) or None
             expect_timeout = 10
             result = []
             while True:
