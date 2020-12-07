@@ -27,3 +27,7 @@ from ....config.peertype_routecollector.r1r2 import PeerTypeConfig
 
 class Test(PeerTypeConfig, Template):
     """BGP test case for redistribution of kernel default routes, with redistribute:default set to false."""
+
+    routers_config_exception = {
+        "r2": r"Having 'accept:default' set to True for peer 'r1' with type 'routecollector' makes no sense",
+    }

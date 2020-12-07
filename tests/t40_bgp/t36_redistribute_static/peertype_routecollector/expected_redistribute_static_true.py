@@ -12,7 +12,8 @@ r1_t_static4 = {
             "protocol": "static4",
             "type": ["static", "univ"],
         }
-    ]
+    ],
+    "100.104.0.0/31": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
 }
 
 r1_t_static6 = {
@@ -24,7 +25,8 @@ r1_t_static6 = {
             "protocol": "static6",
             "type": ["static", "univ"],
         }
-    ]
+    ],
+    "fc00:104::/127": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
 }
 
 r1_t_bgp4_AS65001_r2_peer = {
@@ -107,7 +109,20 @@ r1_t_bgp4 = {
             "protocol": "static4",
             "type": ["static", "univ"],
         }
-    ]
+    ],
+    "100.104.0.0/31": [
+        {
+            "attributes": {
+                "BGP.community": [(65535, 666), (65535, 65281)],
+                "BGP.large_community": [(65000, 3, 1)],
+                "BGP.local_pref": 940,
+            },
+            "pref": 200,
+            "prefix_type": "blackhole",
+            "protocol": "static4",
+            "type": ["static", "univ"],
+        }
+    ],
 }
 
 r2_t_bgp4 = {}
@@ -122,7 +137,20 @@ r1_t_bgp6 = {
             "protocol": "static6",
             "type": ["static", "univ"],
         }
-    ]
+    ],
+    "fc00:104::/127": [
+        {
+            "attributes": {
+                "BGP.community": [(65535, 666), (65535, 65281)],
+                "BGP.large_community": [(65000, 3, 1)],
+                "BGP.local_pref": 940,
+            },
+            "pref": 200,
+            "prefix_type": "blackhole",
+            "protocol": "static6",
+            "type": ["static", "univ"],
+        }
+    ],
 }
 
 r2_t_bgp6 = {}
@@ -137,6 +165,7 @@ r1_master4 = {
             "type": ["static", "univ"],
         }
     ],
+    "100.104.0.0/31": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
     "100.64.0.0/24": [
         {
             "nexthops": [{"interface": "eth0"}],
@@ -188,6 +217,7 @@ r1_master6 = {
             "type": ["static", "univ"],
         }
     ],
+    "fc00:104::/127": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
     "fc01::/64": [
         {
             "nexthops": [{"interface": "eth1"}],
@@ -220,7 +250,8 @@ r1_t_kernel4 = {
             "protocol": "static4",
             "type": ["static", "univ"],
         }
-    ]
+    ],
+    "100.104.0.0/31": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
 }
 
 r2_t_kernel4 = {}
@@ -234,7 +265,8 @@ r1_t_kernel6 = {
             "protocol": "static6",
             "type": ["static", "univ"],
         }
-    ]
+    ],
+    "fc00:104::/127": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
 }
 
 r2_t_kernel6 = {}
@@ -242,6 +274,7 @@ r2_t_kernel6 = {}
 r1_inet = [
     {"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.64.0.1", "protocol": "kernel", "scope": "link"},
     {"dev": "eth1", "dst": "100.101.0.0/24", "flags": [], "gateway": "192.168.1.2", "metric": 600, "protocol": "bird"},
+    {"dst": "100.104.0.0/31", "flags": [], "metric": 600, "protocol": "bird", "type": "blackhole"},
     {"dev": "eth1", "dst": "192.168.1.0/24", "flags": [], "prefsrc": "192.168.1.1", "protocol": "kernel", "scope": "link"},
 ]
 
@@ -250,6 +283,7 @@ r2_inet = [{"dev": "eth0", "dst": "100.64.0.0/24", "flags": [], "prefsrc": "100.
 r1_inet6 = [
     {"dev": "eth0", "dst": "fc00:100::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
     {"dev": "eth1", "dst": "fc00:101::/48", "flags": [], "gateway": "fc01::2", "metric": 600, "pref": "medium", "protocol": "bird"},
+    {"dev": "lo", "dst": "fc00:104::/127", "flags": [], "metric": 600, "pref": "medium", "protocol": "bird", "type": "blackhole"},
     {"dev": "eth1", "dst": "fc01::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
     {"dev": "eth0", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
     {"dev": "eth1", "dst": "fe80::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},

@@ -287,8 +287,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 if redistribute_type not in (
                     "default",
                     "connected",
-                    "static",
                     "kernel",
+                    "kernel_blackhole",
+                    "static",
+                    "static_blackhole",
                     "originated",
                     "bgp",
                     "bgp_own",
@@ -303,19 +305,21 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Check things we are not supposed to be redistributing to external peers
             if self.route_policy_redistribute.default:
                 raise BirdPlanError(
-                    f"Having 'redistribute:default' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                    f"Having 'redistribute:default' set to True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
             if self.route_policy_redistribute.bgp:
                 raise BirdPlanError(
-                    f"Having 'redistribute:bgp' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                    f"Having 'redistribute:bgp' set to True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
             if self.route_policy_redistribute.bgp_peering:
                 raise BirdPlanError(
-                    f"Having 'redistribute:bgp_peering' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                    f"Having 'redistribute:bgp_peering' set to True for peer '{self.name}' "
+                    f"with type '{self.peer_type}' makes no sense"
                 )
             if self.route_policy_redistribute.bgp_transit:
                 raise BirdPlanError(
-                    f"Having 'redistribute:bgp_transit' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                    f"Having 'redistribute:bgp_transit' set to True for peer '{self.name}' "
+                    f"with type '{self.peer_type}' makes no sense"
                 )
 
         # Check that we have static routes imported first
@@ -409,14 +413,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.peer_type not in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
             if self.route_policy_accept.blackhole:
                 raise BirdPlanError(
-                    f"Having 'accept:blackhole' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                    f"Having 'accept:blackhole' set to True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
 
         # Check if this is a customer with blackholing and without a prefix filter set
         if self.peer_type == "customer":
             if self.route_policy_accept.blackhole and not self.filter_policy.prefixes:
                 raise BirdPlanError(
-                    f"Having 'accept:blackhole' set for peer '{self.name}' with type '{self.peer_type}' and without "
+                    f"Having 'accept:blackhole' set to True for peer '{self.name}' with type '{self.peer_type}' and without "
                     "'filter:prefixes' set makes no sense"
                 )
 
@@ -816,16 +820,26 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  if {self.bgp_functions.redistribute_connected(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.redistribute_connected(False)};")
-        # Check for static route redistribution
-        if self.route_policy_redistribute.static:
-            self.conf.add(f"  if {self.bgp_functions.redistribute_static(True)} then accept_route = true;")
-        else:
-            self.conf.add(f"  {self.bgp_functions.redistribute_static(False)};")
         # Check for kernel route redistribution
         if self.route_policy_redistribute.kernel:
             self.conf.add(f"  if {self.bgp_functions.redistribute_kernel(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.redistribute_kernel(False)};")
+        # Check for kernel blackhole route redistribution
+        if self.route_policy_redistribute.kernel_blackhole:
+            self.conf.add(f"  if {self.bgp_functions.redistribute_kernel_blackhole(True)} then accept_route = true;")
+        else:
+            self.conf.add(f"  {self.bgp_functions.redistribute_kernel_blackhole(False)};")
+        # Check for static route redistribution
+        if self.route_policy_redistribute.static:
+            self.conf.add(f"  if {self.bgp_functions.redistribute_static(True)} then accept_route = true;")
+        else:
+            self.conf.add(f"  {self.bgp_functions.redistribute_static(False)};")
+        # Check for static blackhole route redistribution
+        if self.route_policy_redistribute.static_blackhole:
+            self.conf.add(f"  if {self.bgp_functions.redistribute_static_blackhole(True)} then accept_route = true;")
+        else:
+            self.conf.add(f"  {self.bgp_functions.redistribute_static_blackhole(False)};")
         # Check for originated route redistribution
         if self.route_policy_redistribute.originated:
             self.conf.add(f"  if {self.bgp_functions.redistribute_originated(True)} then accept_route = true;")

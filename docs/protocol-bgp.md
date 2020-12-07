@@ -11,6 +11,8 @@ Remember to set the `router_id`, see [Configuration](configuration.md).
 The `accept` key contains a dictionary of routes we will accept into the master table from our BGP table. Namely...
 
 * `default` - Allows us to accept a default route from BGP. The default is `False`.
+* `blackhole` - Allows us to accept a blackhole route from BGP. The default is `True`.
+* `originated` - Allows us to accept originated routes from the BGP table. The default is `True`.
 
 Below is a configuration example...
 ```yaml
@@ -183,11 +185,15 @@ bgp:
 The `import` key contains a dictionary of the routes to import into the main BGP table.
 
 * `connected` routes are kernel device routes for the interfaces listed. A list of interfaces must be provided. This can be a pattern
-like `eth*`.
+like `eth*`. Connected routes are not imported by default..
 
-* `kernel` routes are those statically added to the kernel.
+* `kernel` routes are those statically added to the kernel, excluding blackhole routes. The default for this option is `false`.
 
-* `static` routes are those setup in the static protocol.
+* `kernel_blackhole` routes are those statically added to the kernel which are blackhole routes. This option is independant of the `kernel` option above and will only import blackhole routes. The default for this option is `false`.
+
+* `static` routes are those setup in the static protocol, excluding blackhole routes. The default for this option is `false`.
+
+* `static_blackhole` routes are those setup in the static protocol which are blackhole routes. This option is independant of the `static` option above and will only import blackhole routes. The default for this option is `false`.
 
 
 One can specify the ASN as per below...
@@ -220,6 +226,13 @@ bgp:
   originate:
     - '100.101.0.0/24 blackhole'
     - 'fc00:101::/48 blackhole'
+```
+
+Attributes can also be added to originated routes for instance...
+```yaml
+bird:
+  originate:
+    - '100.101.0.0/24 blackhole { bgp_large_community.add(65000, 111, 222) }'
 ```
 
 
@@ -473,7 +486,7 @@ bgp:
 ...
 ```
 
-# blackhole_community
+## blackhole_community
 
 Set the peers blackhole community. When this option is specified blackhole routes with the large community action
 `(OWN_ASN, 666, XXX)` will result in the blackhole route being propagated to the specified peer(s).
@@ -522,7 +535,7 @@ bgp:
 ```
 
 
-# blackhole_import_maxlen4
+## blackhole_import_maxlen4
 
 Maximum IPv4 blackhole length to import without filtering. Defaults to global setting.
 
@@ -539,7 +552,7 @@ bgp:
 ```
 
 
-# blackhole_import_minlen4
+## blackhole_import_minlen4
 
 Minimum IPv4 blackhole length to import without filtering. Defaults to global setting.
 
@@ -556,7 +569,7 @@ bgp:
 ...
 ```
 
-# blackhole_export_maxlen4
+## blackhole_export_maxlen4
 
 Maximum IPv4 blackhole length to export. Defaults to global setting.
 
@@ -573,7 +586,7 @@ bgp:
 ```
 
 
-# blackhole_export_minlen4
+## blackhole_export_minlen4
 
 Minimum IPv4 blackhole length to export. Defaults to global setting.
 
@@ -591,7 +604,7 @@ bgp:
 ```
 
 
-# blackhole_import_maxlen6
+## blackhole_import_maxlen6
 
 Maximum IPv6 blackhole length to import without filtering. Defaults to global setting.
 
@@ -608,7 +621,7 @@ bgp:
 ```
 
 
-# blackhole_import_minlen6
+## blackhole_import_minlen6
 
 Minimum IPv6 blackhole length to import without filtering. Defaults to global setting.
 
@@ -626,7 +639,7 @@ bgp:
 ```
 
 
-# blackhole_export_maxlen6
+## blackhole_export_maxlen6
 
 Maximum IPv6 blackhole length to export. Defaults to global setting.
 
@@ -643,7 +656,7 @@ bgp:
 ```
 
 
-# blackhole_export_minlen6
+## blackhole_export_minlen6
 
 Minimum IPv6 blackhole length to export. Defaults to global setting.
 
@@ -1378,8 +1391,10 @@ Types of routes to redistribute to the peer, valid options are detailed below...
 * `default` will redistribute the default route, the type of route also needs to be redistributed. eg. `static`. Defaults to `False` except
 for peer type `rrserver-rrserver` which defaults to `True`.
 * `connected` will redistribute connected routes. Defaults to `False`.
-* `static` will redistribute static routes in our global static configuration. Defaults to `False`.
 * `kernel` will redistribute kernel routes. Defaults to `False`.
+* `kernel_blackhole` will redistribute kernel blackhole routes. Defaults to `False`.
+* `static` will redistribute static routes in our global static configuration. Defaults to `False`.
+* `static_blackhole` will redistribute static blackhole routes in our global static configuration. Defaults to `False`.
 * `originated` will redistribute originated routes. Defaults to `False`.
 
 Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
@@ -1389,6 +1404,11 @@ Internal redistribution options and how they are used... (do not use unless you 
 * `bgp_customer` will redistribute our customers BGP routes based on an internal large community `OWN_ASN:3:2`. Automatically set to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
 * `bgp_peering` will redistribute peering session routes based on an internal large community `OWN_ASN:3:3`. Automatically set to `True` for peer types of `customer`.
 * `bgp_transit` will redistribute transit routes based on an internal large community `OWN_ASN:3:4`. Automatically set to `True` for peer types of `customer`.
+
+NB: Peers using peer type `rrserver-rrserver` will by default redistribute default routes should they be received via BGP, but will not by default
+redistribute default routes if received via `kernel`, `static` or `originated` sources. For these sources to be redistributed you need to configure
+`redistribute:default` as `True`.
+
 
 An example of using redistribute can be found below...
 ```yaml

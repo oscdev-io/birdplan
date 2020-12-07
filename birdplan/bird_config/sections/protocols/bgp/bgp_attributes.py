@@ -29,14 +29,22 @@ class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
     ----------
     default : bool
         Accept default route. Defaults to `False`.
+    blackhole : bool
+        Accept blackhole routes. Defaults to `True`.
+    originated : bool
+        Accept originated routes. Defaults to `True`.
 
     """
 
     default: bool
+    blackhole: bool
+    originated: bool
 
     def __init__(self) -> None:
         """Initialize object."""
         self.default = False
+        self.blackhole = True
+        self.originated = True
 
 
 class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
@@ -50,20 +58,28 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
         The interface name can be an exact interface match, or a wildcard with a *.
     kernel : bool
         Import kernel routes into the main BGP table. Defaults to `False`.
+    kernel_blackhole : bool
+        Import kernel blackhole routes into the main BGP table. Defaults to `False`.
     static : bool
         Import static routes into the main BGP table. Defaults to `False`.
+    static_blackhole : bool
+        Import static blackhole routes into the main BGP table. Defaults to `False`.
 
     """
 
     connected: Union[bool, List[str]]
     kernel: bool
+    kernel_blackhole: bool
     static: bool
+    static_blackhole: bool
 
     def __init__(self) -> None:
         """Initialize object."""
         self.connected = False
         self.kernel = False
+        self.kernel_blackhole = False
         self.static = False
+        self.static_blackhole = False
 
 
 class BGPAttributes:  # pylint: disable=too-few-public-methods

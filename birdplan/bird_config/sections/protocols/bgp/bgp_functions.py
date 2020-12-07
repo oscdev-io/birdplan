@@ -41,6 +41,17 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return false;
             }"""
 
+    @bird_function("bgp_is_blackhole")
+    def is_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_is_blackhole function."""
+
+        return """\
+            # Check if this is a blackhole route
+            function bgp_is_blackhole(string filter_name) {
+                if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then return true;
+                return false;
+            }"""
+
     @bird_function("bgp_graceful_shutdown")
     def graceful_shutdown(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_graceful_shutdown function."""
@@ -341,17 +352,17 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
     def accept_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_accept_blackhole function."""
 
-        return """\
+        return f"""\
             # Accept BGP blackhole
-            function bgp_accept_blackhole(string filter_name) {
-                if (BGP_COMMUNITY_BLACKHOLE !~ bgp_community) then return false;
+            function bgp_accept_blackhole(string filter_name) {{
+                if !{self.is_blackhole()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_accept_blackhole] Enabling blackhole for ", net;
                 # Set destination as blackhole
                 dest = RTD_BLACKHOLE;
                 # Make sure we have our NOEXPORT community set
                 if (BGP_COMMUNITY_NOEXPORT !~ bgp_community) then bgp_community.add(BGP_COMMUNITY_NOEXPORT);
-            }"""
+            }}"""
 
     @bird_function("bgp_accept_blackhole_originated")
     def accept_blackhole_originated(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -484,14 +495,14 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
     def filter_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_filter_blackhole function."""
 
-        return """\
+        return f"""\
             # Filter blackhole routes
-            function bgp_filter_blackhole(string filter_name) {
-                if (BGP_COMMUNITY_BLACKHOLE !~ bgp_community) then return false;
+            function bgp_filter_blackhole(string filter_name) {{
+                if !{self.is_blackhole()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_filter_blackhole] Adding BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED to ", net;
                 bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED);
-            }"""
+            }}"""
 
     @bird_function("bgp_filter_blackhole_size")
     def filter_blackhole_size(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -516,8 +527,8 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                     prefix_maxlen = ipv6_maxlen;
                     prefix_minlen = ipv6_minlen;
                 }}
-                # If this is not a blackhole prefix then just return
-                if (BGP_COMMUNITY_BLACKHOLE !~ bgp_community) then return false;
+                # If this is not a blackhole then just return
+                if !{self.is_blackhole()} then return false;
                 # Check prefix is not longer than what we allow
                 if {self.functions.prefix_is_longer(BirdVariable("prefix_maxlen"))} then {{
                     if DEBUG then print filter_name,
@@ -723,12 +734,13 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return """\
             # Check for redistribution of static routes for BGP
+            # - Exclude blackhole routes
             # - Reject routes that are not redistributable
             # - Return true when routes are redistributable
             # - Return false otherwise
             function bgp_redistribute_static(string filter_name; bool redistribute) {
-                # Check for static routes
                 if (proto != "static4" && proto != "static6") then return false;
+                if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then return false;
                 if (redistribute) then {
                     if DEBUG then print filter_name,
                         " [bgp_redistribute_static] Accepting ", net, " due to static route match (redistribute static)";
@@ -739,18 +751,44 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }"""
 
+    @bird_function("bgp_redistribute_static_blackhole")
+    def redistribute_static_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_redistribute_static_blackhole function."""
+
+        return f"""\
+            # Check for redistribution of static blackhole routes for BGP
+            # - Only blackhole routes
+            # - Reject routes that are not redistributable
+            # - Return true when routes are redistributable
+            # - Return false otherwise
+            function bgp_redistribute_static_blackhole(string filter_name; bool redistribute) {{
+                if (proto != "static4" && proto != "static6") then return false;
+                if !{self.is_blackhole()} then return false;
+                if (redistribute) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_redistribute_static_blackhole] Accepting ", net,
+                        " due to static blackhole route match (redistribute static)";
+                    return true;
+                }}
+                if DEBUG then print filter_name,
+                    " [bgp_redistribute_static_blackhole] Rejecting ", net,
+                    " due to static blackhole route match (no redistribute static)";
+                reject;
+            }}"""
+
     @bird_function("bgp_redistribute_kernel")
     def redistribute_kernel(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_redistribute_kernel function."""
 
         return """\
             # Check for redistribution of kernel routes for BGP
+            # - Exclude blackhole routes
             # - Reject routes that are not redistributable
             # - Return true when routes are redistributable
             # - Return false otherwise
             function bgp_redistribute_kernel(string filter_name; bool redistribute) {
-                # Check for kernel routes
                 if (source != RTS_INHERIT) then return false;
+                if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then return false;
                 if (redistribute) then {
                     if DEBUG then print filter_name,
                         " [bgp_redistribute_kernel] Accepting ", net, " due to kernel route match (redistribute kernel)";
@@ -760,6 +798,31 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                     " [bgp_redistribute_kernel] Rejecting ", net, " due to kernel route match (no redistribute kernel)";
                 reject;
             }"""
+
+    @bird_function("bgp_redistribute_kernel_blackhole")
+    def redistribute_kernel_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_redistribute_kernel_blackhole function."""
+
+        return f"""\
+            # Check for redistribution of kernel routes for BGP
+            # - Only blackhole routes
+            # - Reject routes that are not redistributable
+            # - Return true when routes are redistributable
+            # - Return false otherwise
+            function bgp_redistribute_kernel_blackhole(string filter_name; bool redistribute) {{
+                if (source != RTS_INHERIT) then return false;
+                if !{self.is_blackhole()} then return false;
+                if (redistribute) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_redistribute_kernel_blackhole] Accepting ", net,
+                        " due to kernel blackhole route match (redistribute kernel)";
+                    return true;
+                }}
+                if DEBUG then print filter_name,
+                    " [bgp_redistribute_kernel_blackhole] Rejecting ", net,
+                    " due to kernel blackhole route match (no redistribute kernel)";
+                reject;
+            }}"""
 
     @bird_function("bgp_redistribute_originated")
     def redistribute_originated(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -1417,50 +1480,50 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
     def allow_blackholes(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_allow_blackholes function."""
 
-        return """\
+        return f"""\
             # Check if we're allowing blackholes tagged with the blackhole large community
-            function bgp_allow_blackholes(string filter_name; bool capable; int peer_asn; int type_asn) {
+            function bgp_allow_blackholes(string filter_name; bool capable; int peer_asn; int type_asn) {{
                 # If this is not a route with a blackhole community, then just return false
-                if (BGP_COMMUNITY_BLACKHOLE !~ bgp_community) then return false;
+                if !{self.is_blackhole()} then return false;
                 # If this is a blackhole community, check if we're going to allow it
                 if (
                     (BGP_ASN, 666, peer_asn) ~ bgp_large_community ||
                     (BGP_ASN, 666, type_asn) ~ bgp_large_community
-                ) then {
+                ) then {{
                     # Check if the peer is blackhole community capable
-                    if (!capable) then {
+                    if (!capable) then {{
                         if DEBUG then print filter_name,
                             " [bgp_allow_blackholes] Rejecting blackhole ", net,
                             " due to peer not being blackhole community capable";
                         reject;
-                    }
+                    }}
                     # Check if we have a NOEXPORT community set, if we do strip it off")
-                    if (BGP_COMMUNITY_NOEXPORT ~ bgp_community) then {
+                    if (BGP_COMMUNITY_NOEXPORT ~ bgp_community) then {{
                         if DEBUG then print filter_name,
                             " [bgp_allow_blackholes] Removing community BGP_COMMUNITY_NOEXPORT from ", net,
                             " due to match on BGP blackhole advertise large community function";
                         bgp_community.delete(BGP_COMMUNITY_NOEXPORT);
-                    }
+                    }}
                     return true;
-                }
+                }}
                 if DEBUG then print filter_name,
                     " [bgp_allow_blackholes] Rejecting blackhole ", net,
                     " due to no match on BGP blackhole advertise large community function";
                 reject;
-            }"""
+            }}"""
 
     @bird_function("bgp_reject_blackholes")
     def reject_blackholes(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_reject_blackholes function."""
 
-        return """\
+        return f"""\
             # Reject blackhole routes
-            function bgp_reject_blackholes(string filter_name) {
-                if (BGP_COMMUNITY_BLACKHOLE !~ bgp_community) then return false;
+            function bgp_reject_blackholes(string filter_name) {{
+                if !{self.is_blackhole()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_reject_blackholes] Rejecting blackhole ", net, " due to match on BGP_COMMUNITY_BLACKHOLE";
                 reject;
-            }"""
+            }}"""
 
     @bird_function("bgp_reject_noexport")
     def reject_noexport(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument

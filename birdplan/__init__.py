@@ -615,9 +615,9 @@ class BirdPlan:
 
         # Loop with accept items
         for accept, accept_config in self.config["bgp"]["accept"].items():
-            # Allow accept of the default route
-            if accept == "default":
-                self.birdconf.protocols.bgp.route_policy_accept.default = accept_config
+            # Check if we need to accept some kinds of routes
+            if accept in ("default", "blackhole", "originated"):
+                setattr(self.birdconf.protocols.bgp.route_policy_accept, accept, accept_config)
             # If we don't understand this 'accept' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in bgp:accept")
@@ -698,12 +698,21 @@ class BirdPlan:
                     raise BirdPlanError(f"Configurion item '{import_type}' has an unsupported value")
                 # Add configuration
                 self.birdconf.protocols.bgp.route_policy_import.connected = import_connected
+
             # Import kernel routes into the main BGP table
             elif import_type == "kernel":
                 self.birdconf.protocols.bgp.route_policy_import.kernel = import_config
+            # Import kernel blackhole routes into the main BGP table
+            elif import_type == "kernel_blackhole":
+                self.birdconf.protocols.bgp.route_policy_import.kernel_blackhole = import_config
+
             # Import static routes into the main BGP table
             elif import_type == "static":
                 self.birdconf.protocols.bgp.route_policy_import.static = import_config
+            # Import static blackhole routes into the main BGP table
+            elif import_type == "static_blackhole":
+                self.birdconf.protocols.bgp.route_policy_import.static_blackhole = import_config
+
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{import_type}' not understood in bgp:import")
@@ -794,8 +803,10 @@ class BirdPlan:
                     if redistribute_type in (
                         "default",
                         "connected",
-                        "static",
                         "kernel",
+                        "kernel_blackhole",
+                        "static",
+                        "static_blackhole",
                         "originated",
                         "bgp",
                         "bgp_own",
@@ -814,7 +825,7 @@ class BirdPlan:
                 peer["accept"] = {}
                 # Loop with acceptance items
                 for accept, accept_config in config_value.items():
-                    if accept in ["default"]:
+                    if accept in ["blackhole", "default"]:
                         peer["accept"][accept] = accept_config
                     # If we don't understand this 'accept' entry, throw an error
                     else:
