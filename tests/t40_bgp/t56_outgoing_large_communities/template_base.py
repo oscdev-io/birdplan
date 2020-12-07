@@ -38,13 +38,21 @@ class TemplateBase(BirdPlanBaseTestCase):
     def r1_template_extra_config(self):
         """Dynamic configuration."""
 
+        config = []
+
         # Redistribute default routes for all but these peer types...
         r1_peer_type = getattr(self, "r1_peer_type")
         if r1_peer_type not in ("peer", "routecollector", "routeserver", "transit"):
-            return """
-        default: True
-"""
-        return ""
+            config.append("        default: True")
+        # Redistribute blackhole routes only to the below peers that
+        if r1_peer_type in ("internal", "routecollector", "routeserver", "rrclient", "rrserver", "rrserver-rrserver", "transit"):
+            config.append("        kernel_blackhole: True")
+            config.append("        static_blackhole: True")
+        # Mark blackhole capable eBGP peers
+        if r1_peer_type in ("routecollector", "routeserver", "transit"):
+            config.append("      blackhole_community: True")
+
+        return "\n".join(config)
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
@@ -122,6 +130,14 @@ class TemplateBase(BirdPlanBaseTestCase):
         # Add gateway'd kernel routes
         sim.node("r1").run_ip(["route", "add", "100.121.0.0/24", "via", "100.101.0.2"])
         sim.node("r1").run_ip(["route", "add", "fc00:121::/48", "via", "fc00:101::2"])
+
+        # Add device kernel routes
+        sim.node("r1").run_ip(["route", "add", "100.122.0.0/24", "dev", "eth1"])
+        sim.node("r1").run_ip(["route", "add", "fc00:122::/48", "dev", "eth1"])
+
+        # Add device kernel routes
+        sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
+        sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
 
     def test_bird_status(self, sim):
         """Test BIRD status."""

@@ -848,8 +848,10 @@ class BirdPlan:
                         if prepend_type in [
                             "default",
                             "connected",
-                            "static",
                             "kernel",
+                            "kernel_blackhole",
+                            "static",
+                            "static_blackhole",
                             "originated",
                             "bgp",
                             "bgp_own",

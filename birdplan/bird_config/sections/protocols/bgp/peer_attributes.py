@@ -42,10 +42,14 @@ class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods
         Default route outgoing large communities.
     kernel: List[str]
         Kernel route outgoing large communities.
+    kernel_blackhole: List[str]
+        Kernel blackhole route outgoing large communities.
     originated: List[str]
         Originated route outgoing large communities.
     static: List[str]
         Static route outgoing large communities.
+    static_blackhole: List[str]
+        Static blackhole route outgoing large communities.
     bgp: List[str]
         BGP route outgoing large communities.
     bgp_own: List[str]
@@ -62,8 +66,10 @@ class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods
     connected: List[str]
     default: List[str]
     kernel: List[str]
+    kernel_blackhole: List[str]
     originated: List[str]
     static: List[str]
+    static_blackhole: List[str]
     bgp: List[str]
     bgp_own: List[str]
     bgp_customer: List[str]
@@ -75,8 +81,10 @@ class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods
         self.connected = []
         self.default = []
         self.kernel = []
+        self.kernel_blackhole = []
         self.originated = []
         self.static = []
+        self.static_blackhole = []
         self.bgp = []
         self.bgp_own = []
         self.bgp_customer = []
@@ -142,10 +150,14 @@ class BGPPeerPrepend:  # pylint: disable=too-few-public-methods,too-many-instanc
         Default route prepending options.
     kernel: BGPPeerPrependItem
         Kernel route prepending options.
+    kernel_blackhole: BGPPeerPrependItem
+        Kernel blackhole route prepending options.
     originated: BGPPeerPrependItem
         Originated route prepending options.
     static: BGPPeerPrependItem
         Static route prepending options.
+    static_blackhole: BGPPeerPrependItem
+        Static blackhole route prepending options.
     bgp: BGPPeerPrependItem
         BGP route prepending options.
     bgp_own: BGPPeerPrependItem
@@ -162,8 +174,10 @@ class BGPPeerPrepend:  # pylint: disable=too-few-public-methods,too-many-instanc
     connected: BGPPeerPrependItem
     default: BGPPeerPrependItem
     kernel: BGPPeerPrependItem
+    kernel_blackhole: BGPPeerPrependItem
     originated: BGPPeerPrependItem
     static: BGPPeerPrependItem
+    static_blackhole: BGPPeerPrependItem
     bgp: BGPPeerPrependItem
     bgp_own: BGPPeerPrependItem
     bgp_customer: BGPPeerPrependItem
@@ -175,8 +189,10 @@ class BGPPeerPrepend:  # pylint: disable=too-few-public-methods,too-many-instanc
         self.connected = BGPPeerPrependItem()
         self.default = BGPPeerPrependItem()
         self.kernel = BGPPeerPrependItem()
+        self.kernel_blackhole = BGPPeerPrependItem()
         self.originated = BGPPeerPrependItem()
         self.static = BGPPeerPrependItem()
+        self.static_blackhole = BGPPeerPrependItem()
         self.bgp = BGPPeerPrependItem()
         self.bgp_own = BGPPeerPrependItem()
         self.bgp_customer = BGPPeerPrependItem()

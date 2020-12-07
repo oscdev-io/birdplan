@@ -41,6 +41,9 @@ class TemplateBase(BirdPlanBaseTestCase):
     def test_add_kernel_routes(self, sim):
         """Add kernel routes to BIRD instances."""
 
+        if "r1" in self.routers_config_exception:
+            return
+
         # Add gateway'd kernel routes
         sim.node("r1").run_ip(["route", "add", "100.101.0.0/24", "via", "192.168.1.2"])
         sim.node("r1").run_ip(["route", "add", "fc00:101::/48", "via", "fc01::2"])

@@ -970,8 +970,10 @@ Route types...
 
 * `default` will match the default route.
 * `connected` will match connected routes.
-* `static` will match static routes. This will not match default routes.
 * `kernel` will match kernel routes. This will not match default routes.
+* `kernel_blackhole` will match kernel routes.
+* `static` will match static routes. This will not match default routes.
+* `static_blackhole` will match static blackhole routes.
 * `originated` will match originated routes. This will not match default routes.
 
 Internal route types...
@@ -1340,8 +1342,10 @@ Route types...
 
 * `default` will match the default route.
 * `connected` will match connected routes.
-* `static` will match static routes. This will not match default routes.
 * `kernel` will match kernel routes. This will not match default routes.
+* `kernel_blackhole` will match kernel blackhole routes.
+* `static` will match static routes. This will not match default routes.
+* `static_blackhole` will match static blackhole routes.
 * `originated` will match originated routes. This will not match default routes.
 
 Internal route types...
@@ -1392,10 +1396,13 @@ Types of routes to redistribute to the peer, valid options are detailed below...
 for peer type `rrserver-rrserver` which defaults to `True`.
 * `connected` will redistribute connected routes. Defaults to `False`.
 * `kernel` will redistribute kernel routes. Defaults to `False`.
-* `kernel_blackhole` will redistribute kernel blackhole routes. Defaults to `False`.
+* `kernel_blackhole` will redistribute kernel blackhole routes. Defaults to `False`. If set to true, kernel blackhole routes will
+be redistributed regardless of the blackhole large community function value.
 * `static` will redistribute static routes in our global static configuration. Defaults to `False`.
-* `static_blackhole` will redistribute static blackhole routes in our global static configuration. Defaults to `False`.
+* `static_blackhole` will redistribute static blackhole routes in our global static configuration. Defaults to `False`. If set to true,
+static blackhole routes will be redistributed regardless of the blackhole large community function value.
 * `originated` will redistribute originated routes. Defaults to `False`.
+* `originated_default` will redistribute originated default routes. Defaults to `False`.
 
 Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
 

@@ -1137,27 +1137,36 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }"""
 
-    @bird_function("bgp_lc_add_static")
-    def lc_add_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_lc_add_static function."""
-
-        return f"""\
-            function bgp_lc_add_static(string filter_name; lc large_community) {{
-                if ((proto != "static4" && proto != "static6") || {self.functions.is_default()}) then return false;
-                if DEBUG then print filter_name,
-                    " [bgp_lc_add_static] Adding large community ", large_community, " for type STATIC to ", net;
-                bgp_large_community.add(large_community);
-            }}"""
-
     @bird_function("bgp_lc_add_kernel")
     def lc_add_kernel(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_lc_add_kernel function."""
 
         return f"""\
             function bgp_lc_add_kernel(string filter_name; lc large_community) {{
-                if (source != RTS_INHERIT || {self.functions.is_default()}) then return false;
+                if (
+                    source != RTS_INHERIT ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_kernel] Adding large community ", large_community, " for type KERNEL to ", net;
+                bgp_large_community.add(large_community);
+            }}"""
+
+    @bird_function("bgp_lc_add_kernel_blackhole")
+    def lc_add_kernel_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_lc_add_kernel_blackhole function."""
+
+        return f"""\
+            function bgp_lc_add_kernel_blackhole(string filter_name; lc large_community) {{
+                if (
+                    source != RTS_INHERIT ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_lc_add_kernel_blackhole] Adding large community ", large_community, " for type KERNEL BLACKHOLE to ",
+                    net;
                 bgp_large_community.add(large_community);
             }}"""
 
@@ -1171,6 +1180,39 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if (!{self.is_originated()} || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_lc_add_originate] Adding large community ", large_community, " for type ORIGINATED to ", net;
+                bgp_large_community.add(large_community);
+            }}"""
+
+    @bird_function("bgp_lc_add_static")
+    def lc_add_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_lc_add_static function."""
+
+        return f"""\
+            function bgp_lc_add_static(string filter_name; lc large_community) {{
+                if (
+                    (proto != "static4" && proto != "static6") ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_lc_add_static] Adding large community ", large_community, " for type STATIC to ", net;
+                bgp_large_community.add(large_community);
+            }}"""
+
+    @bird_function("bgp_lc_add_static_blackhole")
+    def lc_add_static_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_lc_add_static_blackhole function."""
+
+        return f"""\
+            function bgp_lc_add_static_blackhole(string filter_name; lc large_community) {{
+                if (
+                    (proto != "static4" && proto != "static6") ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_lc_add_static_blackhole] Adding large community ", large_community, " for type STATIC BLACKHOLE to ",
+                    net;
                 bgp_large_community.add(large_community);
             }}"""
 
@@ -1298,27 +1340,35 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_prepend_static")
-    def prepend_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_prepend_static function."""
-
-        return f"""\
-            function bgp_prepend_static(string filter_name; int peer_asn; int prepend_count) {{
-                if ((proto != "static4" && proto != "static6") || {self.functions.is_default()}) then return false;
-                if DEBUG then print filter_name,
-                    " [bgp_prepend_static] Prepending AS-PATH for type STATIC ", prepend_count, "x to ", net;
-                {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
-            }}"""
-
     @bird_function("bgp_prepend_kernel")
     def prepend_kernel(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_prepend_kernel function."""
 
         return f"""\
             function bgp_prepend_kernel(string filter_name; int peer_asn; int prepend_count) {{
-                if (source != RTS_INHERIT || {self.functions.is_default()}) then return false;
+                if (
+                    source != RTS_INHERIT ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_kernel] Prepending AS-PATH for type KERNEL ", prepend_count, "x to ", net;
+                {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
+            }}"""
+
+    @bird_function("bgp_prepend_kernel_blackhole")
+    def prepend_kernel_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_prepend_kernel_blackhole function."""
+
+        return f"""\
+            function bgp_prepend_kernel_blackhole(string filter_name; int peer_asn; int prepend_count) {{
+                if (
+                    source != RTS_INHERIT ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_prepend_kernel_blackhole] Prepending AS-PATH for type KERNEL BLACKHOLE ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
@@ -1331,6 +1381,38 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if (!{self.is_originated()} || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_prepend_originate] Prepending AS-PATH for type ORIGINATED ", prepend_count, "x to ", net;
+                {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
+            }}"""
+
+    @bird_function("bgp_prepend_static")
+    def prepend_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_prepend_static function."""
+
+        return f"""\
+            function bgp_prepend_static(string filter_name; int peer_asn; int prepend_count) {{
+                if (
+                    (proto != "static4" && proto != "static6") ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_prepend_static] Prepending AS-PATH for type STATIC ", prepend_count, "x to ", net;
+                {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
+            }}"""
+
+    @bird_function("bgp_prepend_static_blackhole")
+    def prepend_static_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_prepend_static_blackhole function."""
+
+        return f"""\
+            function bgp_prepend_static_blackhole(string filter_name; int peer_asn; int prepend_count) {{
+                if (
+                    (proto != "static4" && proto != "static6") ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_prepend_static_blackhole] Prepending AS-PATH for type STATIC BLACKHOLE ", prepend_count, "x to ", net;
                 {self.prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
@@ -1482,13 +1564,24 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check if we're allowing blackholes tagged with the blackhole large community
-            function bgp_allow_blackholes(string filter_name; bool capable; int peer_asn; int type_asn) {{
+            function bgp_allow_blackholes(
+                string filter_name;
+                bool capable;
+                bool allow_kernel_blackhole;
+                bool allow_static_blackhole;
+                int peer_asn;
+                int type_asn
+            ) {{
                 # If this is not a route with a blackhole community, then just return false
                 if !{self.is_blackhole()} then return false;
                 # If this is a blackhole community, check if we're going to allow it
                 if (
-                    (BGP_ASN, 666, peer_asn) ~ bgp_large_community ||
-                    (BGP_ASN, 666, type_asn) ~ bgp_large_community
+                    # ASN based ACL
+                    ((BGP_ASN, 666, peer_asn) ~ bgp_large_community || (BGP_ASN, 666, type_asn) ~ bgp_large_community) ||
+                    # Kernel blackholes
+                    (allow_kernel_blackhole && source = RTS_INHERIT) ||
+                    # Static blackholes
+                    (allow_static_blackhole && (proto = "static4" || proto = "static6"))
                 ) then {{
                     # Check if the peer is blackhole community capable
                     if (!capable) then {{

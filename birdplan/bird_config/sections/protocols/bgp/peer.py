@@ -229,8 +229,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     if large_community_type not in (
                         "default",
                         "connected",
-                        "static",
                         "kernel",
+                        "kernel_blackhole",
+                        "static",
+                        "static_blackhole",
                         "originated",
                         "bgp",
                         "bgp_own",
@@ -252,6 +254,20 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                             f"Having 'outgoing_large_communities:{large_community_type}' specified for peer '{self.name}' "
                             f"with type '{self.peer_type}' makes no sense"
                         )
+                    if self.peer_type not in (
+                        "internal",
+                        "routeserver",
+                        "routecollector",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                        "transit",
+                    ):
+                        if large_community_type in ("kernel_blackhole", "static_blackhole"):
+                            raise BirdPlanError(
+                                f"Having 'outgoing_large_communities:{large_community_type}' specified for peer '{self.name}' "
+                                f"with type '{self.peer_type}' makes no sense"
+                            )
                     # Grab the large community attribute
                     large_community_attr = getattr(self.large_communities.outgoing, large_community_type)
                     # Then append them...
@@ -321,7 +337,25 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     f"Having 'redistribute:bgp_transit' set to True for peer '{self.name}' "
                     f"with type '{self.peer_type}' makes no sense"
                 )
-
+        if self.peer_type not in (
+            "internal",
+            "routeserver",
+            "routecollector",
+            "rrclient",
+            "rrserver",
+            "rrserver-rrserver",
+            "transit",
+        ):
+            if self.route_policy_redistribute.kernel_blackhole:
+                raise BirdPlanError(
+                    f"Having 'redistribute:kernel_blackhole' set to True for peer '{self.name}' with type '{self.peer_type}' "
+                    "makes no sense"
+                )
+            if self.route_policy_redistribute.static_blackhole:
+                raise BirdPlanError(
+                    f"Having 'redistribute:static_blackhole' set to True for peer '{self.name}' with type '{self.peer_type}' "
+                    "makes no sense"
+                )
         # Check that we have static routes imported first
         if self.route_policy_redistribute.connected and not self.bgp_attributes.route_policy_import.connected:
             raise BirdPlanError(f"BGP needs connected routes to be imported before they can be redistributed to peer '{self.name}'")
@@ -432,8 +466,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     if prepend_type not in (
                         "default",
                         "connected",
-                        "static",
                         "kernel",
+                        "kernel_blackhole",
+                        "static",
+                        "static_blackhole",
                         "originated",
                         "bgp",
                         "bgp_own",
@@ -448,6 +484,20 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     # Check that we're not doing something stupid
                     if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):
                         if prepend_type in ("default", "bgp_peering", "bgp_transit"):
+                            raise BirdPlanError(
+                                f"Having 'prepend:{prepend_type}' specified for peer '{self.name}' with type '{self.peer_type}' "
+                                "makes no sense"
+                            )
+                    if self.peer_type not in (
+                        "internal",
+                        "routeserver",
+                        "routecollector",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                        "transit",
+                    ):
+                        if prepend_type in ("kernel_blackhole", "static_blackhole"):
                             raise BirdPlanError(
                                 f"Having 'prepend:{prepend_type}' specified for peer '{self.name}' with type '{self.peer_type}' "
                                 "makes no sense"
@@ -780,21 +830,37 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # If the peer accepts blackhole communites, check if we're going to be exporting this blackhole
             if self.blackhole_community:
                 self.conf.add("  # Peer is blackhole community capable")
-                self.conf.add(f"  if {self.bgp_functions.allow_blackholes(True, self.asn, 65413)} then")
+                # Create function call
+                func = self.bgp_functions.allow_blackholes(
+                    True,
+                    self.route_policy_redistribute.kernel_blackhole,
+                    self.route_policy_redistribute.static_blackhole,
+                    self.asn,
+                    65413,
+                )
+                self.conf.add(f"  if {func} then")
                 self.conf.add("    is_blackhole = true;")
             else:
                 self.conf.add("  # Peer is not blackhole community capable")
-                self.conf.add(f"  {self.bgp_functions.allow_blackholes(False, self.asn, 65413)};")
+                self.conf.add(f"  {self.bgp_functions.allow_blackholes(False, False, False, self.asn, 65413)};")
         # Blackhole support for transit
         elif self.peer_type == "transit":
             # If the peer accepts blackhole communites, check if we're going to be exporting this blackhole
             if self.blackhole_community:
+                # Create function call
+                func = self.bgp_functions.allow_blackholes(
+                    True,
+                    self.route_policy_redistribute.kernel_blackhole,
+                    self.route_policy_redistribute.static_blackhole,
+                    self.asn,
+                    65412,
+                )
                 self.conf.add("  # Peer is blackhole community capable")
-                self.conf.add(f"  if {self.bgp_functions.allow_blackholes(True, self.asn, 65412)} then")
+                self.conf.add(f"  if {func} then")
                 self.conf.add("    is_blackhole = true;")
             else:
                 self.conf.add("  # Peer is not blackhole community capable")
-                self.conf.add(f"  {self.bgp_functions.allow_blackholes(False, self.asn, 65412)};")
+                self.conf.add(f"  {self.bgp_functions.allow_blackholes(False, False, False, self.asn, 65412)};")
 
         # Reject NOEXPORT
         if self.peer_type in ("customer", "peer", "routecollector", "routeserver", "transit"):
@@ -895,15 +961,21 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.large_communities.outgoing.connected:
             for large_community in self.large_communities.outgoing.connected:
                 self.conf.add(f"    {self.bgp_functions.lc_add_connected(BirdVariable(large_community))};")
-        if self.large_communities.outgoing.static:
-            for large_community in self.large_communities.outgoing.static:
-                self.conf.add(f"    {self.bgp_functions.lc_add_static(BirdVariable(large_community))};")
         if self.large_communities.outgoing.kernel:
             for large_community in self.large_communities.outgoing.kernel:
                 self.conf.add(f"    {self.bgp_functions.lc_add_kernel(BirdVariable(large_community))};")
+        if self.large_communities.outgoing.kernel_blackhole:
+            for large_community in self.large_communities.outgoing.kernel_blackhole:
+                self.conf.add(f"    {self.bgp_functions.lc_add_kernel_blackhole(BirdVariable(large_community))};")
         if self.large_communities.outgoing.originated:
             for large_community in self.large_communities.outgoing.originated:
                 self.conf.add(f"    {self.bgp_functions.lc_add_originated(BirdVariable(large_community))};")
+        if self.large_communities.outgoing.static:
+            for large_community in self.large_communities.outgoing.static:
+                self.conf.add(f"    {self.bgp_functions.lc_add_static(BirdVariable(large_community))};")
+        if self.large_communities.outgoing.static_blackhole:
+            for large_community in self.large_communities.outgoing.static_blackhole:
+                self.conf.add(f"    {self.bgp_functions.lc_add_static_blackhole(BirdVariable(large_community))};")
         if self.large_communities.outgoing.bgp:
             for large_community in self.large_communities.outgoing.bgp:
                 self.conf.add(f"    {self.bgp_functions.lc_add_bgp(BirdVariable(large_community))};")
@@ -930,12 +1002,18 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"    {self.bgp_functions.prepend_default(BirdVariable('BGP_ASN'), self.prepend.default.own_asn)};")
         if self.prepend.connected.own_asn:
             self.conf.add(f"    {self.bgp_functions.prepend_connected(BirdVariable('BGP_ASN'), self.prepend.connected.own_asn)};")
-        if self.prepend.static.own_asn:
-            self.conf.add(f"    {self.bgp_functions.prepend_static(BirdVariable('BGP_ASN'), self.prepend.static.own_asn)};")
         if self.prepend.kernel.own_asn:
             self.conf.add(f"    {self.bgp_functions.prepend_kernel(BirdVariable('BGP_ASN'), self.prepend.kernel.own_asn)};")
+        if self.prepend.kernel_blackhole.own_asn:
+            func = self.bgp_functions.prepend_kernel_blackhole(BirdVariable("BGP_ASN"), self.prepend.kernel_blackhole.own_asn)
+            self.conf.add(f"    {func};")
         if self.prepend.originated.own_asn:
             self.conf.add(f"    {self.bgp_functions.prepend_originated(BirdVariable('BGP_ASN'), self.prepend.originated.own_asn)};")
+        if self.prepend.static.own_asn:
+            self.conf.add(f"    {self.bgp_functions.prepend_static(BirdVariable('BGP_ASN'), self.prepend.static.own_asn)};")
+        if self.prepend.static_blackhole.own_asn:
+            func = self.bgp_functions.prepend_static_blackhole(BirdVariable("BGP_ASN"), self.prepend.static_blackhole.own_asn)
+            self.conf.add(f"    {func};")
         if self.prepend.bgp.own_asn:
             self.conf.add(f"    {self.bgp_functions.prepend_bgp(BirdVariable('BGP_ASN'), self.prepend.bgp.own_asn)};")
         if self.prepend.bgp_own.own_asn:

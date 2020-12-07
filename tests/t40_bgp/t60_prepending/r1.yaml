@@ -5,6 +5,10 @@ debug: True
 static:
   - '100.131.0.0/24 via 100.101.0.2'
   - 'fc00:131::/48 via fc00:101::2'
+  - '100.132.0.0/24 via "eth1"'
+  - 'fc00:132::/48 via "eth1"'
+  - '100.133.0.0/24 blackhole'
+  - 'fc00:133::/48 blackhole'
   - '0.0.0.0/0 via 100.101.0.2'
   - '::/0 via fc00:101::2'
 
@@ -14,13 +18,19 @@ bgp:
     connected:
       interfaces:
         - eth1
-    static: True
     kernel: True
+    kernel_blackhole: True
+    static: True
+    static_blackhole: True
   accept:
     default: True
   originate:
     - '100.111.0.0/24 via 100.101.0.2'
     - 'fc00:111::/48 via fc00:101::2'
+    - '100.112.0.0/24 via "eth1"'
+    - 'fc00:112::/48 via "eth1"'
+    - '100.113.0.0/24 blackhole'
+    - 'fc00:113::/48 blackhole'
   peers:
     e1:
       asn: 65000
@@ -47,9 +57,9 @@ bgp:
       error_wait_time: 2,5
       redistribute:
         connected: True
-        static: True
-        originated: True
         kernel: True
+        originated: True
+        static: True
 @TEMPLATE_EXTRA_CONFIG@
 @TEMPLATE_PEER_CONFIG@
 @PEER_CONFIG@

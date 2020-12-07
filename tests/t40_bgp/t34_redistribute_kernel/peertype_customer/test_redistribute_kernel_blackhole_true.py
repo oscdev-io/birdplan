@@ -27,3 +27,7 @@ from ...config.peertype_customer.r1r2 import PeerTypeConfig
 
 class Test(PeerTypeConfig, Template):
     """BGP redistribute kernel route test cases, with redistribute:kernel_blackhole set to True."""
+
+    routers_config_exception = {
+        "r1": r"Having 'redistribute:kernel_blackhole' set to True for peer 'r2' with type 'customer' makes no sense",
+    }
