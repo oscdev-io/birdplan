@@ -10,16 +10,15 @@
 
 [Basic](t20_rip/t10_basic/README.md) (including no kernel export)
 
-[Redistribute RIP](t20_rip/t20_redistribute_rip/README.md)
-
 [Redistribute Connected](t20_rip/t30_redistribute_connected/README.md)
 
-[Redistribute Kernel](t20_rip/t40_redistribute_kernel/README.md)
+[Redistribute Kernel](t20_rip/t34_redistribute_kernel/README.md)
 
-[Redistribute Static](t20_rip/t50_redistribute_static/README.md)
+[Redistribute Static](t20_rip/t36_redistribute_static/README.md)
 
-[Redistribute Default](t20_rip/t60_redistribute_default/README.md)
+[Redistribute Default](t20_rip/t38_redistribute_default/README.md)
 
+[Redistribute RIP](t20_rip/t39_redistribute_rip/README.md)
 
 # OSPF
 
