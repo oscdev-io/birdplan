@@ -393,28 +393,34 @@ class BirdPlan:
                 elif isinstance(redistribute_config, dict):
                     # Check it has an "interfaces" key
                     if "interfaces" not in redistribute_config:
-                        raise BirdPlanError(f"Configurion item '{redistribute}' has no 'interfaces' option in bgp:redistribute")
+                        raise BirdPlanError(f"Configurion item '{redistribute}' has no 'interfaces' option in rip:redistribute")
                     # If it does, check that it is a list
                     if not isinstance(redistribute_config["interfaces"], list):
-                        raise BirdPlanError(f"Configurion item '{redistribute}:interfaces' has an invalid type in bgp:redistribute")
+                        raise BirdPlanError(f"Configurion item '{redistribute}:interfaces' has an invalid type in rip:redistribute")
                     # Set redistribute_connected as the interface list
                     redistribute_connected = redistribute_config["interfaces"]
                 else:
                     raise BirdPlanError(f"Configurion item '{redistribute}' has an unsupported value")
                 # Add configuration
                 self.birdconf.protocols.rip.route_policy_redistribute.connected = redistribute_connected
-            # Add static route redistribution
-            elif redistribute == "static":
-                self.birdconf.protocols.rip.route_policy_redistribute.static = redistribute_config
             # Add kernel route redistribution
             elif redistribute == "kernel":
                 self.birdconf.protocols.rip.route_policy_redistribute.kernel = redistribute_config
-            # Allow redistribution of the default route
-            elif redistribute == "default":
-                self.birdconf.protocols.rip.route_policy_redistribute.default = redistribute_config
+            # Add kernel default route redistribution
+            elif redistribute == "kernel_default":
+                self.birdconf.protocols.rip.route_policy_redistribute.kernel_default = redistribute_config
             # Allow redistribution of RIP routes
             elif redistribute == "rip":
                 self.birdconf.protocols.rip.route_policy_redistribute.rip = redistribute_config
+            # Allow redistribution of RIP default routes
+            elif redistribute == "rip_default":
+                self.birdconf.protocols.rip.route_policy_redistribute.rip_default = redistribute_config
+            # Add static route redistribution
+            elif redistribute == "static":
+                self.birdconf.protocols.rip.route_policy_redistribute.static = redistribute_config
+            # Add static default route redistribution
+            elif redistribute == "static_default":
+                self.birdconf.protocols.rip.route_policy_redistribute.static_default = redistribute_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in rip:redistribute")

@@ -19,20 +19,31 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""RIP test case for redistribution of kernel routes."""
+"""RIP test case for redistribution of only the default route."""
 
 from ...basetests import BirdPlanBaseTestCase
 
 
 class Template(BirdPlanBaseTestCase):
-    """RIP test case for redistribution of kernel routes."""
+    """RIP test case for redistribution of only the default route."""
 
-    routers = ["r1", "r2"]
+    routers = ["r1", "r2", "r3"]
+    switches = ["s1", "s2"]
+
     r1_interfaces = ["eth0", "eth1"]
+
+    r2_interfaces = ["eth0", "eth1"]
+    r2_switch_eth1 = "s2"
+
+    r3_interface_eth0 = {"mac": "02:03:00:00:00:01", "ips": ["100.102.0.2/24", "fc00:102::2/64"]}
+    r3_switch_eth0 = "s2"
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
+
+    def test_add_kernel_routes(self, sim):
+        """Add kernel routes."""
 
         # Add gateway'd kernel routes
         sim.node("r1").run_ip(["route", "add", "192.168.20.0/24", "via", "100.101.0.2"])
@@ -47,6 +58,14 @@ class Template(BirdPlanBaseTestCase):
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)
+
+    def test_bird_tables_static4(self, sim):
+        """Test BIRD t_static4 table stub."""
+        self._test_bird_routers_table("t_static4", sim, routers=["r1"])
+
+    def test_bird_tables_static6(self, sim):
+        """Test BIRD t_static6 table stub."""
+        self._test_bird_routers_table("t_static6", sim, routers=["r1"])
 
     def test_bird_tables_rip4(self, sim):
         """Test BIRD t_rip4 table."""

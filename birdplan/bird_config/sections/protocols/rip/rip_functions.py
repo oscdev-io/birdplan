@@ -32,11 +32,11 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
     def accept_connected_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD rip_accept_connected_route function."""
 
-        return """\
+        return f"""\
             # Accept RIP connected routes
-            function rip_accept_connected_route(string filter_name) {
-                if (proto != "direct4_rip" && proto != "direct6_rip") then return false;
+            function rip_accept_connected_route(string filter_name) {{
+                if ((proto != "direct4_rip" && proto != "direct6_rip") || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [rip_accept_connected_route] Accepting RIP connected route ", net;
                 accept;
-            }"""
+            }}"""

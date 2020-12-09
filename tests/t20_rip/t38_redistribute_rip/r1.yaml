@@ -9,7 +9,9 @@ static:
   - '0.0.0.0/0 via 100.101.0.2'
   - '::/0 via fc00:101::2'
 rip:
-@EXTRA_CONFIG@
+  redistribute:
+    static: True
+    static_default: True
   interfaces:
     eth0:
       update-time: 5

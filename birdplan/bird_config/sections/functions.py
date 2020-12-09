@@ -223,27 +223,53 @@ class SectionFunctions(SectionBase):
     def accept_static_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD accept_static_route function."""
 
-        return """\
+        return f"""\
             # Accept static route
-            function accept_static_route(string filter_name) {
-                if (source != RTS_STATIC) then return false;
+            function accept_static_route(string filter_name) {{
+                if (source != RTS_STATIC || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [accept_static_Route] Accepting static route ", net;
+                    " [accept_static_route] Accepting static route ", net;
                 accept;
-            }"""
+            }}"""
+
+    @bird_function("accept_static_default_route")
+    def accept_static_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_static_default_route function."""
+
+        return f"""\
+            # Accept static default route
+            function accept_static_default_route(string filter_name) {{
+                if (source != RTS_STATIC || !{self.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_static_route] Accepting static default route ", net;
+                accept;
+            }}"""
 
     @bird_function("accept_kernel_route")
     def accept_kernel_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD accept_kernel_route function."""
 
-        return """\
+        return f"""\
             # Accept kernel route
-            function accept_kernel_route(string filter_name) {
-                if (source != RTS_INHERIT) then return false;
+            function accept_kernel_route(string filter_name) {{
+                if (source != RTS_INHERIT || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [accept_kernel_route] Accepting kernel route ", net;
                 accept;
-            }"""
+            }}"""
+
+    @bird_function("accept_kernel_default_route")
+    def accept_kernel_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_kernel_default_route function."""
+
+        return f"""\
+            # Accept kernel route
+            function accept_kernel_default_route(string filter_name) {{
+                if (source != RTS_INHERIT || !{self.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_kernel_default_route] Accepting kernel default route ", net;
+                accept;
+            }}"""
 
     @bird_function("accept_ospf_route")
     def accept_ospf_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -262,11 +288,24 @@ class SectionFunctions(SectionBase):
     def accept_rip_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD accept_rip_route function."""
 
-        return """\
+        return f"""\
             # Accept RIP route
-            function accept_rip_route(string filter_name) {
-                if (source != RTS_RIP) then return false;
+            function accept_rip_route(string filter_name) {{
+                if (source != RTS_RIP || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [accept_rip_route] Accepting RIP route ", net;
                 accept;
-            }"""
+            }}"""
+
+    @bird_function("accept_rip_default_route")
+    def accept_rip_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_rip_default_route function."""
+
+        return f"""\
+            # Accept RIP route
+            function accept_rip_default_route(string filter_name) {{
+                if (source != RTS_RIP || !{self.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_rip_default_route] Accepting RIP default route ", net;
+                accept;
+            }}"""

@@ -16,9 +16,9 @@
 
 [Redistribute Static](t20_rip/t36_redistribute_static/README.md)
 
-[Redistribute Default](t20_rip/t38_redistribute_default/README.md)
+[Redistribute RIP](t20_rip/t38_redistribute_rip/README.md)
 
-[Redistribute RIP](t20_rip/t39_redistribute_rip/README.md)
+[Redistribute Default](t20_rip/t39_redistribute_default/README.md)
 
 # OSPF
 
