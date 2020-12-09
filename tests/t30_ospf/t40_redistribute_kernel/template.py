@@ -34,12 +34,15 @@ class Template(BirdPlanBaseTestCase):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
-        # Add gateway'd kernel static routes
+        # Add gateway'd kernel routes
         sim.node("r1").run_ip(["route", "add", "192.168.20.0/24", "via", "100.101.0.2"])
         sim.node("r1").run_ip(["route", "add", "fc20::/64", "via", "fc00:101::2"])
-        # Add link kernel static routes
+        # Add link kernel routes
         sim.node("r1").run_ip(["route", "add", "192.168.30.0/24", "dev", "eth1"])
         sim.node("r1").run_ip(["route", "add", "fc30::/64", "dev", "eth1"])
+        # Add default kernel route
+        sim.node("r1").run_ip(["route", "add", "0.0.0.0/0", "via", "100.101.0.2"])
+        sim.node("r1").run_ip(["route", "add", "::/0", "via", "fc00:101::2"])
 
     def test_bird_status(self, sim):
         """Test BIRD status."""

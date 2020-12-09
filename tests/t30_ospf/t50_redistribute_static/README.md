@@ -33,6 +33,8 @@ class "Router: r1" {
 + fc20:/64 via fc01::2 (eth1)
 - 192.168.30.0/24 dev eth1
 + fc30::/64 dev eth1
+- 0.0.0.0/0 via 100.101.0.2
++ ::/0 via fc00:101::2
 }
 
 

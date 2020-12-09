@@ -275,14 +275,27 @@ class SectionFunctions(SectionBase):
     def accept_ospf_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD accept_ospf_route function."""
 
-        return """\
+        return f"""\
             # Accept OSPF route
-            function accept_ospf_route(string filter_name) {
-                if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2]) then return false;
+            function accept_ospf_route(string filter_name) {{
+                if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [accept_ospf_route] Accepting OSPF route ", net;
                 accept;
-            }"""
+            }}"""
+
+    @bird_function("accept_ospf_default_route")
+    def accept_ospf_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_ospf_default_route function."""
+
+        return f"""\
+            # Accept OSPF route
+            function accept_ospf_default_route(string filter_name) {{
+                if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || !{self.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [accept_ospf_route] Accepting OSPF default route ", net;
+                accept;
+            }}"""
 
     @bird_function("accept_rip_route")
     def accept_rip_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument

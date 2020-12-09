@@ -501,10 +501,10 @@ class BirdPlan:
                 elif isinstance(redistribute_config, dict):
                     # Check it has an "interfaces" key
                     if "interfaces" not in redistribute_config:
-                        raise BirdPlanError(f"Configurion item '{redistribute}' has no 'interfaces' option in bgp:redistribute")
+                        raise BirdPlanError(f"Configurion item '{redistribute}' has no 'interfaces' option in ospf:redistribute")
                     # If it does, check that it is a list
                     if not isinstance(redistribute_config["interfaces"], list):
-                        raise BirdPlanError(f"Configurion item '{redistribute}:interfaces' has an invalid type in bgp:redistribute")
+                        raise BirdPlanError(f"Configurion item '{redistribute}:interfaces' has an invalid type in ospf:redistribute")
                     # Set redistribute_connected as the interface list
                     redistribute_connected = redistribute_config["interfaces"]
                 else:
@@ -514,9 +514,18 @@ class BirdPlan:
             # Add kernel route redistribution
             elif redistribute == "kernel":
                 self.birdconf.protocols.ospf.route_policy_redistribute.kernel = redistribute_config
-            # Allow redistribution of the default route
-            elif redistribute == "default":
-                self.birdconf.protocols.ospf.route_policy_redistribute.default = redistribute_config
+            # Add kernel default route redistribution
+            elif redistribute == "kernel_default":
+                self.birdconf.protocols.ospf.route_policy_redistribute.kernel_default = redistribute_config
+            # Allow redistribution of OSPF default routes
+            elif redistribute == "ospf_default":
+                self.birdconf.protocols.ospf.route_policy_redistribute.ospf_default = redistribute_config
+            # Add static route redistribution
+            elif redistribute == "static":
+                self.birdconf.protocols.ospf.route_policy_redistribute.static = redistribute_config
+            # Add static default route redistribution
+            elif redistribute == "static_default":
+                self.birdconf.protocols.ospf.route_policy_redistribute.static_default = redistribute_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")
