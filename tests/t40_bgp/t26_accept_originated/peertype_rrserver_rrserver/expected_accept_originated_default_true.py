@@ -3,11 +3,11 @@
 
 """Expected test result data."""
 
-r1_t_bgp4_AS65001_r2_peer = {}
+r1_t_bgp4_AS65000_r2_peer = {}
 
 r2_t_bgp4_AS65000_r1_peer = {}
 
-r1_t_bgp6_AS65001_r2_peer = {}
+r1_t_bgp6_AS65000_r2_peer = {}
 
 r2_t_bgp6_AS65000_r1_peer = {}
 
@@ -93,6 +93,13 @@ r1_master4 = {
             "prefix_type": "unicast",
             "protocol": "kernel4",
             "type": ["inherit", "univ"],
+        },
+        {
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
+            "pref": 200,
+            "prefix_type": "blackhole",
+            "protocol": "bgp_originate4",
+            "type": ["static", "univ"],
         },
     ],
     "100.101.0.0/24": [
@@ -210,6 +217,13 @@ r1_master6 = {
             "prefix_type": "unicast",
             "protocol": "kernel6",
             "type": ["inherit", "univ"],
+        },
+        {
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
+            "pref": 200,
+            "prefix_type": "blackhole",
+            "protocol": "bgp_originate6",
+            "type": ["static", "univ"],
         },
     ],
     "fc00:100::/64": [
@@ -452,6 +466,13 @@ r1_t_kernel4 = {
             "protocol": "kernel4",
             "type": ["inherit", "univ"],
         },
+        {
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
+            "pref": 200,
+            "prefix_type": "blackhole",
+            "protocol": "bgp_originate4",
+            "type": ["static", "univ"],
+        },
     ],
     "100.101.0.0/24": [
         {
@@ -540,6 +561,13 @@ r1_t_kernel6 = {
             "prefix_type": "unicast",
             "protocol": "kernel6",
             "type": ["inherit", "univ"],
+        },
+        {
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
+            "pref": 200,
+            "prefix_type": "blackhole",
+            "protocol": "bgp_originate6",
+            "type": ["static", "univ"],
         },
     ],
     "fc00:101::/48": [

@@ -10,9 +10,11 @@ Remember to set the `router_id`, see [Configuration](configuration.md).
 
 The `accept` key contains a dictionary of routes we will accept into the master table from our BGP table. Namely...
 
-* `default` - Allows us to accept a default route from BGP. The default is `False`.
 * `blackhole` - Allows us to accept a blackhole route from BGP. The default is `True`.
 * `originated` - Allows us to accept originated routes from the BGP table. The default is `True`.
+* `originated_default` - Allows us to accept originated routes from the BGP table. The default is `False`.
+
+* `bgp_default` - Allows us to accept a default route from BGP. The default is `False`.
 
 Below is a configuration example...
 ```yaml

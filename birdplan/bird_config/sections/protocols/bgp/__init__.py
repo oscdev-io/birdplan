@@ -453,26 +453,19 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add("{")
         self.conf.add(f'  filter_name = "{filter_name}";')
         # Check if we accept the default route, if not block it
-        if not self.route_policy_accept.default:
-            self.conf.add("  # Do not export default routes to the master table")
-            self.conf.add(f"  if {self.functions.is_default()} then {{")
-            self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " to master table (not accepting default routes)";')
-            self.conf.add("    reject;")
-            self.conf.add("  }")
+        if not self.route_policy_accept.bgp_default:
+            self.conf.add(f"  {self.bgp_functions.accept_bgp_default()};")
         # Check if we accept blackhole routes, if not block it
         if not self.route_policy_accept.blackhole:
-            self.conf.add("  # Do not export blackhole routes to the master table")
-            self.conf.add(f"  if {self.bgp_functions.is_blackhole()} then {{")
-            self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " to master table (not accepting blackhole routes)";')
-            self.conf.add("    reject;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.bgp_functions.accept_blackhole()};")
         # Accept BGP routes into the master routing table
-        self.conf.add("  # Export BGP routes to the master table")
-        self.conf.add("  if (source = RTS_BGP) then accept;")
-        # Accept BGP originated routes into the master routing table
+        self.conf.add(f"  {self.bgp_functions.accept_bgp()};")
+        # Check if we accept originated routes, if not block it
         if self.route_policy_accept.originated:
-            self.conf.add("  # Accept originated routes into the master table")
-            self.conf.add(f"  if {self.bgp_functions.is_originated()} then accept;")
+            self.conf.add(f"  {self.bgp_functions.accept_originated()};")
+        # Check if we accept originated routes, if not block it
+        if self.route_policy_accept.originated_default:
+            self.conf.add(f"  {self.bgp_functions.accept_originated_default()};")
         # Default to reject
         self.conf.add('  if DEBUG then')
         self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from t_bgp to master (fallthrough)";')
