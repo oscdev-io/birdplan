@@ -43,31 +43,28 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
+    def test_add_kernel_routes(self, sim):
+        """Add kernel routes to BIRD instances."""
+
+        # Add gateway'd kernel routes
+        sim.node("r1").run_ip(["route", "add", "100.114.0.0/24", "via", "100.101.0.3"])
+        sim.node("r1").run_ip(["route", "add", "fc00:114::/48", "via", "fc00:101::3"])
+
+        # Add link kernel routes
+        sim.node("r1").run_ip(["route", "add", "100.115.0.0/24", "dev", "eth1"])
+        sim.node("r1").run_ip(["route", "add", "fc00:115::/48", "dev", "eth1"])
+
+        # Add blackhole kernel routes
+        sim.node("r1").run_ip(["route", "add", "blackhole", "100.106.0.0/24"])
+        sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:106::/48"])
+
+        # Add default kernel route
+        sim.node("r1").run_ip(["route", "add", "0.0.0.0/0", "via", "100.101.0.3"])
+        sim.node("r1").run_ip(["route", "add", "::/0", "via", "fc00:101::3"])
+
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)
-
-    def test_bird_tables_direct4_bgp(self, sim):
-        """Test BIRD t_direct4_bgp table."""
-        if self.has_direct_table:
-            self._test_bird_routers_table("t_direct4_bgp", sim, routers=["r1"])
-        else:
-            with pytest.raises(
-                BirdClientError,
-                match=r"BIRD client error: syntax error, unexpected CF_SYM_UNDEFINED, expecting CF_SYM_KNOWN or ALL",
-            ):
-                self._test_bird_routers_table("t_direct4_bgp", sim, routers=["r1"])
-
-    def test_bird_tables_direct6_bgp(self, sim):
-        """Test BIRD t_direct6_bgp table."""
-        if self.has_direct_table:
-            self._test_bird_routers_table("t_direct6_bgp", sim, routers=["r1"])
-        else:
-            with pytest.raises(
-                BirdClientError,
-                match=r"BIRD client error: syntax error, unexpected CF_SYM_UNDEFINED, expecting CF_SYM_KNOWN or ALL",
-            ):
-                self._test_bird_routers_table("t_direct6_bgp", sim, routers=["r1"])
 
     def test_bird_tables_bgp4_peer(self, sim):
         """Test BIRD BGP4 peer table."""
@@ -92,6 +89,36 @@ class TemplateBase(BirdPlanBaseTestCase):
     def test_bird_tables_master6(self, sim):
         """Test BIRD master6 table."""
         self._test_bird_routers_table("master6", sim)
+
+    def test_bird_tables_direct4_bgp(self, sim):
+        """Test BIRD t_direct4_bgp table."""
+        if self.has_direct_table:
+            self._test_bird_routers_table("t_direct4_bgp", sim, routers=["r1"])
+        else:
+            with pytest.raises(
+                BirdClientError,
+                match=r"BIRD client error: syntax error, unexpected CF_SYM_UNDEFINED, expecting CF_SYM_KNOWN or ALL",
+            ):
+                self._test_bird_routers_table("t_direct4_bgp", sim, routers=["r1"])
+
+    def test_bird_tables_direct6_bgp(self, sim):
+        """Test BIRD t_direct6_bgp table."""
+        if self.has_direct_table:
+            self._test_bird_routers_table("t_direct6_bgp", sim, routers=["r1"])
+        else:
+            with pytest.raises(
+                BirdClientError,
+                match=r"BIRD client error: syntax error, unexpected CF_SYM_UNDEFINED, expecting CF_SYM_KNOWN or ALL",
+            ):
+                self._test_bird_routers_table("t_direct6_bgp", sim, routers=["r1"])
+
+    def test_bird_tables_static4(self, sim):
+        """Test BIRD static4 table."""
+        self._test_bird_routers_table("t_static4", sim, routers=["r1"])
+
+    def test_bird_tables_static6(self, sim):
+        """Test BIRD static6 table."""
+        self._test_bird_routers_table("t_static6", sim, routers=["r1"])
 
     def test_bird_tables_kernel4(self, sim):
         """Test BIRD kernel4 table."""

@@ -534,7 +534,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add("string filter_name;")
         self.conf.add("{")
         self.conf.add(f'  filter_name = "{filter_name}";')
-        self.conf.add("  # Origination import")
+        self.conf.add("  # Import connected routes")
         self.conf.add(f"  {self.bgp_functions.import_own(10)};")
         self.conf.add("  accept;")
         self.conf.add("};")
