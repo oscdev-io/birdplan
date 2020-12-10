@@ -19,18 +19,10 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""OSPF test case for redistribution of static default routes, with default settings for redistribute:default."""
+"""OSPF test case for redistribution of static default routes, with default settings for redistribute:static_default."""
 
 from ..template import Template
 
 
 class Test(Template):
-    """OSPF test case for redistribution of static default routes, with default settings for redistribute:default."""
-
-    def _test_bird_tables_static4(self, sim):
-        """Test BIRD t_static4 table stub."""
-        self._test_bird_routers_table("t_static4", sim, routers=["r1"])
-
-    def _test_bird_tables_static6(self, sim):
-        """Test BIRD t_static6 table stub."""
-        self._test_bird_routers_table("t_static6", sim, routers=["r1"])
+    """OSPF test case for redistribution of static default routes, with default settings for redistribute:static_default."""

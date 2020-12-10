@@ -52,8 +52,6 @@ class OSPFRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
         Redistribute kernel routes to the main OSPF table. Defaults to `False`.
     kernel_default : bool
         Redistribute kernel default routes to the main OSPF table. Defaults to `False`.
-    ospf_default : bool
-        Redistribute OSPF default routes. Defaults to `False`.
     static : bool
         Redistribute static routes to the main OSPF table. Defaults to `False`.
     static_default : bool
@@ -72,7 +70,6 @@ class OSPFRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
         self.connected = False
         self.kernel = False
         self.kernel_default = False
-        self.ospf_default = False
         self.static = False
         self.static_default = False
 

@@ -504,7 +504,9 @@ class BirdPlan:
                         raise BirdPlanError(f"Configurion item '{redistribute}' has no 'interfaces' option in ospf:redistribute")
                     # If it does, check that it is a list
                     if not isinstance(redistribute_config["interfaces"], list):
-                        raise BirdPlanError(f"Configurion item '{redistribute}:interfaces' has an invalid type in ospf:redistribute")
+                        raise BirdPlanError(
+                            f"Configurion item '{redistribute}:interfaces' has an invalid type in ospf:redistribute"
+                        )
                     # Set redistribute_connected as the interface list
                     redistribute_connected = redistribute_config["interfaces"]
                 else:
@@ -517,9 +519,6 @@ class BirdPlan:
             # Add kernel default route redistribution
             elif redistribute == "kernel_default":
                 self.birdconf.protocols.ospf.route_policy_redistribute.kernel_default = redistribute_config
-            # Allow redistribution of OSPF default routes
-            elif redistribute == "ospf_default":
-                self.birdconf.protocols.ospf.route_policy_redistribute.ospf_default = redistribute_config
             # Add static route redistribution
             elif redistribute == "static":
                 self.birdconf.protocols.ospf.route_policy_redistribute.static = redistribute_config

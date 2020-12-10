@@ -28,12 +28,28 @@ class Template(BirdPlanBaseTestCase):
     """OSPF test case for redistribution of only the default route."""
 
     routers = ["r1", "r2"]
+    switches = ["s1"]
+
     r1_interfaces = ["eth0", "eth1"]
+
+    r2_interfaces = ["eth0"]
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
-        self._test_setup_specific(sim, tmpdir)
+
+    def test_add_kernel_routes(self, sim):
+        """Add kernel routes."""
+
+        # Add gateway'd kernel routes
+        sim.node("r1").run_ip(["route", "add", "192.168.20.0/24", "via", "100.101.0.2"])
+        sim.node("r1").run_ip(["route", "add", "fc20::/64", "via", "fc00:101::2"])
+        # Add link kernel routes
+        sim.node("r1").run_ip(["route", "add", "192.168.30.0/24", "dev", "eth1"])
+        sim.node("r1").run_ip(["route", "add", "fc30::/64", "dev", "eth1"])
+        # Add default kernel route
+        sim.node("r1").run_ip(["route", "add", "0.0.0.0/0", "via", "100.101.0.2"])
+        sim.node("r1").run_ip(["route", "add", "::/0", "via", "fc00:101::2"])
 
     def _test_setup_specific(self, sim, tmpdir):
         """Set up our test - specific additions."""
@@ -41,20 +57,6 @@ class Template(BirdPlanBaseTestCase):
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)
-
-    def test_bird_tables_static4(self, sim):
-        """Test BIRD t_static4 table."""
-        self._test_bird_tables_static4(sim)
-
-    def _test_bird_tables_static4(self, sim):
-        """Test BIRD t_static4 table stub."""
-
-    def test_bird_tables_static6(self, sim):
-        """Test BIRD t_static6 table."""
-        self._test_bird_tables_static6(sim)
-
-    def _test_bird_tables_static6(self, sim):
-        """Test BIRD t_static6 table stub."""
 
     def test_bird_tables_ospf4(self, sim):
         """Test BIRD t_ospf4 table."""
@@ -71,6 +73,14 @@ class Template(BirdPlanBaseTestCase):
     def test_bird_tables_master6(self, sim):
         """Test BIRD master6 table."""
         self._test_bird_routers_table("master6", sim)
+
+    def test_bird_tables_static4(self, sim):
+        """Test BIRD t_static4 table."""
+        self._test_bird_routers_table("t_static4", sim, routers=["r1"])
+
+    def test_bird_tables_static6(self, sim):
+        """Test BIRD t_static6 table."""
+        self._test_bird_routers_table("t_static6", sim, routers=["r1"])
 
     def test_bird_tables_kernel4(self, sim):
         """Test BIRD kernel4 table."""

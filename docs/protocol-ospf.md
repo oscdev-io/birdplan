@@ -39,7 +39,8 @@ like `eth*`.
 
 * `static_default` routes are default routes setup in the static protocol.
 
-* `ospf_default` allows the redistributing of OSPF default routes we receive. By default we do not redistribute OSPF default routes.
+
+Note: All OSPF routes are redistributed by default, this includes default routes.
 
 
 An example of this configuration can be found below...

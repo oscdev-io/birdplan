@@ -19,22 +19,15 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""OSPF test case for redistribution of kernel default routes, with redistribute:default set to false."""
+"""OSPF test case for redistribution of kernel default routes, with redistribute:kernel_default set to false."""
 
 from ..template import Template
 
 
 class Test(Template):
-    """OSPF test case for redistribution of kernel default routes, with redistribute:default set to false."""
+    """OSPF test case for redistribution of kernel default routes, with redistribute:kernel_default set to false."""
 
     r1_extra_config = """
   redistribute:
-    default: False
-    kernel: True
+    kernel_default: False
 """
-
-    def _test_setup_specific(self, sim, tmpdir):
-        """Set up our test - specific additions."""
-        # Add gateway'd kernel default routes
-        sim.node("r1").run_ip(["route", "add", "0.0.0.0/0", "via", "100.101.0.2"])
-        sim.node("r1").run_ip(["route", "add", "::/0", "via", "fc00:101::2"])
