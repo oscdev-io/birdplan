@@ -474,7 +474,8 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             self.conf.add("  # Accept originated routes into the master table")
             self.conf.add(f"  if {self.bgp_functions.is_originated()} then accept;")
         # Default to reject
-        self.conf.add("  # Reject everything else;")
+        self.conf.add('  if DEBUG then')
+        self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from t_bgp to master (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
@@ -506,7 +507,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # BGP importation of static default routes
         if self.route_policy_import.static_default:
             self.conf.add(f"  {self.bgp_functions.import_static_default()};")
-        # Else accept
+        # Else reject
+        self.conf.add('  if DEBUG then')
+        self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from master to t_bgp (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")

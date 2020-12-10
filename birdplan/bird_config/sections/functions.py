@@ -179,6 +179,17 @@ class SectionFunctions(SectionBase):
                 return false;
             }"""
 
+    @bird_function("is_bgp")
+    def is_bgp(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD is_bgp function."""
+
+        return """\
+            # Match BGP routes
+            function is_bgp(string filter_name) {
+                if (source = RTS_BGP) then return true;
+                return false;
+            }"""
+
     @bird_function("is_bogon")
     def is_bogon(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD is_bogon function."""
@@ -206,106 +217,106 @@ class SectionFunctions(SectionBase):
                 return false;
             }"""
 
-    @bird_function("accept_static_route")
-    def accept_static_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD accept_static_route function."""
+    @bird_function("accept_static")
+    def accept_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_static function."""
 
         return f"""\
             # Accept static route
-            function accept_static_route(string filter_name) {{
+            function accept_static(string filter_name) {{
                 if (source != RTS_STATIC || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [accept_static_route] Accepting static route ", net;
+                    " [accept_static] Accepting static route ", net;
                 accept;
             }}"""
 
-    @bird_function("redistribute_static_route")
-    def redistribute_static_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD redistribute_static_route function."""
+    @bird_function("redistribute_static")
+    def redistribute_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD redistribute_static function."""
 
         return f"""\
             # Accept static route
-            function redistribute_static_route(string filter_name) {{
+            function redistribute_static(string filter_name) {{
                 if (source != RTS_STATIC || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [redistribute_static_route] Accepting static route ", net;
+                    " [redistribute_static] Accepting static route ", net;
                 accept;
             }}"""
 
-    @bird_function("accept_static_default_route")
-    def accept_static_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD accept_static_default_route function."""
+    @bird_function("accept_static_default")
+    def accept_static_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_static_default function."""
 
         return f"""\
             # Accept static default route
-            function accept_static_default_route(string filter_name) {{
+            function accept_static_default(string filter_name) {{
                 if (source != RTS_STATIC || !{self.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [accept_static_route] Accepting static default route ", net;
+                    " [accept_static] Accepting static default route ", net;
                 accept;
             }}"""
 
-    @bird_function("redistribute_static_default_route")
-    def redistribute_static_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD redistribute_static_default_route function."""
+    @bird_function("redistribute_static_default")
+    def redistribute_static_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD redistribute_static_default function."""
 
         return f"""\
             # Accept static default route
-            function redistribute_static_default_route(string filter_name) {{
+            function redistribute_static_default(string filter_name) {{
                 if (source != RTS_STATIC || !{self.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [redistribute_static_route] Accepting static default route ", net;
+                    " [redistribute_static] Accepting static default route ", net;
                 accept;
             }}"""
 
-    @bird_function("accept_kernel_route")
-    def accept_kernel_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD accept_kernel_route function."""
+    @bird_function("accept_kernel")
+    def accept_kernel(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_kernel function."""
 
         return f"""\
             # Accept kernel route
-            function accept_kernel_route(string filter_name) {{
+            function accept_kernel(string filter_name) {{
                 if (source != RTS_INHERIT || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [accept_kernel_route] Accepting kernel route ", net;
+                    " [accept_kernel] Accepting kernel route ", net;
                 accept;
             }}"""
 
-    @bird_function("redistribute_kernel_route")
-    def redistribute_kernel_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD redistribute_kernel_route function."""
+    @bird_function("redistribute_kernel")
+    def redistribute_kernel(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD redistribute_kernel function."""
 
         return f"""\
             # Accept kernel route
-            function redistribute_kernel_route(string filter_name) {{
+            function redistribute_kernel(string filter_name) {{
                 if (source != RTS_INHERIT || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [redistribute_kernel_route] Accepting kernel route ", net;
+                    " [redistribute_kernel] Accepting kernel route ", net;
                 accept;
             }}"""
 
-    @bird_function("accept_kernel_default_route")
-    def accept_kernel_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD accept_kernel_default_route function."""
+    @bird_function("accept_kernel_default")
+    def accept_kernel_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD accept_kernel_default function."""
 
         return f"""\
             # Accept kernel route
-            function accept_kernel_default_route(string filter_name) {{
+            function accept_kernel_default(string filter_name) {{
                 if (source != RTS_INHERIT || !{self.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [accept_kernel_default_route] Accepting kernel default route ", net;
+                    " [accept_kernel_default] Accepting kernel default route ", net;
                 accept;
             }}"""
 
-    @bird_function("redistribute_kernel_default_route")
-    def redistribute_kernel_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD redistribute_kernel_default_route function."""
+    @bird_function("redistribute_kernel_default")
+    def redistribute_kernel_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD redistribute_kernel_default function."""
 
         return f"""\
             # Accept kernel route
-            function redistribute_kernel_default_route(string filter_name) {{
+            function redistribute_kernel_default(string filter_name) {{
                 if (source != RTS_INHERIT || !{self.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [redistribute_kernel_default_route] Accepting kernel default route ", net;
+                    " [redistribute_kernel_default] Accepting kernel default route ", net;
                 accept;
             }}"""

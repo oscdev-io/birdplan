@@ -1060,13 +1060,15 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Finally accept
         self.conf.add("    # Finally accept")
-        self.conf.add(f'    print "[{filter_name}] Accepting ", net, " to peer";', debug=True)
+        self.conf.add('    if DEBUG then')
+        self.conf.add(f'     print "[{filter_name}] Accepting ", net, " from t_bgp to t_bgp_peer (fallthrough)";')
         self.conf.add("    accept;")
         self.conf.add("  }")
 
         # By default reject all routes
         self.conf.add("  # Reject by default")
-        self.conf.add(f'  print "[{filter_name}] Rejecting ", net, " to peer (fallthrough)";', debug=True)
+        self.conf.add('  if DEBUG then')
+        self.conf.add(f'   print "[{filter_name}] Rejecting ", net, " from t_bgp to t_bgp_peer (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
@@ -1074,13 +1076,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def _peer_export_filter(self) -> None:
         """Peer export filter setup from peer table to peer."""
 
+        filter_name = self.filter_name_export
+
         # Configure export filter to the BGP peer
         self.conf.add("# Export filter TO the BGP peer from the peer BGP table")
-        self.conf.add(f"filter {self.filter_name_export} {{")
+        self.conf.add(f"filter {filter_name} {{")
         # Check if we're quarantined, if we are reject routes to the peer
         if self.quarantined:
             self.conf.add("  # Peer is quarantined so reject exporting of routes")
-            self.conf.add(f'  print "[{self.filter_name_export}] Rejecting ", net, " to peer (quarantined)";', debug=True)
+            self.conf.add('  if DEBUG then')
+            self.conf.add(f'   print "[{filter_name}] Rejecting ", net, " from t_bgp_peer to peer (qurantined)";')
             self.conf.add("  reject;")
         # If we're not quarantined, then export routes
         else:

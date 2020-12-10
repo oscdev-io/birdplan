@@ -30,6 +30,84 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
     _section: str = "BGP Functions"
 
+    @bird_function("bgp_accept_bgp")
+    def accept_bgp(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_accept_bgp function."""
+
+        return f"""\
+            # Accept bgp routes
+            function bgp_accept_bgp(string filter_name) {{
+                if (
+                    !{self.functions.is_bgp()} ||
+                    {self.is_blackhole()} ||
+                    {self.is_originated()} ||
+                    {self.functions.is_default()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_accept_bgp] Accepting BGP route ", net;
+                accept;
+            }}"""
+
+    @bird_function("bgp_accept_blackhole")
+    def accept_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_accept_blackhole function."""
+
+        return f"""\
+            # Accept blackhole routes
+            function bgp_accept_blackhole(string filter_name) {{
+                if (
+                    !{self.functions.is_bgp()} ||
+                    !{self.is_blackhole()} ||
+                    {self.functions.is_default()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_accept_blackhole] Accepting BGP blackhole route ", net;
+                accept;
+            }}"""
+
+    @bird_function("bgp_accept_bgp_default")
+    def accept_bgp_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_accept_bgp_default function."""
+
+        return f"""\
+            # Accept BGP default routes
+            function bgp_accept_bgp_default(string filter_name) {{
+                if (
+                    !{self.functions.is_bgp()} ||
+                    {self.is_blackhole()} ||
+                    !{self.functions.is_default()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_accept_bgp_default] Accepting BGP default route ", net;
+                accept;
+            }}"""
+
+    @bird_function("bgp_accept_originated")
+    def accept_originated(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_accept_originated function."""
+
+        return f"""\
+            # Accept originated routes
+            function bgp_accept_originated(string filter_name) {{
+                if (!{self.is_originated()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_accept_originated] Accepting originated route ", net;
+                accept;
+            }}"""
+
+    @bird_function("bgp_accept_originated_default")
+    def accept_originated_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_accept_originated_default function."""
+
+        return f"""\
+            # Accept originated default routes
+            function bgp_accept_originated_default(string filter_name) {{
+                if (!{self.is_originated()} || {self.is_blackhole()} || !{self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_accept_originated_default] Accepting originated default route ", net;
+                accept;
+            }}"""
+
     @bird_function("bgp_is_originated")
     def is_originated(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_is_originated function."""
@@ -201,7 +279,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 # Set local preference
                 bgp_local_pref = BGP_PREF_ROUTESERVER - local_pref_cost;
             }"""
-
 
     @bird_function("bgp_import_static")
     def import_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
