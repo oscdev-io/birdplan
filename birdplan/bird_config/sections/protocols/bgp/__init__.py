@@ -490,20 +490,13 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add(f'  filter_name = "{filter_name}";')
         # BGP importation of kernel routes
         if self.route_policy_import.kernel:
-            self.conf.add("  # Import kernel routes into BGP")
-            self.conf.add("  if (source = RTS_INHERIT && dest != RTD_BLACKHOLE) then {")
-            self.conf.add(f"    {self.bgp_functions.import_own(5)};")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.bgp_functions.import_kernel()};")
         # BGP importation of kernel blackhole routes
         if self.route_policy_import.kernel_blackhole:
-            self.conf.add("  # Import kernel blackhole routes into BGP")
-            self.conf.add("  if (source = RTS_INHERIT && dest = RTD_BLACKHOLE) then {")
-            self.conf.add(f"    {self.bgp_functions.import_own(5)};")
-            self.conf.add("    bgp_community.add(BGP_COMMUNITY_BLACKHOLE);")
-            self.conf.add("    bgp_community.add(BGP_COMMUNITY_NOEXPORT);")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.bgp_functions.import_kernel_blackhole()};")
+        # BGP importation of kernel default routes
+        if self.route_policy_import.kernel_default:
+            self.conf.add(f"  {self.bgp_functions.import_kernel_default()};")
         # BGP importation of static routes
         if self.route_policy_import.static:
             self.conf.add("  # Import static routes into BGP")

@@ -19,6 +19,11 @@ In the case of "test_import_kernel_blackhole_true":
 In the case of "test_import_kernel_blackhole_false":
   - r1 should not be importing kernel routes.
 
+In the case of "test_import_kernel_default_true":
+  - r1 should be importing kernel default routes but not normal kernel routes.
+
+In the case of "test_import_kernel_default_false":
+  - r1 should not be importing kernel routes.
 
 ## Diagram
 
@@ -36,14 +41,6 @@ class "Router: r1" {
   .. Interface: eth1 ..
 - 192.168.1.1/24
 + fc01::1/64
-
-  .. Kernel routes ..
-- 100.101.0.0/24 via 192.168.1.2 (eth1)
-+ fc00:101::/48 via fc01::2 (eth1)
-- 100.103.0.0/24 dev eth1
-+ fc00:103::/64 dev eth1
-- 100.104.0.0/24 blackhole
-+ fc00:104::/64 blackhole
 }
 
 

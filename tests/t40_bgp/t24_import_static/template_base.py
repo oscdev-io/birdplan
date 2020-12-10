@@ -42,14 +42,6 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Test BIRD status."""
         self._test_bird_status(sim)
 
-    def test_bird_tables_static4(self, sim):
-        """Test BIRD static4 table."""
-        self._test_bird_routers_table("t_static4", sim, routers=["r1"])
-
-    def test_bird_tables_static6(self, sim):
-        """Test BIRD static6 table."""
-        self._test_bird_routers_table("t_static6", sim, routers=["r1"])
-
     def test_bird_tables_bgp4_peer(self, sim):
         """Test BIRD BGP4 peer table."""
         self._test_bird_routers_table_bgp_peers(4, sim)
@@ -73,6 +65,14 @@ class TemplateBase(BirdPlanBaseTestCase):
     def test_bird_tables_master6(self, sim):
         """Test BIRD master6 table."""
         self._test_bird_routers_table("master6", sim)
+
+    def test_bird_tables_static4(self, sim):
+        """Test BIRD static4 table."""
+        self._test_bird_routers_table("t_static4", sim, routers=["r1"])
+
+    def test_bird_tables_static6(self, sim):
+        """Test BIRD static6 table."""
+        self._test_bird_routers_table("t_static6", sim, routers=["r1"])
 
     def test_bird_tables_kernel4(self, sim):
         """Test BIRD kernel4 table."""

@@ -60,6 +60,8 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
         Import kernel routes into the main BGP table. Defaults to `False`.
     kernel_blackhole : bool
         Import kernel blackhole routes into the main BGP table. Defaults to `False`.
+    kernel_default : bool
+        Import kernel default routes into the main BGP table. Defaults to `False`.
     static : bool
         Import static routes into the main BGP table. Defaults to `False`.
     static_blackhole : bool
@@ -70,6 +72,7 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
     connected: Union[bool, List[str]]
     kernel: bool
     kernel_blackhole: bool
+    kernel_default: bool
     static: bool
     static_blackhole: bool
 
@@ -78,6 +81,7 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
         self.connected = False
         self.kernel = False
         self.kernel_blackhole = False
+        self.kernel_default = False
         self.static = False
         self.static_blackhole = False
 

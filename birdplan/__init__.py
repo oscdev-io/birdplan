@@ -719,6 +719,9 @@ class BirdPlan:
             # Import kernel blackhole routes into the main BGP table
             elif import_type == "kernel_blackhole":
                 self.birdconf.protocols.bgp.route_policy_import.kernel_blackhole = import_config
+            # Import kernel default routes into the main BGP table
+            elif import_type == "kernel_default":
+                self.birdconf.protocols.bgp.route_policy_import.kernel_default = import_config
 
             # Import static routes into the main BGP table
             elif import_type == "static":

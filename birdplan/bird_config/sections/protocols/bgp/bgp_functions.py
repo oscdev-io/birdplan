@@ -92,6 +92,50 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_local_pref = BGP_PREF_CUSTOMER - local_pref_cost;
             }"""
 
+    @bird_function("bgp_import_kernel")
+    def import_kernel(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_import_kernel function."""
+
+        return f"""\
+            # Import kernel routes
+            function bgp_import_kernel(string filter_name) {{
+                if (source != RTS_INHERIT || dest = RTD_BLACKHOLE || {self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_import_kernel] Importing kernel route ", net;
+                {self.import_own(5)};
+                accept;
+            }}"""
+
+    @bird_function("bgp_import_kernel_blackhole")
+    def import_kernel_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_import_kernel_blackhole function."""
+
+        return f"""\
+            # Import kernel blackhole routes
+            function bgp_import_kernel_blackhole(string filter_name) {{
+                if (source != RTS_INHERIT || dest != RTD_BLACKHOLE || {self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_import_kernel_blackhole] Importing kernel blackhole route ", net;
+                {self.import_own(5)};
+                bgp_community.add(BGP_COMMUNITY_BLACKHOLE);
+                bgp_community.add(BGP_COMMUNITY_NOEXPORT);
+                accept;
+            }}"""
+
+    @bird_function("bgp_import_kernel_default")
+    def import_kernel_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_import_kernel_default function."""
+
+        return f"""\
+            # Import kernel default routes
+            function bgp_import_kernel_default(string filter_name) {{
+                if (source != RTS_INHERIT || dest = RTD_BLACKHOLE || !{self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_import_kernel_default] Importing kernel default route ", net;
+                {self.import_own(5)};
+                accept;
+            }}"""
+
     @bird_function("bgp_import_own")
     def import_own(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_import_own function."""
