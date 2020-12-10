@@ -78,6 +78,6 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
             function ospf_redistribute_connected_route(string filter_name) {{
                 if (proto != "direct4_ospf" && proto != "direct6_ospf" || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [ospf_redistribute_connected_route] Accepting OSPF connected route ", net;
+                    " [ospf_redistribute_connected_route] Redistributing OSPF connected route ", net;
                 accept;
             }}"""
