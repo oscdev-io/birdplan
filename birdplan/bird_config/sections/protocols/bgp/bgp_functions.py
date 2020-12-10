@@ -158,6 +158,22 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_local_pref = BGP_PREF_OWN - local_pref_cost;
             }}"""
 
+    @bird_function("bgp_import_peer")
+    def import_peer(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_import_peer function."""
+
+        return """\
+            # Import peer routes
+            function bgp_import_peer(string filter_name; int peer_asn; int local_pref_cost) {
+                if DEBUG then print filter_name,
+                    " [bgp_import_peer] Adding BGP_LC_RELATION_PEER to ", net, " with local pref ",
+                    BGP_PREF_PEER - local_pref_cost;
+                # Tag route as a peer route
+                bgp_large_community.add(BGP_LC_RELATION_PEER);
+                # Set local preference
+                bgp_local_pref = BGP_PREF_PEER - local_pref_cost;
+            }"""
+
     @bird_function("bgp_import_routecollector")
     def import_routecollector(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_import_routecollector function."""
@@ -186,21 +202,50 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_local_pref = BGP_PREF_ROUTESERVER - local_pref_cost;
             }"""
 
-    @bird_function("bgp_import_peer")
-    def import_peer(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_import_peer function."""
 
-        return """\
-            # Import peer routes
-            function bgp_import_peer(string filter_name; int peer_asn; int local_pref_cost) {
+    @bird_function("bgp_import_static")
+    def import_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_import_static function."""
+
+        return f"""\
+            # Import static routes
+            function bgp_import_static(string filter_name) {{
+                if (source != RTS_STATIC || dest = RTD_BLACKHOLE || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [bgp_import_peer] Adding BGP_LC_RELATION_PEER to ", net, " with local pref ",
-                    BGP_PREF_PEER - local_pref_cost;
-                # Tag route as a peer route
-                bgp_large_community.add(BGP_LC_RELATION_PEER);
-                # Set local preference
-                bgp_local_pref = BGP_PREF_PEER - local_pref_cost;
-            }"""
+                    " [bgp_import_static] Importing static route ", net;
+                {self.import_own(10)};
+                accept;
+            }}"""
+
+    @bird_function("bgp_import_static_blackhole")
+    def import_static_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_import_static_blackhole function."""
+
+        return f"""\
+            # Import static blackhole routes
+            function bgp_import_static_blackhole(string filter_name) {{
+                if (source != RTS_STATIC || dest != RTD_BLACKHOLE || {self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_import_static_blackhole] Importing static blackhole route ", net;
+                {self.import_own(10)};
+                bgp_community.add(BGP_COMMUNITY_BLACKHOLE);
+                bgp_community.add(BGP_COMMUNITY_NOEXPORT);
+                accept;
+            }}"""
+
+    @bird_function("bgp_import_static_default")
+    def import_static_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_import_static_default function."""
+
+        return f"""\
+            # Import static default routes
+            function bgp_import_static_default(string filter_name) {{
+                if (source != RTS_STATIC || dest = RTD_BLACKHOLE || !{self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_import_static_default] Importing static default route ", net;
+                {self.import_own(10)};
+                accept;
+            }}"""
 
     @bird_function("bgp_import_transit")
     def import_transit(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument

@@ -729,6 +729,9 @@ class BirdPlan:
             # Import static blackhole routes into the main BGP table
             elif import_type == "static_blackhole":
                 self.birdconf.protocols.bgp.route_policy_import.static_blackhole = import_config
+            # Import static default routes into the main BGP table
+            elif import_type == "static_default":
+                self.birdconf.protocols.bgp.route_policy_import.static_default = import_config
 
             # If we don't understand this 'redistribute' entry, throw an error
             else:

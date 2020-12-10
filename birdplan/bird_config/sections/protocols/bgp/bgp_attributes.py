@@ -64,6 +64,8 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
         Import kernel default routes into the main BGP table. Defaults to `False`.
     static : bool
         Import static routes into the main BGP table. Defaults to `False`.
+    static_default : bool
+        Import static default routes into the main BGP table. Defaults to `False`.
     static_blackhole : bool
         Import static blackhole routes into the main BGP table. Defaults to `False`.
 
@@ -75,6 +77,7 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
     kernel_default: bool
     static: bool
     static_blackhole: bool
+    static_default: bool
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -84,6 +87,7 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
         self.kernel_default = False
         self.static = False
         self.static_blackhole = False
+        self.static_default = False
 
 
 class BGPAttributes:  # pylint: disable=too-few-public-methods

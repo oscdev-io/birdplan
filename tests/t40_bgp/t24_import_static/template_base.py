@@ -38,6 +38,25 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
+    def test_add_kernel_routes(self, sim):
+        """Add kernel routes to BIRD instances."""
+
+        # Add gateway'd kernel routes
+        sim.node("r1").run_ip(["route", "add", "100.114.0.0/24", "via", "192.168.1.3"])
+        sim.node("r1").run_ip(["route", "add", "fc00:114::/48", "via", "fc01::3"])
+
+        # Add link kernel routes
+        sim.node("r1").run_ip(["route", "add", "100.115.0.0/24", "dev", "eth1"])
+        sim.node("r1").run_ip(["route", "add", "fc00:115::/48", "dev", "eth1"])
+
+        # Add blackhole kernel routes
+        sim.node("r1").run_ip(["route", "add", "blackhole", "100.104.0.0/24"])
+        sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:104::/48"])
+
+        # Add default kernel route
+        sim.node("r1").run_ip(["route", "add", "0.0.0.0/0", "via", "192.168.1.3"])
+        sim.node("r1").run_ip(["route", "add", "::/0", "via", "fc01::3"])
+
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)
