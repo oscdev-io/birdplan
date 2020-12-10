@@ -40,3 +40,44 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
                     " [ospf_accept_connected_route] Accepting OSPF connected route ", net;
                 accept;
             }}"""
+
+    @bird_function("ospf_accept_route")
+    def accept_ospf_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD ospf_accept_route function."""
+
+        return f"""\
+            # Accept OSPF route
+            function ospf_accept_route(string filter_name) {{
+                if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || {self.functions.is_default()}) then
+                    return false;
+                if DEBUG then print filter_name,
+                    " [ospf_accept_route] Accepting OSPF route ", net;
+                accept;
+            }}"""
+
+    @bird_function("ospf_accept_ospf_default_route")
+    def accept_ospf_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD ospf_accept_ospf_default_route function."""
+
+        return f"""\
+            # Accept OSPF route
+            function ospf_accept_ospf_default_route(string filter_name) {{
+                if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || !{self.functions.is_default()}) then
+                    return false;
+                if DEBUG then print filter_name,
+                    " [accept_ospf_route] Accepting OSPF default route ", net;
+                accept;
+            }}"""
+
+    @bird_function("ospf_redistribute_connected_route")
+    def redistribute_connected_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD ospf_redistribute_connected_route function."""
+
+        return f"""\
+            # Accept OSPF connected routes
+            function ospf_redistribute_connected_route(string filter_name) {{
+                if (proto != "direct4_ospf" && proto != "direct6_ospf" || {self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [ospf_redistribute_connected_route] Accepting OSPF connected route ", net;
+                accept;
+            }}"""

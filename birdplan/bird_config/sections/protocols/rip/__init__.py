@@ -198,33 +198,28 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add(f'  filter_name = "{filter_name}";')
         # Redistribute connected
         if self.route_policy_redistribute.connected:
-            self.conf.add("  # Redistribute connected routes")
-            self.conf.add(f"  {self.rip_functions.accept_connected_route()};")
+            self.conf.add(f"  {self.rip_functions.redistribute_connected_route()};")
         # Redistribute kernel routes
         if self.route_policy_redistribute.kernel:
-            self.conf.add("  # Redistribute kernel routes")
-            self.conf.add(f"  {self.functions.accept_kernel_route()};")
+            self.conf.add(f"  {self.functions.redistribute_kernel_route()};")
         # Redistribute kernel routes
         if self.route_policy_redistribute.kernel_default:
-            self.conf.add("  # Redistribute kernel default routes")
-            self.conf.add(f"  {self.functions.accept_kernel_default_route()};")
+            self.conf.add(f"  {self.functions.redistribute_kernel_default_route()};")
         # Redistribute RIP routes
         if self.route_policy_redistribute.rip:
-            self.conf.add("  # Redistribute RIP Routes")
-            self.conf.add(f"  {self.functions.accept_rip_route()};")
+            self.conf.add(f"  {self.rip_functions.redistribute_rip_route()};")
         # Redistribute RIP default routes
         if self.route_policy_redistribute.rip_default:
-            self.conf.add("  # Redistribute RIP default routes")
-            self.conf.add(f"  {self.functions.accept_rip_default_route()};")
+            self.conf.add(f"  {self.rip_functions.redistribute_rip_default_route()};")
         # Redistribute static routes
         if self.route_policy_redistribute.static:
-            self.conf.add("  # Redistribute static routes")
-            self.conf.add(f"  {self.functions.accept_static_route()};")
+            self.conf.add(f"  {self.functions.redistribute_static_route()};")
         # Redistribute static default routes
         if self.route_policy_redistribute.static_default:
-            self.conf.add("  # Redistribute stastic default routes")
-            self.conf.add(f"  {self.functions.accept_static_default_route()};")
+            self.conf.add(f"  {self.functions.redistribute_static_default_route()};")
         # Else reject
+        self.conf.add("  # Reject by default")
+        self.conf.add(f'  print "[{filter_name}] Rejecting ", net, " from t_rip export (fallthrough)";', debug=True)
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
@@ -242,6 +237,7 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add(f'  filter_name = "{filter_name}";')
         # Accept all inbound routes into the table
         self.conf.add("  # Import all RIP routes by default")
+        self.conf.add(f'  print "[{filter_name}] Accepting ", net, " from t_rip import (fallthrough)";', debug=True)
         self.conf.add("  accept;")
         self.conf.add("};")
         self.conf.add("")
@@ -259,13 +255,14 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add(f'  filter_name = "{filter_name}";')
         # Accept only RIP routes into the master table
         self.conf.add("  # Export RIP routes to the master table by default")
-        self.conf.add(f"  {self.functions.accept_rip_route()};")
+        self.conf.add(f"  {self.rip_functions.accept_rip_route()};")
         # Check if we accept the default route
         if self.route_policy_accept.default:
-            self.conf.add("  # Export default route to master (accept:default is set)")
-            self.conf.add(f"  {self.functions.accept_rip_default_route()};")
+            self.conf.add("  # Export default route to master (accept:rip_default is set)")
+            self.conf.add(f"  {self.rip_functions.accept_rip_default_route()};")
         # Default to reject
-        self.conf.add("  # Reject everything else;")
+        self.conf.add("  # Reject by default")
+        self.conf.add(f'  print "[{filter_name}] Rejecting ", net, " from t_rip to master (fallthrough)";', debug=True)
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
@@ -284,12 +281,6 @@ class ProtocolRIP(SectionProtocolBase):
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add(f"  {self.rip_functions.accept_connected_route()};")
-        # Redistribute RIP routes
-        if self.route_policy_redistribute.rip:
-            self.conf.add(f"  {self.functions.accept_rip_route()};")
-        # Redistribute RIP default routes
-        if self.route_policy_redistribute.rip_default:
-            self.conf.add(f"  {self.functions.accept_rip_default_route()};")
         # Redistribute static routes
         if self.route_policy_redistribute.static:
             self.conf.add(f"  {self.functions.accept_static_route()};")
@@ -304,7 +295,7 @@ class ProtocolRIP(SectionProtocolBase):
             self.conf.add(f"  {self.functions.accept_kernel_default_route()};")
         # Else accept
         self.conf.add("  # Reject by default")
-        self.conf.add(f'  print "[{filter_name}] Rejecting ", net, " (fallthrough)";', debug=True)
+        self.conf.add(f'  print "[{filter_name}] Rejecting ", net, " from master to t_rip (fallthrough)";', debug=True)
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")

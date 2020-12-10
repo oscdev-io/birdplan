@@ -64,7 +64,6 @@ class OSPFRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
     connected: Union[bool, List[str]]
     kernel: bool
     kernel_default: bool
-    ospf_default: bool
     static: bool
     static_default: bool
 

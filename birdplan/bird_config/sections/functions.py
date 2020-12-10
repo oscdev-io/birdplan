@@ -206,19 +206,6 @@ class SectionFunctions(SectionBase):
                 return false;
             }"""
 
-    @bird_function("reject_default_route")
-    def reject_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD reject_default_route function."""
-
-        return f"""\
-            # Reject the default route
-            function reject_default_route(string filter_name) {{
-                if !{self.is_default()} then return false;
-                if DEBUG then print filter_name,
-                    " [reject_default_route] Rejecting default route ", net;
-                reject;
-            }}"""
-
     @bird_function("accept_static_route")
     def accept_static_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD accept_static_route function."""
@@ -229,6 +216,19 @@ class SectionFunctions(SectionBase):
                 if (source != RTS_STATIC || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [accept_static_route] Accepting static route ", net;
+                accept;
+            }}"""
+
+    @bird_function("redistribute_static_route")
+    def redistribute_static_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD redistribute_static_route function."""
+
+        return f"""\
+            # Accept static route
+            function redistribute_static_route(string filter_name) {{
+                if (source != RTS_STATIC || {self.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [redistribute_static_route] Accepting static route ", net;
                 accept;
             }}"""
 
@@ -245,6 +245,19 @@ class SectionFunctions(SectionBase):
                 accept;
             }}"""
 
+    @bird_function("redistribute_static_default_route")
+    def redistribute_static_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD redistribute_static_default_route function."""
+
+        return f"""\
+            # Accept static default route
+            function redistribute_static_default_route(string filter_name) {{
+                if (source != RTS_STATIC || !{self.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [redistribute_static_route] Accepting static default route ", net;
+                accept;
+            }}"""
+
     @bird_function("accept_kernel_route")
     def accept_kernel_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD accept_kernel_route function."""
@@ -255,6 +268,19 @@ class SectionFunctions(SectionBase):
                 if (source != RTS_INHERIT || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [accept_kernel_route] Accepting kernel route ", net;
+                accept;
+            }}"""
+
+    @bird_function("redistribute_kernel_route")
+    def redistribute_kernel_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD redistribute_kernel_route function."""
+
+        return f"""\
+            # Accept kernel route
+            function redistribute_kernel_route(string filter_name) {{
+                if (source != RTS_INHERIT || {self.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [redistribute_kernel_route] Accepting kernel route ", net;
                 accept;
             }}"""
 
@@ -271,54 +297,15 @@ class SectionFunctions(SectionBase):
                 accept;
             }}"""
 
-    @bird_function("accept_ospf_route")
-    def accept_ospf_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD accept_ospf_route function."""
+    @bird_function("redistribute_kernel_default_route")
+    def redistribute_kernel_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD redistribute_kernel_default_route function."""
 
         return f"""\
-            # Accept OSPF route
-            function accept_ospf_route(string filter_name) {{
-                if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || {self.is_default()}) then return false;
+            # Accept kernel route
+            function redistribute_kernel_default_route(string filter_name) {{
+                if (source != RTS_INHERIT || !{self.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [accept_ospf_route] Accepting OSPF route ", net;
-                accept;
-            }}"""
-
-    @bird_function("accept_ospf_default_route")
-    def accept_ospf_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD accept_ospf_default_route function."""
-
-        return f"""\
-            # Accept OSPF route
-            function accept_ospf_default_route(string filter_name) {{
-                if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || !{self.is_default()}) then return false;
-                if DEBUG then print filter_name,
-                    " [accept_ospf_route] Accepting OSPF default route ", net;
-                accept;
-            }}"""
-
-    @bird_function("accept_rip_route")
-    def accept_rip_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD accept_rip_route function."""
-
-        return f"""\
-            # Accept RIP route
-            function accept_rip_route(string filter_name) {{
-                if (source != RTS_RIP || {self.is_default()}) then return false;
-                if DEBUG then print filter_name,
-                    " [accept_rip_route] Accepting RIP route ", net;
-                accept;
-            }}"""
-
-    @bird_function("accept_rip_default_route")
-    def accept_rip_default_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD accept_rip_default_route function."""
-
-        return f"""\
-            # Accept RIP route
-            function accept_rip_default_route(string filter_name) {{
-                if (source != RTS_RIP || !{self.is_default()}) then return false;
-                if DEBUG then print filter_name,
-                    " [accept_rip_default_route] Accepting RIP default route ", net;
+                    " [redistribute_kernel_default_route] Accepting kernel default route ", net;
                 accept;
             }}"""

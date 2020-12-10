@@ -208,32 +208,24 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add(f'  filter_name = "{filter_name}";')
         # Redistribute connected
         if self.route_policy_redistribute.connected:
-            self.conf.add("  # Redistribute connected routes")
-            self.conf.add(f"  {self.ospf_functions.accept_connected_route()};")
+            self.conf.add(f"  {self.ospf_functions.redistribute_connected_route()};")
         # Redistribute kernel routes
         if self.route_policy_redistribute.kernel:
-            self.conf.add("  # Redistribute kernel routes")
-            self.conf.add(f"  {self.functions.accept_kernel_route()};")
+            self.conf.add(f"  {self.functions.redistribute_kernel_route()};")
         # Redistribute kernel routes
         if self.route_policy_redistribute.kernel_default:
-            self.conf.add("  # Redistribute kernel default routes")
-            self.conf.add(f"  {self.functions.accept_kernel_default_route()};")
-        # Redistribute OSPF routes
-        self.conf.add("  # Redistribute OSPF Routes")
-        self.conf.add(f"  {self.functions.accept_ospf_route()};")
-        # Redistribute OSPF default routes
-        if self.route_policy_redistribute.ospf_default:
-            self.conf.add("  # Redistribute OSPF default routes")
-            self.conf.add(f"  {self.functions.accept_ospf_default_route()};")
+            self.conf.add(f"  {self.functions.redistribute_kernel_default_route()};")
+        # FIXME remove
+        # # Redistribute OSPF routes
+        # self.conf.add(f"  {self.functions.redistribute_ospf_route()};")
         # Redistribute static routes
         if self.route_policy_redistribute.static:
-            self.conf.add("  # Redistribute static routes")
-            self.conf.add(f"  {self.functions.accept_static_route()};")
+            self.conf.add(f"  {self.functions.redistribute_static_route()};")
         # Redistribute static default routes
         if self.route_policy_redistribute.static_default:
-            self.conf.add("  # Redistribute stastic default routes")
-            self.conf.add(f"  {self.functions.accept_static_default_route()};")
+            self.conf.add(f"  {self.functions.redistribute_static_default_route()};")
         # Else reject
+        self.conf.add(f'  print "[{filter_name}] Rejecting ", net, " from t_ospf export (fallthrough)";', debug=True)
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
@@ -250,6 +242,7 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("{")
         # Accept all inbound routes into the table
         self.conf.add("  # Import all OSPF routes by default")
+        self.conf.add(f'  print "[{filter_name}] Accepting ", net, " from t_ospf import (fallthrough)";', debug=True)
         self.conf.add("  accept;")
         self.conf.add("};")
         self.conf.add("")
@@ -267,13 +260,14 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add(f'  filter_name = "{filter_name}";')
         # Accept only OSPF routes into the master table
         self.conf.add("  # Export OSPF routes to the master table by default")
-        self.conf.add(f"  {self.functions.accept_ospf_route()};")
+        self.conf.add(f"  {self.ospf_functions.accept_ospf_route()};")
         # Check if we accept the default route
         if self.route_policy_accept.default:
-            self.conf.add("  # Export default route to master (accept:default is set)")
-            self.conf.add(f"  {self.functions.accept_ospf_default_route()};")
+            self.conf.add("  # Export default route to master (accept:ospf_default is set)")
+            self.conf.add(f"  {self.ospf_functions.accept_ospf_default_route()};")
         # Default to reject
         self.conf.add("  # Reject everything else;")
+        self.conf.add(f'  print "[{filter_name}] Rejecting ", net, " from t_ospf to master (fallthrough)";', debug=True)
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
@@ -292,11 +286,6 @@ class ProtocolOSPF(SectionProtocolBase):
         # Redistribute connected
         if self.route_policy_redistribute.connected:
             self.conf.add(f"  {self.ospf_functions.accept_connected_route()};")
-        # Redistribute OSPF routes
-        self.conf.add(f"  {self.functions.accept_ospf_route()};")
-        # Redistribute OSPF default routes
-        if self.route_policy_redistribute.ospf_default:
-            self.conf.add(f"  {self.functions.accept_ospf_default_route()};")
         # Redistribute static routes
         if self.route_policy_redistribute.static:
             self.conf.add(f"  {self.functions.accept_static_route()};")
@@ -311,7 +300,7 @@ class ProtocolOSPF(SectionProtocolBase):
             self.conf.add(f"  {self.functions.accept_kernel_default_route()};")
         # Else accept
         self.conf.add("  # Reject by default")
-        self.conf.add(f'  print "[{filter_name}] Rejecting ", net, " (fallthrough)";', debug=True)
+        self.conf.add(f'  print "[{filter_name}] Rejecting ", net, " from master to t_ospf (fallthrough)";', debug=True)
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
