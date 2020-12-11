@@ -10,11 +10,17 @@ Remember to set the `router_id`, see [Configuration](configuration.md).
 
 The `accept` key contains a dictionary of routes we will accept into the master table from our BGP table. Namely...
 
-* `blackhole` - Allows us to accept a blackhole route from BGP. The default is `True`.
 * `originated` - Allows us to accept originated routes from the BGP table. The default is `True`.
-* `originated_default` - Allows us to accept originated routes from the BGP table. The default is `False`.
+* `originated_default` - Allows us to accept locally originated routes from the BGP table. The default is `False`.
 
-* `bgp_default` - Allows us to accept a default route from BGP. The default is `False`.
+* `bgp_customer_blackhole` - Allows us to accept a blackhole route that originated from a customer. The default is `True`.
+* `bgp_own_blackhole` - Allows us to accept a blackhole route that originated from our own federation. The default is `True`.
+
+* `bgp_own_default` - Allows us to accept a default route that originated from within our own federation from the BGP peer.
+  The default is `False` for all peer types except a `rrserver-rrserver` peer.
+* `bgp_transit_default` - Allows us to accept a default route that originated from a transit peer.
+  The default is `False` for all peer types except a `rrserver-rrserver` peer.
+
 
 Below is a configuration example...
 ```yaml
@@ -470,9 +476,22 @@ bgp:
 
 The `accept` key contains a dictionary of routes we will accept. Namely...
 
-* `default` - Allows us to accept a default route from the BGP peer. The default is `False` for everything but a `rrserver-rrserver` peer.
-An exception will be raised if this is set to `True` for peers of type `customer`, `peer` and `routeserver`.
-* `blackhole` - Allows us to accept a blackhole advertisement from the BGP peer. This is only valid for peer types `customer`, `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`. The default is `True` for peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` and `True` when peer type `customer` has `filter:prefixes` set.
+* `bgp_customer_blackhole` - Allows us to accept a blackhole route that originated from a customer.
+  This is only valid for peer types `customer`, `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
+  The default is `True` for peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
+  The default is `True` for peer type `customer` when `filter:prefixes` is set.
+
+* `bgp_own_blackhole` - Allows us to accept a blackhole route that originated from our own federation.
+  This is only valid for peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
+  The default is `True` for peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
+
+* `bgp_own_default` - Allows us to accept a default route that originated from our own federation.
+  This is only valid for peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
+  The default is `True` for peer type `rrserver-rrserver`.
+
+* `bgp_transit_default` - Allows us to accept a default route that originated from a transit peer.
+  The is `True` for peer type `rrserver-rrserver`.
+
 
 
 Below is a configuration example...

@@ -215,7 +215,7 @@ class ProtocolOSPF(SectionProtocolBase):
         # Redistribute kernel routes
         if self.route_policy_redistribute.kernel_default:
             self.conf.add(f"  {self.functions.redistribute_kernel_default()};")
-        # FIXME remove
+        # NK: May affect inter-area routes???? removed for now
         # # Redistribute OSPF routes
         # self.conf.add(f"  {self.functions.redistribute_ospf()};")
         # Redistribute static routes

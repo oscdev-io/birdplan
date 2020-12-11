@@ -630,7 +630,14 @@ class BirdPlan:
         # Loop with accept items
         for accept, accept_config in self.config["bgp"]["accept"].items():
             # Check if we need to accept some kinds of routes
-            if accept in ("bgp_default", "blackhole", "originated", "originated_default"):
+            if accept in (
+                "bgp_customer_blackhole",
+                "bgp_own_blackhole",
+                "bgp_own_default",
+                "bgp_transit_default",
+                "originated",
+                "originated_default",
+            ):
                 setattr(self.birdconf.protocols.bgp.route_policy_accept, accept, accept_config)
             # If we don't understand this 'accept' entry, throw an error
             else:
@@ -845,7 +852,12 @@ class BirdPlan:
                 peer["accept"] = {}
                 # Loop with acceptance items
                 for accept, accept_config in config_value.items():
-                    if accept in ["blackhole", "default"]:
+                    if accept in [
+                        "bgp_customer_blackhole",
+                        "bgp_own_blackhole",
+                        "bgp_own_default",
+                        "bgp_transit_default",
+                    ]:
                         peer["accept"][accept] = accept_config
                     # If we don't understand this 'accept' entry, throw an error
                     else:

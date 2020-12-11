@@ -28,7 +28,11 @@ class TemplateBase(BirdPlanBaseTestCase):
     """BGP accept blackhole route test case template."""
 
     routers = ["r1"]
-    exabgps = ["e1"]
+    exabgps = ["e1", "e2"]
+
+    def e2_asn(self):
+        """Return the same ASN for e2 as e1."""
+        return self.e1_asn
 
     def r1_peer_extra_config(self):
         """Return custom config based on the peer type."""
@@ -58,7 +62,25 @@ class TemplateBase(BirdPlanBaseTestCase):
         # Add large communities for peer types that require them
         large_communities = ""
         if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
-            large_communities = "65000:3:1"
+            large_communities = "65000:3:1 "
+
+            # Advertise transit routes as if they came from a transit peering link
+            self._exabgpcli(
+                sim,
+                "e2",
+                [
+                    "neighbor 100.64.0.1 announce route 100.104.0.2/31 next-hop 100.64.0.3 large-community [65000:3:2] "
+                    "community [ 65535:666 ]"
+                ],
+            )
+            self._exabgpcli(
+                sim,
+                "e2",
+                [
+                    "neighbor fc00:100::1 announce route fc00:104::2/127 next-hop fc00:100::3 large-community [65000:3:2] "
+                    "community [ 65535:666 ]"
+                ],
+            )
 
         self._exabgpcli(
             sim,

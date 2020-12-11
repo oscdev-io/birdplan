@@ -28,7 +28,11 @@ class TemplateBase(BirdPlanBaseTestCase):
     """BGP accept default route test case template."""
 
     routers = ["r1"]
-    exabgps = ["e1"]
+    exabgps = ["e1", "e2"]
+
+    def e2_asn(self):
+        """Return the same ASN for e2 as e1."""
+        return self.e1_asn
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
@@ -46,6 +50,19 @@ class TemplateBase(BirdPlanBaseTestCase):
         if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             large_communities = "65000:3:1"
 
+            # Advertise transit routes as if they came from a transit peering link
+            self._exabgpcli(
+                sim,
+                "e2",
+                ["neighbor 100.64.0.1 announce route 0.0.0.0/0 next-hop 100.64.0.3 large-community [65000:3:4]"],
+            )
+            self._exabgpcli(
+                sim,
+                "e2",
+                ["neighbor fc00:100::1 announce route ::/0 next-hop fc00:100::3 large-community [65000:3:4]"],
+            )
+
+        # Advertise normal default routes, possibly tagged with the above large community to indicate where it originated
         self._exabgpcli(
             sim,
             "e1",

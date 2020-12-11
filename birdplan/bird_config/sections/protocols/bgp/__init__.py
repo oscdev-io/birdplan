@@ -452,14 +452,20 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add("string filter_name;")
         self.conf.add("{")
         self.conf.add(f'  filter_name = "{filter_name}";')
-        # Check if we accept the default route, if not block it
-        if not self.route_policy_accept.bgp_default:
-            self.conf.add(f"  {self.bgp_functions.accept_bgp_default()};")
-        # Check if we accept blackhole routes, if not block it
-        if not self.route_policy_accept.blackhole:
-            self.conf.add(f"  {self.bgp_functions.accept_blackhole()};")
         # Accept BGP routes into the master routing table
         self.conf.add(f"  {self.bgp_functions.accept_bgp()};")
+        # Check if we accept customer blackhole routes, if not block it
+        if self.route_policy_accept.bgp_customer_blackhole:
+            self.conf.add(f"  {self.bgp_functions.accept_customer_blackhole()};")
+        # Check if we accept our own blackhole routes, if not block it
+        if self.route_policy_accept.bgp_own_blackhole:
+            self.conf.add(f"  {self.bgp_functions.accept_own_blackhole()};")
+        # Check if we accept default routes originated from within our federation, if not block it
+        if self.route_policy_accept.bgp_own_default:
+            self.conf.add(f"  {self.bgp_functions.accept_bgp_own_default()};")
+        # Check if we accept default routes originated from transit peers, if not block it
+        if self.route_policy_accept.bgp_transit_default:
+            self.conf.add(f"  {self.bgp_functions.accept_bgp_transit_default()};")
         # Check if we accept originated routes, if not block it
         if self.route_policy_accept.originated:
             self.conf.add(f"  {self.bgp_functions.accept_originated()};")
@@ -467,7 +473,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         if self.route_policy_accept.originated_default:
             self.conf.add(f"  {self.bgp_functions.accept_originated_default()};")
         # Default to reject
-        self.conf.add('  if DEBUG then')
+        self.conf.add("  if DEBUG then")
         self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from t_bgp to master (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")
@@ -501,7 +507,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         if self.route_policy_import.static_default:
             self.conf.add(f"  {self.bgp_functions.import_static_default()};")
         # Else reject
-        self.conf.add('  if DEBUG then')
+        self.conf.add("  if DEBUG then")
         self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from master to t_bgp (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")

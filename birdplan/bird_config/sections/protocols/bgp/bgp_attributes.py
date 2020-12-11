@@ -27,10 +27,14 @@ class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
 
     Attributes
     ----------
-    bgp_default : bool
-        Accept default route. Defaults to `False`.
-    blackhole : bool
+    bgp_customer_blackhole : bool
         Accept blackhole routes. Defaults to `True`.
+    bgp_own_blackhole : bool
+        Accept blackhole routes. Defaults to `True`.
+    bgp_own_default : bool
+        Accept default routes originated from within our federation. Defaults to `False`.
+    bgp_transit_default : bool
+        Accept default routes originated from transit peers. Defaults to `False`.
     originated : bool
         Accept originated routes. Defaults to `True`.
     originated_default : bool
@@ -38,15 +42,19 @@ class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
 
     """
 
-    bgp_default: bool
-    blackhole: bool
+    bgp_customer_blackhole: bool
+    bgp_own_blackhole: bool
+    bgp_own_default: bool
+    bgp_transit_default: bool
     originated: bool
     originated_default: bool
 
     def __init__(self) -> None:
         """Initialize object."""
-        self.bgp_default = False
-        self.blackhole = True
+        self.bgp_customer_blackhole = True
+        self.bgp_own_blackhole = True
+        self.bgp_own_default = False
+        self.bgp_transit_default = False
         self.originated = True
         self.originated_default = False
 
