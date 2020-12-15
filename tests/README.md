@@ -59,7 +59,7 @@
 
 [Redistribute Originated](t40_bgp/t37_redistribute_originated/README.md)
 
-[Redistribute Default](t40_bgp/t38_redistribute_default/README.md)
+[Redistribute BGP Default](t40_bgp/t38_redistribute_bgp_default/README.md)
 
 [Prefix Limit](t40_bgp/t40_prefix_limit/README.md)
 
