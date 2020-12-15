@@ -100,6 +100,11 @@ class BirdPlanBaseTestCase:
     e1_interface_eth0 = {"mac": "02:e1:00:00:00:01", "ips": ["100.64.0.2/24", "fc00:100::2/64"]}
     e1_switch_eth0 = "s1"
 
+    e2_asn = 65001
+    e2_interfaces = ["eth0"]
+    e2_interface_eth0 = {"mac": "02:e2:00:00:00:01", "ips": ["100.64.0.3/24", "fc00:100::3/64"]}
+    e2_switch_eth0 = "s1"
+
     def _test_setup(self, sim, testpath, tmpdir):  # pylint: disable=too-many-locals
         """Set up a BIRD test scenario using our attributes."""
 
@@ -449,15 +454,13 @@ class BirdPlanBaseTestCase:
 
         # Loop with each ExaBGP
         for exabgp in self.exabgps:
-            # Grab ExaBGP's ASN
-            exabgp_asn = getattr(self, f"{exabgp}_asn")
-
             # Grab the configuration filename we're going to be using
             exabgp_conffile = f"{tmpdir}/exabgp.conf.{exabgp}"
 
             # Loop with supported attributes that translate into macros
             internal_macros = {}
             for attr in [
+                "asn",
                 "exabgp_config",
                 "exabgp_config_neighbor1",
                 "exabgp_config_neighbor2",
@@ -482,6 +485,9 @@ class BirdPlanBaseTestCase:
                 # Add our macro
                 internal_macros[f"@{attr.upper()}@"] = value
 
+            # Grab ExaBGP's ASN
+            exabgp_asn = internal_macros["@ASN@"]
+
             # Work out config file name, going 2 levels up in the test directory
             exabgp_config_file = None
             for conffile_path in [
@@ -503,7 +509,7 @@ class BirdPlanBaseTestCase:
                     break
             # If we didn't get a configuration file that exists, then raise an exception
             if not exabgp_config_file:
-                raise RuntimeError("No ExaBGP configuration file found")
+                raise RuntimeError(f"No ExaBGP configuration file found for ExaBGP '{exabgp}' with ASN '{exabgp_asn}'")
 
             # Read in configuration file
             with open(exabgp_config_file, "r") as file:
