@@ -225,7 +225,7 @@ class ProtocolOSPF(SectionProtocolBase):
         if self.route_policy_redistribute.static_default:
             self.conf.add(f"  {self.functions.redistribute_static_default()};")
         # Else reject
-        self.conf.add('  if DEBUG then')
+        self.conf.add("  if DEBUG then")
         self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from t_ospf export (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")
@@ -243,7 +243,7 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("{")
         # Accept all inbound routes into the table
         self.conf.add("  # Import all OSPF routes by default")
-        self.conf.add('  if DEBUG then')
+        self.conf.add("  if DEBUG then")
         self.conf.add(f'    print "[{filter_name}] Accepting ", net, " from t_ospf import (fallthrough)";')
         self.conf.add("  accept;")
         self.conf.add("};")
@@ -269,7 +269,7 @@ class ProtocolOSPF(SectionProtocolBase):
             self.conf.add(f"  {self.ospf_functions.accept_ospf_default()};")
         # Default to reject
         self.conf.add("  # Reject everything else;")
-        self.conf.add('  if DEBUG then')
+        self.conf.add("  if DEBUG then")
         self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from t_ospf to master (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")
@@ -303,7 +303,7 @@ class ProtocolOSPF(SectionProtocolBase):
             self.conf.add(f"  {self.functions.accept_kernel_default()};")
         # Else accept
         self.conf.add("  # Reject by default")
-        self.conf.add('  if DEBUG then')
+        self.conf.add("  if DEBUG then")
         self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from master to t_ospf (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")

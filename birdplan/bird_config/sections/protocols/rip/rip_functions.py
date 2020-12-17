@@ -37,7 +37,8 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             function rip_accept_connected(string filter_name) {{
                 if ((proto != "direct4_rip" && proto != "direct6_rip") || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [rip_accept_connected] Accepting RIP connected route ", net;
+                    " [rip_accept_connected] Accepting RIP connected route ", {self.functions.route_info()},
+                    " due to connected route match";
                 accept;
             }}"""
 
@@ -50,7 +51,8 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             function rip_accept_rip_default(string filter_name) {{
                 if (source != RTS_RIP || !{self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [rip_accept_rip_default] Accepting RIP default route ", net;
+                    " [rip_accept_rip_default] Accepting RIP default route ", {self.functions.route_info()},
+                    " due to default route match";
                 accept;
             }}"""
 
@@ -63,7 +65,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             function rip_accept_rip(string filter_name) {{
                 if (source != RTS_RIP || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [rip_accept_rip] Accepting RIP route ", net;
+                    " [rip_accept_rip] Accepting RIP route ", {self.functions.route_info()}, " due to RIP route match";
                 accept;
             }}"""
 
@@ -76,7 +78,8 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             function rip_redistribute_connected(string filter_name) {{
                 if ((proto != "direct4_rip" && proto != "direct6_rip") || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [rip_redistribute_connected] Redistributing RIP connected route ", net;
+                    " [rip_redistribute_connected] Redistributing RIP connected route ", {self.functions.route_info()},
+                    " due to connected route match";
                 accept;
             }}"""
 
@@ -89,7 +92,8 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             function rip_redistribute_rip_default(string filter_name) {{
                 if (source != RTS_RIP || !{self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [rip_redistribute_rip_default] Redistributing RIP default route ", net;
+                    " [rip_redistribute_rip_default] Redistributing RIP default route ", {self.functions.route_info()},
+                    " due to RIP default route match";
                 accept;
             }}"""
 
@@ -102,6 +106,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             function rip_redistribute_rip(string filter_name) {{
                 if (source != RTS_RIP || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [rip_redistribute_rip] Redistributing RIP route ", net;
+                    " [rip_redistribute_rip] Redistributing RIP route ", {self.functions.route_info()},
+                    " due to RIP route match";
                 accept;
             }}"""

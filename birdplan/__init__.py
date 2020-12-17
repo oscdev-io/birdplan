@@ -828,13 +828,15 @@ class BirdPlan:
                 # Loop with redistribution items
                 for redistribute_type, redistribute_config in config_value.items():
                     if redistribute_type in (
-                        "default",
                         "connected",
                         "kernel",
                         "kernel_blackhole",
+                        "kernel_default",
                         "static",
                         "static_blackhole",
+                        "static_default",
                         "originated",
+                        "originated_default",
                         "bgp",
                         "bgp_own",
                         "bgp_customer",
@@ -878,7 +880,6 @@ class BirdPlan:
                     # Loop with prepend configuration items
                     for prepend_type, prepend_config in config_value.items():
                         if prepend_type in [
-                            "default",
                             "connected",
                             "kernel",
                             "kernel_blackhole",

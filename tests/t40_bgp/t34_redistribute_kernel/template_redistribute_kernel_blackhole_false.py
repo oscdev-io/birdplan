@@ -21,7 +21,7 @@
 
 """BGP redistribute kernel route test case template."""
 
-from .template_base import TemplateBase
+from .template_base_redistribute_kernel_blackhole_ebgp import TemplateBase
 
 
 class Template(TemplateBase):

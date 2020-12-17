@@ -22,6 +22,15 @@ In the case of "test_redistribute_static_blackhole_true":
 In the case of "test_redistribute_static_blackhole_false":
   - r1 should not be exporting its static blackhole routes to r2 as `redistribute:static_blackhole` is set to false.
 
+In the case of "test_redistribute_static_default": **(default)**
+  - r1 should not be exporting its static default routes to r2 as this is default behavior.
+
+In the case of "test_redistribute_static_default_true":
+  - r1 should be exporting its static default routes to r2 depending on the test case.
+
+In the case of "test_redistribute_static_default_false":
+  - r1 should not be exporting its static default routes to r2 as `redistribute:static_default` is set to false.
+
 
 ## Diagram
 
@@ -41,8 +50,14 @@ class "Router: r1" {
 + fc01::1/64
 
   .. BIRD static routes ..
-- 100.101.0.0/24 via 192.168.1.2
-+ fc00:101::/48 via fc01::2
+  - 100.105.0.0/24 via 192.168.1.4 (eth1)
+  + fc00:105::/48 via fc01::4 (eth1)
+  - 100.106.0.0/24 via eth1
+  + fc00:106::/48 via eth1
+  - 100.107.0.0/31 blackhole
+  + fc00:107::/127 blackhole
+  - 0.0.0.0/0 via 192.168.1.4 (eth1)
+  + ::/0 via fc01::4 (eth1)
 }
 
 

@@ -195,13 +195,17 @@ The `import` key contains a dictionary of the routes to import into the main BGP
 * `connected` routes are kernel device routes for the interfaces listed. A list of interfaces must be provided. This can be a pattern
 like `eth*`. Connected routes are not imported by default..
 
-* `kernel` routes are those statically added to the kernel, excluding blackhole routes. The default for this option is `false`.
+* `kernel` routes are those added to the kernel, excluding blackhole and default routes. The default for this option is `False`.
 
-* `kernel_blackhole` routes are those statically added to the kernel which are blackhole routes. This option is independant of the `kernel` option above and will only import blackhole routes. The default for this option is `false`.
+* `kernel_blackhole` routes are those statically added to the kernel which are blackhole routes. This option is independant of the `kernel` option above and will only import blackhole routes. The default for this option is `False`.
 
-* `static` routes are those setup in the static protocol, excluding blackhole routes. The default for this option is `false`.
+* `kernel_default` routes are those added to the kernel. This option is independant of the `kernel` option above and will only import kernel default routes. The default for this option is `False`.
 
-* `static_blackhole` routes are those setup in the static protocol which are blackhole routes. This option is independant of the `static` option above and will only import blackhole routes. The default for this option is `false`.
+* `static` routes are those setup in the static protocol, excluding blackhole and default routes. The default for this option is `False`.
+
+* `static_blackhole` routes are those setup in the static protocol which are blackhole routes. This option is independant of the `static` option above and will only import blackhole routes. The default for this option is `False`.
+
+* `static_default` routes are those setup in the static protocol. This option is independant of the `static` option above and will only import static default routes. The default for this option is `False`.
 
 
 One can specify the ASN as per below...
@@ -1413,17 +1417,19 @@ bgp:
 
 Types of routes to redistribute to the peer, valid options are detailed below...
 
-* `default` will redistribute the default route, the type of route also needs to be redistributed. eg. `static`. Defaults to `False` except
-for peer type `rrserver-rrserver` which defaults to `True`.
 * `connected` will redistribute connected routes. Defaults to `False`.
 * `kernel` will redistribute kernel routes. Defaults to `False`.
-* `kernel_blackhole` will redistribute kernel blackhole routes. Defaults to `False`. If set to true, kernel blackhole routes will
+* `kernel_default` will redistribute kernel default routes. Defaults to `False`.
+* `kernel_blackhole` will redistribute kernel blackhole routes. Defaults to `False`. If set to True, kernel blackhole routes will
 be redistributed regardless of the blackhole large community function value.
 * `static` will redistribute static routes in our global static configuration. Defaults to `False`.
-* `static_blackhole` will redistribute static blackhole routes in our global static configuration. Defaults to `False`. If set to true,
-static blackhole routes will be redistributed regardless of the blackhole large community function value.
+* `static_default` will redistribute static default routes. Defaults to `False`.
+* `static_blackhole` will redistribute static blackhole routes in our global static configuration. Defaults to `False`. If set to
+True, static blackhole routes will be redistributed regardless of the blackhole large community function value.
 * `originated` will redistribute originated routes. Defaults to `False`.
 * `originated_default` will redistribute originated default routes. Defaults to `False`.
+
+* `bgp_default` will redistribute BGP default routes. Automatically set to `True` for peer types of `rrserver-rrserver`.
 
 Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
 
@@ -1432,10 +1438,6 @@ Internal redistribution options and how they are used... (do not use unless you 
 * `bgp_customer` will redistribute our customers BGP routes based on an internal large community `OWN_ASN:3:2`. Automatically set to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
 * `bgp_peering` will redistribute peering session routes based on an internal large community `OWN_ASN:3:3`. Automatically set to `True` for peer types of `customer`.
 * `bgp_transit` will redistribute transit routes based on an internal large community `OWN_ASN:3:4`. Automatically set to `True` for peer types of `customer`.
-
-NB: Peers using peer type `rrserver-rrserver` will by default redistribute default routes should they be received via BGP, but will not by default
-redistribute default routes if received via `kernel`, `static` or `originated` sources. For these sources to be redistributed you need to configure
-`redistribute:default` as `True`.
 
 
 An example of using redistribute can be found below...

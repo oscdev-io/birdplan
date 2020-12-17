@@ -302,13 +302,15 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "redistribute" in peer_config:
             for redistribute_type, redistribute_config in peer_config["redistribute"].items():
                 if redistribute_type not in (
-                    "default",
                     "connected",
                     "kernel",
                     "kernel_blackhole",
+                    "kernel_default",
                     "static",
                     "static_blackhole",
+                    "static_default",
                     "originated",
+                    "originated_default",
                     "bgp",
                     "bgp_own",
                     "bgp_customer",
@@ -319,11 +321,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 setattr(self.route_policy_redistribute, redistribute_type, redistribute_config)
         # Do a sanity check on our redistribution
         if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):
-            # Check things we are not supposed to be redistributing to external peers
-            if self.route_policy_redistribute.default:
-                raise BirdPlanError(
-                    f"Having 'redistribute:default' set to True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
-                )
+            # Check things we are not supposed to be redistributing to peers
             if self.route_policy_redistribute.bgp:
                 raise BirdPlanError(
                     f"Having 'redistribute:bgp' set to True for peer '{self.name}' with type '{self.peer_type}' makes no sense"
@@ -337,6 +335,21 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 raise BirdPlanError(
                     f"Having 'redistribute:bgp_transit' set to True for peer '{self.name}' "
                     f"with type '{self.peer_type}' makes no sense"
+                )
+            if self.route_policy_redistribute.kernel_default:
+                raise BirdPlanError(
+                    f"Having 'redistribute:kernel_default' set to True for peer '{self.name}' with type '{self.peer_type}' makes "
+                    "no sense"
+                )
+            if self.route_policy_redistribute.originated_default:
+                raise BirdPlanError(
+                    f"Having 'redistribute:originated_default' set to True for peer '{self.name}' with type '{self.peer_type}' "
+                    "makes no sense"
+                )
+            if self.route_policy_redistribute.static_default:
+                raise BirdPlanError(
+                    f"Having 'redistribute:static_default' set to True for peer '{self.name}' with type '{self.peer_type}' makes "
+                    "no sense"
                 )
         if self.peer_type not in (
             "internal",
@@ -918,6 +931,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel_blackhole(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_kernel_blackhole(False)};")
+        # Check for kernel default route redistribution
+        if self.route_policy_redistribute.kernel_default:
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel_default(True)} then {{")
+            self.conf.add("    accept_route = true;")
+            self.conf.add("    bypass_bgp_redistribution_checks = true;")
+            self.conf.add("  }")
+        else:
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_kernel_default(False)};")
         # Check for static route redistribution
         if self.route_policy_redistribute.static:
             self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static(True)} then accept_route = true;")
@@ -928,20 +949,27 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static_blackhole(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_static_blackhole(False)};")
+        # Check for static default route redistribution
+        if self.route_policy_redistribute.static_default:
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static_default(True)} then {{")
+            self.conf.add("    accept_route = true;")
+            self.conf.add("    bypass_bgp_redistribution_checks = true;")
+            self.conf.add("  }")
+        else:
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_static_default(False)};")
         # Check for originated route redistribution
         if self.route_policy_redistribute.originated:
             self.conf.add(f"  if {self.bgp_functions.peer_redistribute_originated(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_originated(False)};")
-
-        # Do not redistribute the default route, no matter where we get it from
-        if self.route_policy_redistribute.default:
-            self.conf.add(
-                f"  if {self.bgp_functions.peer_redistribute_default(True, BirdVariable('accept_route'))}"
-                " then bypass_bgp_redistribution_checks = true;"
-            )
+        # Check for originated default route redistribution
+        if self.route_policy_redistribute.originated_default:
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_originated_default(True)} then {{")
+            self.conf.add("    accept_route = true;")
+            self.conf.add("    bypass_bgp_redistribution_checks = true;")
+            self.conf.add("  }")
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_default(False, BirdVariable('accept_route'))};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_originated_default(False)};")
 
         # Start of BGP type checks ...
         self.conf.add("  # BGP route type tests...")

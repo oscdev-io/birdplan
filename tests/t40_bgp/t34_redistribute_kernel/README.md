@@ -1,7 +1,7 @@
 # BGP redistribution of kernel routes
 
 
-Router r1 should export its kernel on interface eth1 to r2 depending on the test case.
+Router r1 should export its kernel routes on interface eth1 to r2 depending on the test case.
 
 
 In the case of "test_redistribute_kernel": **(default)**
@@ -22,6 +22,14 @@ In the case of "test_redistribute_kernel_blackhole_true":
 In the case of "test_redistribute_kernel_blackhole_false":
   - r1 should not be exporting its kernel blackhole routes to r2 as `redistribute:kernel_blackhole` is set to false.
 
+In the case of "test_redistribute_kernel_default": **(default)**
+  - r1 should not be exporting its kernel default routes to r2 as this is default behavior.
+
+In the case of "test_redistribute_kernel_default_true":
+  - r1 should be exporting its kernel default routes to r2 depending on the test case.
+
+In the case of "test_redistribute_kernel_default_false":
+  - r1 should not be exporting its kernel default routes to r2 as `redistribute:kernel_default` is set to false.
 
 ## Diagram
 
@@ -41,12 +49,12 @@ class "Router: r1" {
 + fc01::1/64
 
   .. Kernel routes ..
-- 100.101.0.0/24 via 192.168.1.2 (eth1)
-+ fc00:101::/48 via fc01::2 (eth1)
+- 100.101.0.0/24 via 192.168.1.3
++ fc00:101::/48 via fc01::3
 - 100.103.0.0/24 dev eth1
 + fc00:103::/64 dev eth1
-- 100.104.0.0/24 blackhole
-+ fc00:104::/64 blackhole
+- 100.104.0.0/31 blackhole
++ fc00:104::/127 blackhole
 }
 
 

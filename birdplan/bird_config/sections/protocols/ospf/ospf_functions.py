@@ -37,7 +37,8 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
             function ospf_accept_connected(string filter_name) {{
                 if (proto != "direct4_ospf" && proto != "direct6_ospf" || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [ospf_accept_connected] Accepting OSPF connected route ", net;
+                    " [ospf_accept_connected] Accepting OSPF connected route ", {self.functions.route_info()},
+                    " due to connected route match";
                 accept;
             }}"""
 
@@ -51,7 +52,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
                 if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || {self.functions.is_default()}) then
                     return false;
                 if DEBUG then print filter_name,
-                    " [ospf_accept_ospf] Accepting OSPF route ", net;
+                    " [ospf_accept_ospf] Accepting OSPF route ", {self.functions.route_info()}, " due to OSPF route match";
                 accept;
             }}"""
 
@@ -65,7 +66,8 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
                 if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || !{self.functions.is_default()}) then
                     return false;
                 if DEBUG then print filter_name,
-                    " [accept_ospf] Accepting OSPF default route ", net;
+                    " [accept_ospf] Accepting OSPF default route ", {self.functions.route_info()},
+                    " due to OSPF default route match";
                 accept;
             }}"""
 
@@ -76,8 +78,9 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
         return f"""\
             # Accept OSPF connected routes
             function ospf_redistribute_connected(string filter_name) {{
-                if (proto != "direct4_ospf" && proto != "direct6_ospf" || {self.functions.is_default()}) then return false;
+                if (!{self.functions.is_connected()} || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [ospf_redistribute_connected] Redistributing OSPF connected route ", net;
+                    " [ospf_redistribute_connected] Redistributing OSPF connected route ", {self.functions.route_info()},
+                    " due to connected route match";
                 accept;
             }}"""

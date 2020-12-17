@@ -45,12 +45,16 @@ class TemplateBase(BirdPlanBaseTestCase):
             return
 
         # Add gateway'd kernel routes
-        sim.node("r1").run_ip(["route", "add", "100.101.0.0/24", "via", "192.168.1.2"])
+        sim.node("r1").run_ip(["route", "add", "100.101.0.0/24", "via", "192.168.1.3"])
         sim.node("r1").run_ip(["route", "add", "fc00:101::/48", "via", "fc01::2"])
 
         # Add link kernel routes
         sim.node("r1").run_ip(["route", "add", "100.103.0.0/24", "dev", "eth1"])
         sim.node("r1").run_ip(["route", "add", "fc00:103::/48", "dev", "eth1"])
+
+        # Add kernel default routes
+        sim.node("r1").run_ip(["route", "add", "default", "via", "192.168.1.3"])
+        sim.node("r1").run_ip(["route", "add", "default", "via", "fc01::3"])
 
         # Add kernel blackhole routes
         sim.node("r1").run_ip(["route", "add", "blackhole", "100.104.0.0/31"])

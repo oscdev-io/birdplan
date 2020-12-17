@@ -3,16 +3,33 @@ log_file: "@LOGFILE@"
 debug: True
 
 static:
-  - '100.101.0.0/24 via 192.168.1.2'
-  - 'fc00:101::/48 via fc01::2'
-  - '100.104.0.0/31 blackhole'
-  - 'fc00:104::/127 blackhole'
+  - '100.105.0.0/24 via 192.168.1.4'
+  - 'fc00:105::/48 via fc01::4'
+  - '100.106.0.0/24 via "eth1"'
+  - 'fc00:106::/48 via "eth1"'
+  - '100.107.0.0/31 blackhole'
+  - 'fc00:107::/127 blackhole'
+  - '0.0.0.0/0 via 192.168.1.4'
+  - '::/0 via fc01::4'
 
 bgp:
   asn: @ASN@
   import:
+    kernel: True
+    kernel_blackhole: True
+    kernel_default: True
     static: True
     static_blackhole: True
+    static_default: True
+  originate:
+  - '100.108.0.0/24 via 192.168.1.5'
+  - 'fc00:108::/48 via fc01::5'
+  - '100.109.0.0/24 via "eth1"'
+  - 'fc00:109::/48 via "eth1"'
+  - '100.110.0.0/24 blackhole'
+  - 'fc00:110::/48 blackhole'
+  - '0.0.0.0/0 via 192.168.1.5'
+  - '::/0 via fc01::5'
 @GLOBAL_CONFIG@
   peers:
     r2:
@@ -26,5 +43,6 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
-@PEER_CONFIG@
 @TEMPLATE_PEER_CONFIG@
+@TEMPLATE_PEER_EXTRA_CONFIG@
+@PEER_CONFIG@

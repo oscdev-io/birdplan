@@ -219,7 +219,7 @@ class ProtocolRIP(SectionProtocolBase):
             self.conf.add(f"  {self.functions.redistribute_static_default()};")
         # Else reject
         self.conf.add("  # Reject by default")
-        self.conf.add('  if DEBUG then')
+        self.conf.add("  if DEBUG then")
         self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from t_rip export (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")
@@ -238,7 +238,7 @@ class ProtocolRIP(SectionProtocolBase):
         self.conf.add(f'  filter_name = "{filter_name}";')
         # Accept all inbound routes into the table
         self.conf.add("  # Import all RIP routes by default")
-        self.conf.add('  if DEBUG then')
+        self.conf.add("  if DEBUG then")
         self.conf.add(f'    print "[{filter_name}] Accepting ", net, " from t_rip import (fallthrough)";')
         self.conf.add("  accept;")
         self.conf.add("};")
@@ -264,7 +264,7 @@ class ProtocolRIP(SectionProtocolBase):
             self.conf.add(f"  {self.rip_functions.accept_rip_default()};")
         # Default to reject
         self.conf.add("  # Reject by default")
-        self.conf.add('  if DEBUG then')
+        self.conf.add("  if DEBUG then")
         self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from t_rip to master (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")
@@ -298,7 +298,7 @@ class ProtocolRIP(SectionProtocolBase):
             self.conf.add(f"  {self.functions.accept_kernel_default()};")
         # Else accept
         self.conf.add("  # Reject by default")
-        self.conf.add('  if DEBUG then')
+        self.conf.add("  if DEBUG then")
         self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from master to t_rip (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")
