@@ -552,6 +552,7 @@ class BirdPlanBaseTestCase:
             "template_extra_config",
             "template_global_config",
             "template_peer_config",
+            "template_peer_extra_config",
             "template_allpeer_config",
         ]:
             # Router specific lookup for an attribute to add a macro for
