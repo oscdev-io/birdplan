@@ -71,6 +71,17 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
                 accept;
             }}"""
 
+    @bird_function("ospf_is_connected")
+    def is_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD ospf_is_connected function."""
+
+        return """\
+            # Check if this is an connected route
+            function ospf_is_connected(string filter_name) {
+                if (proto = "direct4_ospf" || proto = "direct6_ospf") then return true;
+                return false;
+            }"""
+
     @bird_function("ospf_redistribute_connected")
     def redistribute_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD ospf_redistribute_connected function."""
@@ -78,7 +89,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
         return f"""\
             # Accept OSPF connected routes
             function ospf_redistribute_connected(string filter_name) {{
-                if (!{self.functions.is_connected()} || {self.functions.is_default()}) then return false;
+                if (!{self.is_connected()} || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [ospf_redistribute_connected] Redistributing OSPF connected route ", {self.functions.route_info()},
                     " due to connected route match";

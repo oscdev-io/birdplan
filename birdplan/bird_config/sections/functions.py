@@ -309,7 +309,7 @@ class SectionFunctions(SectionBase):
         return f"""\
             # Accept kernel route
             function redistribute_kernel(string filter_name) {{
-                if (!{self.is_kernel} || {self.is_default()}) then return false;
+                if (!{self.is_kernel()} || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [redistribute_kernel] Accepting kernel route ", {self.route_info()};
                 accept;
