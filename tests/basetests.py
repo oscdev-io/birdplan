@@ -278,7 +278,7 @@ class BirdPlanBaseTestCase:
         # setting it to None
         expect_count = None
         if isinstance(expected_data, dict):
-            expect_count = len(expected_data) or None
+            expect_count = sum(len(v) for v in expected_data.values()) or None
 
         # Save the start time
         time_start = time.time()
@@ -290,7 +290,7 @@ class BirdPlanBaseTestCase:
 
             # Grab the routers table from BIRD
             result = self._bird_route_table(sim, router, table_name)
-            result_len = len(result)
+            result_len = sum(len(v) for v in result.values())
 
             count_matches = False
             content_matches = False
