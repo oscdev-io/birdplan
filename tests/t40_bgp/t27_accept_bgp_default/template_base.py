@@ -54,12 +54,15 @@ class TemplateBase(BirdPlanBaseTestCase):
             self._exabgpcli(
                 sim,
                 "e2",
-                ["neighbor 100.64.0.1 announce route 0.0.0.0/0 next-hop 100.64.0.3 large-community [65000:3:4]"],
+                [
+                    "neighbor 100.64.0.1 announce route 0.0.0.0/0 next-hop 100.64.0.3 "
+                    "large-community [65000:3:4] local-preference 50"
+                ],
             )
             self._exabgpcli(
                 sim,
                 "e2",
-                ["neighbor fc00:100::1 announce route ::/0 next-hop fc00:100::3 large-community [65000:3:4]"],
+                ["neighbor fc00:100::1 announce route ::/0 next-hop fc00:100::3 large-community [65000:3:4] local-preference 50"],
             )
 
         # Advertise normal default routes, possibly tagged with the above large community to indicate where it originated

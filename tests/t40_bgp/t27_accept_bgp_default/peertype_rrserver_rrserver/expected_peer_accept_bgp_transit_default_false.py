@@ -29,19 +29,35 @@ r1_t_bgp4_AS65000_e2_peer = {
         {
             "attributes": {
                 "BGP.as_path": [],
-                "BGP.large_community": [(65000, 3, 4), (65000, 1101, 12)],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 100,
-                "BGP.next_hop": ["100.64.0.3"],
+                "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
             },
             "bestpath": True,
+            "bgp_type": "i",
+            "nexthops": [{"gateway": "100.64.0.2", "interface": "eth0"}],
+            "pref": 100,
+            "prefix_type": "unicast",
+            "protocol": "bgp4_AS65000_e1",
+            "type": ["BGP", "univ"],
+        },
+        {
+            "attributes": {
+                "BGP.as_path": [],
+                "BGP.large_community": [(65000, 3, 4), (65000, 1101, 12)],
+                "BGP.local_pref": 50,
+                "BGP.next_hop": ["100.64.0.3"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": False,
             "bgp_type": "i",
             "nexthops": [{"gateway": "100.64.0.3", "interface": "eth0"}],
             "pref": 100,
             "prefix_type": "unicast",
             "protocol": "bgp4_AS65000_e2",
             "type": ["BGP", "univ"],
-        }
+        },
     ]
 }
 
@@ -71,19 +87,35 @@ r1_t_bgp6_AS65000_e2_peer = {
         {
             "attributes": {
                 "BGP.as_path": [],
-                "BGP.large_community": [(65000, 3, 4), (65000, 1101, 12)],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 100,
-                "BGP.next_hop": ["fc00:100::3"],
+                "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",
             },
             "bestpath": True,
+            "bgp_type": "i",
+            "nexthops": [{"gateway": "fc00:100::2", "interface": "eth0"}],
+            "pref": 100,
+            "prefix_type": "unicast",
+            "protocol": "bgp6_AS65000_e1",
+            "type": ["BGP", "univ"],
+        },
+        {
+            "attributes": {
+                "BGP.as_path": [],
+                "BGP.large_community": [(65000, 3, 4), (65000, 1101, 12)],
+                "BGP.local_pref": 50,
+                "BGP.next_hop": ["fc00:100::3"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": False,
             "bgp_type": "i",
             "nexthops": [{"gateway": "fc00:100::3", "interface": "eth0"}],
             "pref": 100,
             "prefix_type": "unicast",
             "protocol": "bgp6_AS65000_e2",
             "type": ["BGP", "univ"],
-        }
+        },
     ]
 }
 
