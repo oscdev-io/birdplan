@@ -595,6 +595,9 @@ class BirdPlanBaseTestCase:
         for macro, value in macros.items():
             if isinstance(value, int):
                 value = f"{value}"
+            # Check for odd issues...
+            if value is None:
+                raise RuntimeError(f"Macro '{macro}' for router '{router}' has value None")
             raw_config = raw_config.replace(macro, value)
         # Write out new BirdPlan file with macros replaced
         with open(birdplan_file, "w") as file:
