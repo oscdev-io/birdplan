@@ -25,10 +25,14 @@
 class PeerTypeConfig:
     """BGP configuration for basic setup between r1 and r2."""
 
-    r1_peer_type = "transit"
-
-    r2_peer_type = "customer"
-    r2_peer_config = """
-      filter:
-        origin_asns: [65000]
+    r1_peer_asn = 65000
+    r1_peer_type = "rrclient"
+    r1_global_config = """
+  rr_cluster_id: 0.0.0.1
 """
+    r1_peer_config = """
+      passive: False
+"""
+
+    r2_asn = 65000
+    r2_peer_type = "rrserver"
