@@ -31,11 +31,11 @@ The `redistribute` key contains a dictionary of the redistributable routes to be
 * `connected` routes are kernel device routes for the interfaces listed. A list of interfaces must be provided. This can be a pattern
 like `eth*`.
 
-* `kernel` routes are those added to the kernel. This excludes kernel default routes.
+* `kernel` routes are those added to the kernel. Setting this to `True` will not redistribute kernel default routes by default.
 
 * `kernel_default` routes are default routes added to the kernel.
 
-* `static` routes are those setup in the static protocol. This excludes static default routes.
+* `static` routes are those setup in the static protocol. Setting this to `True` will not redistribute static routes by default.
 
 * `static_default` routes are default routes setup in the static protocol.
 
