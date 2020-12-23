@@ -20,17 +20,19 @@ bgp:
         - eth1
     kernel: True
     kernel_blackhole: True
+    kernel_default: True
     static: True
     static_blackhole: True
-  accept:
-    default: True
+    static_default: True
   originate:
-    - '100.111.0.0/24 via 100.101.0.2'
-    - 'fc00:111::/48 via fc00:101::2'
+    - '100.111.0.0/24 via 100.101.0.4'
+    - 'fc00:111::/48 via fc00:101::4'
     - '100.112.0.0/24 via "eth1"'
     - 'fc00:112::/48 via "eth1"'
     - '100.113.0.0/24 blackhole'
     - 'fc00:113::/48 blackhole'
+    - '0.0.0.0/0 via 100.101.0.4'
+    - '::/0 via fc00:101::4'
   peers:
     e1:
       asn: 65000
@@ -43,6 +45,24 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
+      accept:
+        bgp_own_default: True
+        bgp_transit_default: True
+
+    e2:
+      asn: 65000
+      type: rrserver
+      description: BGP session to e2
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.4
+      neighbor6: fc00:100::4
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      accept:
+        bgp_own_default: True
+        bgp_transit_default: True
 
     r2:
       asn: @PEER_ASN@

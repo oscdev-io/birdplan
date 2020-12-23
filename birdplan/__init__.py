@@ -838,10 +838,14 @@ class BirdPlan:
                         "originated",
                         "originated_default",
                         "bgp",
-                        "bgp_own",
                         "bgp_customer",
+                        "bgp_customer_blackhole",
+                        "bgp_own",
+                        "bgp_own_blackhole",
+                        "bgp_own_default",
                         "bgp_peering",
                         "bgp_transit",
+                        "bgp_transit_default",
                     ):
                         peer["redistribute"][redistribute_type] = redistribute_config
                     # If we don't understand this 'redistribute' entry, throw an error

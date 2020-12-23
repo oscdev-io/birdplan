@@ -993,21 +993,25 @@ An example of this is below...
 
 Route types...
 
-* `default` will match the default route.
 * `connected` will match connected routes.
-* `kernel` will match kernel routes. This will not match default routes.
-* `kernel_blackhole` will match kernel routes.
-* `static` will match static routes. This will not match default routes.
+* `kernel` will match kernel routes. This will not match static blackhole or default routes.
+* `kernel_blackhole` will match kernel blackhole routes.
+* `kernel_default` will match kernel default routes.
+* `static` will match static routes. This will not match static blackhole or default routes.
 * `static_blackhole` will match static blackhole routes.
-* `originated` will match originated routes. This will not match default routes.
-
-Internal route types...
+* `static_default` will match static default routes.
+* `originated` will match originated routes. This will not match originated default routes.
+* `originated_default` will match originated default routes.
 
 * `bgp` will match all BGP routes.
-* `bgp_own` will match BGP routes that originated from our ASN.
-* `bgp_customer` will match our customer routes.
+* `bgp_own` will match BGP routes that originated from within our federation. This will not match our own blackhole or default routes.
+* `bgp_own_blackhole` will match BGP blackhole routes that originated from within our federation.
+* `bgp_own_default` will match BGP default routes that originated from within our federation.
+* `bgp_customer` will match our customer routes. This will not match customer blackhole routes.
+* `bgp_customer_blackhole` will match customer blackhole routes.
 * `bgp_peering` will match our peers routes.
-* `bgp_transit` will match our transit providers routes.
+* `bgp_transit` will match our transit providers routes. This will not match transit default routes.
+* `bgp_transit_default` will match transit default routes.
 
 An example of this is below...
 ```yaml
@@ -1417,27 +1421,47 @@ bgp:
 
 Types of routes to redistribute to the peer, valid options are detailed below...
 
+Locally originated route redistribution...
+
 * `connected` will redistribute connected routes. Defaults to `False`.
 * `kernel` will redistribute kernel routes. Defaults to `False`.
 * `kernel_default` will redistribute kernel default routes. Defaults to `False`.
 * `kernel_blackhole` will redistribute kernel blackhole routes. Defaults to `False`. If set to True, kernel blackhole routes will
-be redistributed regardless of the blackhole large community function value.
+  be redistributed regardless of the blackhole large community function value.
 * `static` will redistribute static routes in our global static configuration. Defaults to `False`.
 * `static_default` will redistribute static default routes. Defaults to `False`.
 * `static_blackhole` will redistribute static blackhole routes in our global static configuration. Defaults to `False`. If set to
-True, static blackhole routes will be redistributed regardless of the blackhole large community function value.
+  True, static blackhole routes will be redistributed regardless of the blackhole large community function value.
 * `originated` will redistribute originated routes. Defaults to `False`.
 * `originated_default` will redistribute originated default routes. Defaults to `False`.
 
-* `bgp_default` will redistribute BGP default routes. Automatically set to `True` for peer types of `rrserver-rrserver`.
+BGP "all" route redistribution...
 
-Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
+* `bgp` will set the default option for all bgp_* options if specified. If set to `False`, one can then individually enable redistribution of various types of BGP routes using the options below. Setting this option to `True` will be pointless as
+it will just result in the defaults being used.
 
-* `bgp` will redistribute BGP routes. Automatically set to `True` for peer types of `rrclient`, `rrserver` and `rrserver-rrserver`. This is a VERY dangerous setting as it does not by default filter outbound routes.
-* `bgp_own` will redistribute our own BGP routes based on an internal large community `OWN_ASN:3:1`. Automatically set to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
-* `bgp_customer` will redistribute our customers BGP routes based on an internal large community `OWN_ASN:3:2`. Automatically set to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
-* `bgp_peering` will redistribute peering session routes based on an internal large community `OWN_ASN:3:3`. Automatically set to `True` for peer types of `customer`.
-* `bgp_transit` will redistribute transit routes based on an internal large community `OWN_ASN:3:4`. Automatically set to `True` for peer types of `customer`.
+BGP route source redistribution...
+
+* `bgp_own` will redistribute our own BGP routes based on an internal large community `OWN_ASN:3:1`. This will set the default value for `bgp_own_blackhole` and `bgp_own_default` to `False` if explicitly set to `False`.
+Defaults to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
+* `bgp_customer` will redistribute our customers BGP routes based on an internal large community `OWN_ASN:3:2`. This will set the default value
+for `bgp_customer_blackhole` to `False` if explicitly set to `False`.
+Defaults to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
+* `bgp_peering` will redistribute peering session routes based on an internal large community `OWN_ASN:3:3`.
+Defaults to `True` for peer types of `customer`.
+* `bgp_transit` will redistribute transit routes based on an internal large community `OWN_ASN:3:4`. This will set the default value
+for `bgp_transit_default` to `False` if explicitly set to `False`.
+Defaults to `True` for peer types of `customer`.
+
+BGP blackhole redistribution...
+
+* `bgp_customer_blackhole` will redistribute BGP default routes. Defaults to `True` for peer types `internal`, `routecollector`, `routeserver`, `rrclient`, `rrserver`, `rrserver-rrserver`, `transit`.
+* `bgp_own_blackhole` will redistribute BGP default routes. Defaults to `True` for peer types `internal`, `routecollector`, `routeserver`, `rrclient`, `rrserver`, `rrserver-rrserver`, `transit`.
+
+BGP default route redistribution...
+
+* `bgp_own_default` will redistribute BGP default routes. Defaults to `True` for peer types of `rrserver-rrserver`.
+* `bgp_transit_default` will redistribute BGP default routes. Defaults to `True` for peer types of `rrserver-rrserver`.
 
 
 An example of using redistribute can be found below...

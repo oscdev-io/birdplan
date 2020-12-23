@@ -183,12 +183,12 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
     def is_bgp_own(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_is_bgp_own function."""
 
-        return """\
+        return f"""\
             # Check if this is a route that originated within our federation
-            function bgp_is_bgp_own(string filter_name) {
-                if (BGP_LC_RELATION_OWN ~ bgp_large_community) then return true;
+            function bgp_is_bgp_own(string filter_name) {{
+                if ({self.functions.is_bgp()} && BGP_LC_RELATION_OWN ~ bgp_large_community) then return true;
                 return false;
-            }"""
+            }}"""
 
     @bird_function("bgp_is_bgp_peer")
     def is_bgp_peer(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -200,6 +200,17 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if (BGP_LC_RELATION_PEER ~ bgp_large_community) then return true;
                 return false;
             }"""
+
+    @bird_function("bgp_is_bgp_peering")
+    def is_bgp_peering(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_is_bgp_peering function."""
+
+        return f"""\
+            # Check if this is a route that originated from a peer or routeserver
+            function bgp_is_bgp_peering(string filter_name) {{
+                if ({self.is_bgp_peer()} || {self.is_bgp_routeserver()}) then return true;
+                return false;
+            }}"""
 
     @bird_function("bgp_is_bgp_routeserver")
     def is_bgp_routeserver(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
@@ -344,13 +355,13 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_peer_allow_blackholes")
-    def peer_allow_blackholes(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_peer_allow_blackholes function."""
+    @bird_function("bgp_peer_reject_non_targetted_blackhole")
+    def peer_reject_non_targetted_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_reject_non_targetted_blackhole function."""
 
         return f"""\
             # Check if we're allowing blackholes tagged with the blackhole large community
-            function bgp_peer_allow_blackholes(
+            function bgp_peer_reject_non_targetted_blackhole(
                 string filter_name;
                 bool capable;
                 bool allow_kernel_blackhole;
@@ -372,21 +383,21 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                     # Check if the peer is blackhole community capable
                     if (!capable) then {{
                         if DEBUG then print filter_name,
-                            " [bgp_peer_allow_blackholes] Rejecting blackhole ", net, " from ", proto,
+                            " [bgp_peer_reject_non_targetted_blackhole] Rejecting blackhole ", {self.functions.route_info()},
                             " due to peer not being blackhole community capable";
                         reject;
                     }}
                     # Check if we have a NOEXPORT community set, if we do strip it off")
                     if (BGP_COMMUNITY_NOEXPORT ~ bgp_community) then {{
                         if DEBUG then print filter_name,
-                            " [bgp_peer_allow_blackholes] Removing community BGP_COMMUNITY_NOEXPORT from ", net, " from ", proto,
-                            " due to match on BGP blackhole advertise large community function";
+                            " [bgp_peer_reject_non_targetted_blackhole] Removing community BGP_COMMUNITY_NOEXPORT from ",
+                            {self.functions.route_info()}, " due to match on BGP blackhole advertise large community function";
                         bgp_community.delete(BGP_COMMUNITY_NOEXPORT);
                     }}
                     return true;
                 }}
                 if DEBUG then print filter_name,
-                    " [bgp_peer_allow_blackholes] Rejecting blackhole ", net, " from ", proto,
+                    " [bgp_peer_reject_non_targetted_blackhole] Rejecting blackhole ", {self.functions.route_info()},
                     " due to no match on BGP blackhole advertise large community function";
                 reject;
             }}"""
@@ -558,112 +569,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                         {self.functions.route_info()};
                     bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE);
                 }}
-            }}"""
-
-    @bird_function("bgp_peer_export_ok")
-    def peer_export_ok(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_peer_export_ok function."""
-
-        return f"""\
-            # Can we export this route to the peer_asn?
-            function bgp_peer_export_ok(
-                string filter_name; int peer_asn;
-                int ipv4_maxlen; int ipv4_minlen;
-                int ipv6_maxlen; int ipv6_minlen
-            )
-            int prefix_maxlen;
-            int prefix_minlen;
-            {{
-                # Work out what prefix lenghts we're going to use
-                if (net.type = NET_IP4) then {{
-                    prefix_maxlen = ipv4_maxlen;
-                    prefix_minlen = ipv4_minlen;
-                }}
-                if (net.type = NET_IP6) then {{
-                    prefix_maxlen = ipv6_maxlen;
-                    prefix_minlen = ipv6_minlen;
-                }}
-                # Check for NOEXPORT large community
-                if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) ~ bgp_large_community) then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_export_ok] Not exporting due to BGP_LC_FUNCTION_NOEXPORT for AS", peer_asn ," for ",
-                        {self.functions.route_info()};
-                    return false;
-                }}
-                # Validate route before export
-                if {self.functions.prefix_is_longer(BirdVariable("prefix_maxlen"))} then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_export_ok] Not exporting due to prefix length >", prefix_maxlen," for ",
-                        {self.functions.route_info()};
-                    return false;
-                }}
-                if {self.functions.prefix_is_shorter(BirdVariable("prefix_minlen"))} then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_export_ok] Not exporting due to prefix length <", prefix_minlen, " for ",
-                        {self.functions.route_info()};
-                    return false;
-                }}
-                # Check if this is a bogon
-                if {self.functions.is_bogon()} then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_export_ok] Not exporting due to ", {self.functions.route_info()}, " being a bogon";
-                    return false;
-                }}
-                # If all above tests are ok, then we can
-                return true;
-            }}"""
-
-    @bird_function("bgp_peer_export_blackhole_ok")
-    def peer_export_blackhole_ok(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_peer_export_blackhole_ok function."""
-
-        return f"""\
-            # Can we export this route to the peer_asn?
-            function bgp_peer_export_blackhole_ok(
-                string filter_name; int peer_asn;
-                int ipv4_maxlen; int ipv4_minlen;
-                int ipv6_maxlen; int ipv6_minlen
-            )
-            int prefix_maxlen;
-            int prefix_minlen;
-            {{
-                # Work out what prefix lenghts we're going to use
-                if (net.type = NET_IP4) then {{
-                    prefix_maxlen = ipv4_maxlen;
-                    prefix_minlen = ipv4_minlen;
-                }}
-                if (net.type = NET_IP6) then {{
-                    prefix_maxlen = ipv6_maxlen;
-                    prefix_minlen = ipv6_minlen;
-                }}
-                # Check for NOEXPORT large community
-                if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) ~ bgp_large_community) then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_export_blackhole_ok] Not exporting due to BGP_LC_FUNCTION_NOEXPORT for AS",
-                        peer_asn ," for ", {self.functions.route_info()};
-                    return false;
-                }}
-                # Validate route before export
-                if {self.functions.prefix_is_longer(BirdVariable("prefix_maxlen"))} then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_export_blackhole_ok] Not exporting due to prefix length >", prefix_maxlen," for ",
-                        net;
-                    return false;
-                }}
-                if {self.functions.prefix_is_shorter(BirdVariable("prefix_minlen"))} then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_export_blackhole_ok] Not exporting due to prefix length <", prefix_minlen, " for ",
-                        net;
-                    return false;
-                }}
-                # Check if this is a bogon
-                if {self.functions.is_bogon()} then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_export_blackhole_ok] Not exporting due to ", {self.functions.route_info()}, " being a bogon";
-                    return false;
-                }}
-                # If all above tests are ok, then we can
-                return true;
             }}"""
 
     @bird_function("bgp_peer_filter_asn_bogons")
@@ -1246,19 +1151,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_local_pref = BGP_PREF_TRANSIT - local_pref_cost;
             }}"""
 
-    @bird_function("bgp_peer_lc_add_default")
-    def peer_lc_add_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_peer_lc_add_default function."""
-
-        return f"""\
-            function bgp_peer_lc_add_default(string filter_name; lc large_community) {{
-                if !{self.functions.is_default()} then return false;
-                if DEBUG then print filter_name,
-                    " [bgp_peer_lc_add_default] Adding large community ", large_community, " for type DEFAULT to ",
-                    {self.functions.route_info()};
-                bgp_large_community.add(large_community);
-            }}"""
-
     @bird_function("bgp_peer_lc_add_connected")
     def peer_lc_add_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_peer_lc_add_connected function."""
@@ -1306,6 +1198,23 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
+    @bird_function("bgp_peer_lc_add_kernel_default")
+    def peer_lc_add_kernel_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_lc_add_kernel_default function."""
+
+        return f"""\
+            function bgp_peer_lc_add_kernel_default(string filter_name; lc large_community) {{
+                if (
+                    !{self.functions.is_kernel()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_lc_add_kernel_default] Adding large community ", large_community,
+                    " for type KERNEL DEFAULT to ", {self.functions.route_info()};
+                bgp_large_community.add(large_community);
+            }}"""
+
     @bird_function("bgp_peer_lc_add_originated")
     def peer_lc_add_originated(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_peer_lc_add_originated function."""
@@ -1317,6 +1226,40 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if DEBUG then print filter_name,
                     " [bgp_peer_lc_add_originate] Adding large community ", large_community,
                     " for type ORIGINATED to ", {self.functions.route_info()};
+                bgp_large_community.add(large_community);
+            }}"""
+
+    @bird_function("bgp_peer_lc_add_originated_blackhole")
+    def peer_lc_add_originated_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_lc_add_originated_blackhole function."""
+
+        return f"""\
+            function bgp_peer_lc_add_originated_blackhole(string filter_name; lc large_community) {{
+                if (
+                    !{self.is_originated()} ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_lc_add_originated_blackhole] Adding large community ", large_community,
+                    " for type ORIGINATED BLACKHOLE to ", {self.functions.route_info()};
+                bgp_large_community.add(large_community);
+            }}"""
+
+    @bird_function("bgp_peer_lc_add_originated_default")
+    def peer_lc_add_originated_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_lc_add_originated_default function."""
+
+        return f"""\
+            function bgp_peer_lc_add_originated_default(string filter_name; lc large_community) {{
+                if (
+                    !{self.is_originated()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_lc_add_originated_default] Adding large community ", large_community,
+                    " for type ORIGINATED DEFAULT to ", {self.functions.route_info()};
                 bgp_large_community.add(large_community);
             }}"""
 
@@ -1354,6 +1297,23 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
+    @bird_function("bgp_peer_lc_add_static_default")
+    def peer_lc_add_static_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_lc_add_static_default function."""
+
+        return f"""\
+            function bgp_peer_lc_add_static_default(string filter_name; lc large_community) {{
+                if (
+                    !{self.functions.is_static()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_lc_add_static_default] Adding large community ", large_community,
+                    " for type STATIC DEFAULT to ", {self.functions.route_info()};
+                bgp_large_community.add(large_community);
+            }}"""
+
     @bird_function("bgp_peer_lc_add_bgp")
     def peer_lc_add_bgp(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_peer_lc_add_bgp function."""
@@ -1362,7 +1322,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             # BGP large community adding
             function bgp_peer_lc_add_bgp(string filter_name; lc large_community) {{
                 if DEBUG then print filter_name,
-                    " [bgp_peer_lc_add_bgp] Adding large community ", large_community, " for type BGP to ",
+                    " [bgp_peer_lc_add_bgp] Adding large community ", large_community, " for type BGP_OWN to ",
                     {self.functions.route_info()};
                 bgp_large_community.add(large_community);
             }}"""
@@ -1374,10 +1334,48 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         return f"""\
             # BGP own route large community adding
             function bgp_peer_lc_add_bgp_own(string filter_name; lc large_community) {{
-                if !{self.is_bgp_own()} then return false;
+                if (
+                    !{self.is_bgp_own()} ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                )  then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_lc_add_bgp_own] Adding large community ", large_community, " for type BGP_OWN to ",
                     {self.functions.route_info()};
+                bgp_large_community.add(large_community);
+            }}"""
+
+    @bird_function("bgp_peer_lc_add_bgp_own_blackhole")
+    def peer_lc_add_bgp_own_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_lc_add_bgp_own_blackhole function."""
+
+        return f"""\
+            function bgp_peer_lc_add_bgp_own_blackhole(string filter_name; lc large_community) {{
+                if (
+                    !{self.is_bgp_own()} ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_lc_add_bgp_own_blackhole] Adding large community ", large_community,
+                    " for type BGP_OWN BLACKHOLE to ", {self.functions.route_info()};
+                bgp_large_community.add(large_community);
+            }}"""
+
+    @bird_function("bgp_peer_lc_add_bgp_own_default")
+    def peer_lc_add_bgp_own_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_lc_add_bgp_own_default function."""
+
+        return f"""\
+            function bgp_peer_lc_add_bgp_own_default(string filter_name; lc large_community) {{
+                if (
+                    !{self.is_bgp_own()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_lc_add_bgp_own_default] Adding large community ", large_community,
+                    " for type BGP_OWN DEFAULT to ", {self.functions.route_info()};
                 bgp_large_community.add(large_community);
             }}"""
 
@@ -1388,10 +1386,31 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         return f"""\
             # BGP customer route large community adding
             function bgp_peer_lc_add_bgp_customer(string filter_name; lc large_community) {{
-                if !{self.is_bgp_customer()} then return false;
+                if (
+                    !{self.is_bgp_customer()} ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_lc_add_bgp_customer] Adding large community ", large_community, " for type BGP_CUSTOMER to ",
                     {self.functions.route_info()};
+                bgp_large_community.add(large_community);
+            }}"""
+
+    @bird_function("bgp_peer_lc_add_bgp_customer_blackhole")
+    def peer_lc_add_bgp_customer_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_lc_add_bgp_customer_blackhole function."""
+
+        return f"""\
+            function bgp_peer_lc_add_bgp_customer_blackhole(string filter_name; lc large_community) {{
+                if (
+                    !{self.is_bgp_customer()} ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_lc_add_bgp_customer_blackhole] Adding large community ", large_community,
+                    " for type BGP_CUSTOMER BLACKHOLE to ", {self.functions.route_info()};
                 bgp_large_community.add(large_community);
             }}"""
 
@@ -1416,10 +1435,31 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         return f"""\
             # BGP transit route large community adding
             function bgp_peer_lc_add_bgp_transit(string filter_name; lc large_community) {{
-                if !{self.is_bgp_transit()} then return false;
+                if (
+                    !{self.is_bgp_transit()} ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_lc_add_bgp_transit] Adding large community ", large_community, " for type BGP_TRANSIT to ",
                     {self.functions.route_info()};
+                bgp_large_community.add(large_community);
+            }}"""
+
+    @bird_function("bgp_peer_lc_add_bgp_transit_default")
+    def peer_lc_add_bgp_transit_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_lc_add_bgp_transit_default function."""
+
+        return f"""\
+            function bgp_peer_lc_add_bgp_transit_default(string filter_name; lc large_community) {{
+                if (
+                    !{self.is_bgp_transit()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_lc_add_bgp_transit_default] Adding large community ", large_community,
+                    " for type BGP_TRANSIT DEFAULT to ", {self.functions.route_info()};
                 bgp_large_community.add(large_community);
             }}"""
 
@@ -1724,21 +1764,46 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_QUARANTINED);
             }}"""
 
-    @bird_function("bgp_peer_redistribute_bgp")
-    def peer_redistribute_bgp(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_peer_redistribute_bgp function."""
+    @bird_function("bgp_peer_redistribute_bgp_customer")
+    def peer_redistribute_bgp_customer(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_redistribute_bgp_customer function."""
 
         return f"""\
-            # Check for redistribution of all BGP routes
-            # - Return true when routes match RTS_BGP
-            # - Return false otherwise
-            function bgp_peer_redistribute_bgp(string filter_name) {{
-                # Check for BGP routes
-                if (source != RTS_BGP || {self.functions.is_default()}) then return false;
+            # Check for redistribution of customer routes for BGP
+            function bgp_peer_redistribute_bgp_customer(string filter_name; bool redistribute) {{
+                # Check for redistribute customer routes
+                if (!{self.is_bgp_customer()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
+                if (redistribute) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_redistribute_bgp_customer] Accepting ", {self.functions.route_info()},
+                        " due to BGP_LC_RELATION_CUSTOMER route match (redistribute customer)";
+                    return true;
+                }}
                 if DEBUG then print filter_name,
-                    " [bgp_peer_redistribute_bgp] Accepting ", {self.functions.route_info()},
-                    " due to RTS_BGP route match (redistribute BGP)";
-                return true;
+                    " [bgp_peer_redistribute_bgp_customer] Rejecting ", {self.functions.route_info()},
+                    " due to BGP_LC_RELATION_CUSTOMER route match (no redistribute customer)";
+                reject;
+            }}"""
+
+    @bird_function("bgp_peer_redistribute_bgp_customer_blackhole")
+    def peer_redistribute_bgp_customer_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_redistribute_bgp_customer_blackhole function."""
+
+        return f"""\
+            # Check for redistribution of customer blackhole routes for BGP
+            function bgp_peer_redistribute_bgp_customer_blackhole(string filter_name; bool redistribute) {{
+                # Check for redistribute customer blackhole routes
+                if (!{self.is_bgp_customer()} || !{self.is_blackhole()} || {self.functions.is_default()}) then return false;
+                if (redistribute) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_redistribute_bgp_customer_blackhole] Accepting ", {self.functions.route_info()},
+                        " due to BGP_LC_RELATION_CUSTOMER and blackhole route match (redistribute customer blackhole)";
+                    return true;
+                }}
+                if DEBUG then print filter_name,
+                    " [bgp_peer_redistribute_bgp_customer_blackhole] Rejecting ", {self.functions.route_info()},
+                    " due to BGP_LC_RELATION_CUSTOMER and blackhole route match (no redistribute customer blackhole)";
+                reject;
             }}"""
 
     @bird_function("bgp_peer_redistribute_bgp_own")
@@ -1747,44 +1812,60 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of our own routes for BGP
-            # - Reject routes that are not exportable
-            # - Return true when routes match BGP_LC_RELATION_OWN and are exportable
-            # - Return false otherwise
-            function bgp_peer_redistribute_bgp_own(string filter_name; bool exportable) {{
-                # Check for exportable own routes
-                if !{self.is_bgp_own()} then return false;
-                if (exportable) then {{
+            function bgp_peer_redistribute_bgp_own(string filter_name; bool redistribute) {{
+                # Check for redistribute own routes
+                if (!{self.is_bgp_own()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
+                if (redistribute) then {{
                     if DEBUG then print filter_name,
                         " [bgp_peer_redistribute_bgp_own] Accepting ", {self.functions.route_info()},
-                        " due to BGP_LC_RELATION_OWN route match (redistribute own) and exportable";
+                        " due to BGP_LC_RELATION_OWN route match (redistribute own)";
                     return true;
                 }}
                 if DEBUG then print filter_name,
                     " [bgp_peer_redistribute_bgp_own] Rejecting ", {self.functions.route_info()},
-                    " due to BGP_LC_RELATION_OWN route match (redistribute own) and not exportable";
+                    " due to BGP_LC_RELATION_OWN route match (no redistribute own)";
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_bgp_customer")
-    def peer_redistribute_bgp_customer(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_peer_redistribute_bgp_customer function."""
+    @bird_function("bgp_peer_redistribute_bgp_own_blackhole")
+    def peer_redistribute_bgp_own_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_redistribute_bgp_own_blackhole function."""
 
         return f"""\
-            # - Reject routes that are not exportable
-            # - Return true when routes match BGP_LC_RELATION_CUSTOMER and are exportable
-            # - Return false otherwise
-            function bgp_peer_redistribute_bgp_customer(string filter_name; bool exportable) {{
-                # Check for exportable customer routes
-                if !{self.is_bgp_customer()} then return false;
-                if (exportable) then {{
+            # Check for redistribution of our own blackhoole routes for BGP
+            function bgp_peer_redistribute_bgp_own_blackhole(string filter_name; bool redistribute) {{
+                # Check for redistribute own blackhole routes
+                if (!{self.is_bgp_own()} || !{self.is_blackhole()} || {self.functions.is_default()}) then return false;
+                if (redistribute) then {{
                     if DEBUG then print filter_name,
-                        " [bgp_peer_redistribute_bgp_customer] Accepting ", {self.functions.route_info()},
-                        " due to BGP_LC_RELATION_CUSTOMER route match (redistribute customer) and exportable";
+                        " [bgp_peer_redistribute_bgp_own_blackhole] Accepting ", {self.functions.route_info()},
+                        " due to BGP_LC_RELATION_OWN and blackhole route match (redistribute own blackhole)";
                     return true;
                 }}
                 if DEBUG then print filter_name,
-                    " [bgp_peer_redistribute_bgp_customer] Rejecting ", {self.functions.route_info()},
-                    " due to BGP_LC_RELATION_CUSTOMER route match (redistribute customer) and not exportable";
+                    " [bgp_peer_redistribute_bgp_own_blackhole] Rejecting ", {self.functions.route_info()},
+                    " due to BGP_LC_RELATION_OWN and blackhole route match (no redistribute own blackhole)";
+                reject;
+            }}"""
+
+    @bird_function("bgp_peer_redistribute_bgp_own_default")
+    def peer_redistribute_bgp_own_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_redistribute_bgp_own_default function."""
+
+        return f"""\
+            # Check for redistribution of our own default routes for BGP
+            function bgp_peer_redistribute_bgp_own_default(string filter_name; bool redistribute) {{
+                # Check for redistribute own default routes
+                if (!{self.is_bgp_own()} || {self.is_blackhole()} || !{self.functions.is_default()}) then return false;
+                if (redistribute) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_redistribute_bgp_own_default] Accepting ", {self.functions.route_info()},
+                        " due to BGP_LC_RELATION_OWN and default route match (redistribute own default)";
+                    return true;
+                }}
+                if DEBUG then print filter_name,
+                    " [bgp_peer_redistribute_bgp_own_default] Rejecting ", {self.functions.route_info()},
+                    " due to BGP_LC_RELATION_OWN and default route match (no redistribute own default)";
                 reject;
             }}"""
 
@@ -1794,34 +1875,32 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of peering routes for BGP
-            # - Reject routes that are not exportable
-            # - Return true when routes match BGP_LC_RELATION_PEER and are exportable
-            # - Return false otherwise
-            function bgp_peer_redistribute_bgp_peering(string filter_name; bool exportable) {{
-                # Check for exportable peering routes
+            function bgp_peer_redistribute_bgp_peering(string filter_name; bool redistribute) {{
+                if (!{self.is_bgp_peering()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
+                # Check for redistribute peering routes
                 if {self.is_bgp_peer()} then {{
-                    if (exportable) then {{
+                    if (redistribute) then {{
                         if DEBUG then print filter_name,
                             " [bgp_peer_redistribute_bgp_peering] Accepting ", {self.functions.route_info()},
-                            " due to BGP_LC_RELATION_PEER route match (redistribute peering) and exportable";
+                            " due to BGP_LC_RELATION_PEER route match (redistribute peering)";
                         return true;
                     }}
                     if DEBUG then print filter_name,
                         " [bgp_peer_redistribute_bgp_peering] Rejecting ", {self.functions.route_info()},
-                        " due to BGP_LC_RELATION_PEER route match (redistribute peering) and not exportable";
+                        " due to BGP_LC_RELATION_PEER route match (no redistribute peering)";
                     reject;
                 }}
-                # Check for exportable routeserver routes
+                # Check for redistribute routeserver routes
                 if {self.is_bgp_routeserver()} then {{
-                    if (exportable) then {{
+                    if (redistribute) then {{
                         if DEBUG then print filter_name,
                             " [bgp_peer_redistribute_bgp_peering] Accepting ", {self.functions.route_info()},
-                            " due to BGP_LC_RELATION_ROUTESERVER route match (redistribute peering) and exportable";
+                            " due to BGP_LC_RELATION_ROUTESERVER route match (redistribute peering)";
                         return true;
                     }}
                     if DEBUG then print filter_name,
                         " [bgp_peer_redistribute_bgp_peering] Rejecting ", {self.functions.route_info()},
-                        " due to BGP_LC_RELATION_ROUTESERVER route match (redistribute peering) and not exportable";
+                        " due to BGP_LC_RELATION_ROUTESERVER route match (no redistribute peering)";
                     reject;
                 }}
                 return false;
@@ -1832,21 +1911,40 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_redistribute_bgp_transit function."""
 
         return f"""\
-            # - Reject routes that are not exportable
-            # - Return true when routes match BGP_LC_RELATION_TRANSIT and are exportable
-            # - Return false otherwise
-            function bgp_peer_redistribute_bgp_transit(string filter_name; bool exportable) {{
-                # Check for exportable transit routes
-                if !{self.is_bgp_transit()} then return false;
-                if (exportable) then {{
+            # Check for redistribution of transit routes for BGP
+            function bgp_peer_redistribute_bgp_transit(string filter_name; bool redistribute) {{
+                # Check for redistribute transit routes
+                if (!{self.is_bgp_transit()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
+                if (redistribute) then {{
                     if DEBUG then print filter_name,
                         " [bgp_peer_redistribute_bgp_transit] Accepting ", {self.functions.route_info()},
-                        " due to BGP_LC_RELATION_TRANSIT route match (redistribute transit) and exportable";
+                        " due to BGP_LC_RELATION_TRANSIT route match (redistribute transit)";
                     return true;
                 }}
                 if DEBUG then print filter_name,
                     " [bgp_peer_redistribute_bgp_transit] Rejecting ", {self.functions.route_info()},
-                    " due to BGP_LC_RELATION_TRANSIT route match (redistribute transit) and not exportable";
+                    " due to BGP_LC_RELATION_TRANSIT route match (no redistribute transit)";
+                reject;
+            }}"""
+
+    @bird_function("bgp_peer_redistribute_bgp_transit_default")
+    def peer_redistribute_bgp_transit_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_redistribute_bgp_transit_default function."""
+
+        return f"""\
+            # Check for redistribution of transit routes for BGP
+            function bgp_peer_redistribute_bgp_transit_default(string filter_name; bool redistribute) {{
+                # Check for redistribute transit routes
+                if (!{self.is_bgp_transit()} || {self.is_blackhole()} || !{self.functions.is_default()}) then return false;
+                if (redistribute) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_redistribute_bgp_transit_default] Accepting ", {self.functions.route_info()},
+                        " due to BGP_LC_RELATION_TRANSIT and default route match (redistribute transit default)";
+                    return true;
+                }}
+                if DEBUG then print filter_name,
+                    " [bgp_peer_redistribute_bgp_transit_default] Rejecting ", {self.functions.route_info()},
+                    " due to BGP_LC_RELATION_TRANSIT and default route match (no redistribute transit default)";
                 reject;
             }}"""
 
@@ -1856,9 +1954,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of connected routes for BGP
-            # - Reject routes that are not redistributable
-            # - Return true when routes are redistributable
-            # - Return false otherwise
             function bgp_peer_redistribute_connected(string filter_name; bool redistribute) {{
                 # Check for connected routes
                 if !{self.is_connected()} then return false;
@@ -1880,10 +1975,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of kernel routes for BGP
-            # - Exclude blackhole routes
-            # - Reject routes that are not redistributable
-            # - Return true when routes are redistributable
-            # - Return false otherwise
             function bgp_peer_redistribute_kernel(string filter_name; bool redistribute) {{
                 if (!{self.functions.is_kernel()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
@@ -1904,20 +1995,16 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of kernel blackhole routes for BGP
-            # - Only blackhole routes
-            # - Reject routes that are not redistributable
-            # - Return true when routes are redistributable
-            # - Return false otherwise
             function bgp_peer_redistribute_kernel_blackhole(string filter_name; bool redistribute) {{
                 if (!{self.functions.is_kernel()} || !{self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
                     if DEBUG then print filter_name,
-                        " [bgp_peer_redistribute_kernel_blackhole] Accepting ", net, " from ", proto,
+                        " [bgp_peer_redistribute_kernel_blackhole] Accepting ", {self.functions.route_info()},
                         " due to kernel blackhole route match (redistribute kernel)";
                     return true;
                 }}
                 if DEBUG then print filter_name,
-                    " [bgp_peer_redistribute_kernel_blackhole] Rejecting ", net, " from ", proto,
+                    " [bgp_peer_redistribute_kernel_blackhole] Rejecting ", {self.functions.route_info()},
                     " due to kernel blackhole route match (no redistribute kernel)";
                 reject;
             }}"""
@@ -1928,9 +2015,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of kernel default routes for BGP
-            # - Reject routes that are not redistributable
-            # - Return true when routes are redistributable and accepted
-            # - Return false otherwise
             function bgp_peer_redistribute_kernel_default(string filter_name; bool redistribute) {{
                 if (!{self.functions.is_kernel()} || {self.is_blackhole()} || !{self.functions.is_default()}) then
                     return false;
@@ -1952,9 +2036,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of originated routes for BGP
-            # - Reject routes that are not redistributable
-            # - Return true when routes are redistributable
-            # - Return false otherwise
             function bgp_peer_redistribute_originated(string filter_name; bool redistribute) {{
                 if (!{self.is_originated()} || {self.is_blackhole()} || {self.functions.is_default()}) then
                     return false;
@@ -1976,9 +2057,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of originated default routes for BGP
-            # - Reject routes that are not redistributable
-            # - Return true when routes are redistributable and accepted
-            # - Return false otherwise
             function bgp_peer_redistribute_originated_default(string filter_name; bool redistribute) {{
                 if (!{self.is_originated()} || {self.is_blackhole()} || !{self.functions.is_default()}) then return false;
                 if (redistribute) then {{
@@ -1999,10 +2077,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of static routes for BGP
-            # - Exclude blackhole routes
-            # - Reject routes that are not redistributable
-            # - Return true when routes are redistributable
-            # - Return false otherwise
             function bgp_peer_redistribute_static(string filter_name; bool redistribute) {{
                 if (!{self.functions.is_static()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
@@ -2023,20 +2097,16 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of static blackhole routes for BGP
-            # - Only blackhole routes
-            # - Reject routes that are not redistributable
-            # - Return true when routes are redistributable
-            # - Return false otherwise
             function bgp_peer_redistribute_static_blackhole(string filter_name; bool redistribute) {{
                 if (!{self.functions.is_static()} || !{self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
                     if DEBUG then print filter_name,
-                        " [bgp_peer_redistribute_static_blackhole] Accepting ", net, " from ", proto,
+                        " [bgp_peer_redistribute_static_blackhole] Accepting ", {self.functions.route_info()},
                         " due to static blackhole route match (redistribute static)";
                     return true;
                 }}
                 if DEBUG then print filter_name,
-                    " [bgp_peer_redistribute_static_blackhole] Rejecting ", net, " from ", proto,
+                    " [bgp_peer_redistribute_static_blackhole] Rejecting ", {self.functions.route_info()},
                     " due to static blackhole route match (no redistribute static)";
                 reject;
             }}"""
@@ -2047,9 +2117,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of static default routes for BGP
-            # - Reject routes that are not redistributable
-            # - Return true when routes are redistributable and accepted
-            # - Return false otherwise
             function bgp_peer_redistribute_static_default(string filter_name; bool redistribute) {{
                 if (!{self.functions.is_static()} || {self.is_blackhole()} || !{self.functions.is_default()}) then
                     return false;
@@ -2179,6 +2246,113 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                     " [bgp_peer_reject_noexport_location] Rejecting ", {self.functions.route_info()},
                     " due to match on BGP_LC_FUNCTION_NOEXPORT_LOCATION with location ", location;
                 reject;
+            }}"""
+
+    @bird_function("bgp_peer_reject_non_exportable")
+    def peer_reject_non_exportable(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_reject_non_exportable function."""
+
+        return f"""\
+            # Can we export this route to the peer_asn?
+            function bgp_peer_reject_non_exportable(
+                string filter_name; int peer_asn;
+                int ipv4_maxlen; int ipv4_minlen;
+                int ipv6_maxlen; int ipv6_minlen
+            )
+            int prefix_maxlen;
+            int prefix_minlen;
+            {{
+                # Work out what prefix lenghts we're going to use
+                if (net.type = NET_IP4) then {{
+                    prefix_maxlen = ipv4_maxlen;
+                    prefix_minlen = ipv4_minlen;
+                }}
+                if (net.type = NET_IP6) then {{
+                    prefix_maxlen = ipv6_maxlen;
+                    prefix_minlen = ipv6_minlen;
+                }}
+                # Check for NOEXPORT large community
+                if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) ~ bgp_large_community) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_reject_non_exportable] Not exporting due to BGP_LC_FUNCTION_NOEXPORT for AS", peer_asn ," for ",
+                        {self.functions.route_info()};
+                    reject;
+                }}
+                # Validate route before export
+                if {self.functions.prefix_is_longer(BirdVariable("prefix_maxlen"))} then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_reject_non_exportable] Not exporting due to prefix length >", prefix_maxlen," for ",
+                        {self.functions.route_info()};
+                    reject;
+                }}
+                if {self.functions.prefix_is_shorter(BirdVariable("prefix_minlen"))} then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_reject_non_exportable] Not exporting due to prefix length <", prefix_minlen, " for ",
+                        {self.functions.route_info()};
+                    reject;
+                }}
+                # Check if this is a bogon
+                if {self.functions.is_bogon()} then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_reject_non_exportable] Not exporting due to ", {self.functions.route_info()}, " being a bogon";
+                    reject;
+                }}
+                # If all above tests are ok, then we can
+                return true;
+            }}"""
+
+    @bird_function("bgp_peer_reject_non_exportable_blackhole")
+    def peer_reject_non_exportable_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_reject_non_exportable_blackhole function."""
+
+        return f"""\
+            # Can we export this route to the peer_asn?
+            function bgp_peer_reject_non_exportable_blackhole(
+                string filter_name; int peer_asn;
+                int ipv4_maxlen; int ipv4_minlen;
+                int ipv6_maxlen; int ipv6_minlen
+            )
+            int prefix_maxlen;
+            int prefix_minlen;
+            {{
+                # Work out what prefix lenghts we're going to use
+                if (net.type = NET_IP4) then {{
+                    prefix_maxlen = ipv4_maxlen;
+                    prefix_minlen = ipv4_minlen;
+                }}
+                if (net.type = NET_IP6) then {{
+                    prefix_maxlen = ipv6_maxlen;
+                    prefix_minlen = ipv6_minlen;
+                }}
+                # Check for NOEXPORT large community
+                if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) ~ bgp_large_community) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_reject_non_exportable_blackhole] Not exporting due to BGP_LC_FUNCTION_NOEXPORT for AS",
+                        peer_asn ," for ", {self.functions.route_info()};
+                    reject;
+                }}
+                # Validate route before export
+                if {self.functions.prefix_is_longer(BirdVariable("prefix_maxlen"))} then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_reject_non_exportable_blackhole] Not exporting due to prefix length >", prefix_maxlen," for ",
+                        net;
+                    reject;
+                }}
+                if {self.functions.prefix_is_shorter(BirdVariable("prefix_minlen"))} then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_reject_non_exportable_blackhole] Not exporting due to prefix length <", prefix_minlen, " for ",
+                        net;
+                    reject;
+                }}
+                # Check if this is a bogon
+                if {self.functions.is_bogon()} then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_reject_non_exportable_blackhole] Not exporting due to ",
+                        {self.functions.route_info()}, " being a bogon";
+                    reject;
+                }}
+                # If all above tests are ok, then we can
+                return true;
             }}"""
 
     @bird_function("bgp_peer_replace_aspath")

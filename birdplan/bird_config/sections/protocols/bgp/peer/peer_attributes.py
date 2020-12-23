@@ -38,58 +38,82 @@ class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods
     ----------
     connected: List[str]
         Connected route outgoing large communities.
-    default: List[str]
-        Default route outgoing large communities.
     kernel: List[str]
         Kernel route outgoing large communities.
     kernel_blackhole: List[str]
         Kernel blackhole route outgoing large communities.
+    kernel_default: List[str]
+        Kernel default route outgoing large communities.
     originated: List[str]
         Originated route outgoing large communities.
+    originated_default: List[str]
+        Originated default route outgoing large communities.
     static: List[str]
         Static route outgoing large communities.
     static_blackhole: List[str]
         Static blackhole route outgoing large communities.
+    static_default: List[str]
+        Static default route outgoing large communities.
     bgp: List[str]
         BGP route outgoing large communities.
     bgp_own: List[str]
         BGP own route outgoing large communities.
+    bgp_own_blackhole: List[str]
+        BGP own blackhole route outgoing large communities.
+    bgp_own_default: List[str]
+        BGP own default route outgoing large communities.
     bgp_customer: List[str]
         BGP customer route outgoing large communities.
+    bgp_customer_blackhole: List[str]
+        BGP customer blackhole route outgoing large communities.
     bgp_peering: List[str]
         BGP peering route outgoing large communities.
     bgp_transit: List[str]
         BGP transit route outgoing large communities.
+    bgp_transit_default: List[str]
+        BGP transit default route outgoing large communities.
 
     """
 
     connected: List[str]
-    default: List[str]
     kernel: List[str]
     kernel_blackhole: List[str]
+    kernel_default: List[str]
     originated: List[str]
+    originated_default: List[str]
     static: List[str]
     static_blackhole: List[str]
+    static_default: List[str]
     bgp: List[str]
     bgp_own: List[str]
+    bgp_own_blackhole: List[str]
+    bgp_own_default: List[str]
     bgp_customer: List[str]
+    bgp_customer_blackhole: List[str]
     bgp_peering: List[str]
     bgp_transit: List[str]
+    bgp_transit_default: List[str]
 
     def __init__(self) -> None:
         """Initialize object."""
         self.connected = []
-        self.default = []
         self.kernel = []
         self.kernel_blackhole = []
+        self.kernel_default = []
         self.originated = []
+        self.originated_default = []
         self.static = []
         self.static_blackhole = []
+        self.static_default = []
         self.bgp = []
         self.bgp_own = []
+        self.bgp_own_blackhole = []
+        self.bgp_own_default = []
         self.bgp_customer = []
+        self.bgp_customer_blackhole = []
         self.bgp_peering = []
         self.bgp_transit = []
+        self.bgp_transit_default = []
 
 
 class BGPPeerLargeCommunities:  # pylint: disable=too-few-public-methods
@@ -306,16 +330,22 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,
         Redistribute static blackhole routes to the peer BGP table. Defaults to `False`.
     static_default : bool
         Redistribute static default routes to the peer BGP table. Defaults to `False`.
-    bgp: bool
-        Redistribute all BGP routes to the peer BGP table. Defaults to `False`.
     bgp_own: bool
         Redistribute our own originated BGP routes to the peer BGP table. Defaults to `False`.
-    bgp_customer: bool
+    bgp_customer : bool
         Redistribute customer BGP routes to the peer BGP table. Defaults to `False`.
-    bgp_peering: bool
+    bgp_peering : bool
         Redistribute peering BGP routes to the peer BGP table. Defaults to `False`.
-    bgp_transit: bool
+    bgp_transit : bool
         Redistribute transit BGP routes to the peer BGP table. Defaults to `False`.
+    bgp_customer_blackhole : bool
+        Redistribute customer blackhole BGP routes to the peer BGP table. Defaults to `False`.
+    bgp_own_blackhole : bool
+        Redistribute our own blackhole BGP routes to the peer BGP table. Defaults to `False`.
+    bgp_own_default : bool
+        Redistribute our own default BGP routes to the peer BGP table. Defaults to `False`.
+    bgp_transit_default : bool
+        Redistribute transit default BGP routes to the peer BGP table. Defaults to `False`.
 
     """
 
@@ -328,11 +358,14 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,
     static: bool
     static_blackhole: bool
     static_default: bool
-    bgp: bool
     bgp_own: bool
     bgp_customer: bool
     bgp_peering: bool
     bgp_transit: bool
+    bgp_customer_blackhole: bool
+    bgp_own_blackhole: bool
+    bgp_own_default: bool
+    bgp_transit_default: bool
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -345,11 +378,14 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,
         self.static = False
         self.static_blackhole = False
         self.static_default = False
-        self.bgp = False
         self.bgp_own = False
         self.bgp_customer = False
         self.bgp_peering = False
         self.bgp_transit = False
+        self.bgp_customer_blackhole = False
+        self.bgp_own_blackhole = False
+        self.bgp_own_default = False
+        self.bgp_transit_default = False
 
 
 class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-instance-attributes

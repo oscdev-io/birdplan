@@ -31,9 +31,12 @@ class TemplateBase(BirdPlanBaseTestCase):
     r1_interfaces = ["eth0", "eth1"]
     r2_interfaces = ["eth0"]
 
-    exabgps = ["e1"]
+    exabgps = ["e1", "e2"]
     e1_asn = 65000
     e1_interface_eth0 = {"mac": "02:e1:00:00:00:01", "ips": ["100.64.0.3/24", "fc00:100::3/64"]}
+
+    e2_asn = 65000
+    e2_interface_eth0 = {"mac": "02:e2:00:00:00:01", "ips": ["100.64.0.4/24", "fc00:100::4/64"]}
 
     def r1_template_extra_config(self):
         """Dynamic configuration."""
@@ -43,11 +46,17 @@ class TemplateBase(BirdPlanBaseTestCase):
         # Redistribute default routes for all but these peer types...
         r1_peer_type = getattr(self, "r1_peer_type")
         if r1_peer_type not in ("peer", "routecollector", "routeserver", "transit"):
-            config.append("        default: True")
+            config.append("        kernel_default: True")
+            config.append("        originated_default: True")
+            config.append("        static_default: True")
+            config.append("        bgp_own_default: True")
+            config.append("        bgp_transit_default: True")
         # Redistribute blackhole routes only to the below peers that
         if r1_peer_type in ("internal", "routecollector", "routeserver", "rrclient", "rrserver", "rrserver-rrserver", "transit"):
             config.append("        kernel_blackhole: True")
             config.append("        static_blackhole: True")
+            config.append("        bgp_own_blackhole: True")
+            config.append("        bgp_customer_blackhole: True")
         # Mark blackhole capable eBGP peers
         if r1_peer_type in ("routecollector", "routeserver", "transit"):
             config.append("      blackhole_community: True")
@@ -67,11 +76,34 @@ class TemplateBase(BirdPlanBaseTestCase):
             "e1",
             ["neighbor 100.64.0.1 announce route 100.64.103.0/24 next-hop 100.64.0.3 large-community [ 65000:3:1 ]"],
         )
+        self._exabgpcli(
+            sim,
+            "e1",
+            ["neighbor 100.64.0.1 announce route 0.0.0.0/0 next-hop 100.64.0.3 large-community [ 65000:3:1 ]"],
+        )
+        self._exabgpcli(
+            sim,
+            "e1",
+            [
+                "neighbor 100.64.0.1 announce route 100.65.103.100/31 next-hop 100.64.0.3 "
+                "large-community [ 65000:3:1 65000:666:65412 65000:666:65413 ] "
+                "community [ 65535:666 65535:65281 ]"
+            ],
+        )
         # Customer route
         self._exabgpcli(
             sim,
             "e1",
             ["neighbor 100.64.0.1 announce route 100.64.104.0/24 next-hop 100.64.0.3 large-community [ 65000:3:2 ]"],
+        )
+        self._exabgpcli(
+            sim,
+            "e1",
+            [
+                "neighbor 100.64.0.1 announce route 100.64.104.100/31 next-hop 100.64.0.3 "
+                "large-community [ 65000:3:2 65000:666:65412 65000:666:65413 ] "
+                "community [ 65535:666 ]"
+            ],
         )
         # Peer route
         self._exabgpcli(
@@ -85,24 +117,46 @@ class TemplateBase(BirdPlanBaseTestCase):
             "e1",
             ["neighbor 100.64.0.1 announce route 100.64.106.0/24 next-hop 100.64.0.3 large-community [ 65000:3:4 ]"],
         )
+        self._exabgpcli(
+            sim,
+            "e2",
+            ["neighbor 100.64.0.1 announce route 0.0.0.0/0 next-hop 100.64.0.4 large-community [ 65000:3:4 ]"],
+        )
         # Route server route
         self._exabgpcli(
             sim,
             "e1",
             ["neighbor 100.64.0.1 announce route 100.64.107.0/24 next-hop 100.64.0.3 large-community [ 65000:3:5 ]"],
         )
-
         # Own route
         self._exabgpcli(
             sim,
             "e1",
             ["neighbor fc00:100::1 announce route fc00:103::/48 next-hop fc00:100::3 large-community [ 65000:3:1 ]"],
         )
+        self._exabgpcli(
+            sim,
+            "e1",
+            ["neighbor fc00:100::1 announce route ::/0 next-hop fc00:100::3 large-community [ 65000:3:1 ]"],
+        )
+        self._exabgpcli(
+            sim,
+            "e1",
+            ["neighbor fc00:100::1 announce route fc00:103::100/127 next-hop fc00:100::3 large-community [ 65000:3:1 ]"],
+        )
         # Customer route
         self._exabgpcli(
             sim,
             "e1",
             ["neighbor fc00:100::1 announce route fc00:104::/48 next-hop fc00:100::3 large-community [ 65000:3:2 ]"],
+        )
+        self._exabgpcli(
+            sim,
+            "e1",
+            [
+                "neighbor fc00:100::1 announce route fc00:104::100/127 next-hop fc00:100::3 large-community [ 65000:3:2 ] "
+                "community [ 65535:666 ]"
+            ],
         )
         # Peer route
         self._exabgpcli(
@@ -116,6 +170,11 @@ class TemplateBase(BirdPlanBaseTestCase):
             "e1",
             ["neighbor fc00:100::1 announce route fc00:106::/48 next-hop fc00:100::3 large-community [ 65000:3:4 ]"],
         )
+        self._exabgpcli(
+            sim,
+            "e2",
+            ["neighbor fc00:100::1 announce route ::/0 next-hop fc00:100::4 large-community [ 65000:3:4 ]"],
+        )
         # Route server route
         self._exabgpcli(
             sim,
@@ -128,14 +187,18 @@ class TemplateBase(BirdPlanBaseTestCase):
             return
 
         # Add gateway'd kernel routes
-        sim.node("r1").run_ip(["route", "add", "100.121.0.0/24", "via", "100.101.0.2"])
-        sim.node("r1").run_ip(["route", "add", "fc00:121::/48", "via", "fc00:101::2"])
+        sim.node("r1").run_ip(["route", "add", "100.121.0.0/24", "via", "100.101.0.3"])
+        sim.node("r1").run_ip(["route", "add", "fc00:121::/48", "via", "fc00:101::3"])
 
         # Add device kernel routes
         sim.node("r1").run_ip(["route", "add", "100.122.0.0/24", "dev", "eth1"])
         sim.node("r1").run_ip(["route", "add", "fc00:122::/48", "dev", "eth1"])
 
-        # Add device kernel routes
+        # Add kernel default routes
+        sim.node("r1").run_ip(["route", "add", "default", "via", "100.101.0.3"])
+        sim.node("r1").run_ip(["route", "add", "default", "via", "fc00:101::3"])
+
+        # Add blackhole kernel routes
         sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
         sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
 
