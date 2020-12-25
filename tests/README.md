@@ -75,13 +75,13 @@
 
 [Outgoing Large Communities](t40_bgp/t56_outgoing_large_communities/README.md)
 
-[Large Community Functions](t40_bgp/t58_large_community_functions/README.md)
+[Filtering (outbound)](t40_bgp/t60_filtering_outbound/README.md)
 
-[Prepending](t40_bgp/t60_prepending/README.md)
+[Filtering (inbound)](t40_bgp/t62_filtering_inbound/README.md)
 
-[Filtering (inbound)](t40_bgp/t80_filtering_inbound/README.md)
+[Prepending](t40_bgp/t80_prepending/README.md)
 
-[Filtering (outbound)](t40_bgp/t81_filtering_outbound/README.md)
+[Large Community Functions](t40_bgp/t82_large_community_functions/README.md)
 
 [Graceful Shutdown](t40_bgp/t90_graceful_shutdown/README.md)
 
