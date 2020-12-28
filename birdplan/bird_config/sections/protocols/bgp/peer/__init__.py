@@ -919,13 +919,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add(f"filter {filter_name}")
         self.conf.add("string filter_name;")
         self.conf.add("bool accept_route;")
-        self.conf.add("bool bypass_export_checks;")
-        self.conf.add("bool is_blackhole;")
         self.conf.add("{")
         self.conf.add(f'  filter_name = "{filter_name}";')
         self.conf.add("  accept_route = false;")
-        self.conf.add("  bypass_export_checks = false;")
-        self.conf.add("  is_blackhole = false;")
         self.conf.add("")
 
         # Reject NOADVERTISE
@@ -945,8 +941,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # If the peer accepts blackhole communites, check if we're going to be exporting this blackhole
             if self.blackhole_community:
                 self.conf.add("  # Peer is blackhole community capable")
-                # Grab BIRD function to reject non targetted blackhole routes, bypassing kernel and static routes originating
-                # locally
+                # Grab BIRD function to reject non targetted blackhole routes
                 peer_reject_non_targetted_blackhole = self.bgp_functions.peer_reject_non_targetted_blackhole(
                     True,
                     self.route_policy_redistribute.kernel_blackhole,
@@ -957,6 +952,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.conf.add(f"  {peer_reject_non_targetted_blackhole};")
             else:
                 self.conf.add("  # Peer is not blackhole community capable")
+                # Grab BIRD function to reject non targetted blackhole routes
                 peer_reject_non_targetted_blackhole = self.bgp_functions.peer_reject_non_targetted_blackhole(
                     False, False, False, self.asn, blackhole_function_arg
                 )
@@ -964,9 +960,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # IMPORTANT: This must be after peer_reject_non_targetted_blackhole as peer_reject_non_targetted_blackhole removes
         #            the NOEXPORT community
-        # Reject NOEXPORT
-        if self.peer_type in ("customer", "peer", "routecollector", "routeserver", "transit"):
+        # Reject NOEXPORT and NOEXPORT ASN
+        if self.peer_type not in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             self.conf.add(f"  {self.bgp_functions.peer_reject_noexport()};")
+            self.conf.add(f"  {self.bgp_functions.peer_reject_noexport_asn(self.asn)};")
 
         # Check for peer types we're not exporting to
         if self.peer_type == "customer":
@@ -995,18 +992,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_kernel(False)};")
         # Check for kernel blackhole route redistribution
         if self.route_policy_redistribute.kernel_blackhole:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel_blackhole(True)} then {{")
-            self.conf.add("    is_blackhole = true;")
-            self.conf.add("    accept_route = true;")
-            self.conf.add("  }")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel_blackhole(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_kernel_blackhole(False)};")
         # Check for kernel default route redistribution
         if self.route_policy_redistribute.kernel_default:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel_default(True)} then {{")
-            self.conf.add("    accept_route = true;")
-            self.conf.add("    bypass_export_checks = true;")
-            self.conf.add("  }")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel_default(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_kernel_default(False)};")
         # Check for static route redistribution
@@ -1016,18 +1007,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_static(False)};")
         # Check for static blackhole route redistribution
         if self.route_policy_redistribute.static_blackhole:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static_blackhole(True)} then {{")
-            self.conf.add("    is_blackhole = true;")
-            self.conf.add("    accept_route = true;")
-            self.conf.add("  }")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static_blackhole(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_static_blackhole(False)};")
         # Check for static default route redistribution
         if self.route_policy_redistribute.static_default:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static_default(True)} then {{")
-            self.conf.add("    accept_route = true;")
-            self.conf.add("    bypass_export_checks = true;")
-            self.conf.add("  }")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static_default(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_static_default(False)};")
         # Check for originated route redistribution
@@ -1037,81 +1022,65 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_originated(False)};")
         # Check for originated default route redistribution
         if self.route_policy_redistribute.originated_default:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_originated_default(True)} then {{")
-            self.conf.add("    accept_route = true;")
-            self.conf.add("    bypass_export_checks = true;")
-            self.conf.add("  }")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_originated_default(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_originated_default(False)};")
 
         # Check redistribution BGP routes originating from the different peer types
         # BGP routes originating from customers
         if self.route_policy_redistribute.bgp_customer:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_customer(True)} then")
-            self.conf.add("    accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_customer(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_customer(False)};")
 
         if self.route_policy_redistribute.bgp_customer_blackhole:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_customer_blackhole(True)} then {{")
-            self.conf.add("    is_blackhole = true;")
-            self.conf.add("    accept_route = true;")
-            self.conf.add("  }")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_customer_blackhole(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_customer_blackhole(False)};")
 
         # BGP routes originating from within our federation
         if self.route_policy_redistribute.bgp_own:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own(True)} then")
-            self.conf.add("    accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_own(False)};")
 
         if self.route_policy_redistribute.bgp_own_blackhole:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own_blackhole(True)} then {{")
-            self.conf.add("    is_blackhole = true;")
-            self.conf.add("    accept_route = true;")
-            self.conf.add("  }")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own_blackhole(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_own_blackhole(False)};")
 
         if self.route_policy_redistribute.bgp_own_default:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own_default(True)} then {{")
-            self.conf.add("    accept_route = true;")
-            self.conf.add("    bypass_export_checks = true;")
-            self.conf.add("  }")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own_default(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_own_default(False)};")
 
         # BGP routes originating from peering
         if self.route_policy_redistribute.bgp_peering:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_peering(True)} then")
-            self.conf.add("    accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_peering(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_peering(False)};")
 
         # BGP routes originating from transit
         if self.route_policy_redistribute.bgp_transit:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_transit(True)} then")
-            self.conf.add("    accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_transit(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_transit(False)};")
 
         if self.route_policy_redistribute.bgp_transit_default:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_transit_default(True)} then {{")
-            self.conf.add("    accept_route = true;")
-            self.conf.add("    bypass_export_checks = true;")
-            self.conf.add("  }")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_transit_default(True)} then accept_route = true;")
         else:
             self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_transit_default(False)};")
 
         # Check if the route is exportable
         self.conf.add("  # BGP exportable checks")
-        self.conf.add("  if (!bypass_export_checks) then {")
-        self.conf.add("     if !is_blackhole then {")
-        self.conf.add(f"       {self._peer_reject_non_exportable()};")
-        self.conf.add("     } else {")
+        self.conf.add(f"  if !{self.functions.is_default()} then {{")
+        # Reject bogons for eBGP peer types
+        if self.peer_type not in ("internal", "rrclient", "rrserver", "rrserver-server"):
+            self.conf.add(f"     {self.bgp_functions.peer_reject_bogons()};")
+        self.conf.add(f"     if {self.bgp_functions.is_blackhole()} then {{")
         self.conf.add(f"       {self._peer_reject_non_exportable_blackhole()};")
+        self.conf.add("     } else {")
+        self.conf.add(f"       {self._peer_reject_non_exportable()};")
         self.conf.add("     }")
 
         # End of BGP type tests
@@ -1603,7 +1572,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def _peer_reject_non_exportable_blackhole(self) -> str:
         """Generate the function call to peer_reject_non_exportable_blackhole."""
         return self.bgp_functions.peer_reject_non_exportable_blackhole(
-            self.asn,
             self.blackhole_export_maxlen4,
             self.blackhole_export_minlen4,
             self.blackhole_export_maxlen6,

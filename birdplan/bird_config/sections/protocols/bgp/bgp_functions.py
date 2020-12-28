@@ -2146,6 +2146,19 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
+    @bird_function("bgp_peer_reject_bogons")
+    def peer_reject_bogons(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_reject_bogons function."""
+
+        return f"""\
+            # Reject bogon routes
+            function bgp_peer_reject_bogons(string filter_name) {{
+                if !{self.functions.is_bogon()} then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_reject_bogons] Rejecting bogon ", {self.functions.route_info()};
+                reject;
+            }}"""
+
     @bird_function("bgp_peer_reject_filtered")
     def peer_reject_filtered(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_peer_reject_filtered function."""
@@ -2185,6 +2198,21 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if DEBUG then print filter_name,
                     " [bgp_peer_reject_noexport] Rejecting ", {self.functions.route_info()},
                     " due to match on BGP_COMMUNITY_NOEXPORT";
+                reject;
+            }}"""
+
+    @bird_function("bgp_peer_reject_noexport_asn")
+    def peer_reject_noexport_asn(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_reject_noexport_asn function."""
+
+        return f"""\
+            # Reject NOEXPORT ASN routes
+            function bgp_peer_reject_noexport_asn(string filter_name; int peer_asn) {{
+                # Check for NOEXPORT large community
+                if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) !~ bgp_large_community) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_reject_noexport_asn] Rejecting ", {self.functions.route_info()},
+                    " due to match on BGP_LC_FUNCTION_NOEXPORT for AS", peer_asn;
                 reject;
             }}"""
 
@@ -2255,7 +2283,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         return f"""\
             # Can we export this route to the peer_asn?
             function bgp_peer_reject_non_exportable(
-                string filter_name; int peer_asn;
+                string filter_name;
                 int ipv4_maxlen; int ipv4_minlen;
                 int ipv6_maxlen; int ipv6_minlen
             )
@@ -2270,13 +2298,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if (net.type = NET_IP6) then {{
                     prefix_maxlen = ipv6_maxlen;
                     prefix_minlen = ipv6_minlen;
-                }}
-                # Check for NOEXPORT large community
-                if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) ~ bgp_large_community) then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_reject_non_exportable] Not exporting due to BGP_LC_FUNCTION_NOEXPORT for AS", peer_asn ," for ",
-                        {self.functions.route_info()};
-                    reject;
                 }}
                 # Validate route before export
                 if {self.functions.prefix_is_longer(BirdVariable("prefix_maxlen"))} then {{
@@ -2291,12 +2312,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                         {self.functions.route_info()};
                     reject;
                 }}
-                # Check if this is a bogon
-                if {self.functions.is_bogon()} then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_reject_non_exportable] Not exporting due to ", {self.functions.route_info()}, " being a bogon";
-                    reject;
-                }}
                 # If all above tests are ok, then we can
                 return true;
             }}"""
@@ -2308,7 +2323,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         return f"""\
             # Can we export this route to the peer_asn?
             function bgp_peer_reject_non_exportable_blackhole(
-                string filter_name; int peer_asn;
+                string filter_name;
                 int ipv4_maxlen; int ipv4_minlen;
                 int ipv6_maxlen; int ipv6_minlen
             )
@@ -2324,13 +2339,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                     prefix_maxlen = ipv6_maxlen;
                     prefix_minlen = ipv6_minlen;
                 }}
-                # Check for NOEXPORT large community
-                if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) ~ bgp_large_community) then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_reject_non_exportable_blackhole] Not exporting due to BGP_LC_FUNCTION_NOEXPORT for AS",
-                        peer_asn ," for ", {self.functions.route_info()};
-                    reject;
-                }}
                 # Validate route before export
                 if {self.functions.prefix_is_longer(BirdVariable("prefix_maxlen"))} then {{
                     if DEBUG then print filter_name,
@@ -2342,13 +2350,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                     if DEBUG then print filter_name,
                         " [bgp_peer_reject_non_exportable_blackhole] Not exporting due to prefix length <", prefix_minlen, " for ",
                         net;
-                    reject;
-                }}
-                # Check if this is a bogon
-                if {self.functions.is_bogon()} then {{
-                    if DEBUG then print filter_name,
-                        " [bgp_peer_reject_non_exportable_blackhole] Not exporting due to ",
-                        {self.functions.route_info()}, " being a bogon";
                     reject;
                 }}
                 # If all above tests are ok, then we can
