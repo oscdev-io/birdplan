@@ -64,7 +64,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             large_communities = "65000:3:1 "
 
-            # Advertise transit routes as if they came from a transit peering link
+            # Advertise customer routes as if they came from a customer peering session
             self._exabgpcli(
                 sim,
                 "e2",
