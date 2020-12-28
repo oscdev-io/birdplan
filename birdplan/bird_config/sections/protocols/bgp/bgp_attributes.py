@@ -18,7 +18,7 @@
 
 """BIRD BGP protocol attributes."""
 
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 
 class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
@@ -102,22 +102,28 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
         self.static_default = False
 
 
-class BGPAttributes:  # pylint: disable=too-few-public-methods
+class BGPPeertypeConstraints:  # pylint: disable=too-few-public-methods
     """
-    BGP attributes.
+    BGP constraints for a specific peer type.
 
     Attributes
     ----------
-    asn : int
-        BGP ASN.
-    graceful_shutdown ; boolean
-        Set graceful_shutdown mode for all peers.
-    rr_cluster_id : Optional[str]
-        Route relfector cluster ID in the case of us being a route reflector.
-    route_policy_accept : BGPRoutePolicyAccept
-        Route policy for acceptance of routes from the main BGP table into the master table.
-    route_policy_import : BGPRoutePolicyImport
-        Route policy for importing of routes from internal tables into our main BGP table.
+    import_maxlen4 : int
+        Prefix maximum length for IPv4 to import.
+    import_minlen4 : int
+        Prefix minimum length for IPv4 to import.
+    export_maxlen4 : int
+        Prefix maximum length for IPv4 to export.
+    export_minlen4 : int
+        Prefix minimum length for IPv4 to export.
+    import_maxlen6 : int
+        Prefix maximum length for IPv6 to import.
+    import_minlen6 : int
+        Prefix minimum length for IPv6 to import.
+    export_maxlen6 : int
+        Prefix maximum length for IPv6 to export.
+    export_minlen6 : int
+        Prefix minimum length for IPv6 to export.
     blackhole_import_maxlen4 : int
         Blackhole maximum length for IPv4 to import.
     blackhole_import_minlen4 : int
@@ -134,22 +140,6 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
         Blackhole maximum length for IPv6 to export.
     blackhole_export_minlen6 : int
         Blackhole minimum length for IPv6 to export.
-    prefix_import_maxlen4 : int
-        Prefix maximum length for IPv4 to import.
-    prefix_import_minlen4 : int
-        Prefix minimum length for IPv4 to import.
-    prefix_export_maxlen4 : int
-        Prefix maximum length for IPv4 to export.
-    prefix_export_minlen4 : int
-        Prefix minimum length for IPv4 to export.
-    prefix_import_maxlen6 : int
-        Prefix maximum length for IPv6 to import.
-    prefix_import_minlen6 : int
-        Prefix minimum length for IPv6 to import.
-    prefix_export_maxlen6 : int
-        Prefix maximum length for IPv6 to export.
-    prefix_export_minlen6 : int
-        Prefix minimum length for IPv6 to export.
     aspath_import_maxlen : int
         AS-PATH maximum length.
     aspath_import_minlen : int
@@ -163,11 +153,17 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
 
     """
 
-    asn: Optional[int]
-    graceful_shutdown: bool
-    rr_cluster_id: Optional[str]
-    route_policy_accept: BGPRoutePolicyAccept
-    route_policy_import: BGPRoutePolicyImport
+    import_maxlen4: int
+    import_minlen4: int
+
+    export_maxlen4: int
+    export_minlen4: int
+
+    import_maxlen6: int
+    import_minlen6: int
+
+    export_maxlen6: int
+    export_minlen6: int
 
     blackhole_import_maxlen4: int
     blackhole_import_minlen4: int
@@ -181,18 +177,6 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
     blackhole_export_maxlen6: int
     blackhole_export_minlen6: int
 
-    prefix_import_maxlen4: int
-    prefix_import_minlen4: int
-
-    prefix_export_maxlen4: int
-    prefix_export_minlen4: int
-
-    prefix_import_maxlen6: int
-    prefix_import_minlen6: int
-
-    prefix_export_maxlen6: int
-    prefix_export_minlen6: int
-
     aspath_import_maxlen: int
     aspath_import_minlen: int
 
@@ -200,17 +184,22 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
     extended_community_import_maxlen: int
     large_community_import_maxlen: int
 
-    def __init__(self) -> None:
+    def __init__(self, peer_type: Optional[str]) -> None:
         """Initialize object."""
 
-        self.asn = None
+        # Set defaults
 
-        self.graceful_shutdown = False
+        self.import_maxlen4 = 24
+        self.import_minlen4 = 8
 
-        self.rr_cluster_id = None
+        self.export_maxlen4 = 24
+        self.export_minlen4 = 8
 
-        self.route_policy_accept = BGPRoutePolicyAccept()
-        self.route_policy_import = BGPRoutePolicyImport()
+        self.import_maxlen6 = 48
+        self.import_minlen6 = 16
+
+        self.export_maxlen6 = 48
+        self.export_minlen6 = 16
 
         self.blackhole_import_maxlen4 = 32
         self.blackhole_import_minlen4 = 24
@@ -224,21 +213,80 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
         self.blackhole_export_maxlen6 = 128
         self.blackhole_export_minlen6 = 64
 
-        self.prefix_import_maxlen4 = 24
-        self.prefix_import_minlen4 = 8
-
-        self.prefix_export_maxlen4 = 24
-        self.prefix_export_minlen4 = 8
-
-        self.prefix_import_maxlen6 = 48
-        self.prefix_import_minlen6 = 16
-
-        self.prefix_export_maxlen6 = 48
-        self.prefix_export_minlen6 = 16
-
         self.aspath_import_maxlen = 100
         self.aspath_import_minlen = 1
 
         self.community_import_maxlen = 100
         self.extended_community_import_maxlen = 100
         self.large_community_import_maxlen = 100
+
+        # Override defaults for internal peer types
+        if peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            self.import_maxlen4 = 32
+            self.export_maxlen4 = 32
+            self.import_maxlen6 = 128
+            self.export_maxlen6 = 128
+
+        # Override defaults for customers with private ASN's
+        elif peer_type == "customer.private":
+            self.import_maxlen4 = 29
+            self.import_minlen4 = 16
+            self.import_maxlen6 = 64
+            self.import_minlen6 = 32
+
+
+class BGPAttributes:  # pylint: disable=too-few-public-methods
+    """
+    BGP attributes.
+
+    Attributes
+    ----------
+    asn : int
+        BGP ASN.
+    graceful_shutdown ; boolean
+        Set graceful_shutdown mode for all peers.
+    rr_cluster_id : Optional[str]
+        Route relfector cluster ID in the case of us being a route reflector.
+    route_policy_accept : BGPRoutePolicyAccept
+        Route policy for acceptance of routes from the main BGP table into the master table.
+    route_policy_import : BGPRoutePolicyImport
+        Route policy for importing of routes from internal tables into our main BGP table.
+    peertype_constraints : BGPPeertypeConstraints
+        Prefix limits for each peer type we support.
+
+    """
+
+    asn: Optional[int]
+    graceful_shutdown: bool
+    rr_cluster_id: Optional[str]
+    route_policy_accept: BGPRoutePolicyAccept
+    route_policy_import: BGPRoutePolicyImport
+
+    peertype_constraints: Dict[str, BGPPeertypeConstraints]
+
+    def __init__(self) -> None:
+        """Initialize object."""
+
+        self.asn = None
+
+        self.graceful_shutdown = False
+
+        self.rr_cluster_id = None
+
+        self.route_policy_accept = BGPRoutePolicyAccept()
+        self.route_policy_import = BGPRoutePolicyImport()
+
+        self.peertype_constraints = {}
+        for peer_type in (
+            "customer",
+            "customer.private",
+            "internal",
+            "peer",
+            "routecollector",
+            "routeserver",
+            "rrclient",
+            "rrserver",
+            "rrserver-rrserver",
+            "transit",
+        ):
+            self.peertype_constraints[peer_type] = BGPPeertypeConstraints(peer_type)

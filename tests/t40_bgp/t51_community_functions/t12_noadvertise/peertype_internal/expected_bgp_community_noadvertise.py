@@ -351,7 +351,7 @@ r10_t_bgp4_AS65000_r1_peer = {
 }
 
 r1_t_bgp6_AS65000_e1_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -369,7 +369,7 @@ r1_t_bgp6_AS65000_e1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:104::/64": [
+    "fc00:104::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -391,7 +391,7 @@ r1_t_bgp6_AS65000_e1_peer = {
 }
 
 r1_t_bgp6_AS65009_r10_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -412,7 +412,7 @@ r1_t_bgp6_AS65009_r10_peer = {
 }
 
 r1_t_bgp6_AS65001_r2_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -433,7 +433,7 @@ r1_t_bgp6_AS65001_r2_peer = {
 }
 
 r1_t_bgp6_AS65000_r3_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -454,7 +454,7 @@ r1_t_bgp6_AS65000_r3_peer = {
 }
 
 r1_t_bgp6_AS65003_r4_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -475,7 +475,7 @@ r1_t_bgp6_AS65003_r4_peer = {
 }
 
 r1_t_bgp6_AS65004_r5_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -496,7 +496,7 @@ r1_t_bgp6_AS65004_r5_peer = {
 }
 
 r1_t_bgp6_AS65005_r6_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -517,7 +517,7 @@ r1_t_bgp6_AS65005_r6_peer = {
 }
 
 r1_t_bgp6_AS65000_r7_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -538,7 +538,7 @@ r1_t_bgp6_AS65000_r7_peer = {
 }
 
 r1_t_bgp6_AS65000_r8_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -559,7 +559,7 @@ r1_t_bgp6_AS65000_r8_peer = {
 }
 
 r1_t_bgp6_AS65000_r9_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -580,7 +580,7 @@ r1_t_bgp6_AS65000_r9_peer = {
 }
 
 r2_t_bgp6_AS65000_r1_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -604,7 +604,7 @@ r2_t_bgp6_AS65000_r1_peer = {
 r3_t_bgp6_AS65000_r1_peer = {}
 
 r4_t_bgp6_AS65000_r1_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -626,7 +626,7 @@ r4_t_bgp6_AS65000_r1_peer = {
 }
 
 r5_t_bgp6_AS65000_r1_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -648,7 +648,7 @@ r5_t_bgp6_AS65000_r1_peer = {
 }
 
 r6_t_bgp6_AS65000_r1_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -676,7 +676,7 @@ r8_t_bgp6_AS65000_r1_peer = {}
 r9_t_bgp6_AS65000_r1_peer = {}
 
 r10_t_bgp6_AS65000_r1_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -836,7 +836,7 @@ r10_t_bgp4 = {
 }
 
 r1_t_bgp6 = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -854,7 +854,7 @@ r1_t_bgp6 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:104::/64": [
+    "fc00:104::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -876,7 +876,7 @@ r1_t_bgp6 = {
 }
 
 r2_t_bgp6 = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -900,7 +900,7 @@ r2_t_bgp6 = {
 r3_t_bgp6 = {}
 
 r4_t_bgp6 = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -924,7 +924,7 @@ r4_t_bgp6 = {
 r5_t_bgp6 = {}
 
 r6_t_bgp6 = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -952,7 +952,7 @@ r8_t_bgp6 = {}
 r9_t_bgp6 = {}
 
 r10_t_bgp6 = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65000",
             "attributes": {

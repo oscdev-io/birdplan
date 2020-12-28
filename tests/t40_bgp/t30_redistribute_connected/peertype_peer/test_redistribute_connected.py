@@ -21,7 +21,7 @@
 
 """BGP redistribute connected route test case."""
 
-from ..template_redistribute_connected_true import Template
+from ..template_redistribute_connected import Template
 from ...config.peertype_peer.r1r2 import PeerTypeConfig
 
 

@@ -3,18 +3,21 @@ log_file: "@LOGFILE@"
 debug: True
 
 static:
-  - '100.105.0.0/24 via 192.168.1.4'
-  - 'fc00:105::/48 via fc01::4'
-  - '100.106.0.0/24 via "eth1"'
-  - 'fc00:106::/48 via "eth1"'
-  - '100.107.0.0/31 blackhole'
-  - 'fc00:107::/127 blackhole'
-  - '0.0.0.0/0 via 192.168.1.4'
-  - '::/0 via fc01::4'
+  - '100.131.0.0/24 via 100.201.0.2'
+  - 'fc00:131::/48 via fc00:201::2'
+  - '100.132.0.0/24 via "eth2"'
+  - 'fc00:132::/48 via "eth2"'
+  - '100.133.0.0/24 blackhole'
+  - 'fc00:133::/64 blackhole'
+  - '0.0.0.0/0 via 100.201.0.2'
+  - '::/0 via fc00:201::2'
 
 bgp:
   asn: @ASN@
   import:
+    connected:
+      interfaces:
+        - eth2
     kernel: True
     kernel_blackhole: True
     kernel_default: True
@@ -22,14 +25,14 @@ bgp:
     static_blackhole: True
     static_default: True
   originate:
-  - '100.108.0.0/24 via 192.168.1.5'
-  - 'fc00:108::/48 via fc01::5'
-  - '100.109.0.0/24 via "eth1"'
-  - 'fc00:109::/48 via "eth1"'
-  - '100.110.0.0/24 blackhole'
-  - 'fc00:110::/48 blackhole'
-  - '0.0.0.0/0 via 192.168.1.5'
-  - '::/0 via fc01::5'
+    - '100.111.0.0/24 via 100.201.0.4'
+    - 'fc00:111::/48 via fc00:201::4'
+    - '100.112.0.0/24 via "eth2"'
+    - 'fc00:112::/48 via "eth2"'
+    - '100.113.0.0/24 blackhole'
+    - 'fc00:113::/64 blackhole'
+    - '0.0.0.0/0 via 100.201.0.4'
+    - '::/0 via fc00:201::4'
 @GLOBAL_CONFIG@
   peers:
     r2:

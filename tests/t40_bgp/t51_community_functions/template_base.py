@@ -85,6 +85,22 @@ class TemplateBase(BirdPlanBaseTestCase):
     e1_interface_eth0 = {"mac": "02:e1:00:00:00:01", "ips": ["100.64.0.100/24", "fc00:100::100/64"]}
     e1_switch_eth0 = "s1"
 
+    def r1_template_peer_config(self):
+        """Return custom config based on the peer type."""
+        # Grab the peer type
+        peer_type = getattr(self, "r1_peer_type")
+        # If its a customer, return the prefixes
+        if peer_type == "customer":
+            return """
+        prefixes:
+          - 100.64.101.0/24+
+          - 100.64.104.0/24+
+          - fc00:101::/48+
+          - fc00:104::/48+
+"""
+        # If not, just return a blank string
+        return ""
+
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
@@ -106,7 +122,7 @@ class TemplateBase(BirdPlanBaseTestCase):
             sim,
             "e1",
             [
-                "neighbor fc00:100::1 announce route fc00:101::/64 next-hop fc00:100::100 "
+                "neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::100 "
                 f"large-community [ {self.e1_template_large_communities} {self.e1_extra_large_communities} ] "
                 f"community [ {self.e1_template_communities} {self.e1_extra_communities} ] "
                 f"{self.e1_template_extra}"

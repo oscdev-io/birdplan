@@ -34,9 +34,10 @@ from .peer_attributes import (
     BGPPeerPrepend,
     BGPPeerRoutePolicyAccept,
     BGPPeerRoutePolicyRedistribute,
+    BGPPeerConstraints,
 )
 
-from ..bgp_attributes import BGPAttributes
+from ..bgp_attributes import BGPAttributes, BGPPeertypeConstraints
 from ..bgp_functions import BGPFunctions
 from ..typing import BGPPeerConfig
 from ...pipe import ProtocolPipe, ProtocolPipeFilterType
@@ -135,14 +136,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Check if we're actually replacing it?
             if peer_config["replace_aspath"]:
                 self.replace_aspath = True
-                self.prefix_import_minlen4 = 16
-                self.prefix_import_maxlen4 = 29
-                self.prefix_export_minlen4 = 16
-                self.prefix_export_maxlen4 = 29
-                self.prefix_import_maxlen6 = 64
-                self.prefix_import_minlen6 = 32
-                self.prefix_export_maxlen6 = 64
-                self.prefix_export_minlen6 = 32
 
         # If the peer type is of internal nature, but doesn't match our peer type, throw an exception
         if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
@@ -663,33 +656,82 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     # Add to our configuration
                     self.blackhole_community.append(util.sanitize_community(community))
 
-        # Setup our limits
-        for attr_name in (
-            "blackhole_import_maxlen4",
-            "blackhole_import_minlen4",
-            "blackhole_export_maxlen4",
-            "blackhole_export_minlen4",
-            "blackhole_import_maxlen6",
-            "blackhole_import_minlen6",
-            "blackhole_export_maxlen6",
-            "blackhole_export_minlen6",
-            "prefix_import_maxlen4",
-            "prefix_import_minlen4",
-            "prefix_export_maxlen4",
-            "prefix_export_minlen4",
-            "prefix_import_maxlen6",
-            "prefix_import_minlen6",
-            "prefix_export_maxlen6",
-            "prefix_export_minlen6",
-            "aspath_import_maxlen",
-            "aspath_import_minlen",
-            "community_import_maxlen",
-            "extended_community_import_maxlen",
-            "large_community_import_maxlen",
-        ):
-            # Check if we have peer configuration for this attribute, if we do set it
-            if attr_name in peer_config:
-                setattr(self, attr_name, peer_config[attr_name])
+        # Setup our constraint overrides
+        if "constraints" in peer_config:
+            for constraint_name, constraint_value in peer_config["constraints"].items():
+                if constraint_name not in (
+                    "blackhole_import_maxlen4",
+                    "blackhole_import_minlen4",
+                    "blackhole_export_maxlen4",
+                    "blackhole_export_minlen4",
+                    "blackhole_import_maxlen6",
+                    "blackhole_import_minlen6",
+                    "blackhole_export_maxlen6",
+                    "blackhole_export_minlen6",
+                    "import_maxlen4",
+                    "import_minlen4",
+                    "export_maxlen4",
+                    "export_minlen4",
+                    "import_maxlen6",
+                    "import_minlen6",
+                    "export_maxlen6",
+                    "export_minlen6",
+                    "aspath_import_maxlen",
+                    "aspath_import_minlen",
+                    "community_import_maxlen",
+                    "extended_community_import_maxlen",
+                    "large_community_import_maxlen",
+                ):
+                    raise BirdPlanError(
+                        f"BGP peer 'constraints' configuration '{constraint_name}' for peer '{self.name}' with type "
+                        f"'{self.peer_type}' is invalid"
+                    )
+                # Make sure this peer supports blackhole imports
+                if constraint_name.startswith("blackhole_import_"):
+                    if self.peer_type not in (
+                        "customer",
+                        "internal",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                    ):
+                        raise BirdPlanError(
+                            f"Having '{constraint_name}' specified for peer '{self.name}' with type '{self.peer_type}' "
+                            "makes no sense"
+                        )
+                # Make sure this peer accepts blackhole exports
+                if constraint_name.startswith("blackhole_export_"):
+                    if self.peer_type not in (
+                        "internal",
+                        "routeserver",
+                        "routecollector",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                        "transit",
+                    ):
+                        raise BirdPlanError(
+                            f"Having '{constraint_name}' specified for peer '{self.name}' with type '{self.peer_type}' "
+                            "makes no sense"
+                        )
+                # Make sure this peer supports imports
+                if "import" in constraint_name:
+                    if self.peer_type not in (
+                        "customer",
+                        "internal",
+                        "peer",
+                        "routeserver",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                        "transit",
+                    ):
+                        raise BirdPlanError(
+                            f"Having '{constraint_name}' specified for peer '{self.name}' with type '{self.peer_type}' "
+                            "makes no sense"
+                        )
+                # Set constraint
+                setattr(self.constraints, constraint_name, constraint_value)
 
     def configure(self) -> None:
         """Configure BGP peer."""
@@ -1566,7 +1608,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def _peer_reject_non_exportable(self) -> str:
         """Generate the function call to peer_reject_non_exportable."""
         return self.bgp_functions.peer_reject_non_exportable(
-            self.asn, self.prefix_export_maxlen4, self.prefix_export_minlen4, self.prefix_export_maxlen6, self.prefix_export_minlen6
+            self.export_maxlen4, self.export_minlen4, self.export_maxlen6, self.export_minlen6
         )
 
     def _peer_reject_non_exportable_blackhole(self) -> str:
@@ -1581,7 +1623,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def _bgp_filter_prefix_size(self) -> str:
         """Return a BGP prefix size filter for a specific IP version."""
         return self.bgp_functions.peer_filter_prefix_size(
-            self.prefix_import_maxlen4, self.prefix_import_minlen4, self.prefix_import_maxlen6, self.prefix_import_minlen6
+            self.import_maxlen4, self.import_minlen4, self.import_maxlen6, self.import_minlen6
         )
 
     def _bgp_filter_blackhole_size(self) -> str:
@@ -1860,235 +1902,250 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         """Set the blackhole community."""
         self.peer_attributes.blackhole_community = blackhole_community
 
+    @property
+    def constraints(self) -> BGPPeerConstraints:
+        """Return our own BGP constraint overrides."""
+        return self.peer_attributes.constraints
+
+    @property
+    def global_constraints(self) -> BGPPeertypeConstraints:
+        """Return the global constraints for our peer type."""
+        # Work out the peer type we're going to use for the global constraints
+        peer_type = self.peer_type
+        if peer_type == "customer" and self.replace_aspath:
+            peer_type = "customer.private"
+
+        return self.bgp_attributes.peertype_constraints[peer_type]
+
     # IPV4 BLACKHOLE IMPORT PREFIX LENGTHS
 
     @property
     def blackhole_import_maxlen4(self) -> int:
         """Return the current value of blackhole_import_maxlen4."""
-        return self.peer_attributes.blackhole_import_maxlen4 or self.bgp_attributes.blackhole_import_maxlen4
+        return self.constraints.blackhole_import_maxlen4 or self.global_constraints.blackhole_import_maxlen4
 
     @blackhole_import_maxlen4.setter
     def blackhole_import_maxlen4(self, blackhole_import_maxlen4: int) -> None:
         """Setter for blackhole_import_maxlen4."""
-        self.peer_attributes.blackhole_import_maxlen4 = blackhole_import_maxlen4
+        self.constraints.blackhole_import_maxlen4 = blackhole_import_maxlen4
 
     @property
     def blackhole_import_minlen4(self) -> int:
         """Return the current value of blackhole_import_minlen4."""
-        return self.peer_attributes.blackhole_import_minlen4 or self.bgp_attributes.blackhole_import_minlen4
+        return self.constraints.blackhole_import_minlen4 or self.global_constraints.blackhole_import_minlen4
 
     @blackhole_import_minlen4.setter
     def blackhole_import_minlen4(self, blackhole_import_minlen4: int) -> None:
         """Setter for blackhole_import_minlen4."""
-        self.peer_attributes.blackhole_import_minlen4 = blackhole_import_minlen4
+        self.constraints.blackhole_import_minlen4 = blackhole_import_minlen4
 
     # IPV4 BLACKHOLE EXPORT PREFIX LENGTHS
 
     @property
     def blackhole_export_maxlen4(self) -> int:
         """Return the current value of blackhole_export_maxlen4."""
-        return self.peer_attributes.blackhole_export_maxlen4 or self.bgp_attributes.blackhole_export_maxlen4
+        return self.constraints.blackhole_export_maxlen4 or self.global_constraints.blackhole_export_maxlen4
 
     @blackhole_export_maxlen4.setter
     def blackhole_export_maxlen4(self, blackhole_export_maxlen4: int) -> None:
         """Setter for blackhole_export_maxlen4."""
-        self.peer_attributes.blackhole_export_maxlen4 = blackhole_export_maxlen4
+        self.constraints.blackhole_export_maxlen4 = blackhole_export_maxlen4
 
     @property
     def blackhole_export_minlen4(self) -> int:
         """Return the current value of blackhole_export_minlen4."""
-        return self.peer_attributes.blackhole_export_minlen4 or self.bgp_attributes.blackhole_export_minlen4
+        return self.constraints.blackhole_export_minlen4 or self.global_constraints.blackhole_export_minlen4
 
     @blackhole_export_minlen4.setter
     def blackhole_export_minlen4(self, blackhole_export_minlen4: int) -> None:
         """Setter for blackhole_export_minlen4."""
-        self.peer_attributes.blackhole_export_minlen4 = blackhole_export_minlen4
+        self.constraints.blackhole_export_minlen4 = blackhole_export_minlen4
 
     # IPV6 BLACKHOLE IMPORT PREFIX LENGTHS
 
     @property
     def blackhole_import_maxlen6(self) -> int:
         """Return the current value of blackhole_import_maxlen6."""
-        return self.peer_attributes.blackhole_import_maxlen6 or self.bgp_attributes.blackhole_import_maxlen6
+        return self.constraints.blackhole_import_maxlen6 or self.global_constraints.blackhole_import_maxlen6
 
     @blackhole_import_maxlen6.setter
     def blackhole_import_maxlen6(self, blackhole_import_maxlen6: int) -> None:
         """Setter for blackhole_import_maxlen6."""
-        self.peer_attributes.blackhole_import_maxlen6 = blackhole_import_maxlen6
+        self.constraints.blackhole_import_maxlen6 = blackhole_import_maxlen6
 
     @property
     def blackhole_import_minlen6(self) -> int:
         """Return the current value of blackhole_import_minlen6."""
-        return self.peer_attributes.blackhole_import_minlen6 or self.bgp_attributes.blackhole_import_minlen6
+        return self.constraints.blackhole_import_minlen6 or self.global_constraints.blackhole_import_minlen6
 
     @blackhole_import_minlen6.setter
     def blackhole_import_minlen6(self, blackhole_import_minlen6: int) -> None:
         """Setter for blackhole_import_minlen6."""
-        self.peer_attributes.blackhole_import_minlen6 = blackhole_import_minlen6
+        self.constraints.blackhole_import_minlen6 = blackhole_import_minlen6
 
     # IPV6 BLACKHOLE EXPORT PREFIX LENGTHS
 
     @property
     def blackhole_export_maxlen6(self) -> int:
         """Return the current value of blackhole_export_maxlen6."""
-        return self.peer_attributes.blackhole_export_maxlen6 or self.bgp_attributes.blackhole_export_maxlen6
+        return self.constraints.blackhole_export_maxlen6 or self.global_constraints.blackhole_export_maxlen6
 
     @blackhole_export_maxlen6.setter
     def blackhole_export_maxlen6(self, blackhole_export_maxlen6: int) -> None:
         """Setter for blackhole_export_maxlen6."""
-        self.peer_attributes.blackhole_export_maxlen6 = blackhole_export_maxlen6
+        self.constraints.blackhole_export_maxlen6 = blackhole_export_maxlen6
 
     @property
     def blackhole_export_minlen6(self) -> int:
         """Return the current value of blackhole_export_minlen6."""
-        return self.peer_attributes.blackhole_export_minlen6 or self.bgp_attributes.blackhole_export_minlen6
+        return self.constraints.blackhole_export_minlen6 or self.global_constraints.blackhole_export_minlen6
 
     @blackhole_export_minlen6.setter
     def blackhole_export_minlen6(self, blackhole_export_minlen6: int) -> None:
         """Setter for blackhole_export_minlen6."""
-        self.peer_attributes.blackhole_export_minlen6 = blackhole_export_minlen6
+        self.constraints.blackhole_export_minlen6 = blackhole_export_minlen6
 
     # IPV4 IMPORT PREFIX LENGTHS
 
     @property
-    def prefix_import_maxlen4(self) -> int:
-        """Return the current value of prefix_import_maxlen4."""
-        return self.peer_attributes.prefix_import_maxlen4 or self.bgp_attributes.prefix_import_maxlen4
+    def import_maxlen4(self) -> int:
+        """Return the current value of import_maxlen4."""
+        return self.constraints.import_maxlen4 or self.global_constraints.import_maxlen4
 
-    @prefix_import_maxlen4.setter
-    def prefix_import_maxlen4(self, prefix_import_maxlen4: int) -> None:
-        """Setter for prefix_import_maxlen4."""
-        self.peer_attributes.prefix_import_maxlen4 = prefix_import_maxlen4
+    @import_maxlen4.setter
+    def import_maxlen4(self, import_maxlen4: int) -> None:
+        """Setter for import_maxlen4."""
+        self.constraints.import_maxlen4 = import_maxlen4
 
     @property
-    def prefix_import_minlen4(self) -> int:
-        """Return the current value of prefix_import_minlen4."""
-        return self.peer_attributes.prefix_import_minlen4 or self.bgp_attributes.prefix_import_minlen4
+    def import_minlen4(self) -> int:
+        """Return the current value of import_minlen4."""
+        return self.constraints.import_minlen4 or self.global_constraints.import_minlen4
 
-    @prefix_import_minlen4.setter
-    def prefix_import_minlen4(self, prefix_import_minlen4: int) -> None:
-        """Setter for prefix_import_minlen4."""
-        self.peer_attributes.prefix_import_minlen4 = prefix_import_minlen4
+    @import_minlen4.setter
+    def import_minlen4(self, import_minlen4: int) -> None:
+        """Setter for import_minlen4."""
+        self.constraints.import_minlen4 = import_minlen4
 
     # IPV4 EXPORT PREFIX LENGHTS
 
     @property
-    def prefix_export_maxlen4(self) -> int:
-        """Return the current value of prefix_export_maxlen4."""
-        return self.peer_attributes.prefix_export_maxlen4 or self.bgp_attributes.prefix_export_maxlen4
+    def export_maxlen4(self) -> int:
+        """Return the current value of export_maxlen4."""
+        return self.constraints.export_maxlen4 or self.global_constraints.export_maxlen4
 
-    @prefix_export_maxlen4.setter
-    def prefix_export_maxlen4(self, prefix_export_maxlen4: int) -> None:
-        """Setter for prefix_export_maxlen4."""
-        self.peer_attributes.prefix_export_maxlen4 = prefix_export_maxlen4
+    @export_maxlen4.setter
+    def export_maxlen4(self, export_maxlen4: int) -> None:
+        """Setter for export_maxlen4."""
+        self.constraints.export_maxlen4 = export_maxlen4
 
     @property
-    def prefix_export_minlen4(self) -> int:
-        """Return the current value of prefix_export_minlen4."""
-        return self.peer_attributes.prefix_export_minlen4 or self.bgp_attributes.prefix_export_minlen4
+    def export_minlen4(self) -> int:
+        """Return the current value of export_minlen4."""
+        return self.constraints.export_minlen4 or self.global_constraints.export_minlen4
 
-    @prefix_export_minlen4.setter
-    def prefix_export_minlen4(self, prefix_export_minlen4: int) -> None:
-        """Setter for prefix_export_minlen4."""
-        self.peer_attributes.prefix_export_minlen4 = prefix_export_minlen4
+    @export_minlen4.setter
+    def export_minlen4(self, export_minlen4: int) -> None:
+        """Setter for export_minlen4."""
+        self.constraints.export_minlen4 = export_minlen4
 
     # IPV6 IMPORT LENGTHS
 
     @property
-    def prefix_import_maxlen6(self) -> int:
-        """Return the current value of prefix_import_maxlen6."""
-        return self.peer_attributes.prefix_import_maxlen6 or self.bgp_attributes.prefix_import_maxlen6
+    def import_maxlen6(self) -> int:
+        """Return the current value of import_maxlen6."""
+        return self.constraints.import_maxlen6 or self.global_constraints.import_maxlen6
 
-    @prefix_import_maxlen6.setter
-    def prefix_import_maxlen6(self, prefix_import_maxlen6: int) -> None:
-        """Setter for prefix_import_maxlen6."""
-        self.peer_attributes.prefix_import_maxlen6 = prefix_import_maxlen6
+    @import_maxlen6.setter
+    def import_maxlen6(self, import_maxlen6: int) -> None:
+        """Setter for import_maxlen6."""
+        self.constraints.import_maxlen6 = import_maxlen6
 
     @property
-    def prefix_import_minlen6(self) -> int:
-        """Return the current value of prefix_import_minlen6."""
-        return self.peer_attributes.prefix_import_minlen6 or self.bgp_attributes.prefix_import_minlen6
+    def import_minlen6(self) -> int:
+        """Return the current value of import_minlen6."""
+        return self.constraints.import_minlen6 or self.global_constraints.import_minlen6
 
-    @prefix_import_minlen6.setter
-    def prefix_import_minlen6(self, prefix_import_minlen6: int) -> None:
-        """Setter for prefix_import_minlen6."""
-        self.peer_attributes.prefix_import_minlen6 = prefix_import_minlen6
+    @import_minlen6.setter
+    def import_minlen6(self, import_minlen6: int) -> None:
+        """Setter for import_minlen6."""
+        self.constraints.import_minlen6 = import_minlen6
 
     # IPV6 EXPORT LENGTHS
 
     @property
-    def prefix_export_minlen6(self) -> int:
-        """Return the current value of prefix_export_minlen6."""
-        return self.peer_attributes.prefix_export_minlen6 or self.bgp_attributes.prefix_export_minlen6
+    def export_minlen6(self) -> int:
+        """Return the current value of export_minlen6."""
+        return self.constraints.export_minlen6 or self.global_constraints.export_minlen6
 
-    @prefix_export_minlen6.setter
-    def prefix_export_minlen6(self, prefix_export_minlen6: int) -> None:
-        """Setter for prefix_export_minlen6."""
-        self.peer_attributes.prefix_export_minlen6 = prefix_export_minlen6
+    @export_minlen6.setter
+    def export_minlen6(self, export_minlen6: int) -> None:
+        """Setter for export_minlen6."""
+        self.constraints.export_minlen6 = export_minlen6
 
     @property
-    def prefix_export_maxlen6(self) -> int:
-        """Return the current value of prefix_export_maxlen6."""
-        return self.peer_attributes.prefix_export_maxlen6 or self.bgp_attributes.prefix_export_maxlen6
+    def export_maxlen6(self) -> int:
+        """Return the current value of export_maxlen6."""
+        return self.constraints.export_maxlen6 or self.global_constraints.export_maxlen6
 
-    @prefix_export_maxlen6.setter
-    def prefix_export_maxlen6(self, prefix_export_maxlen6: int) -> None:
-        """Setter for prefix_export_maxlen6."""
-        self.peer_attributes.prefix_export_maxlen6 = prefix_export_maxlen6
+    @export_maxlen6.setter
+    def export_maxlen6(self, export_maxlen6: int) -> None:
+        """Setter for export_maxlen6."""
+        self.constraints.export_maxlen6 = export_maxlen6
 
     # AS PATH LENGTHS
 
     @property
     def aspath_import_minlen(self) -> int:
         """Return the current value of aspath_import_minlen."""
-        return self.peer_attributes.aspath_import_minlen or self.bgp_attributes.aspath_import_minlen
+        return self.constraints.aspath_import_minlen or self.global_constraints.aspath_import_minlen
 
     @aspath_import_minlen.setter
     def aspath_import_minlen(self, aspath_import_minlen: int) -> None:
         """Set the AS path minlen."""
-        self.peer_attributes.aspath_import_minlen = aspath_import_minlen
+        self.constraints.aspath_import_minlen = aspath_import_minlen
 
     @property
     def aspath_import_maxlen(self) -> int:
         """Return the current value of aspath_import_maxlen."""
-        return self.peer_attributes.aspath_import_maxlen or self.bgp_attributes.aspath_import_maxlen
+        return self.constraints.aspath_import_maxlen or self.global_constraints.aspath_import_maxlen
 
     @aspath_import_maxlen.setter
     def aspath_import_maxlen(self, aspath_import_maxlen: int) -> None:
         """Set the AS path maxlen."""
-        self.peer_attributes.aspath_import_maxlen = aspath_import_maxlen
+        self.constraints.aspath_import_maxlen = aspath_import_maxlen
 
     # COMMUNITY LENGTHS
 
     @property
     def community_import_maxlen(self) -> int:
         """Return the current value of community_import_maxlen."""
-        return self.peer_attributes.community_import_maxlen or self.bgp_attributes.community_import_maxlen
+        return self.constraints.community_import_maxlen or self.global_constraints.community_import_maxlen
 
     @community_import_maxlen.setter
     def community_import_maxlen(self, community_import_maxlen: int) -> None:
         """Set the value of community_import_maxlen."""
-        self.peer_attributes.community_import_maxlen = community_import_maxlen
+        self.constraints.community_import_maxlen = community_import_maxlen
 
     @property
     def extended_community_import_maxlen(self) -> int:
         """Return the current value of extended_community_import_maxlen."""
-        return self.peer_attributes.extended_community_import_maxlen or self.bgp_attributes.extended_community_import_maxlen
+        return self.constraints.extended_community_import_maxlen or self.global_constraints.extended_community_import_maxlen
 
     @extended_community_import_maxlen.setter
     def extended_community_import_maxlen(self, extended_community_import_maxlen: int) -> None:
         """Set the value of extended_community_import_maxlen."""
-        self.peer_attributes.extended_community_import_maxlen = extended_community_import_maxlen
+        self.constraints.extended_community_import_maxlen = extended_community_import_maxlen
 
     @property
     def large_community_import_maxlen(self) -> int:
         """Return the current value of large_community_import_maxlen."""
-        return self.peer_attributes.large_community_import_maxlen or self.bgp_attributes.large_community_import_maxlen
+        return self.constraints.large_community_import_maxlen or self.global_constraints.large_community_import_maxlen
 
     @large_community_import_maxlen.setter
     def large_community_import_maxlen(self, large_community_import_maxlen: int) -> None:
         """Set the value of large_community_import_maxlen."""
-        self.peer_attributes.large_community_import_maxlen = large_community_import_maxlen
+        self.constraints.large_community_import_maxlen = large_community_import_maxlen
 
     #
     # Helper properties

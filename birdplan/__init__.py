@@ -598,27 +598,7 @@ class BirdPlan:
                 # Globals
                 "asn",
                 "graceful_shutdown",
-                "blackhole_import_maxlen4",
-                "blackhole_import_minlen4",
-                "blackhole_export_maxlen4",
-                "blackhole_export_minlen4",
-                "blackhole_import_maxlen6",
-                "blackhole_import_minlen6",
-                "blackhole_export_maxlen6",
-                "blackhole_export_minlen6",
-                "prefix_import_maxlen4",
-                "prefix_export_maxlen4",
-                "prefix_import_minlen4",
-                "prefix_export_minlen4",
-                "prefix_import_maxlen6",
-                "prefix_export_maxlen6",
-                "prefix_import_minlen6",
-                "prefix_export_minlen6",
-                "aspath_import_maxlen",
-                "aspath_import_minlen",
-                "community_import_maxlen",
-                "extended_community_import_maxlen",
-                "large_community_import_maxlen",
+                "peertype_constraints",
                 "originate",  # Origination
                 "accept",
                 "import",
@@ -629,6 +609,7 @@ class BirdPlan:
 
         self._config_bgp_accept()
         self._config_bgp_globals()
+        self._config_bgp_peertype_constraints()
         self._config_bgp_originate()
 
         self._config_bgp_import()
@@ -660,37 +641,115 @@ class BirdPlan:
     def _config_bgp_globals(self) -> None:
         """Configure bgp globals."""
 
-        # Setup prefix lengths
-        for item in [
-            "graceful_shutdown",
-            "blackhole_import_maxlen4",
-            "blackhole_import_minlen4",
-            "blackhole_export_maxlen4",
-            "blackhole_export_minlen4",
-            "blackhole_import_maxlen6",
-            "blackhole_import_minlen6",
-            "blackhole_export_maxlen6",
-            "blackhole_export_minlen6",
-            "prefix_import_maxlen4",
-            "prefix_export_maxlen4",
-            "prefix_import_minlen4",
-            "prefix_export_minlen4",
-            "prefix_import_maxlen6",
-            "prefix_export_maxlen6",
-            "prefix_import_minlen6",
-            "prefix_export_minlen6",
-            "aspath_import_maxlen",
-            "aspath_import_minlen",
-            "community_import_maxlen",
-            "extended_community_import_maxlen",
-            "large_community_import_maxlen",
-        ]:
-            if item in self.config["bgp"]:
-                setattr(self.birdconf.protocols.bgp, item, self.config["bgp"][item])
+        # Setup graceful shutdown if specified
+        if "graceful_shutdown" in self.config["bgp"]:
+            self.birdconf.protocols.bgp.graceful_shutdown = self.config["bgp"]["graceful_shutdown"]
 
         # Set our route reflector cluster id
         if "rr_cluster_id" in self.config["bgp"]:
             self.birdconf.protocols.bgp.rr_cluster_id = self.config["bgp"]["rr_cluster_id"]
+
+    def _config_bgp_peertype_constraints(self) -> None:
+        """Configure bgp:peertype_constraints section."""
+
+        # If we don't have a peertype_constraints section, just return
+        if "peertype_constraints" not in self.config["bgp"]:
+            return
+
+        for peer_type in self.config["bgp"]["peertype_constraints"]:
+            # Make sure we have a valid peer type
+            if peer_type not in (
+                "customer",
+                "customer.private",
+                "internal",
+                "peer",
+                "routecollector",
+                "routeserver",
+                "rrclient",
+                "rrserver",
+                "rrserver-rrserver",
+                "transit",
+            ):
+                raise BirdPlanError(f"The 'bgp:peertype_constraints' config item '{peer_type}' is not supported")
+            # Loop with constraint items
+            for constraint_name in self.config["bgp"]["peertype_constraints"][peer_type]:
+                # Make sure we have a valid constraint to set
+                if constraint_name not in (
+                    "blackhole_import_maxlen4",
+                    "blackhole_import_minlen4",
+                    "blackhole_export_maxlen4",
+                    "blackhole_export_minlen4",
+                    "blackhole_import_maxlen6",
+                    "blackhole_import_minlen6",
+                    "blackhole_export_maxlen6",
+                    "blackhole_export_minlen6",
+                    "import_maxlen4",
+                    "export_maxlen4",
+                    "import_minlen4",
+                    "export_minlen4",
+                    "import_maxlen6",
+                    "export_maxlen6",
+                    "import_minlen6",
+                    "export_minlen6",
+                    "aspath_import_maxlen",
+                    "aspath_import_minlen",
+                    "community_import_maxlen",
+                    "extended_community_import_maxlen",
+                    "large_community_import_maxlen",
+                ):
+                    raise BirdPlanError(
+                        f"The 'bgp:peertype_constraints:{peer_type}' config item '{constraint_name}' is not supported"
+                    )
+                # Make sure this peer supports blackhole imports
+                if constraint_name.startswith("blackhole_import_"):
+                    if peer_type not in (
+                        "customer",
+                        "internal",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                    ):
+                        raise BirdPlanError(
+                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' "
+                            "makes no sense"
+                        )
+                # Make sure this peer accepts blackhole exports
+                if constraint_name.startswith("blackhole_export_"):
+                    if peer_type not in (
+                        "internal",
+                        "routeserver",
+                        "routecollector",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                        "transit",
+                    ):
+                        raise BirdPlanError(
+                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' "
+                            "makes no sense"
+                        )
+                # Make sure this peer supports imports
+                if "import" in constraint_name:
+                    if peer_type not in (
+                        "customer",
+                        "internal",
+                        "peer",
+                        "routeserver",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                        "transit",
+                    ):
+                        raise BirdPlanError(
+                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' "
+                            "makes no sense"
+                        )
+                # Finally set the constraint item
+                setattr(
+                    self.birdconf.protocols.bgp.constraints(peer_type),
+                    constraint_name,
+                    self.config["bgp"]["peertype_constraints"][peer_type][constraint_name],
+                )
 
     def _config_bgp_originate(self) -> None:
         """Configure bgp:originate section."""
@@ -801,27 +860,6 @@ class BirdPlan:
                 "cost",
                 "graceful_shutdown",
                 "blackhole_community",
-                "blackhole_import_maxlen4",
-                "blackhole_import_minlen4",
-                "blackhole_export_maxlen4",
-                "blackhole_export_minlen4",
-                "blackhole_import_maxlen6",
-                "blackhole_import_minlen6",
-                "blackhole_export_maxlen6",
-                "blackhole_export_minlen6",
-                "prefix_import_maxlen4",
-                "prefix_import_minlen4",
-                "prefix_export_maxlen4",
-                "prefix_export_minlen4",
-                "prefix_import_maxlen6",
-                "prefix_import_minlen6",
-                "prefix_export_maxlen6",
-                "prefix_export_minlen6",
-                "aspath_import_maxlen",
-                "aspath_import_minlen",
-                "community_import_maxlen",
-                "extended_community_import_maxlen",
-                "large_community_import_maxlen",
             ):
                 peer[config_item] = config_value
             # Peer location configuration
@@ -914,6 +952,43 @@ class BirdPlan:
                         peer["prepend"][prepend_type] = prepend_config
                 else:
                     peer["prepend"] = config_value
+
+            # Work out our constraints
+            elif config_item == "constraints":
+                # Loop with constraint configuration items
+                for constraint_name, constraint_value in config_value.items():
+                    if constraint_name not in (
+                        "blackhole_import_maxlen4",
+                        "blackhole_import_minlen4",
+                        "blackhole_export_maxlen4",
+                        "blackhole_export_minlen4",
+                        "blackhole_import_maxlen6",
+                        "blackhole_import_minlen6",
+                        "blackhole_export_maxlen6",
+                        "blackhole_export_minlen6",
+                        "import_maxlen4",
+                        "export_maxlen4",
+                        "import_minlen4",
+                        "export_minlen4",
+                        "import_maxlen6",
+                        "export_maxlen6",
+                        "import_minlen6",
+                        "export_minlen6",
+                        "aspath_import_maxlen",
+                        "aspath_import_minlen",
+                        "community_import_maxlen",
+                        "extended_community_import_maxlen",
+                        "large_community_import_maxlen",
+                    ):
+                        raise BirdPlanError(
+                            f"Configuration item '{constraint_name}' not understood in bgp:peers:{peer_name}:prepend"
+                        )
+                    # Make sure we have a prepend key
+                    if "constraints" not in peer:
+                        peer["constraints"] = {}
+                    # Then add the config...
+                    peer["constraints"][constraint_name] = constraint_value
+
             else:
                 raise BirdPlanError(f"Configuration item '{config_item}' not understood in bgp:peers:{peer_name}")
 

@@ -1,45 +1,43 @@
 # BGP basic test to accept blackhole routes
 
-ExaBGP e1 should be advertising a blackhole route to r1, we accept blackhole routes by default.
+## Peer-based setting
 
-ExaBGP e2 should be advertising a blackhole route to r1, we accept blackhole routes by default.
-
-
-In the case of "test_peer_accept_bgp_own_blackhole": **(default)**
+In the case of `test_peer_accept_bgp_own_blackhole`: **(default)**
   - r1 should be accepting our own blackhole routes by default.
 
-In the case of "test_peer_accept_bgp_own_blackhole_true":
+In the case of `test_peer_accept_bgp_own_blackhole_true`:
   - r1 should be accepting our own blackhole routes (by default).
 
-In the case of "test_peer_accept_bgp_own_blackhole_false":
+In the case of `test_peer_accept_bgp_own_blackhole_false`:
   - r1 should not be accepting our own blackhole routes.
 
-In the case of "test_peer_accept_bgp_customer_blackhole": **(default)**
+In the case of `test_peer_accept_bgp_customer_blackhole`: **(default)**
   - r1 should be accepting customer blackhole routes by default.
 
-In the case of "test_peer_accept_bgp_customer_blackhole_true":
+In the case of `test_peer_accept_bgp_customer_blackhole_true`:
   - r1 should be accepting customer blackhole routes (by default).
 
-In the case of "test_peer_accept_bgp_customer_blackhole_false":
+In the case of `test_peer_accept_bgp_customer_blackhole_false`:
   - r1 should not be accepting customer blackhole routes.
 
+## Global setting
 
-In the case of "test_global_accept_bgp_own_blackhole": **(default)**
+In the case of `test_global_accept_bgp_own_blackhole`: **(default)**
   - r1 should accept our own blackhole routes into the master table by default.
 
-In the case of "test_global_accept_bgp_own_blackhole_true":
+In the case of `test_global_accept_bgp_own_blackhole_true`:
   - r1 should accept our own blackhole routes into the master table (by default).
 
-In the case of "test_global_accept_bgp_own_blackhole_false":
+In the case of `test_global_accept_bgp_own_blackhole_false`:
   - r1 should not accept our own blackhole routes into the master table.
 
-In the case of "test_global_accept_bgp_customer_blackhole": **(default)**
+In the case of `test_global_accept_bgp_customer_blackhole`: **(default)**
   - r1 should accept customer blackhole routes into the master table by default.
 
-In the case of "test_global_accept_bgp_customer_blackhole_true":
+In the case of `test_global_accept_bgp_customer_blackhole_true`:
   - r1 should accept customer blackhole routes into the master table (by default).
 
-In the case of "test_global_accept_bgp_customer_blackhole_false":
+In the case of `test_global_accept_bgp_customer_blackhole_false`:
   - r1 should not accept customer blackhole routes into the master table.
 
 
@@ -55,6 +53,10 @@ class "Router: r1" {
   .. Interface: eth0 ..
 - 100.64.0.1/24
 + fc00:100::1/64
+
+  .. Interface: eth2 ..
+- 100.201.0.1/24
++ fc00:201::1/48
 }
 
 
@@ -78,6 +80,7 @@ class "Switch: s1" {}
 "ExaBGP: e1" -down-> "Switch: s1": r1 eth0
 "ExaBGP: e2" -down-> "Switch: s1": r1 eth0
 "Switch: s1" -down-> "Router: r1": r1 eth0
+"Router: r1" --() NC: r1 eth2
 
 @enduml
 ```

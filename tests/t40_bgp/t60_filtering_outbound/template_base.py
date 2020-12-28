@@ -30,11 +30,35 @@ class TemplateBase(BirdPlanBaseTestCase):
     routers = ["r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10"]
     exabgps = ["e1"]
 
+    template_macros = [
+        "template_r1_config",
+        "template_r2_config",
+        "template_r3_config",
+        "template_r4_config",
+        "template_r5_config",
+        "template_r6_config",
+        "template_r7_config",
+        "template_r8_config",
+        "template_r9_config",
+        "template_r10_config",
+        "r2_asn",
+        "extra_r2_config",
+    ]
+
+    r1_r2_asn = "65001"
+    r1_extra_r2_config = ""
+
+    # Communities to inject into the prefix we're advertising
+    e1_template_large_communities = ""
     e1_template_communities = ""
-    e1_template_extra = ""
-    e1_extra_communities = ""
+
+    # Prefix lenghts to test
+    test_prefix_lengths4 = []
+    test_prefix_lengths6 = []
 
     r1_peer_asn = 65100
+    # Needed to prevent errors in IDE, as this comes from the config classes
+    r1_peer_type = ""
 
     r4_asn = 65003
     r4_peer_asn = 65000
@@ -78,7 +102,7 @@ class TemplateBase(BirdPlanBaseTestCase):
     r10_interface_eth0 = {"mac": "02:10:00:00:00:01", "ips": ["100.64.0.10/24", "fc00:100::10/64"]}
     r10_switch_eth0 = "s1"
 
-    e1_asn = 65100
+    e1_asn = 65000
     e1_interfaces = ["eth0"]
     e1_interface_eth0 = {"mac": "02:e1:00:00:00:01", "ips": ["100.64.0.100/24", "fc00:100::100/64"]}
     e1_switch_eth0 = "s1"
@@ -87,37 +111,32 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
-    @property
-    def large_communities(self):
-        """Return additional large communities we should be using."""
-        return ""
-
     def test_announce_routes(self, sim):
         """Announce a prefix from ExaBGP to BIRD."""
 
-        self._exabgpcli(
-            sim,
-            "e1",
-            [
-                "neighbor 100.64.0.1 announce route 100.68.0.0/22 next-hop 100.64.0.100 "
-                f"large-community [ {self.large_communities} {self.e1_template_communities} {self.e1_extra_communities} ] "
-                f"{self.e1_template_extra}"
-            ],
-        )
-        self._exabgpcli(
-            sim,
-            "e1",
-            [
-                "neighbor fc00:100::1 announce route fc00:101::/44 next-hop fc00:100::100 "
-                f"large-community [ {self.large_communities} {self.e1_template_communities} {self.e1_extra_communities} ] "
-                f"{self.e1_template_extra}"
-            ],
-        )
+        # Loop with IPv4 prefix lengths and advertise each one
+        for prefix_length in self.test_prefix_lengths4:
+            self._exabgpcli(
+                sim,
+                "e1",
+                [
+                    f"neighbor 100.64.0.1 announce route 100.101.0.0/{prefix_length} next-hop 100.64.0.100 "
+                    f"large-community [ 65000:3:1 {self.e1_template_large_communities} ] "
+                    f"community [ {self.e1_template_communities} ]"
+                ],
+            )
 
-        self._test_announce_routes(sim)
-
-    def _test_announce_routes(self, sim):
-        """Announce extra prefixes from ExaBGP to BIRD."""
+        # Loop with IPv6 prefix lengths and advertise each one
+        for prefix_length in self.test_prefix_lengths6:
+            self._exabgpcli(
+                sim,
+                "e1",
+                [
+                    f"neighbor fc00:100::1 announce route fc00:101::/{prefix_length} next-hop fc00:100::100 "
+                    f"large-community [ 65000:3:1 {self.e1_template_large_communities} ] "
+                    f"community [ {self.e1_template_communities} ]"
+                ],
+            )
 
     def test_bird_status(self, sim):
         """Test BIRD status."""

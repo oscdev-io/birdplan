@@ -28,7 +28,9 @@ class TemplateBase(BirdPlanBaseTestCase):
     """BGP outgoing large communities test case template."""
 
     routers = ["r1", "r2"]
-    r1_interfaces = ["eth0", "eth1"]
+    r1_interfaces = ["eth0", "eth2"]
+    r1_interface_eth2 = {"mac": "02:01:02:00:00:01", "ips": ["100.201.0.1/24", "fc00:201::1/48"]}
+
     r2_interfaces = ["eth0"]
 
     exabgps = ["e1", "e2"]
@@ -85,7 +87,7 @@ class TemplateBase(BirdPlanBaseTestCase):
             sim,
             "e1",
             [
-                "neighbor 100.64.0.1 announce route 100.65.103.100/31 next-hop 100.64.0.3 "
+                "neighbor 100.64.0.1 announce route 100.64.103.100/31 next-hop 100.64.0.3 "
                 "large-community [ 65000:3:1 65000:666:65412 65000:666:65413 ] "
                 "community [ 65535:666 65535:65281 ]"
             ],
@@ -142,7 +144,11 @@ class TemplateBase(BirdPlanBaseTestCase):
         self._exabgpcli(
             sim,
             "e1",
-            ["neighbor fc00:100::1 announce route fc00:103::100/127 next-hop fc00:100::3 large-community [ 65000:3:1 ]"],
+            [
+                "neighbor fc00:100::1 announce route fc00:103::100/127 next-hop fc00:100::3 "
+                "large-community [ 65000:3:1 65000:666:65412 65000:666:65413 ] "
+                "community [ 65535:666 65535:65281 ]"
+            ],
         )
         # Customer route
         self._exabgpcli(
@@ -154,7 +160,8 @@ class TemplateBase(BirdPlanBaseTestCase):
             sim,
             "e1",
             [
-                "neighbor fc00:100::1 announce route fc00:104::100/127 next-hop fc00:100::3 large-community [ 65000:3:2 ] "
+                "neighbor fc00:100::1 announce route fc00:104::100/127 next-hop fc00:100::3 "
+                "large-community [ 65000:3:2 ] "
                 "community [ 65535:666 ]"
             ],
         )
@@ -187,18 +194,18 @@ class TemplateBase(BirdPlanBaseTestCase):
             return
 
         # Add gateway'd kernel routes
-        sim.node("r1").run_ip(["route", "add", "100.121.0.0/24", "via", "100.101.0.3"])
-        sim.node("r1").run_ip(["route", "add", "fc00:121::/48", "via", "fc00:101::3"])
+        sim.node("r1").run_ip(["route", "add", "100.121.0.0/24", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "fc00:121::/48", "via", "fc00:201::3"])
 
-        # Add device kernel routes
-        sim.node("r1").run_ip(["route", "add", "100.122.0.0/24", "dev", "eth1"])
-        sim.node("r1").run_ip(["route", "add", "fc00:122::/48", "dev", "eth1"])
+        # Add kernel device routes
+        sim.node("r1").run_ip(["route", "add", "100.122.0.0/24", "dev", "eth2"])
+        sim.node("r1").run_ip(["route", "add", "fc00:122::/48", "dev", "eth2"])
 
         # Add kernel default routes
-        sim.node("r1").run_ip(["route", "add", "default", "via", "100.101.0.3"])
-        sim.node("r1").run_ip(["route", "add", "default", "via", "fc00:101::3"])
+        sim.node("r1").run_ip(["route", "add", "default", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "default", "via", "fc00:201::3"])
 
-        # Add blackhole kernel routes
+        # Add kernel blackhole routes
         sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
         sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
 

@@ -387,6 +387,123 @@ class BGPPeerRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods,
         self.bgp_transit_default = False
 
 
+class BGPPeerConstraints:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
+    """
+    BGP peer prefix limits.
+
+    Attributes
+    ----------
+    import_maxlen4 : Optional[int]
+        Prefix import maximum length for IPv4.
+    import_minlen4 : Optional[int]
+        Prefix import minimum length for IPv4.
+    export_maxlen4 : Optional[int]
+        Prefix export maximum length for IPv4.
+    export_minlen4 : Optional[int]
+        Prefix export minimum length for IPv4.
+    import_maxlen6 : Optional[int]
+        Prefix import maximum length for IPv6.
+    import_minlen6 : Optional[int]
+        Prefix import minimum length for IPv6.
+    export_maxlen6 : Optional[int]
+        Prefix export maximum length for IPv6.
+    export_minlen6 : Optional[int]
+        Prefix export minimum length for IPv6.
+    blackhole_import_maxlen4 : Optional[int]
+        Blackhole maximum length for IPv4.
+    blackhole_import_minlen4 : Optional[int]
+        Blackhole minimum length for IPv4.
+    blackhole_export_maxlen4 : Optional[int]
+        Blackhole maximum length for IPv4.
+    blackhole_export_minlen4 : Optional[int]
+        Blackhole minimum length for IPv4.
+    blackhole_import_maxlen6 : Optional[int]
+        Blackhole maximum length for IPv6.
+    blackhole_import_minlen6 : Optional[int]
+        Blackhole minimum length for IPv6.
+    blackhole_export_maxlen6 : Optional[int]
+        Blackhole maximum length for IPv6.
+    blackhole_export_minlen6 : Optional[int]
+        Blackhole minimum length for IPv6.
+    aspath_import_maxlen : Optional[int]
+        AS-PATH maximum length.
+    aspath_import_minlen : Optional[int]
+        AS-PATH minimum length.
+    community_maxlen : Optional[int]
+        Community maximum length.
+    extended_community_maxlen : Optional[int]
+        Extended community maximum length.
+    large_community_maxlen : Optional[int]
+        Large community maximum length.
+
+    """
+
+    import_maxlen4: Optional[int]
+    import_minlen4: Optional[int]
+
+    export_maxlen4: Optional[int]
+    export_minlen4: Optional[int]
+
+    import_maxlen6: Optional[int]
+    import_minlen6: Optional[int]
+
+    export_maxlen6: Optional[int]
+    export_minlen6: Optional[int]
+
+    blackhole_import_maxlen4: Optional[int]
+    blackhole_import_minlen4: Optional[int]
+
+    blackhole_export_maxlen4: Optional[int]
+    blackhole_export_minlen4: Optional[int]
+
+    blackhole_import_maxlen6: Optional[int]
+    blackhole_import_minlen6: Optional[int]
+
+    blackhole_export_maxlen6: Optional[int]
+    blackhole_export_minlen6: Optional[int]
+
+    aspath_import_maxlen: Optional[int]
+    aspath_import_minlen: Optional[int]
+
+    community_import_maxlen: Optional[int]
+    extended_community_import_maxlen: Optional[int]
+    large_community_import_maxlen: Optional[int]
+
+    def __init__(self) -> None:
+        """Initialize object."""
+
+        self.import_maxlen4 = None
+        self.import_minlen4 = None
+
+        self.export_maxlen4 = None
+        self.export_minlen4 = None
+
+        self.import_maxlen6 = None
+        self.import_minlen6 = None
+
+        self.export_maxlen6 = None
+        self.export_minlen6 = None
+
+        self.blackhole_import_maxlen4 = None
+        self.blackhole_import_minlen4 = None
+
+        self.blackhole_export_maxlen4 = None
+        self.blackhole_export_minlen4 = None
+
+        self.blackhole_import_maxlen6 = None
+        self.blackhole_import_minlen6 = None
+
+        self.blackhole_export_maxlen6 = None
+        self.blackhole_export_minlen6 = None
+
+        self.aspath_import_maxlen = None
+        self.aspath_import_minlen = None
+
+        self.community_import_maxlen = None
+        self.extended_community_import_maxlen = None
+        self.large_community_import_maxlen = None
+
+
 class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """
     BGP peer attributes.
@@ -447,48 +564,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         BGP peer filtering options.
     peeringdb: Optional[BGPPeerPeeringDB]
         BGP peer peeringdb entry.
-    blackhole_import_maxlen4 : Optional[int]
-        Blackhole maximum length for IPv4.
-    blackhole_import_minlen4 : Optional[int]
-        Blackhole minimum length for IPv4.
-    blackhole_export_maxlen4 : Optional[int]
-        Blackhole maximum length for IPv4.
-    blackhole_export_minlen4 : Optional[int]
-        Blackhole minimum length for IPv4.
-    blackhole_import_maxlen6 : Optional[int]
-        Blackhole maximum length for IPv6.
-    blackhole_import_minlen6 : Optional[int]
-        Blackhole minimum length for IPv6.
-    blackhole_export_maxlen6 : Optional[int]
-        Blackhole maximum length for IPv6.
-    blackhole_export_minlen6 : Optional[int]
-        Blackhole minimum length for IPv6.
-    prefix_import_maxlen4 : Optional[int]
-        Prefix import maximum length for IPv4.
-    prefix_import_minlen4 : Optional[int]
-        Prefix import minimum length for IPv4.
-    prefix_export_maxlen4 : Optional[int]
-        Prefix export maximum length for IPv4.
-    prefix_export_minlen4 : Optional[int]
-        Prefix export minimum length for IPv4.
-    prefix_import_maxlen6 : Optional[int]
-        Prefix import maximum length for IPv6.
-    prefix_import_minlen6 : Optional[int]
-        Prefix import minimum length for IPv6.
-    prefix_export_maxlen6 : Optional[int]
-        Prefix export maximum length for IPv6.
-    prefix_export_minlen6 : Optional[int]
-        Prefix export minimum length for IPv6.
-    aspath_import_maxlen : Optional[int]
-        AS-PATH maximum length.
-    aspath_import_minlen : Optional[int]
-        AS-PATH minimum length.
-    community_maxlen : Optional[int]
-        Community maximum length.
-    extended_community_maxlen : Optional[int]
-        Extended community maximum length.
-    large_community_maxlen : Optional[int]
-        Large community maximum length.
+    constraints: BGPPeerConstraints
+        BGP peer constraint overrides.
 
     """
 
@@ -537,36 +614,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     blackhole_community: Optional[Union[List[str], bool]]
 
-    blackhole_import_maxlen4: Optional[int]
-    blackhole_import_minlen4: Optional[int]
-
-    blackhole_export_maxlen4: Optional[int]
-    blackhole_export_minlen4: Optional[int]
-
-    blackhole_import_maxlen6: Optional[int]
-    blackhole_import_minlen6: Optional[int]
-
-    blackhole_export_maxlen6: Optional[int]
-    blackhole_export_minlen6: Optional[int]
-
-    prefix_import_maxlen4: Optional[int]
-    prefix_import_minlen4: Optional[int]
-
-    prefix_export_maxlen4: Optional[int]
-    prefix_export_minlen4: Optional[int]
-
-    prefix_import_maxlen6: Optional[int]
-    prefix_import_minlen6: Optional[int]
-
-    prefix_export_maxlen6: Optional[int]
-    prefix_export_minlen6: Optional[int]
-
-    aspath_import_maxlen: Optional[int]
-    aspath_import_minlen: Optional[int]
-
-    community_import_maxlen: Optional[int]
-    extended_community_import_maxlen: Optional[int]
-    large_community_import_maxlen: Optional[int]
+    constraints: BGPPeerConstraints
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -617,36 +665,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
         self.blackhole_community = None
 
-        self.blackhole_import_maxlen4 = None
-        self.blackhole_import_minlen4 = None
-
-        self.blackhole_export_maxlen4 = None
-        self.blackhole_export_minlen4 = None
-
-        self.blackhole_import_maxlen6 = None
-        self.blackhole_import_minlen6 = None
-
-        self.blackhole_export_maxlen6 = None
-        self.blackhole_export_minlen6 = None
-
-        self.prefix_import_maxlen4 = None
-        self.prefix_import_minlen4 = None
-
-        self.prefix_export_maxlen4 = None
-        self.prefix_export_minlen4 = None
-
-        self.prefix_import_maxlen6 = None
-        self.prefix_import_minlen6 = None
-
-        self.prefix_export_maxlen6 = None
-        self.prefix_export_minlen6 = None
-
-        self.aspath_import_maxlen = None
-        self.aspath_import_minlen = None
-
-        self.community_import_maxlen = None
-        self.extended_community_import_maxlen = None
-        self.large_community_import_maxlen = None
+        self.constraints = BGPPeerConstraints()
 
     @property
     def name(self) -> str:

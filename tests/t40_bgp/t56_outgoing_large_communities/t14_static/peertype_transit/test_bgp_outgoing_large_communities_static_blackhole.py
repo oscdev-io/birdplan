@@ -22,7 +22,7 @@
 """BGP outgoing large communities test case."""
 
 from ..template_outgoing_large_communities_static_blackhole import Template
-from ....config.peertype_transit.r1r2 import PeerTypeConfig
+from ....config.peertype_transit.customer.r1r2 import PeerTypeConfig
 
 
 class Test(PeerTypeConfig, Template):

@@ -22,7 +22,7 @@
 """BGP outgoing large communities test case."""
 
 from ..template_outgoing_large_communities_bgp_own_default import Template
-from ....config.peertype_routecollector.r1r2 import PeerTypeConfig
+from ....config.peertype_routecollector.peer.r1r2 import PeerTypeConfig
 
 
 class Test(PeerTypeConfig, Template):

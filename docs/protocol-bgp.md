@@ -49,119 +49,6 @@ bgp:
 ```
 
 
-
-# blackhole_import_maxlen4
-
-Default maximum IPv4 blackhole length to import from a BGP peer without filtering. Defaults to `32`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_import_maxlen4: 25
-...
-```
-
-
-# blackhole_import_minlen4
-
-Default minimum IPv4 blackhole length to import from a BGP peer without filtering. Defaults to `24`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_import_minlen4: 7
-...
-```
-
-
-# blackhole_export_maxlen4
-
-Default maximum IPv4 blackhole length to export to a BGP peer. Defaults to `32`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_export_maxlen4: 25
-...
-```
-
-
-# blackhole_export_minlen4
-
-Default minimum IPv4 blackhole length to export to a BGP peer. Defaults to `24`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_export_minlen4: 7
-...
-```
-
-
-# blackhole_import_maxlen6
-
-Default maximum IPv6 blackhole length to import from a BGP peer without filtering. Defaults to `32`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_import_maxlen6: 25
-...
-```
-
-
-# blackhole_import_minlen6
-
-Default minimum IPv6 blackhole length to import from a BGP peer without filtering. Defaults to `26`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_import_minlen6: 7
-...
-```
-
-
-# blackhole_export_maxlen6
-
-Default maximum IPv6 blackhole length to export to a BGP peer. Defaults to `32`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_export_maxlen6: 25
-...
-```
-
-
-# blackhole_export_minlen6
-
-Default minimum IPv6 blackhole length to export to a BGP peer. Defaults to `26`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_export_minlen6: 7
-...
-```
-
-
 # graceful_shutdown
 
 Add the graceful_shutdown community to all outgoing prefixes for all peers.
@@ -247,197 +134,129 @@ bird:
     - '100.101.0.0/24 blackhole { bgp_large_community.add(65000, 111, 222) }'
 ```
 
+# peertype_constraints
 
-# prefix_import_maxlen4
+This configuration key can be used to override the global constraints in place for each of the peer types.
 
-Default maximum IPv4 prefix length to import from a BGP peer without filtering. Defaults to `24`.
+## Valid peer types
+* `customer`
+* `customer.private` - This is a special peer type used when a `customer` peer type has a private ASN which is translated to our
+own ASN on eBGP export (ie. the `replace_aspath` is specified).
+* `internal`
+* `peer`
+* `routecollector`
+* `routeserver`
+* `rrclient`
+* `rrserver`
+* `rrserver-rrserver`
+* `transit`
 
-An example of this usage is below...
+## Prefix size limits
+
+* `import_maxlen4`
+
+Maximum IPv4 import prefix length, defaults to `24`
+except for `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` which defaults to `32`
+and `customer.private` which defaults to `29`.
+
+* `import_minlen4`
+
+Minimum IPv4 import prefix length, defaults to `8`
+except for `customer.private` which defaults to `16`.
+
+* `export_maxlen4`
+
+Maximum IPv4 export prefix length, defaults to `24`
+except for `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` which defaults to `32`
+and `customer.private` which defaults to `29`.
+
+* `export_minlen4`
+
+Minimum IPv4 export prefix length, defaults to `8`
+except for `customer.private` which defaults to `16`.
+
+* `import_maxlen6`
+
+Maximum IPv6 import prefix length, defaults to `48`
+except for `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` which defaults to `128`
+and `customer.private` which defaults to `64`.
+
+* `import_minlen6`
+
+Minimum IPv6 import prefix length, defaults to `16`
+and `customer.private` which defaults to `32`.
+
+* `export_maxlen6`
+
+Maximum IPv6 export prefix length, defaults to `48`
+except for `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` which defaults to `128`
+and `customer.private` which defaults to `64`.
+
+* `export_minlen6`
+
+Minimum IPv6 export prefix length, defaults to `16`
+and `customer.private` which defaults to `32`.
+
+## Blackhole size limits
+
+* `blackhole_import_maxlen4`
+
+Blackhole maximum IPv4 import prefix length, defaults to `32`.
+
+* `blackhole_import_minlen4`
+
+Blackhole minimum IPv4 import prefix length, defaults to `24`.
+
+* `blackhole_export_maxlen4`
+
+Blackhole maximum IPv4 export prefix length, defaults to `32`.
+
+* `blackhole_export_minlen4`
+
+Blackhole minimum IPv4 export prefix length, defaults to `24`.
+
+* `blackhole_import_maxlen6`
+
+Blackhole maximum IPv6 import prefix length, defaults to `128`.
+
+* `blackhole_import_minlen6`
+
+Blackhole minimum IPv6 import prefix length, defaults to `64`.
+
+* `blackhole_export_maxlen6`
+
+Blackhole maximum IPv6 export prefix length, defaults to `128`.
+
+* `blackhole_export_minlen6`
+
+Blackhole minimum IPv6 export prefix length, defaults to `64`.
+
+## AS-PATH length limits
+
+* `aspath_import_maxlen` - AS-PATH import maximum length, defaults to `100`.
+
+* `aspath_import_minlen` - AS-PATH import minimum length, defaults to `1`.
+
+## Community length limits
+
+* `community_import_maxlen` - Community import maximum length, defaults to `100`.
+
+* `extended_community_import_maxlen` - Extended community import maximum length, defaults to `100`.
+
+* `large_community_import_maxlen` - Large community import maximum length, defaults to `100`.
+
+
+An example of setting the global defaults for a specific peer type can be found below...
 ```yaml
 ...
 
 bgp:
-  prefix_import_maxlen4: 25
+  peertype_constraints:
+    customer:
+      import_maxlen4: 25
 ...
 ```
 
-
-# prefix_import_minlen4
-
-Default minimum IPv4 prefix length to import from a BGP peer without filtering. Defaults to `8`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_import_minlen4: 7
-...
-```
-
-
-# prefix_export_maxlen4
-
-Default maximum IPv4 prefix length to export to a BGP peer. Defaults to `24`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_export_maxlen4: 25
-...
-```
-
-
-# prefix_export_minlen4
-
-Default minimum IPv4 prefix length to export to a BGP peer. Defaults to `8`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_export_minlen4: 7
-...
-```
-
-
-# prefix_import_maxlen6
-
-Default maximum IPv6 prefix length to import from a BGP peer without filtering. Defaults to `48`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_import_maxlen6: 47
-...
-```
-
-
-# prefix_import_minlen6
-
-Default minimum IPv6 prefix length to import from a BGP peer without filtering. Defaults to `16`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_import_minlen6: 15
-...
-```
-
-
-# prefix_export_maxlen6
-
-Default maximum IPv6 prefix length to export to a BGP peer. Defaults to `48`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_export_maxlen6: 47
-...
-```
-
-
-# prefix_export_minlen6
-
-Default minimum IPv6 prefix length to export to a BGP peer. Defaults to `16`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_export_minlen6: 15
-...
-```
-
-
-# aspath_import_maxlen
-
-Default maximum AS-PATH length to allow from a BGP peer without filtering. Defaults to `100`.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  aspath_import_maxlen: 90
-...
-```
-
-
-# aspath_import_minlen
-
-Default minimum AS-PATH length to allow from a BGP peer without filtering. Defaults to `1`.
-
-You probably NEVER want to change this.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  aspath_import_minlen: 2
-...
-```
-
-
-# community_import_maxlen
-
-Default maximum number of communities before the prefix gets filtered. Defaults to `100`.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  community_import_maxlen: 90
-...
-```
-
-
-# extended_community_import_maxlen
-
-Default maximum number of extended communities before the prefix gets filtered. Defaults to `100`.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  extended_community_import_maxlen: 90
-...
-```
-
-
-# large_community_import_maxlen
-
-Default maximum number of large communities before the prefix gets filtered. Defaults to `100`.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  large_community_import_maxlen: 90
-...
-```
 
 
 # rr_cluster_id
@@ -556,145 +375,6 @@ bgp:
     peer1:
       asn: 65000
       blackhole_community: True
-...
-```
-
-
-## blackhole_import_maxlen4
-
-Maximum IPv4 blackhole length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_import_maxlen4: 32
-...
-```
-
-
-## blackhole_import_minlen4
-
-Minimum IPv4 blackhole length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_import_minlen4: 24
-...
-```
-
-## blackhole_export_maxlen4
-
-Maximum IPv4 blackhole length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_export_maxlen4: 32
-...
-```
-
-
-## blackhole_export_minlen4
-
-Minimum IPv4 blackhole length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_export_minlen4: 24
-...
-```
-
-
-## blackhole_import_maxlen6
-
-Maximum IPv6 blackhole length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_import_maxlen6: 128
-...
-```
-
-
-## blackhole_import_minlen6
-
-Minimum IPv6 blackhole length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_import_minlen6: 64
-...
-```
-
-
-## blackhole_export_maxlen6
-
-Maximum IPv6 blackhole length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_export_maxlen6: 128
-...
-```
-
-
-## blackhole_export_minlen6
-
-Minimum IPv6 blackhole length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_export_minlen6: 64
 ...
 ```
 
@@ -1100,247 +780,60 @@ bgp:
 ```
 
 
-## prefix_import_maxlen4
 
-Maximum IPv4 prefix length to import without filtering. Defaults to global setting.
+## constraints
 
-An example of this usage is below...
+This configuration key can be used to override the global peer type constraints.
+All values default to the global setting for the specific peer type (above).
+
+### Normal prefix size limits
+
+* `import_maxlen4` - maximum IPv4 import prefix length.
+* `import_minlen4` - minimum IPv4 import prefix length.
+* `export_maxlen4` - maximum IPv4 export prefix length.
+* `export_minlen4` - minimum IPv4 export prefix length.
+* `import_maxlen6` - maximum IPv6 import prefix length.
+* `import_minlen6` - minimum IPv6 import prefix length.
+* `export_maxlen6` - maximum IPv6 export prefix length.
+* `export_minlen6` - minimum IPv6 export prefix length.
+
+### Blackhole prefix size limits
+
+* `blackhole_import_maxlen4` - blackhole maximum IPv4 import prefix length.
+* `blackhole_import_minlen4` - blackhole minimum IPv4 import prefix length.
+* `blackhole_export_maxlen4` - blackhole maximum IPv4 export prefix length.
+* `blackhole_export_minlen4` - blackhole minimum IPv4 export prefix length.
+* `blackhole_import_maxlen6` - blackhole maximum IPv6 import prefix length.
+* `blackhole_import_minlen6` - blackhole minimum IPv6 import prefix length.
+* `blackhole_export_maxlen6` - blackhole maximum IPv6 export prefix length.
+* `blackhole_export_minlen6` - blackhole minimum IPv6 export prefix length.
+
+### AS-PATH length limits
+
+* `aspath_import_maxlen` - AS-PATH import maximum length.
+* `aspath_import_minlen` - AS-PATH import minimum length.
+
+### Community length limits
+
+* `community_import_maxlen` - Community import maximum length.
+* `extended_community_import_maxlen` - Extended community import maximum length.
+* `large_community_import_maxlen` - Large community import maximum length.
+
+
+An example of overriding a constraint can be found below...
 ```yaml
-...
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_import_maxlen4: 25
-...
-```
-
-
-## prefix_import_minlen4
-
-Minimum IPv4 prefix length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_import_minlen4: 7
-...
-```
-
-
-## prefix_export_maxlen4
-
-Maximum IPv4 prefix length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_export_maxlen4: 25
-...
-```
-
-
-## prefix_export_minlen4
-
-Minimum IPv4 prefix length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
+..
 
 bgp:
   peers:
     peer1:
       asn: 65000
       description: Some peer
-      prefix_export_minlen4: 7
+      constraints:
+        import_maxlen4: 25
 ...
 ```
 
-
-## prefix_import_maxlen6
-
-Maximum IPv6 prefix length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_import_maxlen6: 47
-...
-```
-
-
-## prefix_import_minlen6
-
-Minimum IPv6 prefix length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_import_minlen6: 15
-...
-```
-
-
-## prefix_export_maxlen6
-
-Maximum IPv6 prefix length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_export_maxlen6: 47
-...
-```
-
-
-## prefix_export_minlen6
-
-Minimum IPv6 prefix length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_export_minlen6: 15
-...
-```
-
-
-## aspath_import_maxlen
-
-Maximum AS-PATH length to allow without filtering. Defaults to global setting.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      aspath_import_maxlen: 90
-...
-```
-
-
-## aspath_import_minlen
-
-Minimum AS-PATH length to allow without filtering. Defaults to global setting.
-
-You probably NEVER want to change this.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      aspath_import_minlen: 2
-...
-```
-
-
-## community_import_maxlen
-
-Maximum number of communities before the prefix gets filtered. Defaults to global setting.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      community_import_maxlen: 90
-...
-```
-
-
-## extended_community_import_maxlen
-
-Maximum number of extended communities before the prefix gets filtered. Defaults to global setting.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      extended_community_import_maxlen: 90
-...
-```
-
-
-## large_community_import_maxlen
-
-Maximum number of large communities before the prefix gets filtered. Defaults to global setting.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      large_community_import_maxlen: 90
-...
-```
 
 
 ## prepend
@@ -1425,13 +918,13 @@ Locally originated route redistribution...
 
 * `connected` will redistribute connected routes. Defaults to `False`.
 * `kernel` will redistribute kernel routes. Defaults to `False`.
-* `kernel_default` will redistribute kernel default routes. Defaults to `False`.
 * `kernel_blackhole` will redistribute kernel blackhole routes. Defaults to `False`. If set to True, kernel blackhole routes will
   be redistributed regardless of the blackhole large community function value.
+* `kernel_default` will redistribute kernel default routes. Defaults to `False`.
 * `static` will redistribute static routes in our global static configuration. Defaults to `False`.
-* `static_default` will redistribute static default routes. Defaults to `False`.
 * `static_blackhole` will redistribute static blackhole routes in our global static configuration. Defaults to `False`. If set to
   True, static blackhole routes will be redistributed regardless of the blackhole large community function value.
+* `static_default` will redistribute static default routes. Defaults to `False`.
 * `originated` will redistribute originated routes. Defaults to `False`.
 * `originated_default` will redistribute originated default routes. Defaults to `False`.
 
@@ -1491,6 +984,9 @@ This is only valid for peer types of `customer` and `internal`.
 This will result in a large community being added to the prefix, which will end up in the AS-PATH being replaced on all eBGP peers.
 
 All private ASN's will be replaced up to a limit of 10, any AS-PATH longer than this will be truncated.
+
+Using this option will set the `constraints` profile to `customer.private` and apply the relevant adjusted limits.
+
 
 An example is below...
 ```yaml

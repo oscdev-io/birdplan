@@ -31,5 +31,5 @@ class Template(TemplateBase):
   import:
     connected:
       interfaces:
-        - eth1
+        - eth2
 """

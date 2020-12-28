@@ -82,7 +82,7 @@ r9_t_bgp4_AS65000_r1_peer = {}
 r10_t_bgp4_AS65000_r1_peer = {}
 
 r1_t_bgp6_AS65100_e1_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65100",
             "attributes": {
@@ -101,7 +101,7 @@ r1_t_bgp6_AS65100_e1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:104::/64": [
+    "fc00:104::/48": [
         {
             "asn": "AS65100",
             "attributes": {

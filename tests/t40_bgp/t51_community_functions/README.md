@@ -1,14 +1,14 @@
 # BGP community function tests
 
-Router r1 should be receiving routes from e1 test cases and advertising to r2-r9.
+Test BGP large community functions from e1 to r1 to r2-r10.
 
-In terms of test set "t10_noexport":
+In terms of test set `t10_noexport`:
   - ExaBGP e1 should advertise a route with a NOEXPORT community.
 
-In terms of test set "t12_noadvertise":
+In terms of test set `t12_noadvertise`:
   - ExaBGP e1 should advertise a route with a NOADVERTISE community.
 
-In terms of test set "t20_blackhole":
+In terms of test set `t20_blackhole`:
   - ExaBGP e1 should advertise a route with a blackhole community.
 
 ## Diagram
@@ -16,7 +16,7 @@ In terms of test set "t20_blackhole":
 ```plantuml
 @startuml
 hide circle
-title Test BGP large community functions from e1 to r1 to r2-r10
+title Test BGP large community functions
 
 
 class "Router: r1" {

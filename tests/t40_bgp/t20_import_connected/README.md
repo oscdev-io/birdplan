@@ -1,21 +1,19 @@
 # BGP importing of connected routes
 
 
-Router r1 should import connected routes but not export to r2.
-
-In the case of "import_connected":  **(default)**
+In the case of `import_connected`:  **(default)**
   - r1 should not be importing any routes by default.
 
-In the case of "import_connected_false":
+In the case of `import_connected_false`:
   - r1 should not be importing routes from any interfaces.
 
-In the case of "import_connected_list":
+In the case of `import_connected_list`:
   - r1 should be importing routes from the list of interfaces.
 
-In the case of "import_connected_star":
+In the case of `import_connected_star`:
   - r1 should be importing routes from the matched interfaces.
 
-In the case of "import_connected_true":
+In the case of `import_connected_true`:
   - r1 should be importing routes from all interfaces.
 
 
@@ -24,7 +22,7 @@ In the case of "import_connected_true":
 ```plantuml
 @startuml
 hide circle
-title Test import connected routes on r1 eth1
+title Test import connected routes on r1
 
 
 class "Router: r1" {
@@ -38,11 +36,11 @@ class "Router: r1" {
 
   .. Interface: eth2 ..
 - 100.201.0.1/24
-+ fc00:201::1/64
++ fc00:201::1/48
 
   .. Interface: eth10 ..
 - 100.211.0.1/24
-+ fc00:211::1/64
++ fc00:211::1/48
 }
 
 

@@ -21,7 +21,7 @@
 
 """BGP community functions test case template."""
 
-from .template_base import TemplateBase
+from ..template_base import TemplateBase
 
 
 class Template(TemplateBase):
@@ -43,7 +43,7 @@ class Template(TemplateBase):
             sim,
             "e1",
             [
-                "neighbor fc00:100::1 announce route fc00:104::/64 next-hop fc00:100::100 "
+                "neighbor fc00:100::1 announce route fc00:104::/48 next-hop fc00:100::100 "
                 f"large-community [ {self.e1_template_large_communities} {self.e1_extra_large_communities} ] "
                 "community [ 65535:65281 ] "
             ],

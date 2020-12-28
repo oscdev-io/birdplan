@@ -29,8 +29,9 @@ class TemplateBase(BirdPlanBaseTestCase):
 
     routers = ["r1", "r2"]
 
-    r1_interfaces = ["eth0", "eth1"]
-    r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["192.168.1.1/24", "fc01::1/64"]}
+    r1_interfaces = ["eth0", "eth2"]
+
+    r1_interface_eth2 = {"mac": "02:01:02:00:00:01", "ips": ["100.201.0.1/24", "fc00:201::1/48"]}
 
     r2_interfaces = ["eth0"]
 
@@ -42,20 +43,20 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Add kernel routes to BIRD instances."""
 
         # Add gateway'd kernel routes
-        sim.node("r1").run_ip(["route", "add", "100.114.0.0/24", "via", "192.168.1.3"])
-        sim.node("r1").run_ip(["route", "add", "fc00:114::/48", "via", "fc01::3"])
+        sim.node("r1").run_ip(["route", "add", "100.121.0.0/24", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "fc00:121::/48", "via", "fc00:201::3"])
 
-        # Add link kernel routes
-        sim.node("r1").run_ip(["route", "add", "100.115.0.0/24", "dev", "eth1"])
-        sim.node("r1").run_ip(["route", "add", "fc00:115::/48", "dev", "eth1"])
+        # Add kernel device routes
+        sim.node("r1").run_ip(["route", "add", "100.122.0.0/24", "dev", "eth2"])
+        sim.node("r1").run_ip(["route", "add", "fc00:122::/48", "dev", "eth2"])
 
-        # Add blackhole kernel routes
-        sim.node("r1").run_ip(["route", "add", "blackhole", "100.104.0.0/24"])
-        sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:104::/48"])
+        # Add kernel default routes
+        sim.node("r1").run_ip(["route", "add", "default", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "default", "via", "fc00:201::3"])
 
-        # Add default kernel route
-        sim.node("r1").run_ip(["route", "add", "0.0.0.0/0", "via", "192.168.1.3"])
-        sim.node("r1").run_ip(["route", "add", "::/0", "via", "fc01::3"])
+        # Add kernel blackhole routes
+        sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
+        sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
 
     def test_bird_status(self, sim):
         """Test BIRD status."""
