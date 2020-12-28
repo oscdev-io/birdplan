@@ -107,7 +107,7 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config:
-            if config_item not in ["router_id", "log_file", "debug", "static", "export_kernel", "bgp", "rip", "ospf"]:
+            if config_item not in ("router_id", "log_file", "debug", "static", "export_kernel", "bgp", "rip", "ospf"):
                 raise BirdPlanError(f"The config item '{config_item}' is not supported")
 
         # Configure sections
@@ -350,7 +350,7 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config["rip"]:
-            if config_item not in ["accept", "redistribute", "interfaces"]:
+            if config_item not in ("accept", "redistribute", "interfaces"):
                 raise BirdPlanError(f"The 'rip' config item '{config_item}' is not supported")
 
         self._config_rip_accept()
@@ -455,7 +455,7 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config["ospf"]:
-            if config_item not in ["accept", "redistribute", "areas"]:
+            if config_item not in ("accept", "redistribute", "areas"):
                 raise BirdPlanError(f"The 'ospf' config item '{config_item}' is not supported")
 
         self._config_ospf_accept()
@@ -580,7 +580,7 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config["bgp"]:
-            if config_item not in [
+            if config_item not in (
                 # Globals
                 "asn",
                 "graceful_shutdown",
@@ -610,7 +610,7 @@ class BirdPlan:
                 "import",
                 "rr_cluster_id",
                 "peers",
-            ]:
+            ):
                 raise BirdPlanError(f"The 'bgp' config item '{config_item}' is not supported")
 
         self._config_bgp_accept()
@@ -815,19 +815,17 @@ class BirdPlan:
                 peer["location"] = {}
                 # Loop with location configuration items
                 for location_type, location_config in config_value.items():
-                    if location_type in ["iso3166", "unm49"]:
-                        peer["location"][location_type] = location_config
-                    # If we don't understand this 'location' entry, throw an error
-                    else:
+                    if location_type not in ("iso3166", "unm49"):
                         raise BirdPlanError(
                             f"Configuration item '{location_type}' not understood in bgp:peers:{peer_name}:location"
                         )
+                    peer["location"][location_type] = location_config
             # Work out redistribution
             elif config_item == "redistribute":
                 peer["redistribute"] = {}
                 # Loop with redistribution items
                 for redistribute_type, redistribute_config in config_value.items():
-                    if redistribute_type in (
+                    if redistribute_type not in (
                         "connected",
                         "kernel",
                         "kernel_blackhole",
@@ -847,43 +845,39 @@ class BirdPlan:
                         "bgp_transit",
                         "bgp_transit_default",
                     ):
-                        peer["redistribute"][redistribute_type] = redistribute_config
-                    # If we don't understand this 'redistribute' entry, throw an error
-                    else:
                         raise BirdPlanError(
                             f"Configuration item '{redistribute_type}' not understood in bgp:peers:{peer_name} redistribute"
                         )
+                    peer["redistribute"][redistribute_type] = redistribute_config
+
             # Work out acceptance of routes
             elif config_item == "accept":
                 peer["accept"] = {}
                 # Loop with acceptance items
                 for accept, accept_config in config_value.items():
-                    if accept in [
+                    if accept not in (
                         "bgp_customer_blackhole",
                         "bgp_own_blackhole",
                         "bgp_own_default",
                         "bgp_transit_default",
-                    ]:
-                        peer["accept"][accept] = accept_config
-                    # If we don't understand this 'accept' entry, throw an error
-                    else:
+                    ):
                         raise BirdPlanError(f"Configuration item '{accept}' not understood in bgp:peers:{peer_name}:accept")
+                    peer["accept"][accept] = accept_config
             # Work out filters
             elif config_item == "filter":
                 peer["filter"] = {}
                 # Loop with filter configuration items
                 for filter_type, filter_config in config_value.items():
-                    if filter_type in ["prefixes", "origin_asns", "peer_asns", "as-set"]:
-                        peer["filter"][filter_type] = filter_config
-                    # If we don't understand this 'filter' entry, throw an error
-                    else:
+                    if filter_type not in ("prefixes", "origin_asns", "peer_asns", "as-set"):
                         raise BirdPlanError(f"Configuration item '{filter_type}' not understood in bgp:peers:{peer_name}:filter")
+                    peer["filter"][filter_type] = filter_config
+
             # Work out prepending options
             elif config_item == "prepend":
                 if isinstance(config_value, dict):
                     # Loop with prepend configuration items
                     for prepend_type, prepend_config in config_value.items():
-                        if prepend_type in [
+                        if prepend_type not in (
                             "connected",
                             "kernel",
                             "kernel_blackhole",
@@ -895,17 +889,15 @@ class BirdPlan:
                             "bgp_customer",
                             "bgp_peering",
                             "bgp_transit",
-                        ]:
-                            # Make sure we have a prepend key
-                            if "prepend" not in peer:
-                                peer["prepend"] = {}
-                            # Then add the config...
-                            peer["prepend"][prepend_type] = prepend_config
-                        # If we don't understand this 'prepend' entry, throw an error
-                        else:
+                        ):
                             raise BirdPlanError(
                                 f"Configuration item '{prepend_type}' not understood in bgp:peers:{peer_name}:prepend"
                             )
+                        # Make sure we have a prepend key
+                        if "prepend" not in peer:
+                            peer["prepend"] = {}
+                        # Then add the config...
+                        peer["prepend"][prepend_type] = prepend_config
                 else:
                     peer["prepend"] = config_value
             else:
