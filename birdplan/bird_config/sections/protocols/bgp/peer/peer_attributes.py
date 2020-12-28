@@ -19,7 +19,6 @@
 """BIRD BGP protocol attributes."""
 
 from typing import Any, Dict, List, Optional, Union
-import requests
 from birdplan.exceptions import BirdPlanError
 
 # This type is a string as we can have it set to "peeringdb"
@@ -534,7 +533,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     filter_policy: BGPPeerFilterPolicy
 
-    _peeringdb: Optional[BGPPeerPeeringDB]
+    peeringdb: Optional[BGPPeerPeeringDB]
 
     blackhole_community: Optional[Union[List[str], bool]]
 
@@ -614,7 +613,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
         self.filter_policy = BGPPeerFilterPolicy()
 
-        self._peeringdb = None
+        self.peeringdb = None
 
         self.blackhole_community = None
 
@@ -648,21 +647,6 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.community_import_maxlen = None
         self.extended_community_import_maxlen = None
         self.large_community_import_maxlen = None
-
-    @property
-    def peeringdb(self) -> BGPPeerPeeringDB:
-        """Return our peeringdb entry, if there is one."""
-        # We cannot do lookups on private ASN's
-        if (self.asn >= 64512 and self.asn <= 65534) or (self.asn >= 4200000000 and self.asn <= 4294967294):
-            return {"info_prefixes4": None, "info_prefixes6": None}
-        # If we don't having peerindb info, grab it
-        if not self._peeringdb:
-            self._peeringdb = requests.get(f"https://www.peeringdb.com/api/net?asn__in={self.asn}").json()["data"][0]
-        # Check the result of peeringdb is not empty
-        if not self._peeringdb:
-            raise BirdPlanError("PeeringDB returned and empty result")
-        # Lastly return it
-        return self._peeringdb
 
     @property
     def name(self) -> str:

@@ -21,6 +21,7 @@
 # pylint: disable=too-many-lines
 
 from typing import Dict, List, Optional, Union
+import requests
 
 from .peer_attributes import (
     BGPPeerAttributes,
@@ -1868,7 +1869,17 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
     @property
     def peeringdb(self) -> BGPPeerPeeringDB:
-        """Return our peeringdb entry."""
+        """Return our peeringdb entry, if there is one."""
+        # We cannot do lookups on private ASN's
+        if (self.asn >= 64512 and self.asn <= 65534) or (self.asn >= 4200000000 and self.asn <= 4294967294):
+            return {"info_prefixes4": None, "info_prefixes6": None}
+        # If we don't having peerindb info, grab it
+        if not self.peer_attributes.peeringdb:
+            self.peer_attributes.peeringdb = requests.get(f"https://www.peeringdb.com/api/net?asn__in={self.asn}").json()["data"][0]
+        # Check the result of peeringdb is not empty
+        if not self.peer_attributes.peeringdb:
+            raise BirdPlanError("PeeringDB returned and empty result")
+        # Lastly return it
         return self.peer_attributes.peeringdb
 
     @property
