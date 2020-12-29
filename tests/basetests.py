@@ -322,6 +322,10 @@ class BirdPlanBaseTestCase:
 
             time.sleep(0.5)
 
+        # Sort nexthops by protocol
+        for nexthops in result.values():
+            nexthops.sort(key=lambda item: item["protocol"])
+
         # Add report
         report = f"{table_variable_name} = " + pprint.pformat(result)
         sim.add_report_obj(f"BIRD_TABLE({router})[{table_name}]", report)
