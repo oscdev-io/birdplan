@@ -43,15 +43,24 @@ class Template(BirdPlanBaseTestCase):
         """Test BIRD status."""
         self._test_bird_status(sim)
 
-    def test_bird_tables_direct4_ospf(self, sim):
-        """Test BIRD t_direct4_ospf table."""
-        if self.has_direct_tables:
-            self._test_bird_routers_table("t_direct4_ospf", sim, routers=["r1"])
+    def test_add_kernel_routes(self, sim):
+        """Add kernel routes to BIRD instances."""
 
-    def test_bird_tables_direct6_ospf(self, sim):
-        """Test BIRD t_direct6_ospf table."""
-        if self.has_direct_tables:
-            self._test_bird_routers_table("t_direct6_ospf", sim, routers=["r1"])
+        # Add gateway'd kernel routes
+        sim.node("r1").run_ip(["route", "add", "100.121.0.0/24", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "fc00:121::/48", "via", "fc00:201::3"])
+
+        # Add kernel device routes
+        sim.node("r1").run_ip(["route", "add", "100.122.0.0/24", "dev", "eth2"])
+        sim.node("r1").run_ip(["route", "add", "fc00:122::/48", "dev", "eth2"])
+
+        # Add kernel default routes
+        sim.node("r1").run_ip(["route", "add", "default", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "default", "via", "fc00:201::3"])
+
+        # Add kernel blackhole routes
+        sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
+        sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
 
     def test_bird_tables_ospf4(self, sim):
         """Test BIRD t_ospf4 table."""
@@ -68,6 +77,16 @@ class Template(BirdPlanBaseTestCase):
     def test_bird_tables_master6(self, sim):
         """Test BIRD master6 table."""
         self._test_bird_routers_table("master6", sim)
+
+    def test_bird_tables_direct4_ospf(self, sim):
+        """Test BIRD t_direct4_ospf table."""
+        if self.has_direct_tables:
+            self._test_bird_routers_table("t_direct4_ospf", sim, routers=["r1"])
+
+    def test_bird_tables_direct6_ospf(self, sim):
+        """Test BIRD t_direct6_ospf table."""
+        if self.has_direct_tables:
+            self._test_bird_routers_table("t_direct6_ospf", sim, routers=["r1"])
 
     def test_bird_tables_kernel4(self, sim):
         """Test BIRD kernel4 table."""

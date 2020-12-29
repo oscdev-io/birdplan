@@ -28,21 +28,32 @@ class Template(BirdPlanBaseTestCase):
     """OSPF test case for redistribution of kernel routes."""
 
     routers = ["r1", "r2"]
-    r1_interfaces = ["eth0", "eth1"]
+
+    r1_interfaces = ["eth0", "eth2"]
+    r1_interface_eth2 = {"mac": "02:01:02:00:00:01", "ips": ["100.201.0.1/24", "fc00:201::1/48"]}
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
+    def test_add_kernel_routes(self, sim):
+        """Add kernel routes to BIRD instances."""
+
         # Add gateway'd kernel routes
-        sim.node("r1").run_ip(["route", "add", "192.168.20.0/24", "via", "100.101.0.2"])
-        sim.node("r1").run_ip(["route", "add", "fc20::/64", "via", "fc00:101::2"])
-        # Add link kernel routes
-        sim.node("r1").run_ip(["route", "add", "192.168.30.0/24", "dev", "eth1"])
-        sim.node("r1").run_ip(["route", "add", "fc30::/64", "dev", "eth1"])
-        # Add default kernel route
-        sim.node("r1").run_ip(["route", "add", "0.0.0.0/0", "via", "100.101.0.2"])
-        sim.node("r1").run_ip(["route", "add", "::/0", "via", "fc00:101::2"])
+        sim.node("r1").run_ip(["route", "add", "100.121.0.0/24", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "fc00:121::/48", "via", "fc00:201::3"])
+
+        # Add kernel device routes
+        sim.node("r1").run_ip(["route", "add", "100.122.0.0/24", "dev", "eth2"])
+        sim.node("r1").run_ip(["route", "add", "fc00:122::/48", "dev", "eth2"])
+
+        # Add kernel default routes
+        sim.node("r1").run_ip(["route", "add", "default", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "default", "via", "fc00:201::3"])
+
+        # Add kernel blackhole routes
+        sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
+        sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
 
     def test_bird_status(self, sim):
         """Test BIRD status."""
