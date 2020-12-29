@@ -3,84 +3,6 @@
 
 """Expected test result data."""
 
-r1_t_direct4_rip = {
-    "100.101.0.0/24": [
-        {
-            "nexthops": [{"interface": "eth1"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct4_rip",
-            "type": ["device", "univ"],
-        }
-    ],
-    "100.201.0.0/24": [
-        {
-            "nexthops": [{"interface": "eth2"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct4_rip",
-            "type": ["device", "univ"],
-        }
-    ],
-    "100.211.0.0/24": [
-        {
-            "nexthops": [{"interface": "eth10"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct4_rip",
-            "type": ["device", "univ"],
-        }
-    ],
-    "100.64.0.0/24": [
-        {
-            "nexthops": [{"interface": "eth0"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct4_rip",
-            "type": ["device", "univ"],
-        }
-    ],
-}
-
-r1_t_direct6_rip = {
-    "fc00:100::/64": [
-        {
-            "nexthops": [{"interface": "eth0"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct6_rip",
-            "type": ["device", "univ"],
-        }
-    ],
-    "fc00:101::/64": [
-        {
-            "nexthops": [{"interface": "eth1"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct6_rip",
-            "type": ["device", "univ"],
-        }
-    ],
-    "fc00:201::/64": [
-        {
-            "nexthops": [{"interface": "eth2"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct6_rip",
-            "type": ["device", "univ"],
-        }
-    ],
-    "fc00:211::/64": [
-        {
-            "nexthops": [{"interface": "eth10"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct6_rip",
-            "type": ["device", "univ"],
-        }
-    ],
-}
-
 r1_t_rip4 = {
     "100.101.0.0/24": [
         {
@@ -565,6 +487,84 @@ r2_master6 = {
             "prefix_type": "unicast",
             "protocol": "rip6",
             "type": ["RIP", "univ"],
+        }
+    ],
+}
+
+r1_t_direct4_rip = {
+    "100.101.0.0/24": [
+        {
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4_rip",
+            "type": ["device", "univ"],
+        }
+    ],
+    "100.201.0.0/24": [
+        {
+            "nexthops": [{"interface": "eth2"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4_rip",
+            "type": ["device", "univ"],
+        }
+    ],
+    "100.211.0.0/24": [
+        {
+            "nexthops": [{"interface": "eth10"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4_rip",
+            "type": ["device", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4_rip",
+            "type": ["device", "univ"],
+        }
+    ],
+}
+
+r1_t_direct6_rip = {
+    "fc00:100::/64": [
+        {
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6_rip",
+            "type": ["device", "univ"],
+        }
+    ],
+    "fc00:101::/64": [
+        {
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6_rip",
+            "type": ["device", "univ"],
+        }
+    ],
+    "fc00:201::/64": [
+        {
+            "nexthops": [{"interface": "eth2"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6_rip",
+            "type": ["device", "univ"],
+        }
+    ],
+    "fc00:211::/64": [
+        {
+            "nexthops": [{"interface": "eth10"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6_rip",
+            "type": ["device", "univ"],
         }
     ],
 }

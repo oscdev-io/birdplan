@@ -3,30 +3,6 @@
 
 """Expected test result data."""
 
-r1_t_direct4_rip = {
-    "100.101.0.0/24": [
-        {
-            "nexthops": [{"interface": "eth1"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct4_rip",
-            "type": ["device", "univ"],
-        }
-    ]
-}
-
-r1_t_direct6_rip = {
-    "fc00:101::/64": [
-        {
-            "nexthops": [{"interface": "eth1"}],
-            "pref": 240,
-            "prefix_type": "unicast",
-            "protocol": "direct6_rip",
-            "type": ["device", "univ"],
-        }
-    ]
-}
-
 r1_t_rip4 = {
     "100.101.0.0/24": [
         {
@@ -331,6 +307,30 @@ r2_master6 = {
             "type": ["RIP", "univ"],
         }
     ],
+}
+
+r1_t_direct4_rip = {
+    "100.101.0.0/24": [
+        {
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4_rip",
+            "type": ["device", "univ"],
+        }
+    ]
+}
+
+r1_t_direct6_rip = {
+    "fc00:101::/64": [
+        {
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6_rip",
+            "type": ["device", "univ"],
+        }
+    ]
 }
 
 r1_t_kernel4 = {

@@ -3,30 +3,6 @@
 
 """Expected test result data."""
 
-r1_t_static4 = {
-    "10.0.0.0/24": [
-        {
-            "nexthops": [{"gateway": "100.101.0.2", "interface": "eth1"}],
-            "pref": 200,
-            "prefix_type": "unicast",
-            "protocol": "static4",
-            "type": ["static", "univ"],
-        }
-    ]
-}
-
-r1_t_static6 = {
-    "fc10::/64": [
-        {
-            "nexthops": [{"gateway": "fc00:101::2", "interface": "eth1"}],
-            "pref": 200,
-            "prefix_type": "unicast",
-            "protocol": "static6",
-            "type": ["static", "univ"],
-        }
-    ]
-}
-
 r1_t_rip4 = {
     "10.0.0.0/24": [
         {
@@ -183,6 +159,30 @@ r2_master6 = {
             "type": ["RIP", "univ"],
         }
     ],
+}
+
+r1_t_static4 = {
+    "10.0.0.0/24": [
+        {
+            "nexthops": [{"gateway": "100.101.0.2", "interface": "eth1"}],
+            "pref": 200,
+            "prefix_type": "unicast",
+            "protocol": "static4",
+            "type": ["static", "univ"],
+        }
+    ]
+}
+
+r1_t_static6 = {
+    "fc10::/64": [
+        {
+            "nexthops": [{"gateway": "fc00:101::2", "interface": "eth1"}],
+            "pref": 200,
+            "prefix_type": "unicast",
+            "protocol": "static6",
+            "type": ["static", "univ"],
+        }
+    ]
 }
 
 r1_t_kernel4 = {

@@ -39,10 +39,6 @@ class Template(BirdPlanBaseTestCase):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
-    def test_bird_status(self, sim):
-        """Test BIRD status."""
-        self._test_bird_status(sim)
-
     def test_add_kernel_routes(self, sim):
         """Add kernel routes to BIRD instances."""
 
@@ -62,15 +58,9 @@ class Template(BirdPlanBaseTestCase):
         sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
         sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
 
-    def test_bird_tables_direct4_rip(self, sim):
-        """Test BIRD t_direct4_rip table."""
-        if self.has_direct_tables:
-            self._test_bird_routers_table("t_direct4_rip", sim, routers=["r1"])
-
-    def test_bird_tables_direct6_rip(self, sim):
-        """Test BIRD t_direct6_rip table."""
-        if self.has_direct_tables:
-            self._test_bird_routers_table("t_direct6_rip", sim, routers=["r1"])
+    def test_bird_status(self, sim):
+        """Test BIRD status."""
+        self._test_bird_status(sim)
 
     def test_bird_tables_rip4(self, sim):
         """Test BIRD t_rip4 table."""
@@ -87,6 +77,16 @@ class Template(BirdPlanBaseTestCase):
     def test_bird_tables_master6(self, sim):
         """Test BIRD master6 table."""
         self._test_bird_routers_table("master6", sim)
+
+    def test_bird_tables_direct4_rip(self, sim):
+        """Test BIRD t_direct4_rip table."""
+        if self.has_direct_tables:
+            self._test_bird_routers_table("t_direct4_rip", sim, routers=["r1"])
+
+    def test_bird_tables_direct6_rip(self, sim):
+        """Test BIRD t_direct6_rip table."""
+        if self.has_direct_tables:
+            self._test_bird_routers_table("t_direct6_rip", sim, routers=["r1"])
 
     def test_bird_tables_kernel4(self, sim):
         """Test BIRD kernel4 table."""
