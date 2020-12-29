@@ -1,13 +1,13 @@
 # Basic RIP test
 
 
-In terms of test "rip": **(default)**
+In terms of test `rip`: **(default)**
   - Router r1 should install RIP routes into OS RIB.
 
-In terms of test "export_kernel_rip_false":
+In terms of test `export_kernel_rip_false`:
   - Router r1 should not install RIP routes into OS RIB.
 
-In terms of test "export_kernel_rip_true":
+In terms of test `export_kernel_rip_true`:
   - Router r1 should install RIP routes into OS RIB.
 
 
