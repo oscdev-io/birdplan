@@ -541,9 +541,8 @@ class BirdPlanBaseTestCase:
         bird_statefile = f"{tmpdir}/bird.state.{router}"
         bird_logfile = f"{tmpdir}/bird.log.{router}"
 
-        # Loop with supported attributes that translate into macros
-        internal_macros = {}
-        for attr in [
+        # Work out what attributes we support for macros
+        attr_list = [
             "asn",
             "peer_asn",
             "peer_type",
@@ -558,7 +557,14 @@ class BirdPlanBaseTestCase:
             "template_peer_config",
             "template_peer_extra_config",
             "template_allpeer_config",
-        ]:
+        ]
+        extra_attr_list = getattr(self, "template_macros")
+        if extra_attr_list:
+            attr_list.extend(extra_attr_list)
+
+        # Loop with supported attributes that translate into macros
+        internal_macros = {}
+        for attr in attr_list:
             # Router specific lookup for an attribute to add a macro for
             router_attr = f"{router}_{attr}"
             if hasattr(self, router_attr):
