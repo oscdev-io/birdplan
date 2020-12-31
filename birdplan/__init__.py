@@ -18,8 +18,11 @@
 
 """BirdPlan package."""
 
+# pylint: disable=too-many-lines
+
 from typing import Any, Dict, List, Optional, Union
 import os
+import jinja2
 import yaml
 from .bird_config import BirdConfig
 from .exceptions import BirdPlanError
@@ -57,11 +60,22 @@ class BirdPlan:
 
         """
 
-        # Read in configuration file
+        # Create search paths for Jinja2
+        search_paths = [os.path.dirname(plan_file)]
+        # We need to pass Jinja2 our filename, as it is in the search path
+        plan_file_fname = os.path.basename(plan_file)
+
+        # Render first with jinja
+        template_env = jinja2.Environment(  # nosec
+            loader=jinja2.FileSystemLoader(searchpath=search_paths),
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+
+        # Check if we can load the configuration
         try:
-            with open(plan_file, "r") as file:
-                raw_config = file.read()
-        except OSError as err:
+            raw_config = template_env.get_template(plan_file_fname).render()
+        except jinja2.TemplateError as err:
             raise BirdPlanError(f"Failed to read BirdPlan file '{plan_file}': {err}") from None
 
         # Load configuration using YAML
