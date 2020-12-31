@@ -56,6 +56,15 @@ In terms of a `internal` peer type the permissable prefix size is between /32 an
 
 This can be combined with the large community function (OWN_ASN, 666, XXX) to propagate export to peer types `transit`, `routeserver`, `routecollector` that support blackholing.
 
+## NO_EXPORT 65535:65281
+
+The NO_EXPORT community 65535:65281 is supported for all peer types.
+
+## NO_ADVERTISE 65535:65282
+
+The NO_ADVERTISE community 65535:65282 is supported for all peer types.
+
+
 # Large Communities
 
 Large communities are in the form of (OWN_ASN, FUNCTION, XXX) and are described below.
