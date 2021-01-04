@@ -120,7 +120,7 @@ class TemplateBase(BirdPlanBaseTestCase):
                 sim,
                 "e1",
                 [
-                    f"neighbor 100.64.0.1 announce route 100.101.0.0/{prefix_length} next-hop 100.64.0.100 "
+                    f"neighbor 100.64.0.1 announce route 100.0.0.0/{prefix_length} next-hop 100.64.0.100 "
                     f"large-community [ 65000:3:1 {self.e1_template_large_communities} ] "
                     f"community [ {self.e1_template_communities} ]"
                 ],
@@ -132,7 +132,7 @@ class TemplateBase(BirdPlanBaseTestCase):
                 sim,
                 "e1",
                 [
-                    f"neighbor fc00:100::1 announce route fc00:101::/{prefix_length} next-hop fc00:100::100 "
+                    f"neighbor fc00:100::1 announce route fc00::/{prefix_length} next-hop fc00:100::100 "
                     f"large-community [ 65000:3:1 {self.e1_template_large_communities} ] "
                     f"community [ {self.e1_template_communities} ]"
                 ],

@@ -144,6 +144,11 @@ bgp:
       connect_retry_time: 2
       error_wait_time: 2,5
       type: rrserver
+      constraints:
+        import_minlen4: 7
+        import_maxlen4: 32
+        import_minlen6: 15
+        import_maxlen6: 128
 @PEER_CONFIG@
 @TEMPLATE_PEER_CONFIG@
 @PEER_EXTRA_CONFIG@
