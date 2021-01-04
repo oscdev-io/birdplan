@@ -19,11 +19,21 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP filtering test case."""
-
-from ..template_blackhole_export_constraints import Template
-from ....config.peertype_customer_private.r1_to_r10 import PeerTypeConfig
+"""BGP configuration for a setup with r1, r2, r3, r4, r5, r6, r7, r8, r9 and r10."""
 
 
-class Test(PeerTypeConfig, Template):
-    """BGP filtering test case."""
+class PeerTypeConfig:
+    """BGP configuration for a setup with r1, r2, r3, r4, r5, r6, r7, r8, r9 and r10."""
+
+    r1_peer_type = "customer"
+
+    r1_r2_asn = "4200000000"
+    r1_extra_r2_config = """
+      replace_aspath: True
+"""
+
+    r1_peer_config = """
+      filter:
+        origin_asns:
+          - 65100
+"""

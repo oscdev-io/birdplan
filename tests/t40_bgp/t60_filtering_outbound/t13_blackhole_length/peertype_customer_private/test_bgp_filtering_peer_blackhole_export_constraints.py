@@ -22,16 +22,11 @@
 """BGP filtering test case."""
 
 from ..template_peer_blackhole_export_constraints import Template
-from ....config.peertype_customer.r1_to_r10 import PeerTypeConfig
+from ....config.peertype_customer_private.r1_to_r10 import PeerTypeConfig
 
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
-
-    r1_r2_asn = "4200000000"
-    r1_extra_r2_config = """
-      replace_aspath: True
-"""
 
     routers_config_exception = {
         "r1": r"Having 'blackhole_export_minlen4' specified for peer 'r2' with type 'customer' makes no sense"
