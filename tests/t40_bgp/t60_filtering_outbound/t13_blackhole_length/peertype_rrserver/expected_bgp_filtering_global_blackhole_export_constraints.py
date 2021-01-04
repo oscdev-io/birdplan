@@ -4,7 +4,7 @@
 """Expected test result data."""
 
 r1_t_bgp4_AS65000_e1_peer = {
-    "100.101.0.0/28": [
+    "100.0.0.0/28": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -23,7 +23,7 @@ r1_t_bgp4_AS65000_e1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -42,7 +42,7 @@ r1_t_bgp4_AS65000_e1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/32": [
+    "100.0.0.0/32": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -64,7 +64,7 @@ r1_t_bgp4_AS65000_e1_peer = {
 }
 
 r1_t_bgp4_AS65009_r10_peer = {
-    "100.101.0.0/28": [
+    "100.0.0.0/28": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -83,7 +83,7 @@ r1_t_bgp4_AS65009_r10_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -102,7 +102,7 @@ r1_t_bgp4_AS65009_r10_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/32": [
+    "100.0.0.0/32": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -126,7 +126,7 @@ r1_t_bgp4_AS65009_r10_peer = {
 r1_t_bgp4_AS65001_r2_peer = {}
 
 r1_t_bgp4_AS65000_r3_peer = {
-    "100.101.0.0/28": [
+    "100.0.0.0/28": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -145,7 +145,7 @@ r1_t_bgp4_AS65000_r3_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -164,7 +164,7 @@ r1_t_bgp4_AS65000_r3_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/32": [
+    "100.0.0.0/32": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -188,7 +188,7 @@ r1_t_bgp4_AS65000_r3_peer = {
 r1_t_bgp4_AS65003_r4_peer = {}
 
 r1_t_bgp4_AS65004_r5_peer = {
-    "100.101.0.0/28": [
+    "100.0.0.0/28": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -207,7 +207,7 @@ r1_t_bgp4_AS65004_r5_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -226,7 +226,7 @@ r1_t_bgp4_AS65004_r5_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/32": [
+    "100.0.0.0/32": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -248,7 +248,7 @@ r1_t_bgp4_AS65004_r5_peer = {
 }
 
 r1_t_bgp4_AS65005_r6_peer = {
-    "100.101.0.0/28": [
+    "100.0.0.0/28": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -267,7 +267,7 @@ r1_t_bgp4_AS65005_r6_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -286,7 +286,7 @@ r1_t_bgp4_AS65005_r6_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/32": [
+    "100.0.0.0/32": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -308,7 +308,7 @@ r1_t_bgp4_AS65005_r6_peer = {
 }
 
 r1_t_bgp4_AS65000_r7_peer = {
-    "100.101.0.0/28": [
+    "100.0.0.0/28": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -327,7 +327,7 @@ r1_t_bgp4_AS65000_r7_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -346,7 +346,7 @@ r1_t_bgp4_AS65000_r7_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/32": [
+    "100.0.0.0/32": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -368,7 +368,7 @@ r1_t_bgp4_AS65000_r7_peer = {
 }
 
 r1_t_bgp4_AS65000_r8_peer = {
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -390,7 +390,7 @@ r1_t_bgp4_AS65000_r8_peer = {
 }
 
 r1_t_bgp4_AS65000_r9_peer = {
-    "100.101.0.0/28": [
+    "100.0.0.0/28": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -409,7 +409,7 @@ r1_t_bgp4_AS65000_r9_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -428,7 +428,7 @@ r1_t_bgp4_AS65000_r9_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/32": [
+    "100.0.0.0/32": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -456,7 +456,7 @@ r3_t_bgp4_AS65000_r1_peer = {}
 r4_t_bgp4_AS65000_r1_peer = {}
 
 r5_t_bgp4_AS65000_r1_peer = {
-    "100.101.0.0/28": [
+    "100.0.0.0/28": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -476,7 +476,7 @@ r5_t_bgp4_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -496,7 +496,7 @@ r5_t_bgp4_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/32": [
+    "100.0.0.0/32": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -519,7 +519,7 @@ r5_t_bgp4_AS65000_r1_peer = {
 }
 
 r6_t_bgp4_AS65000_r1_peer = {
-    "100.101.0.0/28": [
+    "100.0.0.0/28": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -539,7 +539,7 @@ r6_t_bgp4_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -559,7 +559,7 @@ r6_t_bgp4_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/32": [
+    "100.0.0.0/32": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -588,7 +588,7 @@ r8_t_bgp4_AS65000_r1_peer = {}
 r9_t_bgp4_AS65000_r1_peer = {}
 
 r10_t_bgp4_AS65000_r1_peer = {
-    "100.101.0.0/28": [
+    "100.0.0.0/28": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -608,7 +608,7 @@ r10_t_bgp4_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -628,7 +628,7 @@ r10_t_bgp4_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/32": [
+    "100.0.0.0/32": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -651,7 +651,7 @@ r10_t_bgp4_AS65000_r1_peer = {
 }
 
 r1_t_bgp6_AS65000_e1_peer = {
-    "fc00:101::/124": [
+    "fc00::/124": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -670,7 +670,7 @@ r1_t_bgp6_AS65000_e1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -689,7 +689,7 @@ r1_t_bgp6_AS65000_e1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/128": [
+    "fc00::/128": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -711,7 +711,7 @@ r1_t_bgp6_AS65000_e1_peer = {
 }
 
 r1_t_bgp6_AS65009_r10_peer = {
-    "fc00:101::/124": [
+    "fc00::/124": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -730,7 +730,7 @@ r1_t_bgp6_AS65009_r10_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -749,7 +749,7 @@ r1_t_bgp6_AS65009_r10_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/128": [
+    "fc00::/128": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -773,7 +773,7 @@ r1_t_bgp6_AS65009_r10_peer = {
 r1_t_bgp6_AS65001_r2_peer = {}
 
 r1_t_bgp6_AS65000_r3_peer = {
-    "fc00:101::/124": [
+    "fc00::/124": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -792,7 +792,7 @@ r1_t_bgp6_AS65000_r3_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -811,7 +811,7 @@ r1_t_bgp6_AS65000_r3_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/128": [
+    "fc00::/128": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -835,7 +835,7 @@ r1_t_bgp6_AS65000_r3_peer = {
 r1_t_bgp6_AS65003_r4_peer = {}
 
 r1_t_bgp6_AS65004_r5_peer = {
-    "fc00:101::/124": [
+    "fc00::/124": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -854,7 +854,7 @@ r1_t_bgp6_AS65004_r5_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -873,7 +873,7 @@ r1_t_bgp6_AS65004_r5_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/128": [
+    "fc00::/128": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -895,7 +895,7 @@ r1_t_bgp6_AS65004_r5_peer = {
 }
 
 r1_t_bgp6_AS65005_r6_peer = {
-    "fc00:101::/124": [
+    "fc00::/124": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -914,7 +914,7 @@ r1_t_bgp6_AS65005_r6_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -933,7 +933,7 @@ r1_t_bgp6_AS65005_r6_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/128": [
+    "fc00::/128": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -955,7 +955,7 @@ r1_t_bgp6_AS65005_r6_peer = {
 }
 
 r1_t_bgp6_AS65000_r7_peer = {
-    "fc00:101::/124": [
+    "fc00::/124": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -974,7 +974,7 @@ r1_t_bgp6_AS65000_r7_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -993,7 +993,7 @@ r1_t_bgp6_AS65000_r7_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/128": [
+    "fc00::/128": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -1015,7 +1015,7 @@ r1_t_bgp6_AS65000_r7_peer = {
 }
 
 r1_t_bgp6_AS65000_r8_peer = {
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -1037,7 +1037,7 @@ r1_t_bgp6_AS65000_r8_peer = {
 }
 
 r1_t_bgp6_AS65000_r9_peer = {
-    "fc00:101::/124": [
+    "fc00::/124": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -1056,7 +1056,7 @@ r1_t_bgp6_AS65000_r9_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -1075,7 +1075,7 @@ r1_t_bgp6_AS65000_r9_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/128": [
+    "fc00::/128": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -1103,7 +1103,7 @@ r3_t_bgp6_AS65000_r1_peer = {}
 r4_t_bgp6_AS65000_r1_peer = {}
 
 r5_t_bgp6_AS65000_r1_peer = {
-    "fc00:101::/124": [
+    "fc00::/124": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -1123,7 +1123,7 @@ r5_t_bgp6_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -1143,7 +1143,7 @@ r5_t_bgp6_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/128": [
+    "fc00::/128": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -1166,7 +1166,7 @@ r5_t_bgp6_AS65000_r1_peer = {
 }
 
 r6_t_bgp6_AS65000_r1_peer = {
-    "fc00:101::/124": [
+    "fc00::/124": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -1186,7 +1186,7 @@ r6_t_bgp6_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -1206,7 +1206,7 @@ r6_t_bgp6_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/128": [
+    "fc00::/128": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -1235,7 +1235,7 @@ r8_t_bgp6_AS65000_r1_peer = {}
 r9_t_bgp6_AS65000_r1_peer = {}
 
 r10_t_bgp6_AS65000_r1_peer = {
-    "fc00:101::/124": [
+    "fc00::/124": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -1255,7 +1255,7 @@ r10_t_bgp6_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -1275,7 +1275,7 @@ r10_t_bgp6_AS65000_r1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/128": [
+    "fc00::/128": [
         {
             "asn": "AS65000",
             "attributes": {
@@ -1298,7 +1298,7 @@ r10_t_bgp6_AS65000_r1_peer = {
 }
 
 r1_t_bgp4 = {
-    "100.101.0.0/28": [
+    "100.0.0.0/28": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -1317,7 +1317,7 @@ r1_t_bgp4 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/30": [
+    "100.0.0.0/30": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -1336,7 +1336,7 @@ r1_t_bgp4 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.101.0.0/32": [
+    "100.0.0.0/32": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -1376,7 +1376,7 @@ r9_t_bgp4 = {}
 r10_t_bgp4 = {}
 
 r1_t_bgp6 = {
-    "fc00:101::/124": [
+    "fc00::/124": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -1395,7 +1395,7 @@ r1_t_bgp6 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/126": [
+    "fc00::/126": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -1414,7 +1414,7 @@ r1_t_bgp6 = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/128": [
+    "fc00::/128": [
         {
             "attributes": {
                 "BGP.as_path": [],
