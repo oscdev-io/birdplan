@@ -235,7 +235,8 @@ Blackhole minimum IPv6 export prefix length, defaults to `64`.
 
 * `aspath_import_maxlen` - AS-PATH import maximum length, defaults to `100`.
 
-* `aspath_import_minlen` - AS-PATH import minimum length, defaults to `1`.
+* `aspath_import_minlen` - AS-PATH import minimum length, defaults to `1`
+except for `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` which defaults to `0`.
 
 ## Community length limits
 

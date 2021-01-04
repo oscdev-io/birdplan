@@ -30,6 +30,9 @@ class TemplateBase(BirdPlanBaseTestCase):
     routers = ["r1"]
     exabgps = ["e1"]
 
+    # Needed to prevent errors in IDE, as this comes from the config classes
+    r1_peer_type = ""
+
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)

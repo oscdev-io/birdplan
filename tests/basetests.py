@@ -64,6 +64,9 @@ class BirdPlanBaseTestCase:
     # Routers configuration exception catching
     routers_config_exception = {}
 
+    # Extra macros to pull in
+    template_macros = []
+
     # Supported attributes include:
     # rX_asn
     # rX_peer_asn

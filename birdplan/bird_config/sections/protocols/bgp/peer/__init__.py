@@ -1408,6 +1408,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             if self.peer_type == "internal" and self.replace_aspath:
                 self.conf.add(f"  {self.bgp_functions.peer_filter_asn_private(BirdVariable('PRIVATE_ASNS'))};")
 
+            # NK: Should we be filtering AS-PATH lengths for internal systems?
+            # - probably safer to do so?
+            self.conf.add(
+                f"  {self.bgp_functions.peer_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
+            )
+
         # Transit providers
         elif self.peer_type == "transit":
             self.conf.add(f"  {self.bgp_functions.peer_communities_strip_all()};")

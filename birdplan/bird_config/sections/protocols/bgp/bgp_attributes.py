@@ -226,6 +226,7 @@ class BGPPeertypeConstraints:  # pylint: disable=too-few-public-methods
             self.export_maxlen4 = 32
             self.import_maxlen6 = 128
             self.export_maxlen6 = 128
+            self.aspath_import_minlen = 0
 
         # Override defaults for customers with private ASN's
         elif peer_type == "customer.private":
