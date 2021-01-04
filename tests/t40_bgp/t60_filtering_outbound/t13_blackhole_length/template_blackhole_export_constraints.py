@@ -19,37 +19,25 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP global blackhole export constraints test case template."""
+"""BGP default blackhole export constraints test case template."""
 
 from ..template_base import TemplateBase
 
 
 class Template(TemplateBase):
-    """BGP global blackhole export constraints test case template."""
+    """BGP default blackhole export constraints test case template."""
 
     r1_template_extra_config = """
       blackhole_community: true
 """
 
+    r1_template_peer_config = """
+      constraints:
+        blackhole_import_minlen4: 23
+"""
+
     e1_template_communities = "65535:666"
     e1_template_large_communities = "65000:666:65413 65000:666:65412"
 
-    test_prefix_lengths4 = [28, 30, 32]
-    test_prefix_lengths6 = [124, 126, 128]
-
-    def r1_template_global_config(self):
-        """Output customized global config depending on the peer type constraint specified."""
-
-        peer_type = self.r1_peer_type
-
-        if "replace_aspath" in getattr(self, "r1_extra_r2_config", ""):
-            peer_type = "customer.private"
-
-        return f"""
-  peertype_constraints:
-    {peer_type}:
-      blackhole_export_minlen4: 29
-      blackhole_export_maxlen4: 31
-      blackhole_export_minlen6: 125
-      blackhole_export_maxlen6: 127
-"""
+    test_prefix_lengths4 = [23, 24, 32]
+    test_prefix_lengths6 = [63, 64, 128]
