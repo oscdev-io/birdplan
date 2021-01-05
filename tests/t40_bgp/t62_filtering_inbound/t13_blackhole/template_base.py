@@ -27,7 +27,7 @@ from ..template_base import TemplateBase as TemplateSetBase
 class TemplateBase(TemplateSetBase):
     """BGP blackhole length test case template."""
 
-    blackhole_ranges = [101]
+    test_blackhole_ranges = [101]
     test_blackhole_lengths4 = []
     test_blackhole_lengths6 = []
 
@@ -54,7 +54,7 @@ class TemplateBase(TemplateSetBase):
             large_communities = "65000:3:1"
 
         # Loop with IP ranges
-        for iprange in self.blackhole_ranges:
+        for iprange in self.test_blackhole_ranges:
 
             # Loop with IPv4 blackhole lenghts
             for test_blackhole_length4 in self.test_blackhole_lengths4:

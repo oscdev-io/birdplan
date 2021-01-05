@@ -27,6 +27,8 @@ from .template_base import TemplateBase
 class Template(TemplateBase):
     """BGP AS-PATH length test case template."""
 
+    test_as_path_counts = [3, 4, 20, 21]
+
     def r1_template_global_config(self):
         """Output customized global config depending on the peer type constraint specified."""
 
@@ -41,5 +43,3 @@ class Template(TemplateBase):
       aspath_import_maxlen: 20
       aspath_import_minlen: 4
 """
-
-    test_as_path_counts = [3, 4, 20, 21]

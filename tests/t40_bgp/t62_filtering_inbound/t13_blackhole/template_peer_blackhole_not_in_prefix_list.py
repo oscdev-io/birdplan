@@ -27,7 +27,7 @@ from .template_base import TemplateBase
 class Template(TemplateBase):
     """BGP blackhole test case template."""
 
-    blackhole_ranges = [101, 102]
+    test_blackhole_ranges = [101, 102]
 
     test_blackhole_lengths4 = [28, 30, 32]
     test_blackhole_lengths6 = [124, 126, 128]
