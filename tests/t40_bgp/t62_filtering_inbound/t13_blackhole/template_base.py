@@ -19,24 +19,41 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP blackhole too long test case template."""
+"""BGP prefix length test case template."""
 
-from ..template_base import TemplateBase
+from ..template_base import TemplateBase as TemplateSetBase
 
 
-class TemplateSetBase(TemplateBase):  # pylint:disable=abstract-method
-    """BGP blackhole too long test case template."""
+class TemplateBase(TemplateSetBase):
+    """BGP prefix length test case template."""
 
-    def r1_template_peer_config(self):
-        """Return custom config based on the peer type."""
-        # Grab the peer type
-        peer_type = getattr(self, "r1_peer_type")
-        # If its a customer, return the prefixes
-        if peer_type == "customer":
-            return """
-        prefixes:
-          - 100.68.0.0/22+
-          - fc00:101::/46+
-"""
-        # If not, just return a blank string
-        return ""
+    test_prefix_lengths4 = []
+    test_prefix_lengths6 = []
+
+    def _test_announce_routes(self, sim):
+        """Announce various length prefixes."""
+
+        # Add large communities for peer types that require them
+        large_communities = ""
+        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            large_communities = "65000:3:1"
+
+        for test_prefix_length4 in self.test_prefix_lengths4:
+            self._exabgpcli(
+                sim,
+                "e1",
+                [
+                    f"neighbor 100.64.0.1 announce route 100.101.0.0/{test_prefix_length4} next-hop 100.64.0.2 "
+                    f"large-community [ {large_communities} ] community [65535:666]"
+                ],
+            )
+
+        for test_prefix_length6 in self.test_prefix_lengths6:
+            self._exabgpcli(
+                sim,
+                "e1",
+                [
+                    f"neighbor fc00:100::1 announce route fc00:101::/{test_prefix_length6} next-hop fc00:100::2 "
+                    f"large-community [ {large_communities} ] community [65535:666]"
+                ],
+            )
