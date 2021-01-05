@@ -30,6 +30,10 @@ class TemplateBase(BirdPlanBaseTestCase):
     routers = ["r1"]
     exabgps = ["e1"]
 
+    # The default route test requires e2, which is a macro in r1.yaml, so we add it here so it can end up being
+    # blank for other tests
+    template_macros = ["e2_config"]
+
     # Needed to prevent errors in IDE, as this comes from the config classes
     r1_peer_type = ""
 

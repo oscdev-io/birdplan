@@ -91,11 +91,16 @@ In terms of test `test_bgp_filtering_transit_free_asn`:
 
 ## Tests for BGP default route filtering
 
-In terms of test `test_bgp_filtering_default_allowed`:
-- ExaBGP e1 should export a default route that is allowed.
+In terms of test `test_bgp_filtering_default`:
+- ExaBGP e1 and e2 should export default route(s) and depending on the peer type we filter them.
 
-In terms of test `test_bgp_filtering_default_not_allowed`:
-- ExaBGP e1 should export a default route that is not allowed.
+In terms of test `test_bgp_filtering_accept_bgp_own_default`:
+- ExaBGP e1 and e2 should export default route(s) and depending on the peer type we filter them or accept only
+our own default route.
+
+In terms of test `test_bgp_filtering_accept_bgp_transit_default`:
+- ExaBGP e1 and e2 should export default route(s) and depending on the peer type we filter them or accept only
+our the transit default route.
 
 
 ## Tests for BGP first AS not peer AS filtering
