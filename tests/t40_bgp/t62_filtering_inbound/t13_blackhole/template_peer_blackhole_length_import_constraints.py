@@ -30,10 +30,27 @@ class Template(TemplateBase):
     test_blackhole_lengths4 = [28, 30, 32]
     test_blackhole_lengths6 = [124, 126, 128]
 
-    r1_template_peer_config = """
-      constraints:
-        blackhole_export_minlen4: 29
-        blackhole_export_maxlen4: 31
-        blackhole_export_minlen6: 125
-        blackhole_export_maxlen6: 127
+    def r1_template_peer_config(self):
+        """Return custom config based on the peer type."""
+
+        output = ""
+
+        # Grab the peer type
+        peer_type = getattr(self, "r1_peer_type")
+        # If its a customer, return the prefixes
+        if peer_type == "customer":
+            output += """
+        prefixes:
+          - 100.101.0.0/22+
+          - fc00:101::/46+
 """
+
+        output += """
+      constraints:
+        blackhole_import_minlen4: 29
+        blackhole_import_maxlen4: 31
+        blackhole_import_minlen6: 125
+        blackhole_import_maxlen6: 127
+"""
+
+        return output

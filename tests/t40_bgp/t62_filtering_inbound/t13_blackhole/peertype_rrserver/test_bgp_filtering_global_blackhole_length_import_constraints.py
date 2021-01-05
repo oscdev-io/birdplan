@@ -19,36 +19,11 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP blackhole test case template."""
+"""BGP filtering test case."""
 
-from .template_base import TemplateBase
+from ..template_global_blackhole_length_import_constraints import Template
+from ....config.peertype_rrserver.e1r1 import PeerTypeConfig
 
 
-class Template(TemplateBase):
-    """BGP blackhole test case template."""
-
-    blackhole_ranges = [101, 102]
-
-    test_blackhole_lengths4 = [28, 30, 32]
-    test_blackhole_lengths6 = [124, 126, 128]
-
-    def r1_template_peer_config(self):
-        """Return custom config based on the peer type."""
-
-        output = ""
-
-        # Grab the peer type
-        peer_type = getattr(self, "r1_peer_type")
-        # If this is not a customer peer type, we need to add the filter section
-        if peer_type != "customer":
-            output += """
-      filter:
-"""
-
-        output += """
-        prefixes:
-          - 100.102.0.0/22+
-          - fc00:102::/46+
-"""
-
-        return output
+class Test(PeerTypeConfig, Template):
+    """BGP filtering test case."""
