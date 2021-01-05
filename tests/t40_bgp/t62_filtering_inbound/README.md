@@ -44,34 +44,34 @@ In terms of test `test_bgp_filtering_peer_blackhole_not_in_prefix_list`:
 
 ## Tests for BGP community length filtering
 
-In terms of test `test_bgp_filtering_too_many_communities`:
-- ExaBGP e1 should export a route where the route has too many normal communities, with default test settings.
+In terms of test `test_bgp_filtering_community_length_import_constraints`:
+- ExaBGP e1 should export communities with varying lengths to test the default min and max constraint values.
 
-In terms of test `test_bgp_filtering_too_many_communities_global`:
-- ExaBGP e1 should export a route where the route has too many normal communities, with custom global length configuration.
+In terms of test `test_bgp_filtering_global_community_length_import_constraints`:
+- ExaBGP e1 should export communities with varying lengths to test the global min and max constraint values when overridden.
 
-In terms of test `test_bgp_filtering_too_many_communities_peer`:
-- ExaBGP e1 should export a route where the route has too many normal communities, with custom peer length configuration.
-
-
-In terms of test `test_bgp_filtering_too_many_extended_communities`:
-- ExaBGP e1 should export a route where the route has too many extended communities, with default test settings.
-
-In terms of test `test_bgp_filtering_too_many_extended_communities_global`:
-- ExaBGP e1 should export a route where the route has too many extended communities, with custom global length configuration.
-
-In terms of test `test_bgp_filtering_too_many_extended_communities_peer`:
-- ExaBGP e1 should export a route where the route has too many extended communities, with custom peer length configuration.
+In terms of test `test_bgp_filtering_peer_community_length_import_constraints`:
+- ExaBGP e1 should export communities with varying lengths to test the peer min and max constraint values when overridden.
 
 
-In terms of test `test_bgp_filtering_too_many_large_communities`:
-- ExaBGP e1 should export a route where the route has too many large communities, with default test settings.
+In terms of test `test_bgp_filtering_extended_community_length_import_constraints`:
+- ExaBGP e1 should export extended communities with varying lengths to test the default min and max constraint values.
 
-In terms of test `test_bgp_filtering_too_many_large_communities_global`:
-- ExaBGP e1 should export a route where the route has too many large communities, with custom global length configuration.
+In terms of test `test_bgp_filtering_global_extended_community_length_import_constraints`:
+- ExaBGP e1 should export extended communities with varying lengths to test the global min and max constraint values when overridden.
 
-In terms of test `test_bgp_filtering_too_many_large_communities_peer`:
-- ExaBGP e1 should export a route where the route has too many large communities, with custom peer length configuration.
+In terms of test `test_bgp_filtering_peer_extended_community_length_import_constraints`:
+- ExaBGP e1 should export extended communities with varying lengths to test the peer min and max constraint values when overridden.
+
+
+In terms of test `test_bgp_filtering_large_community_length_import_constraints`:
+- ExaBGP e1 should export large communities with varying lengths to test the default min and max constraint values.
+
+In terms of test `test_bgp_filtering_global_large_community_length_import_constraints`:
+- ExaBGP e1 should export large communities with varying lengths to test the global min and max constraint values when overridden.
+
+In terms of test `test_bgp_filtering_peer_large_community_length_import_constraints`:
+- ExaBGP e1 should export large communities with varying lengths to test the peer min and max constraint values when overridden.
 
 
 ## Tests for BGP bogon filtering

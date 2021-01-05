@@ -1338,7 +1338,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  {self.bgp_functions.peer_filter_asn_invalid(self.asn)};")
             self.conf.add(f"  {self.bgp_functions.peer_filter_asn_transit()};")
             self.conf.add(f"  {self.bgp_functions.peer_filter_nexthop_not_peerip()};")
-            self.conf.add(f"  {self._bgp_filter_community_lengths()};")
+
         # Peers
         elif self.peer_type == "peer":
             self.conf.add(f"  {self.bgp_functions.peer_communities_strip_all()};")
@@ -1354,7 +1354,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  {self.bgp_functions.peer_filter_nexthop_not_peerip()};")
             self.conf.add(f"  {self.bgp_functions.peer_filter_asn_invalid(self.asn)};")
             self.conf.add(f"  {self.bgp_functions.peer_filter_asn_transit()};")
-            self.conf.add(f"  {self._bgp_filter_community_lengths()};")
+
         # Routecollector
         elif self.peer_type == "routecollector":
             self.conf.add(f"  {self.bgp_functions.peer_communities_strip_all()};")
@@ -1372,7 +1372,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 f"  {self.bgp_functions.peer_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
             )
             self.conf.add(f"  {self.bgp_functions.peer_filter_asn_transit()};")
-            self.conf.add(f"  {self._bgp_filter_community_lengths()};")
+
         # Internal router peer types
         elif self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             self.conf.add(f"  {self.bgp_functions.peer_filter_lc_no_relation()};")
@@ -1437,6 +1437,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             )
             self.conf.add(f"  {self.bgp_functions.peer_filter_asn_invalid(self.asn)};")
             self.conf.add(f"  {self.bgp_functions.peer_filter_nexthop_not_peerip()};")
+
+        # With exception of routecollector (which is not supposed to be sending us routes), check the community lengths
+        if self.peer_type != "routecollector":
             self.conf.add(f"  {self._bgp_filter_community_lengths()};")
 
         # Flip around the meaning of filters depending on peer type
