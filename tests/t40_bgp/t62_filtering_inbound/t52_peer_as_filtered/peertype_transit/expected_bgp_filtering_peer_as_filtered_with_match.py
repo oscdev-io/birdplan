@@ -26,7 +26,7 @@ r1_t_bgp4_AS65001_e1_peer = {
 }
 
 r1_t_bgp6_AS65001_e1_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65003",
             "attributes": {
