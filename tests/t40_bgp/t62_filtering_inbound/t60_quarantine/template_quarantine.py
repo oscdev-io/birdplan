@@ -47,5 +47,5 @@ class Template(TemplateBase):
         self._exabgpcli(
             sim,
             "e1",
-            [f"neighbor fc00:100::1 announce route fc00:101::/64 next-hop fc00:100::2 large-community [{large_communities}]"],
+            [f"neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 large-community [{large_communities}]"],
         )
