@@ -1404,6 +1404,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.conf.add(f"  {self.bgp_functions.peer_filter_invalid_blackhole()};")
                 self.conf.add(f"  {self._bgp_filter_blackhole_size()};")
 
+            self.conf.add("  # Bypass prefix size filters for the default route")
+            self.conf.add(f"  if !{self.functions.is_default()} then {self._bgp_filter_prefix_size()};")
+
             # Check if we're replacing the AS-PATH
             if self.peer_type == "internal" and self.replace_aspath:
                 self.conf.add(f"  {self.bgp_functions.peer_filter_asn_private(BirdVariable('PRIVATE_ASNS'))};")
@@ -1418,17 +1421,15 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         elif self.peer_type == "transit":
             self.conf.add(f"  {self.bgp_functions.peer_communities_strip_all()};")
             self.conf.add(f"  {self.bgp_functions.peer_import_transit(self.asn, self.cost)};")
-            # Check if we're accepting the default route
-            if self.route_policy_accept.bgp_transit_default:
-                self.conf.add("  # Bypass bogon filters for the default route")
-                self.conf.add(f"  if !{self.functions.is_default()} then {self.bgp_functions.peer_filter_bogons()};")
-                self.conf.add(f"  {self.bgp_functions.peer_filter_blackhole()};")
-                self.conf.add("  # Bypass prefix size filters for the default route")
-                self.conf.add(f"  if !{self.functions.is_default()} then {self._bgp_filter_prefix_size()};")
-            else:
+            # Check if we need to filter out the default route
+            if not self.route_policy_accept.bgp_transit_default:
                 self.conf.add(f"  {self.bgp_functions.peer_filter_default()};")
-                self.conf.add(f"  {self.bgp_functions.peer_filter_blackhole()};")
-                self.conf.add(f"  {self.bgp_functions.peer_filter_bogons()};")
+
+            self.conf.add(f"  {self.bgp_functions.peer_filter_blackhole()};")
+            self.conf.add("  # Bypass bogon filters for the default route")
+            self.conf.add(f"  if !{self.functions.is_default()} then {self.bgp_functions.peer_filter_bogons()};")
+            self.conf.add("  # Bypass prefix size filters for the default route")
+            self.conf.add(f"  if !{self.functions.is_default()} then {self._bgp_filter_prefix_size()};")
 
             self.conf.add(f"  {self.bgp_functions.peer_filter_asn_bogons()};")
             self.conf.add(

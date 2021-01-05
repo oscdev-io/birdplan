@@ -15,6 +15,18 @@ In terms of test `test_bgp_filtering_peer_as_path_length_import_constraints`:
 - ExaBGP e1 should export prefixes with varying AS-PATH lengths to test the peer min and max constraint values when overridden.
 
 
+## Tests for BGP prefix length filtering
+
+In terms of test `test_bgp_filtering_prefix_length_import_constraints`:
+- ExaBGP e1 should export prefixes with varying lengths to test the default min and max constraint values.
+
+In terms of test `test_bgp_filtering_global_prefix_length_import_constraints`:
+- ExaBGP e1 should export prefixes with varying lengths to test the global min and max constraint values when overridden.
+
+In terms of test `test_bgp_filtering_peer_prefix_length_import_constraints`:
+- ExaBGP e1 should export prefixes with varying lengths to test the peer min and max constraint values when overridden.
+
+
 ## Tests for BGP blackholing
 
 In terms of test `test_bgp_blackhole_not_in_prefix_list`:
@@ -38,28 +50,6 @@ In terms of test `test_bgp_filtering_as_path_too_short_global`:
 In terms of test `test_bgp_filtering_as_path_too_short_peer`:
 - ExaBGP e1 should export a prefix which has a blackhole community set and has a length that is too short, with custom peer length configuration.
 
-
-
-## Tests for BGP prefix length filtering
-
-In terms of test `test_bgp_filtering_prefix_too_long`:
-- ExaBGP e1 should export a route where the prefix is too long, with default test settings.
-
-In terms of test `test_bgp_filtering_prefix_too_long_global`:
-- ExaBGP e1 should export a route where the prefix is too long, with custom global length configuration.
-
-In terms of test `test_bgp_filtering_prefix_too_long_peer`:
-- ExaBGP e1 should export a route where the prefix is too long, with custom peer length configuration.
-
-
-In terms of test `test_bgp_filtering_prefix_too_short`:
-- ExaBGP e1 should export a route where the prefix is too short, with default test settings.
-
-In terms of test `test_bgp_filtering_prefix_too_short_global`:
-- ExaBGP e1 should export a route where the prefix is too short, with custom global length configuration.
-
-In terms of test `test_bgp_filtering_prefix_too_short_peer`:
-- ExaBGP e1 should export a route where the prefix is too short, with custom peer length configuration.
 
 
 ## Tests for BGP community length filtering

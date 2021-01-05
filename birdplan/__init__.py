@@ -732,6 +732,7 @@ class BirdPlan:
                 if "import" in constraint_name:
                     if peer_type not in (
                         "customer",
+                        "customer.private",
                         "internal",
                         "peer",
                         "routeserver",
