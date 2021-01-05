@@ -21,7 +21,7 @@
 
 """BGP prefix filtered test case template."""
 
-from ..template_base import TemplateBase
+from .template_base import TemplateBase
 
 
 class Template(TemplateBase):
@@ -29,24 +29,5 @@ class Template(TemplateBase):
 
     r1_template_peer_config = """
       filter:
-        prefixes: ["100.64.102.0/24", "fc00:102::/64"]
+        prefixes: ["100.64.102.0/24", "fc00:102::/48"]
 """
-
-    def _test_announce_routes(self, sim):
-        """Announce a BGP prefix."""
-
-        # Add large communities for peer types that require them
-        large_communities = ""
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
-            large_communities = "65000:3:1"
-
-        self._exabgpcli(
-            sim,
-            "e1",
-            [f"neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 large-community [{large_communities}]"],
-        )
-        self._exabgpcli(
-            sim,
-            "e1",
-            [f"neighbor fc00:100::1 announce route fc00:101::/64 next-hop fc00:100::2 large-community [{large_communities}]"],
-        )

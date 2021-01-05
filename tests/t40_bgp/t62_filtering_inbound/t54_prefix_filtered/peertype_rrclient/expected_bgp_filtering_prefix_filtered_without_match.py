@@ -25,7 +25,7 @@ r1_t_bgp4_AS65000_e1_peer = {
 }
 
 r1_t_bgp6_AS65000_e1_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -67,7 +67,7 @@ r1_t_bgp4 = {
 }
 
 r1_t_bgp6 = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -127,7 +127,7 @@ r1_master6 = {
             "type": ["device", "univ"],
         }
     ],
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -169,7 +169,7 @@ r1_t_kernel4 = {
 }
 
 r1_t_kernel6 = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "attributes": {
                 "BGP.as_path": [],
@@ -198,7 +198,7 @@ r1_inet6 = [
     {"dev": "eth0", "dst": "fc00:100::/64", "flags": [], "metric": 256, "pref": "medium", "protocol": "kernel"},
     {
         "dev": "eth0",
-        "dst": "fc00:101::/64",
+        "dst": "fc00:101::/48",
         "flags": [],
         "gateway": "fc00:100::2",
         "metric": 600,
