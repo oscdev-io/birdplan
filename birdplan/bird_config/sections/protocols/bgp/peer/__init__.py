@@ -566,20 +566,82 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "prepend" in peer_config:
             # Add prepending configuration
             if isinstance(peer_config["prepend"], dict):
+                # Check if we're prepending blackhole routes
+                if "blackhole" in peer_config["prepend"]:
+                    option = peer_config["prepend"]["blackhole"]
+                    self.prepend.kernel_blackhole.own_asn = option
+                    self.prepend.static_blackhole.own_asn = option
+                    self.prepend.bgp_customer_blackhole.own_asn = option
+                    self.prepend.bgp_own_blackhole.own_asn = option
+                # Check if we're prepending default routes
+                if "default" in peer_config["prepend"]:
+                    option = peer_config["prepend"]["default"]
+                    self.prepend.kernel_default.own_asn = option
+                    self.prepend.originated_default.own_asn = option
+                    self.prepend.static_default.own_asn = option
+                    self.prepend.bgp_own_default.own_asn = option
+                    self.prepend.bgp_transit_default.own_asn = option
+                # Check if we're prepending all BGP routes
+                if "bgp" in peer_config["prepend"]:
+                    option = peer_config["prepend"]["bgp"]
+                    self.prepend.bgp_customer.own_asn = option
+                    self.prepend.bgp_customer_blackhole.own_asn = option
+                    self.prepend.bgp_own.own_asn = option
+                    self.prepend.bgp_own_blackhole.own_asn = option
+                    self.prepend.bgp_own_default.own_asn = option
+                    self.prepend.bgp_peering.own_asn = option
+                    self.prepend.bgp_transit.own_asn = option
+                    self.prepend.bgp_transit_default.own_asn = option
+                # Check if we're prepending all kernel routes
+                if "kernel" in peer_config["prepend"]:
+                    option = peer_config["prepend"]["kernel"]
+                    self.prepend.kernel_blackhole.own_asn = option
+                    self.prepend.kernel_default.own_asn = option
+                # Check if we're prepending all static routes
+                if "static" in peer_config["prepend"]:
+                    option = peer_config["prepend"]["static"]
+                    self.prepend.static_blackhole.own_asn = option
+                    self.prepend.static_default.own_asn = option
+                # Check if we're prepending all originated routes
+                if "originated" in peer_config["prepend"]:
+                    option = peer_config["prepend"]["originated"]
+                    self.prepend.originated_default.own_asn = option
+                # Check if we're prepending all customer BGP routes
+                if "bgp_customer" in peer_config["prepend"]:
+                    option = peer_config["prepend"]["bgp_customer"]
+                    self.prepend.bgp_customer_blackhole.own_asn = option
+                # Check if we're prepending all our own BGP routes
+                if "bgp_own" in peer_config["prepend"]:
+                    option = peer_config["prepend"]["bgp_own"]
+                    self.prepend.bgp_own_blackhole.own_asn = option
+                    self.prepend.bgp_own_default.own_asn = option
+                # Check if we're prepending all transit BGP routes
+                if "bgp_transit" in peer_config["prepend"]:
+                    option = peer_config["prepend"]["bgp_transit"]
+                    self.prepend.bgp_transit_default.own_asn = option
+
                 for prepend_type, prepend_config in peer_config["prepend"].items():
                     if prepend_type not in (
+                        "bgp",
+                        "blackhole",
                         "default",
                         "connected",
                         "kernel",
                         "kernel_blackhole",
+                        "kernel_default",
                         "static",
                         "static_blackhole",
+                        "static_default",
                         "originated",
-                        "bgp",
+                        "originated_default",
                         "bgp_own",
+                        "bgp_own_blackhole",
+                        "bgp_own_default",
                         "bgp_customer",
+                        "bgp_customer_blackhole",
                         "bgp_peering",
                         "bgp_transit",
+                        "bgp_transit_default",
                     ):
                         raise BirdPlanError(
                             f"BGP peer 'prepend' configuration '{prepend_type}' for peer '{self.name}' with type "
@@ -587,7 +649,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         )
                     # Check that we're not doing something stupid
                     if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):
-                        if prepend_type in ("default", "bgp_peering", "bgp_transit"):
+                        if prepend_type in (
+                            "default",
+                            "kernel_default",
+                            "static_default",
+                            "originated_default",
+                            "bgp_own_default",
+                            "bgp_peering",
+                            "bgp_transit",
+                            "bgp_transit_default",
+                        ):
                             raise BirdPlanError(
                                 f"Having 'prepend:{prepend_type}' specified for peer '{self.name}' with type '{self.peer_type}' "
                                 "makes no sense"
@@ -601,18 +672,43 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         "rrserver-rrserver",
                         "transit",
                     ):
-                        if prepend_type in ("kernel_blackhole", "static_blackhole"):
+                        if prepend_type in (
+                            "blackhole",
+                            "kernel_blackhole",
+                            "static_blackhole",
+                            "bgp_customer_blackhole",
+                            "bgp_own_blackhole",
+                        ):
                             raise BirdPlanError(
                                 f"Having 'prepend:{prepend_type}' specified for peer '{self.name}' with type '{self.peer_type}' "
                                 "makes no sense"
                             )
-                    # Grab the prepend attribute
-                    prepend_attr = getattr(self.prepend, prepend_type)
-                    # Set prepend count
-                    setattr(prepend_attr, "own_asn", prepend_config)
+                    # Exclude virtual options "bgp" and "default" from being set
+                    if prepend_type not in ("bgp", "blackhole", "default"):
+                        # Grab the prepend attribute
+                        prepend_attr = getattr(self.prepend, prepend_type)
+                        # Set prepend count
+                        setattr(prepend_attr, "own_asn", prepend_config)
             # If its just a number set the count
             else:
-                self.prepend.bgp.own_asn = peer_config["prepend"]
+                option = peer_config["prepend"]
+                self.prepend.connected.own_asn = option
+                self.prepend.kernel.own_asn = option
+                self.prepend.kernel_default.own_asn = option
+                self.prepend.kernel_blackhole.own_asn = option
+                self.prepend.originated.own_asn = option
+                self.prepend.originated_default.own_asn = option
+                self.prepend.static.own_asn = option
+                self.prepend.static_blackhole.own_asn = option
+                self.prepend.static_default.own_asn = option
+                self.prepend.bgp_customer.own_asn = option
+                self.prepend.bgp_customer_blackhole.own_asn = option
+                self.prepend.bgp_own.own_asn = option
+                self.prepend.bgp_own_blackhole.own_asn = option
+                self.prepend.bgp_own_default.own_asn = option
+                self.prepend.bgp_peering.own_asn = option
+                self.prepend.bgp_transit.own_asn = option
+                self.prepend.bgp_transit_default.own_asn = option
 
         # Check if we're quarantined
         if "quarantine" in peer_config and peer_config["quarantine"]:
@@ -1192,42 +1288,108 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"    {self.bgp_functions.peer_remove_lc_private()};")
 
         # Check if we're doing AS-PATH prepending...
-        if self.prepend.default.own_asn:
-            self.conf.add(f"    {self.bgp_functions.peer_prepend_default(BirdVariable('BGP_ASN'), self.prepend.default.own_asn)};")
         if self.prepend.connected.own_asn:
             self.conf.add(
                 f"    {self.bgp_functions.peer_prepend_connected(BirdVariable('BGP_ASN'), self.prepend.connected.own_asn)};"
             )
+
         if self.prepend.kernel.own_asn:
             self.conf.add(f"    {self.bgp_functions.peer_prepend_kernel(BirdVariable('BGP_ASN'), self.prepend.kernel.own_asn)};")
-        if self.prepend.kernel_blackhole.own_asn:
-            func = self.bgp_functions.peer_prepend_kernel_blackhole(BirdVariable("BGP_ASN"), self.prepend.kernel_blackhole.own_asn)
-            self.conf.add(f"    {func};")
+
+        if self.peer_type in ("internal", "routecollector", "routeserver", "rrclient", "rrserver", "rrserver-rrserver", "transit"):
+            if self.prepend.kernel_blackhole.own_asn:
+                peer_prepend_kernel_blackhole = self.bgp_functions.peer_prepend_kernel_blackhole(
+                    BirdVariable("BGP_ASN"), self.prepend.kernel_blackhole.own_asn
+                )
+                self.conf.add(f"    {peer_prepend_kernel_blackhole};")
+
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            if self.prepend.kernel_default.own_asn:
+                peer_prepend_kernel_default = self.bgp_functions.peer_prepend_kernel_default(
+                    BirdVariable("BGP_ASN"), self.prepend.kernel_default.own_asn
+                )
+                self.conf.add(f"    {peer_prepend_kernel_default};")
+
         if self.prepend.originated.own_asn:
             self.conf.add(
                 f"    {self.bgp_functions.peer_prepend_originated(BirdVariable('BGP_ASN'), self.prepend.originated.own_asn)};"
             )
+
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            if self.prepend.originated_default.own_asn:
+                peer_prepend_originated_default = self.bgp_functions.peer_prepend_originated_default(
+                    BirdVariable("BGP_ASN"), self.prepend.originated_default.own_asn
+                )
+                self.conf.add(f"    {peer_prepend_originated_default};")
+
         if self.prepend.static.own_asn:
             self.conf.add(f"    {self.bgp_functions.peer_prepend_static(BirdVariable('BGP_ASN'), self.prepend.static.own_asn)};")
-        if self.prepend.static_blackhole.own_asn:
-            func = self.bgp_functions.peer_prepend_static_blackhole(BirdVariable("BGP_ASN"), self.prepend.static_blackhole.own_asn)
-            self.conf.add(f"    {func};")
-        if self.prepend.bgp.own_asn:
-            self.conf.add(f"    {self.bgp_functions.peer_prepend_bgp(BirdVariable('BGP_ASN'), self.prepend.bgp.own_asn)};")
+
+        if self.peer_type in ("internal", "routecollector", "routeserver", "rrclient", "rrserver", "rrserver-rrserver", "transit"):
+            if self.prepend.static_blackhole.own_asn:
+                peer_prepend_static_blackhole = self.bgp_functions.peer_prepend_static_blackhole(
+                    BirdVariable("BGP_ASN"), self.prepend.static_blackhole.own_asn
+                )
+                self.conf.add(f"    {peer_prepend_static_blackhole};")
+
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            if self.prepend.static_default.own_asn:
+                peer_prepend_static_default = self.bgp_functions.peer_prepend_static_default(
+                    BirdVariable("BGP_ASN"), self.prepend.static_default.own_asn
+                )
+                self.conf.add(f"    {peer_prepend_static_default};")
+
+        # FIXME
+        # if self.prepend.bgp.own_asn:
+        #     self.conf.add(f"    {self.bgp_functions.peer_prepend_bgp(BirdVariable('BGP_ASN'), self.prepend.bgp.own_asn)};")
+
         if self.prepend.bgp_own.own_asn:
             self.conf.add(f"    {self.bgp_functions.peer_prepend_bgp_own(BirdVariable('BGP_ASN'), self.prepend.bgp_own.own_asn)};")
+
+        if self.peer_type in ("internal", "routecollector", "routeserver", "rrclient", "rrserver", "rrserver-rrserver", "transit"):
+            if self.prepend.bgp_own_blackhole.own_asn:
+                peer_prepend_bgp_own_blackhole = self.bgp_functions.peer_prepend_bgp_own_blackhole(
+                    BirdVariable("BGP_ASN"), self.prepend.bgp_own_blackhole.own_asn
+                )
+                self.conf.add(f"    {peer_prepend_bgp_own_blackhole};")
+
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            if self.prepend.bgp_own_default.own_asn:
+                peer_prepend_bgp_own_default = self.bgp_functions.peer_prepend_bgp_own_default(
+                    BirdVariable("BGP_ASN"), self.prepend.bgp_own_default.own_asn
+                )
+                self.conf.add(f"    {peer_prepend_bgp_own_default};")
+
         if self.prepend.bgp_customer.own_asn:
             self.conf.add(
                 f"    {self.bgp_functions.peer_prepend_bgp_customer(BirdVariable('BGP_ASN'), self.prepend.bgp_customer.own_asn)};"
             )
-        if self.prepend.bgp_peering.own_asn:
-            self.conf.add(
-                f"    {self.bgp_functions.peer_prepend_bgp_peering(BirdVariable('BGP_ASN'), self.prepend.bgp_peering.own_asn)};"
-            )
-        if self.prepend.bgp_transit.own_asn:
-            self.conf.add(
-                f"    {self.bgp_functions.peer_prepend_bgp_transit(BirdVariable('BGP_ASN'), self.prepend.bgp_transit.own_asn)};"
-            )
+
+        if self.peer_type in ("internal", "routecollector", "routeserver", "rrclient", "rrserver", "rrserver-rrserver", "transit"):
+            if self.prepend.bgp_customer_blackhole.own_asn:
+                peer_prepend_bgp_customer_blackhole = self.bgp_functions.peer_prepend_bgp_customer_blackhole(
+                    BirdVariable("BGP_ASN"), self.prepend.bgp_customer_blackhole.own_asn
+                )
+                self.conf.add(f"    {peer_prepend_bgp_customer_blackhole};")
+
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            if self.prepend.bgp_peering.own_asn:
+                self.conf.add(
+                    f"    {self.bgp_functions.peer_prepend_bgp_peering(BirdVariable('BGP_ASN'), self.prepend.bgp_peering.own_asn)};"
+                )
+
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            if self.prepend.bgp_transit.own_asn:
+                self.conf.add(
+                    f"    {self.bgp_functions.peer_prepend_bgp_transit(BirdVariable('BGP_ASN'), self.prepend.bgp_transit.own_asn)};"
+                )
+
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+            if self.prepend.bgp_transit_default.own_asn:
+                peer_prepend_bgp_transit_default = self.bgp_functions.peer_prepend_bgp_transit_default(
+                    BirdVariable("BGP_ASN"), self.prepend.bgp_transit_default.own_asn
+                )
+                self.conf.add(f"    {peer_prepend_bgp_transit_default};")
 
         # Do large community prepending if the peer is a customer, peer, routeserver or transit
         if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):

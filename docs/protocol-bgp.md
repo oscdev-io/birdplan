@@ -863,21 +863,29 @@ bgp:
 
 Route types...
 
-* `default` will match the default route.
+* `blackhole` will set the default value for all *_blackhole options.
+* `default` will set the default value for all *_default options.
 * `connected` will match connected routes.
-* `kernel` will match kernel routes. This will not match default routes.
+* `kernel` will match kernel routes. This will also set the default for all kernel_* options.
 * `kernel_blackhole` will match kernel blackhole routes.
-* `static` will match static routes. This will not match default routes.
+* `kernel_default` will match kernel default routes.
+* `static` will match static routes. This will also set the default for all static_* options.
 * `static_blackhole` will match static blackhole routes.
-* `originated` will match originated routes. This will not match default routes.
+* `static_default` will match static default routes.
+* `originated` will match originated routes. This will also set the default for all originated_* options.
+* `originated_default` will match originated routes default routes.
 
 Internal route types...
 
-* `bgp` will match all BGP routes.
-* `bgp_own` will match BGP routes that originated from our ASN.
-* `bgp_customer` will match our customer routes.
+* `bgp` will set the default value for all bgp_* options.
+* `bgp_own` will match BGP routes that originated from our ASN. This will also set the default for all bgp_own_* options.
+* `bgp_own_blackhole` will match BGP blackhole routes that originated from our ASN.
+* `bgp_own_default` will match BGP default routes that originated from our ASN.
+* `bgp_customer` will match our customer routes. This will set the default for all bgp_customer_* options.
+* `bgp_customer_blackhole` will match BGP blackhole routes received from customers.
 * `bgp_peering` will match our peers routes.
-* `bgp_transit` will match our transit providers routes.
+* `bgp_transit` will match our transit providers routes. This will set the default for all bgp_transit_* options.
+* `bgp_transit_default` will match BGP default routes received from transit providers.
 
 An example of this is below...
 ```yaml

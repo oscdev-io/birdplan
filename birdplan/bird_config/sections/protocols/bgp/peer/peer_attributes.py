@@ -169,58 +169,80 @@ class BGPPeerPrepend:  # pylint: disable=too-few-public-methods,too-many-instanc
     ----------
     connected: BGPPeerPrependItem
         Connected route prepending options.
-    default: BGPPeerPrependItem
-        Default route prepending options.
     kernel: BGPPeerPrependItem
         Kernel route prepending options.
     kernel_blackhole: BGPPeerPrependItem
         Kernel blackhole route prepending options.
+    kernel_default: BGPPeerPrependItem
+        Kernel default route prepending options.
     originated: BGPPeerPrependItem
         Originated route prepending options.
+    originated_default: BGPPeerPrependItem
+        Originated default route prepending options.
     static: BGPPeerPrependItem
         Static route prepending options.
     static_blackhole: BGPPeerPrependItem
         Static blackhole route prepending options.
+    static_default: BGPPeerPrependItem
+        Static default route prepending options.
     bgp: BGPPeerPrependItem
         BGP route prepending options.
     bgp_own: BGPPeerPrependItem
         BGP own route prepending options.
+    bgp_own_blackhole: BGPPeerPrependItem
+        BGP own blackhole route prepending options.
+    bgp_own_default: BGPPeerPrependItem
+        BGP own default route prepending options.
     bgp_customer: BGPPeerPrependItem
         BGP customer route prepending options.
+    bgp_customer_blackhole: BGPPeerPrependItem
+        BGP customer blackhole route prepending options.
     bgp_peering: BGPPeerPrependItem
         BGP peering route prepending options.
     bgp_transit: BGPPeerPrependItem
         BGP transit route prepending options.
+    bgp_transit_default: BGPPeerPrependItem
+        BGP transit default route prepending options.
 
     """
 
     connected: BGPPeerPrependItem
-    default: BGPPeerPrependItem
     kernel: BGPPeerPrependItem
     kernel_blackhole: BGPPeerPrependItem
+    kernel_default: BGPPeerPrependItem
     originated: BGPPeerPrependItem
+    originated_default: BGPPeerPrependItem
     static: BGPPeerPrependItem
     static_blackhole: BGPPeerPrependItem
-    bgp: BGPPeerPrependItem
+    static_default: BGPPeerPrependItem
     bgp_own: BGPPeerPrependItem
+    bgp_own_blackhole: BGPPeerPrependItem
+    bgp_own_default: BGPPeerPrependItem
     bgp_customer: BGPPeerPrependItem
+    bgp_customer_blackhole: BGPPeerPrependItem
     bgp_peering: BGPPeerPrependItem
     bgp_transit: BGPPeerPrependItem
+    bgp_transit_default: BGPPeerPrependItem
 
     def __init__(self) -> None:
         """Initialize object."""
         self.connected = BGPPeerPrependItem()
-        self.default = BGPPeerPrependItem()
         self.kernel = BGPPeerPrependItem()
         self.kernel_blackhole = BGPPeerPrependItem()
+        self.kernel_default = BGPPeerPrependItem()
         self.originated = BGPPeerPrependItem()
+        self.originated_default = BGPPeerPrependItem()
         self.static = BGPPeerPrependItem()
         self.static_blackhole = BGPPeerPrependItem()
-        self.bgp = BGPPeerPrependItem()
+        self.static_default = BGPPeerPrependItem()
         self.bgp_own = BGPPeerPrependItem()
+        self.bgp_own_blackhole = BGPPeerPrependItem()
+        self.bgp_own_default = BGPPeerPrependItem()
         self.bgp_customer = BGPPeerPrependItem()
+        self.bgp_customer_blackhole = BGPPeerPrependItem()
         self.bgp_peering = BGPPeerPrependItem()
         self.bgp_transit = BGPPeerPrependItem()
+        self.bgp_transit_default = BGPPeerPrependItem()
 
 
 class BGPPeerRoutePolicyAccept:  # pylint: disable=too-few-public-methods

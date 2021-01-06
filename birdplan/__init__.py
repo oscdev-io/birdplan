@@ -931,17 +931,26 @@ class BirdPlan:
                     # Loop with prepend configuration items
                     for prepend_type, prepend_config in config_value.items():
                         if prepend_type not in (
+                            "blackhole",
+                            "default",
                             "connected",
                             "kernel",
                             "kernel_blackhole",
+                            "kernel_default",
                             "static",
                             "static_blackhole",
+                            "static_default",
                             "originated",
+                            "originated_default",
                             "bgp",
                             "bgp_own",
+                            "bgp_own_blackhole",
+                            "bgp_own_default",
                             "bgp_customer",
+                            "bgp_customer_blackhole",
                             "bgp_peering",
                             "bgp_transit",
+                            "bgp_transit_default",
                         ):
                             raise BirdPlanError(
                                 f"Configuration item '{prepend_type}' not understood in bgp:peers:{peer_name}:prepend"

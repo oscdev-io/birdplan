@@ -1557,16 +1557,52 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
+    @bird_function("bgp_peer_prepend_kernel_default")
+    def peer_prepend_kernel_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_prepend_kernel_default function."""
+
+        return f"""\
+            function bgp_peer_prepend_kernel_default(string filter_name; int peer_asn; int prepend_count) {{
+                if (
+                    !{self.functions.is_kernel()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_prepend_kernel_default] Prepending AS-PATH for type KERNEL DEFAULT ",
+                    prepend_count, "x to ", {self.functions.route_info()};
+                {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
+            }}"""
+
     @bird_function("bgp_peer_prepend_originated")
     def peer_prepend_originated(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_peer_prepend_originated function."""
 
         return f"""\
             function bgp_peer_prepend_originated(string filter_name; int peer_asn; int prepend_count) {{
-                if (!{self.is_originated()} || {self.functions.is_default()}) then return false;
+                if (
+                    !{self.is_originated()} ||
+                    {self.functions.is_default()}
+                ) then return false;
                 if DEBUG then print filter_name,
-                    " [bgp_peer_prepend_originate] Prepending AS-PATH for type ORIGINATED ", prepend_count, "x to ",
+                    " [bgp_peer_prepend_originated] Prepending AS-PATH for type ORIGINATED ", prepend_count, "x to ",
                     {self.functions.route_info()};
+                {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
+            }}"""
+
+    @bird_function("bgp_peer_prepend_originated_default")
+    def peer_prepend_originated_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_prepend_originated_default function."""
+
+        return f"""\
+            function bgp_peer_prepend_originated_default(string filter_name; int peer_asn; int prepend_count) {{
+                if (
+                    !{self.is_originated()} ||
+                    !{self.functions.is_default()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_prepend_originated_default] Prepending AS-PATH for type ORIGINATED DEFAULT ", prepend_count,
+                    "x to ", {self.functions.route_info()};
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
@@ -1604,17 +1640,20 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_bgp")
-    def peer_prepend_bgp(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_peer_prepend_bgp function."""
+    @bird_function("bgp_peer_prepend_static_default")
+    def peer_prepend_static_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_prepend_static_default function."""
 
         return f"""\
-            # BGP route prepending
-            function bgp_peer_prepend_bgp(string filter_name; int peer_asn; int prepend_count)
-            {{
+            function bgp_peer_prepend_static_default(string filter_name; int peer_asn; int prepend_count) {{
+                if (
+                    !{self.functions.is_static()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
                 if DEBUG then print filter_name,
-                    " [bgp_peer_prepend_bgp] Prepending AS-PATH for type BGP ", prepend_count, "x to ",
-                    {self.functions.route_info()};
+                    " [bgp_peer_prepend_static_default] Prepending AS-PATH for type STATIC DEFAULT ",
+                    prepend_count, "x to ", {self.functions.route_info()};
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
@@ -1623,26 +1662,85 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_bgp_own function."""
 
         return f"""\
-            # BGP own route prepending
             function bgp_peer_prepend_bgp_own(string filter_name; int peer_asn; int prepend_count) {{
-                if !{self.is_bgp_own()} then return false;
+                if (
+                    !{self.is_bgp_own()} ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_prepend_bgp_own] Prepending AS-PATH for type BGP_OWN ", prepend_count, "x to ",
                     {self.functions.route_info()};
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
+    @bird_function("bgp_peer_prepend_bgp_own_blackhole")
+    def peer_prepend_bgp_own_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_prepend_bgp_own_blackhole function."""
+
+        return f"""\
+            function bgp_peer_prepend_bgp_own_blackhole(string filter_name; int peer_asn; int prepend_count) {{
+                if (
+                    !{self.is_bgp_own()} ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_prepend_bgp_own_blackhole] Prepending AS-PATH for type BGP_OWN BLACKHOLE ", prepend_count,
+                    "x to ", {self.functions.route_info()};
+                {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
+            }}"""
+
+
+    @bird_function("bgp_peer_prepend_bgp_own_default")
+    def peer_prepend_bgp_own_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_prepend_bgp_own_default function."""
+
+        return f"""\
+            function bgp_peer_prepend_bgp_own_default(string filter_name; int peer_asn; int prepend_count) {{
+                if (
+                    !{self.is_bgp_own()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_prepend_bgp_own_default] Prepending AS-PATH for type BGP_OWN DEFAULT ", prepend_count,
+                    "x to ", {self.functions.route_info()};
+                {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
+            }}"""
+
+
     @bird_function("bgp_peer_prepend_bgp_customer")
     def peer_prepend_bgp_customer(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_peer_prepend_bgp_customer function."""
 
         return f"""\
-            # BGP customer route prepending
             function bgp_peer_prepend_bgp_customer(string filter_name; int peer_asn; int prepend_count) {{
-                if !{self.is_bgp_customer()} then return false;
+                if (
+                    !{self.is_bgp_customer()} ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_prepend_bgp_customer] Prepending AS-PATH for type BGP_CUSTOMER ", prepend_count, "x to ",
                     {self.functions.route_info()};
+                {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
+            }}"""
+
+    @bird_function("bgp_peer_prepend_bgp_customer_blackhole")
+    def peer_prepend_bgp_customer_blackhole(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_prepend_bgp_customer_blackhole function."""
+
+        return f"""\
+            function bgp_peer_prepend_bgp_customer_blackhole(string filter_name; int peer_asn; int prepend_count) {{
+                if (
+                    !{self.is_bgp_customer()} ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_prepend_bgp_customer_blackhole] Prepending AS-PATH for type BGP_CUSTOMER BLACKHOLE ", prepend_count,
+                    "x to ", {self.functions.route_info()};
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
@@ -1651,7 +1749,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_bgp_peering function."""
 
         return f"""\
-            # BGP peering route prepending
             function bgp_peer_prepend_bgp_peering(string filter_name; int peer_asn; int prepend_count) {{
                 if (!{self.is_bgp_peer()} && !{self.is_bgp_routeserver()}) then return false;
                 if DEBUG then print filter_name,
@@ -1665,12 +1762,32 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_bgp_transit function."""
 
         return f"""\
-            # BGP transit route prepending
             function bgp_peer_prepend_bgp_transit(string filter_name; int peer_asn; int prepend_count) {{
-                if !{self.is_bgp_transit()} then return false;
+                if (
+                    !{self.is_bgp_transit()} ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_prepend_bgp_transit] Prepending AS-PATH for type BGP_TRANSIT ", prepend_count, "x to ",
                     {self.functions.route_info()};
+                {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
+            }}"""
+
+    @bird_function("bgp_peer_prepend_bgp_transit_default")
+    def peer_prepend_bgp_transit_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_prepend_bgp_transit_default function."""
+
+        return f"""\
+            function bgp_peer_prepend_bgp_transit_default(string filter_name; int peer_asn; int prepend_count) {{
+                if (
+                    !{self.is_bgp_transit()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_prepend_bgp_transit_default] Prepending AS-PATH for type BGP_TRANSIT DEFAULT ", prepend_count,
+                    "x to ", {self.functions.route_info()};
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 

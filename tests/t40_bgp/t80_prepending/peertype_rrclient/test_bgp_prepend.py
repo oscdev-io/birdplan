@@ -21,7 +21,7 @@
 
 """BGP prepending test case."""
 
-from ..template_prepend_bgp import Template
+from ..template_prepend import Template
 from ...config.peertype_rrclient.r1r2 import PeerTypeConfig
 
 
