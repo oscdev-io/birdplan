@@ -3,6 +3,7 @@ FROM idmslinux/rolling
 RUN set -ex; \
     echo "Updating and installing..."; \
     pacman -Syu --noconfirm \
+        python-jinja \
         python-pytest-runner \
         python-pytest-cov \
         python-pytest-black \
