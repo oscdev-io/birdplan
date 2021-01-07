@@ -1691,7 +1691,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-
     @bird_function("bgp_peer_prepend_bgp_own_default")
     def peer_prepend_bgp_own_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_peer_prepend_bgp_own_default function."""
@@ -1708,7 +1707,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                     "x to ", {self.functions.route_info()};
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
-
 
     @bird_function("bgp_peer_prepend_bgp_customer")
     def peer_prepend_bgp_customer(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument

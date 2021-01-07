@@ -1339,10 +1339,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 )
                 self.conf.add(f"    {peer_prepend_static_default};")
 
-        # FIXME
-        # if self.prepend.bgp.own_asn:
-        #     self.conf.add(f"    {self.bgp_functions.peer_prepend_bgp(BirdVariable('BGP_ASN'), self.prepend.bgp.own_asn)};")
-
         if self.prepend.bgp_own.own_asn:
             self.conf.add(f"    {self.bgp_functions.peer_prepend_bgp_own(BirdVariable('BGP_ASN'), self.prepend.bgp_own.own_asn)};")
 
