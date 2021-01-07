@@ -1402,7 +1402,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Check if we need to do any blackhole manipulation
         if self.blackhole_community and isinstance(self.blackhole_community, list):
             self.conf.add("    # If this is a blackhole route, then add the communities")
-            self.conf.add("    if is_blackhole then {")
+            self.conf.add(f"    if {self.bgp_functions.is_blackhole()} then {{")
             self.conf.add("      bgp_community.delete([BGP_COMMUNITY_BLACKHOLE]);")
             # Loop with the communities we have to add
             for community in self.blackhole_community:
