@@ -420,6 +420,62 @@ bgp:
 ```
 
 
+
+## constraints
+
+This configuration key can be used to override the global peer type constraints.
+All values default to the global setting for the specific peer type (above).
+
+### Normal prefix size limits
+
+* `import_maxlen4` - maximum IPv4 import prefix length.
+* `import_minlen4` - minimum IPv4 import prefix length.
+* `export_maxlen4` - maximum IPv4 export prefix length.
+* `export_minlen4` - minimum IPv4 export prefix length.
+* `import_maxlen6` - maximum IPv6 import prefix length.
+* `import_minlen6` - minimum IPv6 import prefix length.
+* `export_maxlen6` - maximum IPv6 export prefix length.
+* `export_minlen6` - minimum IPv6 export prefix length.
+
+### Blackhole prefix size limits
+
+* `blackhole_import_maxlen4` - blackhole maximum IPv4 import prefix length.
+* `blackhole_import_minlen4` - blackhole minimum IPv4 import prefix length.
+* `blackhole_export_maxlen4` - blackhole maximum IPv4 export prefix length.
+* `blackhole_export_minlen4` - blackhole minimum IPv4 export prefix length.
+* `blackhole_import_maxlen6` - blackhole maximum IPv6 import prefix length.
+* `blackhole_import_minlen6` - blackhole minimum IPv6 import prefix length.
+* `blackhole_export_maxlen6` - blackhole maximum IPv6 export prefix length.
+* `blackhole_export_minlen6` - blackhole minimum IPv6 export prefix length.
+
+### AS-PATH length limits
+
+* `aspath_import_maxlen` - AS-PATH import maximum length.
+* `aspath_import_minlen` - AS-PATH import minimum length.
+
+### Community length limits
+
+* `community_import_maxlen` - Community import maximum length.
+* `extended_community_import_maxlen` - Extended community import maximum length.
+* `large_community_import_maxlen` - Large community import maximum length.
+
+
+An example of overriding a constraint can be found below...
+```yaml
+..
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      constraints:
+        import_maxlen4: 25
+...
+```
+
+
+
 ## cost
 
 This is the value to reduce the LOCAL_PREF by. Refer to [BGP Appendix](protocol-bgp-appendix.md) for a list of the local preferences.
@@ -779,62 +835,6 @@ bgp:
       prefix_limit6: 100
 ...
 ```
-
-
-
-## constraints
-
-This configuration key can be used to override the global peer type constraints.
-All values default to the global setting for the specific peer type (above).
-
-### Normal prefix size limits
-
-* `import_maxlen4` - maximum IPv4 import prefix length.
-* `import_minlen4` - minimum IPv4 import prefix length.
-* `export_maxlen4` - maximum IPv4 export prefix length.
-* `export_minlen4` - minimum IPv4 export prefix length.
-* `import_maxlen6` - maximum IPv6 import prefix length.
-* `import_minlen6` - minimum IPv6 import prefix length.
-* `export_maxlen6` - maximum IPv6 export prefix length.
-* `export_minlen6` - minimum IPv6 export prefix length.
-
-### Blackhole prefix size limits
-
-* `blackhole_import_maxlen4` - blackhole maximum IPv4 import prefix length.
-* `blackhole_import_minlen4` - blackhole minimum IPv4 import prefix length.
-* `blackhole_export_maxlen4` - blackhole maximum IPv4 export prefix length.
-* `blackhole_export_minlen4` - blackhole minimum IPv4 export prefix length.
-* `blackhole_import_maxlen6` - blackhole maximum IPv6 import prefix length.
-* `blackhole_import_minlen6` - blackhole minimum IPv6 import prefix length.
-* `blackhole_export_maxlen6` - blackhole maximum IPv6 export prefix length.
-* `blackhole_export_minlen6` - blackhole minimum IPv6 export prefix length.
-
-### AS-PATH length limits
-
-* `aspath_import_maxlen` - AS-PATH import maximum length.
-* `aspath_import_minlen` - AS-PATH import minimum length.
-
-### Community length limits
-
-* `community_import_maxlen` - Community import maximum length.
-* `extended_community_import_maxlen` - Extended community import maximum length.
-* `large_community_import_maxlen` - Large community import maximum length.
-
-
-An example of overriding a constraint can be found below...
-```yaml
-..
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      constraints:
-        import_maxlen4: 25
-...
-```
-
 
 
 ## prepend
