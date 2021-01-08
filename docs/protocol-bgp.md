@@ -752,6 +752,8 @@ Route types...
 Internal route types...
 
 * `bgp` will set the default value for all bgp_* options.
+* `bgp_blackhole` will set the default value for all bgp_*_blackhole options.
+* `bgp_default` will set the default value for all bgp_*_default options.
 * `bgp_own` will match BGP routes that originated from our ASN. This will also set the default for all bgp_own_* options.
 * `bgp_own_blackhole` will match BGP blackhole routes that originated from our ASN.
 * `bgp_own_default` will match BGP default routes that originated from our ASN.
@@ -893,6 +895,8 @@ Route types...
 Internal route types...
 
 * `bgp` will set the default value for all bgp_* options.
+* `bgp_blackhole` will set the default value for all bgp_*_blackhole options.
+* `bgp_default` will set the default value for all bgp_*_default options.
 * `bgp_own` will match BGP routes that originated from our ASN. This will also set the default for all bgp_own_* options.
 * `bgp_own_blackhole` will match BGP blackhole routes that originated from our ASN.
 * `bgp_own_default` will match BGP default routes that originated from our ASN.
