@@ -439,7 +439,7 @@ r1_t_bgp4_AS65001_r2_peer = {
             "attributes": {
                 "BGP.as_path": [],
                 "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 666, 65412), (65000, 666, 65413)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 666, 65412), (65000, 666, 65413), (65000, 5000, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.3"],
                 "BGP.origin": "IGP",
@@ -710,7 +710,14 @@ r2_t_bgp4_AS65000_r1_peer = {
             "attributes": {
                 "BGP.as_path": [65000],
                 "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 666, 65412), (65000, 666, 65413), (65001, 3, 2), (65001, 1101, 26)],
+                "BGP.large_community": [
+                    (65000, 3, 1),
+                    (65000, 666, 65412),
+                    (65000, 666, 65413),
+                    (65000, 5000, 1),
+                    (65001, 3, 2),
+                    (65001, 1101, 26),
+                ],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -1087,7 +1094,7 @@ r1_t_bgp6_AS65001_r2_peer = {
             "attributes": {
                 "BGP.as_path": [],
                 "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 666, 65412), (65000, 666, 65413)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 666, 65412), (65000, 666, 65413), (65000, 5000, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::3"],
                 "BGP.origin": "IGP",
@@ -1251,7 +1258,14 @@ r2_t_bgp6_AS65000_r1_peer = {
             "attributes": {
                 "BGP.as_path": [65000],
                 "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 666, 65412), (65000, 666, 65413), (65001, 3, 2), (65001, 1101, 26)],
+                "BGP.large_community": [
+                    (65000, 3, 1),
+                    (65000, 666, 65412),
+                    (65000, 666, 65413),
+                    (65000, 5000, 1),
+                    (65001, 3, 2),
+                    (65001, 1101, 26),
+                ],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",

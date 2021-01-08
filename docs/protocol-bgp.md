@@ -709,58 +709,73 @@ bgp:
 ```
 
 
+
 ## outgoing_large_communities
 
-**The first method we can use to specify outgoing large communities is just with a list:**
+This option allows us to set outgoing large communites in two methods listed below.
 
-This will result in the large communities being added for all outbound prefixes.
+
+**The first method we can use to specify outbound large communites is just list of communites:**
+
+This will result in `65000:99:98` and `65000:99:99` being added to all outgoing prefixes.
 
 An example of this is below...
 ```yaml
+...
+bgp:
   peers:
     peer1:
       asn: 65000
       description: Some peer
-      outgoing_large_communities:
-        - 65000:5000:1
-        - 65000:5000:2
+      outgoing_large_communites:
+        - 65000:99:98
+        - 65000:99:99
+...
 ```
 
-**The second method is we can use a dict to do fine grained outgoing large communities based on route type:**
+**The second method is we can use a dict to do fine grained adding of communites based on route type:**
 
 Route types...
 
+* `blackhole` will set the default value for all *_blackhole options.
+* `default` will set the default value for all *_default options.
 * `connected` will match connected routes.
-* `kernel` will match kernel routes. This will not match static blackhole or default routes.
+* `kernel` will match kernel routes. This will also set the default for all kernel_* options.
 * `kernel_blackhole` will match kernel blackhole routes.
 * `kernel_default` will match kernel default routes.
-* `static` will match static routes. This will not match static blackhole or default routes.
+* `static` will match static routes. This will also set the default for all static_* options.
 * `static_blackhole` will match static blackhole routes.
 * `static_default` will match static default routes.
-* `originated` will match originated routes. This will not match originated default routes.
-* `originated_default` will match originated default routes.
+* `originated` will match originated routes. This will also set the default for all originated_* options.
+* `originated_default` will match originated routes default routes.
 
-* `bgp` will match all BGP routes.
-* `bgp_own` will match BGP routes that originated from within our federation. This will not match our own blackhole or default routes.
-* `bgp_own_blackhole` will match BGP blackhole routes that originated from within our federation.
-* `bgp_own_default` will match BGP default routes that originated from within our federation.
-* `bgp_customer` will match our customer routes. This will not match customer blackhole routes.
-* `bgp_customer_blackhole` will match customer blackhole routes.
+Internal route types...
+
+* `bgp` will set the default value for all bgp_* options.
+* `bgp_own` will match BGP routes that originated from our ASN. This will also set the default for all bgp_own_* options.
+* `bgp_own_blackhole` will match BGP blackhole routes that originated from our ASN.
+* `bgp_own_default` will match BGP default routes that originated from our ASN.
+* `bgp_customer` will match our customer routes. This will set the default for all bgp_customer_* options.
+* `bgp_customer_blackhole` will match BGP blackhole routes received from customers.
 * `bgp_peering` will match our peers routes.
-* `bgp_transit` will match our transit providers routes. This will not match transit default routes.
-* `bgp_transit_default` will match transit default routes.
+* `bgp_transit` will match our transit providers routes. This will set the default for all bgp_transit_* options.
+* `bgp_transit_default` will match BGP default routes received from transit providers.
+
 
 An example of this is below...
 ```yaml
+...
+bgp:
   peers:
     peer1:
       asn: 65000
       description: Some peer
       outgoing_large_communities:
         static:
-          - 65000:5000:1
+          - 65000:99:98
         bgp_customer:
-          - 65000:5000:2
+          - 65000:99:99
+...
 ```
 
 

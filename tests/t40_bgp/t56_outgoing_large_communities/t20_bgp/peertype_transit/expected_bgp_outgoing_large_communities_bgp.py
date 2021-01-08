@@ -304,7 +304,7 @@ r1_t_bgp4_AS65000_e2_peer = {
 r1_t_bgp4_AS65001_r2_peer = {
     "100.111.0.0/24": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
             "nexthops": [{"gateway": "100.201.0.4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -314,7 +314,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     ],
     "100.112.0.0/24": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -324,7 +324,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     ],
     "100.113.0.0/24": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2), (65000, 5000, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate4",
@@ -334,7 +334,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     "100.121.0.0/24": [
         {
             "attributes": {
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 945,
                 "Kernel.metric": "0",
                 "Kernel.source": "3",
@@ -349,7 +349,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     "100.122.0.0/24": [
         {
             "attributes": {
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 945,
                 "Kernel.metric": "0",
                 "Kernel.scope": "253",
@@ -366,7 +366,7 @@ r1_t_bgp4_AS65001_r2_peer = {
         {
             "attributes": {
                 "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 945,
                 "Kernel.metric": "0",
                 "Kernel.source": "3",
@@ -379,7 +379,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     ],
     "100.131.0.0/24": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 940},
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -389,7 +389,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     ],
     "100.132.0.0/24": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 940},
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -399,11 +399,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     ],
     "100.133.0.0/24": [
         {
-            "attributes": {
-                "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
-                "BGP.local_pref": 940,
-            },
+            "attributes": {"BGP.community": [(65535, 666)], "BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "static4",
@@ -412,7 +408,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     ],
     "100.201.0.0/24": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 940},
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
             "nexthops": [{"interface": "eth2"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -502,7 +498,7 @@ r2_t_bgp4_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -521,7 +517,7 @@ r2_t_bgp4_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -540,7 +536,7 @@ r2_t_bgp4_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 2), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 2), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -559,7 +555,7 @@ r2_t_bgp4_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -578,7 +574,7 @@ r2_t_bgp4_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -598,7 +594,7 @@ r2_t_bgp4_AS65000_r1_peer = {
             "attributes": {
                 "BGP.as_path": [65000],
                 "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2), (65001, 1101, 26)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2), (65001, 1101, 26)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -617,7 +613,7 @@ r2_t_bgp4_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -636,7 +632,7 @@ r2_t_bgp4_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -656,7 +652,7 @@ r2_t_bgp4_AS65000_r1_peer = {
             "attributes": {
                 "BGP.as_path": [65000],
                 "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2), (65001, 1101, 26)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2), (65001, 1101, 26)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -675,7 +671,7 @@ r2_t_bgp4_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -1139,7 +1135,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     ],
     "fc00:111::/48": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
             "nexthops": [{"gateway": "fc00:201::4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1149,7 +1145,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     ],
     "fc00:112::/48": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 930},
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1160,7 +1156,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     "fc00:121::/48": [
         {
             "attributes": {
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 945,
                 "Kernel.metric": "1024",
                 "Kernel.source": "3",
@@ -1175,7 +1171,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     "fc00:122::/48": [
         {
             "attributes": {
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 945,
                 "Kernel.metric": "1024",
                 "Kernel.source": "3",
@@ -1191,7 +1187,7 @@ r1_t_bgp6_AS65001_r2_peer = {
         {
             "attributes": {
                 "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
+                "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 945,
                 "Kernel.metric": "1024",
                 "Kernel.source": "3",
@@ -1204,7 +1200,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     ],
     "fc00:131::/48": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 940},
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1214,7 +1210,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     ],
     "fc00:132::/48": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 940},
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1224,11 +1220,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     ],
     "fc00:133::/64": [
         {
-            "attributes": {
-                "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
-                "BGP.local_pref": 940,
-            },
+            "attributes": {"BGP.community": [(65535, 666)], "BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "static6",
@@ -1237,7 +1229,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     ],
     "fc00:201::/48": [
         {
-            "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)], "BGP.local_pref": 940},
+            "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
             "nexthops": [{"interface": "eth2"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -1318,7 +1310,7 @@ r2_t_bgp6_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -1337,7 +1329,7 @@ r2_t_bgp6_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -1356,7 +1348,7 @@ r2_t_bgp6_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -1375,7 +1367,7 @@ r2_t_bgp6_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -1395,7 +1387,7 @@ r2_t_bgp6_AS65000_r1_peer = {
             "attributes": {
                 "BGP.as_path": [65000],
                 "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2), (65001, 1101, 26)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2), (65001, 1101, 26)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -1414,7 +1406,7 @@ r2_t_bgp6_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -1433,7 +1425,7 @@ r2_t_bgp6_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -1453,7 +1445,7 @@ r2_t_bgp6_AS65000_r1_peer = {
             "attributes": {
                 "BGP.as_path": [65000],
                 "BGP.community": [(65535, 666)],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2), (65001, 1101, 26)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2), (65001, 1101, 26)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -1472,7 +1464,7 @@ r2_t_bgp6_AS65000_r1_peer = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -1806,7 +1798,7 @@ r2_t_bgp4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -1825,7 +1817,7 @@ r2_t_bgp4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -1844,7 +1836,7 @@ r2_t_bgp4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 2), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 2), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -1863,7 +1855,7 @@ r2_t_bgp4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -1882,7 +1874,7 @@ r2_t_bgp4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -1901,7 +1893,7 @@ r2_t_bgp4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -1920,7 +1912,7 @@ r2_t_bgp4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -1939,7 +1931,7 @@ r2_t_bgp4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -2348,7 +2340,7 @@ r2_t_bgp6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -2367,7 +2359,7 @@ r2_t_bgp6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -2386,7 +2378,7 @@ r2_t_bgp6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -2405,7 +2397,7 @@ r2_t_bgp6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -2424,7 +2416,7 @@ r2_t_bgp6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -2443,7 +2435,7 @@ r2_t_bgp6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -2462,7 +2454,7 @@ r2_t_bgp6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -2727,7 +2719,7 @@ r2_master4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -2746,7 +2738,7 @@ r2_master4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -2765,7 +2757,7 @@ r2_master4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 2), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 2), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -2784,7 +2776,7 @@ r2_master4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -2803,7 +2795,7 @@ r2_master4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -2822,7 +2814,7 @@ r2_master4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -2841,7 +2833,7 @@ r2_master4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -2860,7 +2852,7 @@ r2_master4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -3219,7 +3211,7 @@ r2_master6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -3238,7 +3230,7 @@ r2_master6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -3257,7 +3249,7 @@ r2_master6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -3276,7 +3268,7 @@ r2_master6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -3295,7 +3287,7 @@ r2_master6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -3314,7 +3306,7 @@ r2_master6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -3333,7 +3325,7 @@ r2_master6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -3580,7 +3572,7 @@ r2_t_kernel4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -3599,7 +3591,7 @@ r2_t_kernel4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -3618,7 +3610,7 @@ r2_t_kernel4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 2), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 1200, 2), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -3637,7 +3629,7 @@ r2_t_kernel4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -3656,7 +3648,7 @@ r2_t_kernel4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -3675,7 +3667,7 @@ r2_t_kernel4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -3694,7 +3686,7 @@ r2_t_kernel4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -3713,7 +3705,7 @@ r2_t_kernel4 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.1"],
                 "BGP.origin": "IGP",
@@ -4036,7 +4028,7 @@ r2_t_kernel6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -4055,7 +4047,7 @@ r2_t_kernel6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -4074,7 +4066,7 @@ r2_t_kernel6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -4093,7 +4085,7 @@ r2_t_kernel6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -4112,7 +4104,7 @@ r2_t_kernel6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -4131,7 +4123,7 @@ r2_t_kernel6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",
@@ -4150,7 +4142,7 @@ r2_t_kernel6 = {
             "asn": "AS65000",
             "attributes": {
                 "BGP.as_path": [65000],
-                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1), (65001, 3, 2)],
+                "BGP.large_community": [(65000, 3, 1), (65001, 3, 2)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::1", "fe80::1:ff:fe00:1"],
                 "BGP.origin": "IGP",

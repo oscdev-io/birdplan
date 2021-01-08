@@ -2,16 +2,20 @@
 
 Test BGP outgoing large communities from r1 to r2.
 
-In terms of test set `t10_connected`:
-  - This test set tests adding a large community to a connected route.
+
+In terms of test set `t10_list`:
+  - This test set tests adding a large community all advertised routes.
 
 In terms of test set `t12_kernel`:
   - This test set tests adding a large community to a kernel route.
 
-In terms of test set `t14_static`:
+In terms of test set `t14_connected`:
+  - This test set tests adding a large community to a connected route.
+
+In terms of test set `t16_static`:
   - This test set tests adding a large community to a static route.
 
-In terms of test set `t16_originated`:
+In terms of test set `t18_originated`:
   - This test set tests adding a large community to an orginated route.
 
 In terms of test set `t20_bgp`:
@@ -29,9 +33,11 @@ In terms of test set `t26_bgp_peering`:
 In terms of test set `t28_bgp_transit`:
   - This test set tests adding a large community to a route originating from a transit provider.
 
-In terms of test set `t30_community_list`:
-  - This test set tests adding a large community all advertised routes.
+In terms of test set `t30_blackhole`:
+  - This test set tests adding a large community to all blackhole routes.
 
+In terms of test set `t32_default`:
+  - This test set tests adding a large community to all default routes.
 
 ## Diagram
 

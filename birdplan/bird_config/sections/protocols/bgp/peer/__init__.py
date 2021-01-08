@@ -216,12 +216,74 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Add incoming large communities
             for large_community in sorted(peer_config["incoming_large_communities"]):
                 self.large_communities.incoming.append(util.sanitize_community(large_community))
-        # Check if we are adding large communities to outgoing routes
+
+        #
+        # bgp:peers:$PEER:outgoing_large_communities
+        #
+
+        # Check for outgoing_large_communities we need to setup
         if "outgoing_large_communities" in peer_config:
-            # Add outgoing large community configuration
+            # Add outgoing_large_communities configuration
             if isinstance(peer_config["outgoing_large_communities"], dict):
-                for large_community_type, large_community_config in peer_config["outgoing_large_communities"].items():
-                    if large_community_type not in (
+                # Check if we're adding large communities to blackhole routes
+                if "blackhole" in peer_config["outgoing_large_communities"]:
+                    lc_option = util.sanitize_community_list(peer_config["outgoing_large_communities"]["blackhole"])
+                    self.large_communities.outgoing.kernel_blackhole = lc_option
+                    self.large_communities.outgoing.static_blackhole = lc_option
+                    self.large_communities.outgoing.bgp_customer_blackhole = lc_option
+                    self.large_communities.outgoing.bgp_own_blackhole = lc_option
+                # Check if we're adding large communities to default routes
+                if "default" in peer_config["outgoing_large_communities"]:
+                    lc_option = util.sanitize_community_list(peer_config["outgoing_large_communities"]["default"])
+                    self.large_communities.outgoing.kernel_default = lc_option
+                    self.large_communities.outgoing.originated_default = lc_option
+                    self.large_communities.outgoing.static_default = lc_option
+                    self.large_communities.outgoing.bgp_own_default = lc_option
+                    self.large_communities.outgoing.bgp_transit_default = lc_option
+                # Check if we're adding outgoing large communitiesing to all BGP routes
+                if "bgp" in peer_config["outgoing_large_communities"]:
+                    lc_option = util.sanitize_community_list(peer_config["outgoing_large_communities"]["bgp"])
+                    self.large_communities.outgoing.bgp_customer = lc_option
+                    self.large_communities.outgoing.bgp_customer_blackhole = lc_option
+                    self.large_communities.outgoing.bgp_own = lc_option
+                    self.large_communities.outgoing.bgp_own_blackhole = lc_option
+                    self.large_communities.outgoing.bgp_own_default = lc_option
+                    self.large_communities.outgoing.bgp_peering = lc_option
+                    self.large_communities.outgoing.bgp_transit = lc_option
+                    self.large_communities.outgoing.bgp_transit_default = lc_option
+                # Check if we're adding outgoing large communities to all kernel routes
+                if "kernel" in peer_config["outgoing_large_communities"]:
+                    lc_option = util.sanitize_community_list(peer_config["outgoing_large_communities"]["kernel"])
+                    self.large_communities.outgoing.kernel_blackhole = lc_option
+                    self.large_communities.outgoing.kernel_default = lc_option
+                # Check if we're adding outgoing large communities to all static routes
+                if "static" in peer_config["outgoing_large_communities"]:
+                    lc_option = util.sanitize_community_list(peer_config["outgoing_large_communities"]["static"])
+                    self.large_communities.outgoing.static_blackhole = lc_option
+                    self.large_communities.outgoing.static_default = lc_option
+                # Check if we're adding outgoing large communities to all originated routes
+                if "originated" in peer_config["outgoing_large_communities"]:
+                    lc_option = util.sanitize_community_list(peer_config["outgoing_large_communities"]["originated"])
+                    self.large_communities.outgoing.originated_default = lc_option
+                # Check if we're adding outgoing large communities to all customer BGP routes
+                if "bgp_customer" in peer_config["outgoing_large_communities"]:
+                    lc_option = util.sanitize_community_list(peer_config["outgoing_large_communities"]["bgp_customer"])
+                    self.large_communities.outgoing.bgp_customer_blackhole = lc_option
+                # Check if we're adding outgoing large communities to all our own BGP routes
+                if "bgp_own" in peer_config["outgoing_large_communities"]:
+                    lc_option = util.sanitize_community_list(peer_config["outgoing_large_communities"]["bgp_own"])
+                    self.large_communities.outgoing.bgp_own_blackhole = lc_option
+                    self.large_communities.outgoing.bgp_own_default = lc_option
+                # Check if we're adding outgoing large communities to all transit BGP routes
+                if "bgp_transit" in peer_config["outgoing_large_communities"]:
+                    lc_option = util.sanitize_community_list(peer_config["outgoing_large_communities"]["bgp_transit"])
+                    self.large_communities.outgoing.bgp_transit_default = lc_option
+
+                for lc_type, lc_config in peer_config["outgoing_large_communities"].items():
+                    if lc_type not in (
+                        "bgp",
+                        "blackhole",
+                        "default",
                         "connected",
                         "kernel",
                         "kernel_blackhole",
@@ -231,33 +293,33 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         "static_default",
                         "originated",
                         "originated_default",
-                        "bgp",
-                        "bgp_customer",
-                        "bgp_customer_blackhole",
                         "bgp_own",
                         "bgp_own_blackhole",
                         "bgp_own_default",
+                        "bgp_customer",
+                        "bgp_customer_blackhole",
                         "bgp_peering",
                         "bgp_transit",
                         "bgp_transit_default",
                     ):
                         raise BirdPlanError(
-                            f"BGP peer 'outgoing_large_community' configuration '{large_community_type}' for peer '{self.name}' "
-                            f"with type '{self.peer_type}' is invalid"
+                            f"BGP peer 'outgoing_large_communities' configuration '{lc_type}' for peer '{self.name}' with type "
+                            f"'{self.peer_type}' is invalid"
                         )
                     # Check that we're not doing something stupid
                     if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):
-                        if large_community_type in (
+                        if lc_type in (
+                            "default",
                             "kernel_default",
-                            "originated_default",
                             "static_default",
+                            "originated_default",
                             "bgp_own_default",
                             "bgp_peering",
                             "bgp_transit",
                             "bgp_transit_default",
                         ):
                             raise BirdPlanError(
-                                f"Having 'outgoing_large_communities:{large_community_type}' specified for peer '{self.name}' "
+                                f"Having 'outgoing_large_communities:{lc_type}' specified for peer '{self.name}' "
                                 f"with type '{self.peer_type}' makes no sense"
                             )
                     if self.peer_type not in (
@@ -269,25 +331,41 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         "rrserver-rrserver",
                         "transit",
                     ):
-                        if large_community_type in (
+                        if lc_type in (
+                            "blackhole",
                             "kernel_blackhole",
                             "static_blackhole",
                             "bgp_customer_blackhole",
                             "bgp_own_blackhole",
                         ):
                             raise BirdPlanError(
-                                f"Having 'outgoing_large_communities:{large_community_type}' specified for peer '{self.name}' "
+                                f"Having 'outgoing_large_communities:{lc_type}' specified for peer '{self.name}' "
                                 f"with type '{self.peer_type}' makes no sense"
                             )
-                    # Grab the large community attribute
-                    large_community_attr = getattr(self.large_communities.outgoing, large_community_type)
-                    # Then append them...
-                    for large_community in sorted(large_community_config):
-                        large_community_attr.append(util.sanitize_community(large_community))
+                    # Exclude virtual options "bgp" and "default" from being set
+                    if lc_type not in ("bgp", "blackhole", "default"):
+                        # Set the community list
+                        setattr(self.large_communities.outgoing, lc_type, util.sanitize_community_list(lc_config))
             # If its just a number set the count
             else:
-                for large_community in sorted(peer_config["outgoing_large_communities"]):
-                    self.large_communities.outgoing.bgp.append(util.sanitize_community(large_community))
+                lc_option = util.sanitize_community_list(peer_config["outgoing_large_communities"])
+                self.large_communities.outgoing.connected = lc_option
+                self.large_communities.outgoing.kernel = lc_option
+                self.large_communities.outgoing.kernel_default = lc_option
+                self.large_communities.outgoing.kernel_blackhole = lc_option
+                self.large_communities.outgoing.originated = lc_option
+                self.large_communities.outgoing.originated_default = lc_option
+                self.large_communities.outgoing.static = lc_option
+                self.large_communities.outgoing.static_blackhole = lc_option
+                self.large_communities.outgoing.static_default = lc_option
+                self.large_communities.outgoing.bgp_customer = lc_option
+                self.large_communities.outgoing.bgp_customer_blackhole = lc_option
+                self.large_communities.outgoing.bgp_own = lc_option
+                self.large_communities.outgoing.bgp_own_blackhole = lc_option
+                self.large_communities.outgoing.bgp_own_default = lc_option
+                self.large_communities.outgoing.bgp_peering = lc_option
+                self.large_communities.outgoing.bgp_transit = lc_option
+                self.large_communities.outgoing.bgp_transit_default = lc_option
 
         # Turn on passive mode for route reflectors and customers
         if self.peer_type in ("customer", "rrclient"):
@@ -568,57 +646,57 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             if isinstance(peer_config["prepend"], dict):
                 # Check if we're prepending blackhole routes
                 if "blackhole" in peer_config["prepend"]:
-                    option = peer_config["prepend"]["blackhole"]
-                    self.prepend.kernel_blackhole.own_asn = option
-                    self.prepend.static_blackhole.own_asn = option
-                    self.prepend.bgp_customer_blackhole.own_asn = option
-                    self.prepend.bgp_own_blackhole.own_asn = option
+                    prepend_option = peer_config["prepend"]["blackhole"]
+                    self.prepend.kernel_blackhole.own_asn = prepend_option
+                    self.prepend.static_blackhole.own_asn = prepend_option
+                    self.prepend.bgp_customer_blackhole.own_asn = prepend_option
+                    self.prepend.bgp_own_blackhole.own_asn = prepend_option
                 # Check if we're prepending default routes
                 if "default" in peer_config["prepend"]:
-                    option = peer_config["prepend"]["default"]
-                    self.prepend.kernel_default.own_asn = option
-                    self.prepend.originated_default.own_asn = option
-                    self.prepend.static_default.own_asn = option
-                    self.prepend.bgp_own_default.own_asn = option
-                    self.prepend.bgp_transit_default.own_asn = option
+                    prepend_option = peer_config["prepend"]["default"]
+                    self.prepend.kernel_default.own_asn = prepend_option
+                    self.prepend.originated_default.own_asn = prepend_option
+                    self.prepend.static_default.own_asn = prepend_option
+                    self.prepend.bgp_own_default.own_asn = prepend_option
+                    self.prepend.bgp_transit_default.own_asn = prepend_option
                 # Check if we're prepending all BGP routes
                 if "bgp" in peer_config["prepend"]:
-                    option = peer_config["prepend"]["bgp"]
-                    self.prepend.bgp_customer.own_asn = option
-                    self.prepend.bgp_customer_blackhole.own_asn = option
-                    self.prepend.bgp_own.own_asn = option
-                    self.prepend.bgp_own_blackhole.own_asn = option
-                    self.prepend.bgp_own_default.own_asn = option
-                    self.prepend.bgp_peering.own_asn = option
-                    self.prepend.bgp_transit.own_asn = option
-                    self.prepend.bgp_transit_default.own_asn = option
+                    prepend_option = peer_config["prepend"]["bgp"]
+                    self.prepend.bgp_customer.own_asn = prepend_option
+                    self.prepend.bgp_customer_blackhole.own_asn = prepend_option
+                    self.prepend.bgp_own.own_asn = prepend_option
+                    self.prepend.bgp_own_blackhole.own_asn = prepend_option
+                    self.prepend.bgp_own_default.own_asn = prepend_option
+                    self.prepend.bgp_peering.own_asn = prepend_option
+                    self.prepend.bgp_transit.own_asn = prepend_option
+                    self.prepend.bgp_transit_default.own_asn = prepend_option
                 # Check if we're prepending all kernel routes
                 if "kernel" in peer_config["prepend"]:
-                    option = peer_config["prepend"]["kernel"]
-                    self.prepend.kernel_blackhole.own_asn = option
-                    self.prepend.kernel_default.own_asn = option
+                    prepend_option = peer_config["prepend"]["kernel"]
+                    self.prepend.kernel_blackhole.own_asn = prepend_option
+                    self.prepend.kernel_default.own_asn = prepend_option
                 # Check if we're prepending all static routes
                 if "static" in peer_config["prepend"]:
-                    option = peer_config["prepend"]["static"]
-                    self.prepend.static_blackhole.own_asn = option
-                    self.prepend.static_default.own_asn = option
+                    prepend_option = peer_config["prepend"]["static"]
+                    self.prepend.static_blackhole.own_asn = prepend_option
+                    self.prepend.static_default.own_asn = prepend_option
                 # Check if we're prepending all originated routes
                 if "originated" in peer_config["prepend"]:
-                    option = peer_config["prepend"]["originated"]
-                    self.prepend.originated_default.own_asn = option
+                    prepend_option = peer_config["prepend"]["originated"]
+                    self.prepend.originated_default.own_asn = prepend_option
                 # Check if we're prepending all customer BGP routes
                 if "bgp_customer" in peer_config["prepend"]:
-                    option = peer_config["prepend"]["bgp_customer"]
-                    self.prepend.bgp_customer_blackhole.own_asn = option
+                    prepend_option = peer_config["prepend"]["bgp_customer"]
+                    self.prepend.bgp_customer_blackhole.own_asn = prepend_option
                 # Check if we're prepending all our own BGP routes
                 if "bgp_own" in peer_config["prepend"]:
-                    option = peer_config["prepend"]["bgp_own"]
-                    self.prepend.bgp_own_blackhole.own_asn = option
-                    self.prepend.bgp_own_default.own_asn = option
+                    prepend_option = peer_config["prepend"]["bgp_own"]
+                    self.prepend.bgp_own_blackhole.own_asn = prepend_option
+                    self.prepend.bgp_own_default.own_asn = prepend_option
                 # Check if we're prepending all transit BGP routes
                 if "bgp_transit" in peer_config["prepend"]:
-                    option = peer_config["prepend"]["bgp_transit"]
-                    self.prepend.bgp_transit_default.own_asn = option
+                    prepend_option = peer_config["prepend"]["bgp_transit"]
+                    self.prepend.bgp_transit_default.own_asn = prepend_option
 
                 for prepend_type, prepend_config in peer_config["prepend"].items():
                     if prepend_type not in (
@@ -691,24 +769,24 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         setattr(prepend_attr, "own_asn", prepend_config)
             # If its just a number set the count
             else:
-                option = peer_config["prepend"]
-                self.prepend.connected.own_asn = option
-                self.prepend.kernel.own_asn = option
-                self.prepend.kernel_default.own_asn = option
-                self.prepend.kernel_blackhole.own_asn = option
-                self.prepend.originated.own_asn = option
-                self.prepend.originated_default.own_asn = option
-                self.prepend.static.own_asn = option
-                self.prepend.static_blackhole.own_asn = option
-                self.prepend.static_default.own_asn = option
-                self.prepend.bgp_customer.own_asn = option
-                self.prepend.bgp_customer_blackhole.own_asn = option
-                self.prepend.bgp_own.own_asn = option
-                self.prepend.bgp_own_blackhole.own_asn = option
-                self.prepend.bgp_own_default.own_asn = option
-                self.prepend.bgp_peering.own_asn = option
-                self.prepend.bgp_transit.own_asn = option
-                self.prepend.bgp_transit_default.own_asn = option
+                prepend_option = peer_config["prepend"]
+                self.prepend.connected.own_asn = prepend_option
+                self.prepend.kernel.own_asn = prepend_option
+                self.prepend.kernel_default.own_asn = prepend_option
+                self.prepend.kernel_blackhole.own_asn = prepend_option
+                self.prepend.originated.own_asn = prepend_option
+                self.prepend.originated_default.own_asn = prepend_option
+                self.prepend.static.own_asn = prepend_option
+                self.prepend.static_blackhole.own_asn = prepend_option
+                self.prepend.static_default.own_asn = prepend_option
+                self.prepend.bgp_customer.own_asn = prepend_option
+                self.prepend.bgp_customer_blackhole.own_asn = prepend_option
+                self.prepend.bgp_own.own_asn = prepend_option
+                self.prepend.bgp_own_blackhole.own_asn = prepend_option
+                self.prepend.bgp_own_default.own_asn = prepend_option
+                self.prepend.bgp_peering.own_asn = prepend_option
+                self.prepend.bgp_transit.own_asn = prepend_option
+                self.prepend.bgp_transit_default.own_asn = prepend_option
 
         # Check if we're quarantined
         if "quarantine" in peer_config and peer_config["quarantine"]:
@@ -1254,9 +1332,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.large_communities.outgoing.static_default:
             for large_community in self.large_communities.outgoing.static_default:
                 self.conf.add(f"    {self.bgp_functions.peer_lc_add_static_default(BirdVariable(large_community))};")
-        if self.large_communities.outgoing.bgp:
-            for large_community in self.large_communities.outgoing.bgp:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_bgp(BirdVariable(large_community))};")
         if self.large_communities.outgoing.bgp_own:
             for large_community in self.large_communities.outgoing.bgp_own:
                 self.conf.add(f"    {self.bgp_functions.peer_lc_add_bgp_own(BirdVariable(large_community))};")

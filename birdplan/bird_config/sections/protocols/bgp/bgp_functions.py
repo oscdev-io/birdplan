@@ -1314,19 +1314,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_bgp")
-    def peer_lc_add_bgp(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD bgp_peer_lc_add_bgp function."""
-
-        return f"""\
-            # BGP large community adding
-            function bgp_peer_lc_add_bgp(string filter_name; lc large_community) {{
-                if DEBUG then print filter_name,
-                    " [bgp_peer_lc_add_bgp] Adding large community ", large_community, " for type BGP_OWN to ",
-                    {self.functions.route_info()};
-                bgp_large_community.add(large_community);
-            }}"""
-
     @bird_function("bgp_peer_lc_add_bgp_own")
     def peer_lc_add_bgp_own(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_peer_lc_add_bgp_own function."""

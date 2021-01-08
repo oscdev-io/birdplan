@@ -322,7 +322,7 @@ r1_t_bgp4_AS65000_r2_peer = {
         {
             "attributes": {
                 "BGP.as_path": [],
-                "BGP.large_community": [(65000, 3, 4)],
+                "BGP.large_community": [(65000, 3, 4), (65000, 5000, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["100.64.0.4"],
                 "BGP.origin": "IGP",
@@ -1139,7 +1139,7 @@ r1_t_bgp6_AS65000_r2_peer = {
         {
             "attributes": {
                 "BGP.as_path": [],
-                "BGP.large_community": [(65000, 3, 4)],
+                "BGP.large_community": [(65000, 3, 4), (65000, 5000, 1)],
                 "BGP.local_pref": 100,
                 "BGP.next_hop": ["fc00:100::4"],
                 "BGP.origin": "IGP",

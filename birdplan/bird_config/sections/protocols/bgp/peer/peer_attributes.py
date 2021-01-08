@@ -53,8 +53,6 @@ class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods
         Static blackhole route outgoing large communities.
     static_default: List[str]
         Static default route outgoing large communities.
-    bgp: List[str]
-        BGP route outgoing large communities.
     bgp_own: List[str]
         BGP own route outgoing large communities.
     bgp_own_blackhole: List[str]
@@ -104,7 +102,6 @@ class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods
         self.static = []
         self.static_blackhole = []
         self.static_default = []
-        self.bgp = []
         self.bgp_own = []
         self.bgp_own_blackhole = []
         self.bgp_own_default = []
@@ -185,8 +182,6 @@ class BGPPeerPrepend:  # pylint: disable=too-few-public-methods,too-many-instanc
         Static blackhole route prepending options.
     static_default: BGPPeerPrependItem
         Static default route prepending options.
-    bgp: BGPPeerPrependItem
-        BGP route prepending options.
     bgp_own: BGPPeerPrependItem
         BGP own route prepending options.
     bgp_own_blackhole: BGPPeerPrependItem

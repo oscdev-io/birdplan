@@ -345,7 +345,7 @@ r1_t_bgp4_AS65001_r2_peer = {
         },
         {
             "attributes": {
-                "BGP.large_community": [(65000, 3, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
                 "BGP.local_pref": 945,
                 "Kernel.metric": "0",
                 "Kernel.source": "3",
@@ -1158,7 +1158,7 @@ r1_t_bgp6_AS65001_r2_peer = {
         },
         {
             "attributes": {
-                "BGP.large_community": [(65000, 3, 1)],
+                "BGP.large_community": [(65000, 3, 1), (65000, 5000, 1)],
                 "BGP.local_pref": 945,
                 "Kernel.metric": "1024",
                 "Kernel.source": "3",
