@@ -968,9 +968,7 @@ class BirdPlan:
 
                 # Else if we don't know what it is, then throw an exception
                 else:
-                    raise BirdPlanError(
-                        f"Configuration item bgp:peers:{peer_name}:outgoing_large_communities has incorrect type"
-                    )
+                    raise BirdPlanError(f"Configuration item bgp:peers:{peer_name}:outgoing_large_communities has incorrect type")
 
             # Work out prepending options
             elif config_item == "prepend":
