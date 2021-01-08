@@ -1,48 +1,76 @@
 # BGP prepending tests
 
-Router r1 should be advertising a prefix to router r2.
+ExaBGP e1 and e2 (as route reflectors) should be advertising routes to router r1 which in turn should be prepending to router r2.
+
+
+## Tests for prepending all routes
+
+In terms of test `test_bgp_prepend`:
+  - All exported routes should be prepended.
+
 
 ## Tests for BGP prepending of BGP route types
 
-For these tests r1 is peering with e1 which is advertising routes as a route reflector with various large communities set to seed the below tests with data.
+In terms of test `test_bgp_prepend_bgp`:
+  - All BGP routes should be prepended.
 
 In terms of test `test_bgp_prepend_bgp_customer`:
-  - ExaBGP e1 should advertise routes to r1 and r1 should prepend the customer route to r2 with a large community added.
+  - Customer BGP routes should be prepended.
 
-In terms of test `test_bgp_prepend_bgp`:
-  - ExaBGP e1 should advertise routes to r1 and r1 should prepend all BGP routes to r2 with a large community added.
+In terms of test `test_bgp_prepend_bgp_customer_blackhole`:
+  - Customer BGP blackhole routes should be prepended.
 
 In terms of test `test_bgp_prepend_bgp_own`:
-  - ExaBGP e1 should advertise routes to r1 and r1 should prepend OWN BGP routes to r2 with a large community added.
+  - All routes that originated within our federation routes should be prepended.
+
+In terms of test `test_bgp_prepend_bgp_own_blackhole`:
+  - All blackhole routes that originated within our federation should be prepended.
+
+In terms of test `test_bgp_prepend_bgp_own_default`:
+  - All default routes that originated within our federation should be prepended.
 
 In terms of test `test_bgp_prepend_bgp_peering`:
-  - ExaBGP e1 should advertise routes to r1 and r1 should prepend peering BGP routes to r2 with a large community added.
+  - All BGP routes received from peers or routeservers should be prepended.
 
 In terms of test `test_bgp_prepend_bgp_transit`:
-  - ExaBGP e1 should advertise routes to r1 and r1 should prepend transit BGP routes to r2 with a large community added.
+  - All BGP routes received from transit should be prepended.
+
+In terms of test `test_bgp_prepend_bgp_transit_default`:
+  - All BGP default routes received from transit should be prepended.
+
 
 ## Tests for BGP prepending of route types
 
-In terms of test `test_bgp_prepend_connected`:
-  - r1 should prepend connected routes to r2 with a large community added.
+In terms of test `test_bgp_prepend_blackhole`:
+  - All BGP blackhole routes should be prepended.
 
 In terms of test `test_bgp_prepend_default`:
-  - r1 should prepend the default route to r2 with a large community added.
+  - All BGP default routes should be prepended.
 
 In terms of test `test_bgp_prepend_kernel`:
-  - r1 should prepend the kernel routes to r2 with a large community added.
+  - All locally originated kernel routes should be prepended.
 
 In terms of test `test_bgp_prepend_kernel_blackhole`:
-  - r1 should prepend the kernel blackhole routes to r2 with a large community added.
+  - All locally originated kernel blackhole routes should be prepended.
+
+In terms of test `test_bgp_prepend_kernel_default`:
+  - All locally originated kernel default routes should be prepended.
 
 In terms of test `test_bgp_prepend_originated`:
-  - r1 should prepend originated routes to r2 with a large community added.
+  - All locally originated BGP routes should be prepended.
+
+In terms of test `test_bgp_prepend_originated_default`:
+  - All locally originated BGP default routes should be prepended.
 
 In terms of test `test_bgp_prepend_static`:
-  - r1 should prepend static routes to r2 with a large community added.
+  - All locally originated static routes should be prepended.
 
 In terms of test `test_bgp_prepend_static_blackhole`:
-  - r1 should prepend static blackhole routes to r2 with a large community added.
+  - All locally originated static blackhole routes should be prepended.
+
+In terms of test `test_bgp_prepend_static_default`:
+  - All locally originated static default routes should be prepended.
+
 
 ## Diagram
 
