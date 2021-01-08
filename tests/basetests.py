@@ -531,7 +531,7 @@ class BirdPlanBaseTestCase:
                 file.write(raw_config)
 
             # Add config file to our simulation so we get a report for it
-            sim.add_conffile(f"EXABGP_CONFFILE({exabgp})", exabgp_conffile)
+            sim.add_conffile(f"exabgp.conf.{exabgp}", exabgp_conffile)
 
     def _birdplan_run(  # pylint: disable=too-many-arguments,too-many-locals
         self, sim: Simulation, tmpdir: str, router: str, args: List[str]
@@ -644,9 +644,9 @@ class BirdPlanBaseTestCase:
         result = birdplan_cmdline.run(cmdline_args)
 
         # Add test report sections
-        sim.add_conffile(f"BIRDPLAN_CONFFILE({router})", birdplan_file)
-        sim.add_conffile(f"BIRD_CONFFILE({router})", bird_conffile)
-        sim.add_logfile(f"BIRD_LOGFILE({router})", bird_logfile)
+        sim.add_conffile(f"birdplan.yaml.{router}", birdplan_file)
+        sim.add_conffile(f"bird.conf.{router}", bird_conffile)
+        sim.add_logfile(f"bird.log.{router}", bird_logfile)
 
         # Add the birdplan configuration object to the simulation
         if args[0] == "configure":
@@ -698,7 +698,7 @@ class BirdPlanBaseTestCase:
     def _bird_log_matches(self, sim: Simulation, router: str, matches: str) -> bool:
         """Check if the BIRD log file contains a string."""
 
-        logname = f"BIRD_LOGFILE({router})"
+        logname = f"bird.log.{router}"
         # Make sure the log name exists
         if logname not in sim.logfiles:
             raise RuntimeError(f"Log name not found: {logname}")
