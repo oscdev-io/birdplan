@@ -13,33 +13,9 @@ Peer costs are minus'd from the below preference values.
 | BGP_PREF_TRANSIT | 150 | Transit routes |
 
 
-# Prefix Sizes
+# Prefix Size Constraints
 
-These are globals which can be overridden in configuration.
-
-| Constant | Size | Description |
-| --- | --- | --- |
-| PREFIX_IMPORT_MAXLEN4 | 24 | Maximum IPv4 CIDR length to import |
-| PREFIX_IMPORT_MINLEN4 | 8 | Minimum IPv4 CIDR length to import |
-| PREFIX_EXPORT_MAXLEN4 | 24 | Maximum IPv4 CIDR length to export |
-| PREFIX_EXPORT_MINLEN4 | 8 | Minimum IPv4 CIDR length to export |
-| PREFIX_IMPORT_MAXLEN6 | 48 | Maximum IPv6 CIDR length to import |
-| PREFIX_IMPORT_MINLEN6 | 16 | Minimum IPv6 CIDR length to import |
-| PREFIX_EXPORT_MAXLEN6 | 48 | Maximum IPv6 CIDR length to export |
-| PREFIX_EXPORT_MINLEN6 | 16 | Minimum IPv6 CIDR length to export |
-
-When using the `replace_aspath` feature, the minimum and maximum prefix lengths we import and export are adjusted as follows. This allows a peer using this feature to advertise a /29 IPv4 and /64 IPv6 prefix to us.
-
-| Constant | Size | Description |
-| --- | --- | --- |
-| PREFIX_IMPORT_MAXLEN4 | 29 | Maximum IPv4 CIDR length to import |
-| PREFIX_IMPORT_MINLEN4 | 16 | Minimum IPv4 CIDR length to import |
-| PREFIX_EXPORT_MAXLEN4 | 29 | Maximum IPv4 CIDR length to export |
-| PREFIX_EXPORT_MINLEN4 | 16 | Minimum IPv4 CIDR length to export |
-| PREFIX_IMPORT_MAXLEN6 | 64 | Maximum IPv6 CIDR length to import |
-| PREFIX_IMPORT_MINLEN6 | 32 | Minimum IPv6 CIDR length to import |
-| PREFIX_EXPORT_MAXLEN6 | 64 | Maximum IPv6 CIDR length to export |
-| PREFIX_EXPORT_MINLEN6 | 32 | Minimum IPv6 CIDR length to export |
+See `constraints` under [protocol-bgp](protocol-bgp.md).
 
 
 # Communities
