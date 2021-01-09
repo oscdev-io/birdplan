@@ -26,8 +26,3 @@ from .template import Template
 
 class Test(Template):
     """Test case for redistribution of static routes via OSPF, with default settings."""
-
-    r1_extra_config = """
-  redistribute:
-    static: False
-"""

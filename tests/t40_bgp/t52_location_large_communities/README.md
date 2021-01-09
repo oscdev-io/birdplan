@@ -1,9 +1,6 @@
 # BGP location-based large community tests
 
-Router r1 should be receiving routes from e1 test cases.
-
-
-## Tests for BGP location-based large communities
+Test BGP location-based large communities from e1 to r1.
 
 In terms of test "test_bgp_stripping_community_location_iso3166":
   - ExaBGP e1 should export a prefix to router to r2, router r2 should add a location-based ISO-3166 large community.
@@ -17,7 +14,7 @@ In terms of test "test_bgp_stripping_community_location_unm49":
 ```plantuml
 @startuml
 hide circle
-title Test BGP large location-based large communities from e1 to r1
+title Test BGP large location-based large communities
 
 
 class "Router: r1" {

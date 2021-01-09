@@ -27,3 +27,7 @@ from ...config.peertype_peer.r1r2 import PeerTypeConfig
 
 class Test(PeerTypeConfig, Template):
     """BGP redistribute static route test cases, with redistribute:static_blackhole set to True."""
+
+    routers_config_exception = {
+        "r1": r"Having 'redistribute:static_blackhole' set to True for peer 'r2' with type 'peer' makes no sense",
+    }

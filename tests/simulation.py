@@ -182,6 +182,11 @@ class Simulation:  # pylint: disable=too-many-instance-attributes
         return items
 
     @property
+    def conffiles(self) -> Dict[str, str]:
+        """Return our configuration files."""
+        return self._conffiles
+
+    @property
     def logfiles(self) -> Dict[str, str]:
         """Return our log files."""
         return self._logfiles

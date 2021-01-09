@@ -28,15 +28,70 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
 
     _section: str = "OSPF Functions"
 
-    @bird_function("ospf_accept_connected_route")
-    def accept_connected_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD ospf_accept_connected_route function."""
+    @bird_function("ospf_accept_connected")
+    def accept_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD ospf_accept_connected function."""
+
+        return f"""\
+            # Accept OSPF connected routes
+            function ospf_accept_connected(string filter_name) {{
+                if (proto != "direct4_ospf" && proto != "direct6_ospf" || {self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [ospf_accept_connected] Accepting OSPF connected route ", {self.functions.route_info()},
+                    " due to connected route match";
+                accept;
+            }}"""
+
+    @bird_function("ospf_accept_ospf")
+    def accept_ospf(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD ospf_accept_ospf function."""
+
+        return f"""\
+            # Accept OSPF route
+            function ospf_accept_ospf(string filter_name) {{
+                if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || {self.functions.is_default()}) then
+                    return false;
+                if DEBUG then print filter_name,
+                    " [ospf_accept_ospf] Accepting OSPF route ", {self.functions.route_info()}, " due to OSPF route match";
+                accept;
+            }}"""
+
+    @bird_function("ospf_accept_ospf_default")
+    def accept_ospf_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD ospf_accept_ospf_default function."""
+
+        return f"""\
+            # Accept OSPF route
+            function ospf_accept_ospf_default(string filter_name) {{
+                if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || !{self.functions.is_default()}) then
+                    return false;
+                if DEBUG then print filter_name,
+                    " [accept_ospf] Accepting OSPF default route ", {self.functions.route_info()},
+                    " due to OSPF default route match";
+                accept;
+            }}"""
+
+    @bird_function("ospf_is_connected")
+    def is_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD ospf_is_connected function."""
 
         return """\
-            # Accept OSPF connected routes
-            function ospf_accept_connected_route(string filter_name) {
-                if (proto != "direct4_ospf" && proto != "direct6_ospf") then return false;
-                if DEBUG then print filter_name,
-                    " [ospf_accept_connected_route] Accepting OSPF connected route ", net;
-                accept;
+            # Check if this is an connected route
+            function ospf_is_connected(string filter_name) {
+                if (proto = "direct4_ospf" || proto = "direct6_ospf") then return true;
+                return false;
             }"""
+
+    @bird_function("ospf_redistribute_connected")
+    def redistribute_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD ospf_redistribute_connected function."""
+
+        return f"""\
+            # Accept OSPF connected routes
+            function ospf_redistribute_connected(string filter_name) {{
+                if (!{self.is_connected()} || {self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [ospf_redistribute_connected] Redistributing OSPF connected route ", {self.functions.route_info()},
+                    " due to connected route match";
+                accept;
+            }}"""

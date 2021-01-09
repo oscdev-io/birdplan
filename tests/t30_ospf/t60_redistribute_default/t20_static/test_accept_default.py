@@ -29,14 +29,5 @@ class Test(Template):
 
     r1_extra_config = """
   redistribute:
-    default: True
-    static: True
+    static_default: True
 """
-
-    def _test_bird_tables_static4(self, sim):
-        """Test BIRD t_static4 table stub."""
-        self._test_bird_routers_table("t_static4", sim, routers=["r1"])
-
-    def _test_bird_tables_static6(self, sim):
-        """Test BIRD t_static6 table stub."""
-        self._test_bird_routers_table("t_static6", sim, routers=["r1"])

@@ -21,6 +21,8 @@
 """Testing stuff."""
 
 import re
+import os
+import shutil
 import pytest
 from .simulation import Simulation
 
@@ -195,6 +197,13 @@ def fixture_sim(request):
             expected_file.write("# pylint: disable=too-many-lines\n\n")
             expected_file.write('"""Expected test result data."""\n\n')
             expected_file.write(simulation.variables)
+
+        # Grab the expected data file directory
+        expected_dir = os.path.dirname(simulation.expected_path)
+        for conffile_name, sim_conffile_path in simulation.conffiles.items():
+            # If this is a birdplan config file, write it out
+            if "birdplan" in conffile_name:
+                shutil.copyfile(sim_conffile_path, f"{expected_dir}/expected_{conffile_name}")
 
     # Destroy simulation
     simulation.destroy()

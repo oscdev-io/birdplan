@@ -18,6 +18,8 @@
 
 """Bird configuration utility functions."""
 
+from typing import List
+
 
 def sanitize_community(community: str) -> str:
     """Sanitize a string representation of a large community."""
@@ -26,3 +28,13 @@ def sanitize_community(community: str) -> str:
     # Re-join using , and add brackets
     community_str = "(%s)" % ",".join(community_components)
     return community_str
+
+
+def sanitize_community_list(communities: List[str]) -> List[str]:
+    """Sanitize a list of communities."""
+
+    result = []
+    for community in sorted(communities):
+        result.append(sanitize_community(community))
+
+    return result

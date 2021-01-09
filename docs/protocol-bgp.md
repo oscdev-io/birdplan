@@ -10,9 +10,17 @@ Remember to set the `router_id`, see [Configuration](configuration.md).
 
 The `accept` key contains a dictionary of routes we will accept into the master table from our BGP table. Namely...
 
-* `default` - Allows us to accept a default route from BGP. The default is `False`.
-* `blackhole` - Allows us to accept a blackhole route from BGP. The default is `True`.
 * `originated` - Allows us to accept originated routes from the BGP table. The default is `True`.
+* `originated_default` - Allows us to accept locally originated routes from the BGP table. The default is `False`.
+
+* `bgp_customer_blackhole` - Allows us to accept a blackhole route that originated from a customer. The default is `True`.
+* `bgp_own_blackhole` - Allows us to accept a blackhole route that originated from our own federation. The default is `True`.
+
+* `bgp_own_default` - Allows us to accept a default route that originated from within our own federation from the BGP peer.
+  The default is `False` for all peer types except a `rrserver-rrserver` peer.
+* `bgp_transit_default` - Allows us to accept a default route that originated from a transit peer.
+  The default is `False` for all peer types except a `rrserver-rrserver` peer.
+
 
 Below is a configuration example...
 ```yaml
@@ -38,119 +46,6 @@ router_id: 0.0.0.1
 
 bgp:
   asn: 65000
-```
-
-
-
-# blackhole_import_maxlen4
-
-Default maximum IPv4 blackhole length to import from a BGP peer without filtering. Defaults to `32`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_import_maxlen4: 25
-...
-```
-
-
-# blackhole_import_minlen4
-
-Default minimum IPv4 blackhole length to import from a BGP peer without filtering. Defaults to `24`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_import_minlen4: 7
-...
-```
-
-
-# blackhole_export_maxlen4
-
-Default maximum IPv4 blackhole length to export to a BGP peer. Defaults to `32`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_export_maxlen4: 25
-...
-```
-
-
-# blackhole_export_minlen4
-
-Default minimum IPv4 blackhole length to export to a BGP peer. Defaults to `24`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_export_minlen4: 7
-...
-```
-
-
-# blackhole_import_maxlen6
-
-Default maximum IPv6 blackhole length to import from a BGP peer without filtering. Defaults to `32`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_import_maxlen6: 25
-...
-```
-
-
-# blackhole_import_minlen6
-
-Default minimum IPv6 blackhole length to import from a BGP peer without filtering. Defaults to `26`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_import_minlen6: 7
-...
-```
-
-
-# blackhole_export_maxlen6
-
-Default maximum IPv6 blackhole length to export to a BGP peer. Defaults to `32`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_export_maxlen6: 25
-...
-```
-
-
-# blackhole_export_minlen6
-
-Default minimum IPv6 blackhole length to export to a BGP peer. Defaults to `26`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  blackhole_export_minlen6: 7
-...
 ```
 
 
@@ -187,13 +82,17 @@ The `import` key contains a dictionary of the routes to import into the main BGP
 * `connected` routes are kernel device routes for the interfaces listed. A list of interfaces must be provided. This can be a pattern
 like `eth*`. Connected routes are not imported by default..
 
-* `kernel` routes are those statically added to the kernel, excluding blackhole routes. The default for this option is `false`.
+* `kernel` routes are those added to the kernel, excluding blackhole and default routes. The default for this option is `False`.
 
-* `kernel_blackhole` routes are those statically added to the kernel which are blackhole routes. This option is independant of the `kernel` option above and will only import blackhole routes. The default for this option is `false`.
+* `kernel_blackhole` routes are those statically added to the kernel which are blackhole routes. This option is independant of the `kernel` option above and will only import blackhole routes. The default for this option is `False`.
 
-* `static` routes are those setup in the static protocol, excluding blackhole routes. The default for this option is `false`.
+* `kernel_default` routes are those added to the kernel. This option is independant of the `kernel` option above and will only import kernel default routes. The default for this option is `False`.
 
-* `static_blackhole` routes are those setup in the static protocol which are blackhole routes. This option is independant of the `static` option above and will only import blackhole routes. The default for this option is `false`.
+* `static` routes are those setup in the static protocol, excluding blackhole and default routes. The default for this option is `False`.
+
+* `static_blackhole` routes are those setup in the static protocol which are blackhole routes. This option is independant of the `static` option above and will only import blackhole routes. The default for this option is `False`.
+
+* `static_default` routes are those setup in the static protocol. This option is independant of the `static` option above and will only import static default routes. The default for this option is `False`.
 
 
 One can specify the ASN as per below...
@@ -235,197 +134,130 @@ bird:
     - '100.101.0.0/24 blackhole { bgp_large_community.add(65000, 111, 222) }'
 ```
 
+# peertype_constraints
 
-# prefix_import_maxlen4
+This configuration key can be used to override the global constraints in place for each of the peer types.
 
-Default maximum IPv4 prefix length to import from a BGP peer without filtering. Defaults to `24`.
+## Valid peer types
+* `customer`
+* `customer.private` - This is a special peer type used when a `customer` peer type has a private ASN which is translated to our
+own ASN on eBGP export (ie. the `replace_aspath` is specified).
+* `internal`
+* `peer`
+* `routecollector`
+* `routeserver`
+* `rrclient`
+* `rrserver`
+* `rrserver-rrserver`
+* `transit`
 
-An example of this usage is below...
+## Prefix size limits
+
+* `import_maxlen4`
+
+Maximum IPv4 import prefix length, defaults to `24`
+except for `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` which defaults to `32`
+and `customer.private` which defaults to `29`.
+
+* `import_minlen4`
+
+Minimum IPv4 import prefix length, defaults to `8`
+except for `customer.private` which defaults to `16`.
+
+* `export_maxlen4`
+
+Maximum IPv4 export prefix length, defaults to `24`
+except for `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` which defaults to `32`
+and `customer.private` which defaults to `29`.
+
+* `export_minlen4`
+
+Minimum IPv4 export prefix length, defaults to `8`
+except for `customer.private` which defaults to `16`.
+
+* `import_maxlen6`
+
+Maximum IPv6 import prefix length, defaults to `48`
+except for `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` which defaults to `128`
+and `customer.private` which defaults to `64`.
+
+* `import_minlen6`
+
+Minimum IPv6 import prefix length, defaults to `16`
+and `customer.private` which defaults to `32`.
+
+* `export_maxlen6`
+
+Maximum IPv6 export prefix length, defaults to `48`
+except for `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` which defaults to `128`
+and `customer.private` which defaults to `64`.
+
+* `export_minlen6`
+
+Minimum IPv6 export prefix length, defaults to `16`
+and `customer.private` which defaults to `32`.
+
+## Blackhole size limits
+
+* `blackhole_import_maxlen4`
+
+Blackhole maximum IPv4 import prefix length, defaults to `32`.
+
+* `blackhole_import_minlen4`
+
+Blackhole minimum IPv4 import prefix length, defaults to `24`.
+
+* `blackhole_export_maxlen4`
+
+Blackhole maximum IPv4 export prefix length, defaults to `32`.
+
+* `blackhole_export_minlen4`
+
+Blackhole minimum IPv4 export prefix length, defaults to `24`.
+
+* `blackhole_import_maxlen6`
+
+Blackhole maximum IPv6 import prefix length, defaults to `128`.
+
+* `blackhole_import_minlen6`
+
+Blackhole minimum IPv6 import prefix length, defaults to `64`.
+
+* `blackhole_export_maxlen6`
+
+Blackhole maximum IPv6 export prefix length, defaults to `128`.
+
+* `blackhole_export_minlen6`
+
+Blackhole minimum IPv6 export prefix length, defaults to `64`.
+
+## AS-PATH length limits
+
+* `aspath_import_maxlen` - AS-PATH import maximum length, defaults to `100`.
+
+* `aspath_import_minlen` - AS-PATH import minimum length, defaults to `1`
+except for `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` which defaults to `0`.
+
+## Community length limits
+
+* `community_import_maxlen` - Community import maximum length, defaults to `100`.
+
+* `extended_community_import_maxlen` - Extended community import maximum length, defaults to `100`.
+
+* `large_community_import_maxlen` - Large community import maximum length, defaults to `100`.
+
+
+An example of setting the global defaults for a specific peer type can be found below...
 ```yaml
 ...
 
 bgp:
-  prefix_import_maxlen4: 25
+  peertype_constraints:
+    customer:
+      import_maxlen4: 25
 ...
 ```
 
-
-# prefix_import_minlen4
-
-Default minimum IPv4 prefix length to import from a BGP peer without filtering. Defaults to `8`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_import_minlen4: 7
-...
-```
-
-
-# prefix_export_maxlen4
-
-Default maximum IPv4 prefix length to export to a BGP peer. Defaults to `24`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_export_maxlen4: 25
-...
-```
-
-
-# prefix_export_minlen4
-
-Default minimum IPv4 prefix length to export to a BGP peer. Defaults to `8`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_export_minlen4: 7
-...
-```
-
-
-# prefix_import_maxlen6
-
-Default maximum IPv6 prefix length to import from a BGP peer without filtering. Defaults to `48`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_import_maxlen6: 47
-...
-```
-
-
-# prefix_import_minlen6
-
-Default minimum IPv6 prefix length to import from a BGP peer without filtering. Defaults to `16`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_import_minlen6: 15
-...
-```
-
-
-# prefix_export_maxlen6
-
-Default maximum IPv6 prefix length to export to a BGP peer. Defaults to `48`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_export_maxlen6: 47
-...
-```
-
-
-# prefix_export_minlen6
-
-Default minimum IPv6 prefix length to export to a BGP peer. Defaults to `16`.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  prefix_export_minlen6: 15
-...
-```
-
-
-# aspath_import_maxlen
-
-Default maximum AS-PATH length to allow from a BGP peer without filtering. Defaults to `100`.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  aspath_import_maxlen: 90
-...
-```
-
-
-# aspath_import_minlen
-
-Default minimum AS-PATH length to allow from a BGP peer without filtering. Defaults to `1`.
-
-You probably NEVER want to change this.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  aspath_import_minlen: 2
-...
-```
-
-
-# community_import_maxlen
-
-Default maximum number of communities before the prefix gets filtered. Defaults to `100`.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  community_import_maxlen: 90
-...
-```
-
-
-# extended_community_import_maxlen
-
-Default maximum number of extended communities before the prefix gets filtered. Defaults to `100`.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  extended_community_import_maxlen: 90
-...
-```
-
-
-# large_community_import_maxlen
-
-Default maximum number of large communities before the prefix gets filtered. Defaults to `100`.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  large_community_import_maxlen: 90
-...
-```
 
 
 # rr_cluster_id
@@ -468,9 +300,22 @@ bgp:
 
 The `accept` key contains a dictionary of routes we will accept. Namely...
 
-* `default` - Allows us to accept a default route from the BGP peer. The default is `False` for everything but a `rrserver-rrserver` peer.
-An exception will be raised if this is set to `True` for peers of type `customer`, `peer` and `routeserver`.
-* `blackhole` - Allows us to accept a blackhole advertisement from the BGP peer. This is only valid for peer types `customer`, `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`. The default is `True` for peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` and `True` when peer type `customer` has `filter:prefixes` set.
+* `bgp_customer_blackhole` - Allows us to accept a blackhole route that originated from a customer.
+  This is only valid for peer types `customer`, `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
+  The default is `True` for peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
+  The default is `True` for peer type `customer` when `filter:prefixes` is set.
+
+* `bgp_own_blackhole` - Allows us to accept a blackhole route that originated from our own federation.
+  This is only valid for peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
+  The default is `True` for peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
+
+* `bgp_own_default` - Allows us to accept a default route that originated from our own federation.
+  This is only valid for peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
+  The default is `True` for peer type `rrserver-rrserver`.
+
+* `bgp_transit_default` - Allows us to accept a default route that originated from a transit peer.
+  The is `True` for peer type `rrserver-rrserver`.
+
 
 
 Below is a configuration example...
@@ -535,145 +380,6 @@ bgp:
 ```
 
 
-## blackhole_import_maxlen4
-
-Maximum IPv4 blackhole length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_import_maxlen4: 32
-...
-```
-
-
-## blackhole_import_minlen4
-
-Minimum IPv4 blackhole length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_import_minlen4: 24
-...
-```
-
-## blackhole_export_maxlen4
-
-Maximum IPv4 blackhole length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_export_maxlen4: 32
-...
-```
-
-
-## blackhole_export_minlen4
-
-Minimum IPv4 blackhole length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_export_minlen4: 24
-...
-```
-
-
-## blackhole_import_maxlen6
-
-Maximum IPv6 blackhole length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_import_maxlen6: 128
-...
-```
-
-
-## blackhole_import_minlen6
-
-Minimum IPv6 blackhole length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_import_minlen6: 64
-...
-```
-
-
-## blackhole_export_maxlen6
-
-Maximum IPv6 blackhole length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_export_maxlen6: 128
-...
-```
-
-
-## blackhole_export_minlen6
-
-Minimum IPv6 blackhole length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      blackhole_export_minlen6: 64
-...
-```
-
-
 ## connect_delay_time
 
 Delay in seconds between protocol startup and the first attempt to connect. Default: 5 seconds.
@@ -712,6 +418,62 @@ bgp:
       connect_retry_time: 60
 ...
 ```
+
+
+
+## constraints
+
+This configuration key can be used to override the global peer type constraints.
+All values default to the global setting for the specific peer type (above).
+
+### Normal prefix size limits
+
+* `import_maxlen4` - maximum IPv4 import prefix length.
+* `import_minlen4` - minimum IPv4 import prefix length.
+* `export_maxlen4` - maximum IPv4 export prefix length.
+* `export_minlen4` - minimum IPv4 export prefix length.
+* `import_maxlen6` - maximum IPv6 import prefix length.
+* `import_minlen6` - minimum IPv6 import prefix length.
+* `export_maxlen6` - maximum IPv6 export prefix length.
+* `export_minlen6` - minimum IPv6 export prefix length.
+
+### Blackhole prefix size limits
+
+* `blackhole_import_maxlen4` - blackhole maximum IPv4 import prefix length.
+* `blackhole_import_minlen4` - blackhole minimum IPv4 import prefix length.
+* `blackhole_export_maxlen4` - blackhole maximum IPv4 export prefix length.
+* `blackhole_export_minlen4` - blackhole minimum IPv4 export prefix length.
+* `blackhole_import_maxlen6` - blackhole maximum IPv6 import prefix length.
+* `blackhole_import_minlen6` - blackhole minimum IPv6 import prefix length.
+* `blackhole_export_maxlen6` - blackhole maximum IPv6 export prefix length.
+* `blackhole_export_minlen6` - blackhole minimum IPv6 export prefix length.
+
+### AS-PATH length limits
+
+* `aspath_import_maxlen` - AS-PATH import maximum length.
+* `aspath_import_minlen` - AS-PATH import minimum length.
+
+### Community length limits
+
+* `community_import_maxlen` - Community import maximum length.
+* `extended_community_import_maxlen` - Extended community import maximum length.
+* `large_community_import_maxlen` - Large community import maximum length.
+
+
+An example of overriding a constraint can be found below...
+```yaml
+..
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      constraints:
+        import_maxlen4: 25
+...
+```
+
 
 
 ## cost
@@ -947,52 +709,75 @@ bgp:
 ```
 
 
+
 ## outgoing_large_communities
 
-**The first method we can use to specify outgoing large communities is just with a list:**
+This option allows us to set outgoing large communites in two methods listed below.
 
-This will result in the large communities being added for all outbound prefixes.
+
+**The first method we can use to specify outbound large communites is just list of communites:**
+
+This will result in `65000:99:98` and `65000:99:99` being added to all outgoing prefixes.
 
 An example of this is below...
 ```yaml
+...
+bgp:
   peers:
     peer1:
       asn: 65000
       description: Some peer
-      outgoing_large_communities:
-        - 65000:5000:1
-        - 65000:5000:2
+      outgoing_large_communites:
+        - 65000:99:98
+        - 65000:99:99
+...
 ```
 
-**The second method is we can use a dict to do fine grained outgoing large communities based on route type:**
+**The second method is we can use a dict to do fine grained adding of communites based on route type:**
 
 Route types...
 
-* `default` will match the default route.
+* `blackhole` will set the default value for all *_blackhole options.
+* `default` will set the default value for all *_default options.
 * `connected` will match connected routes.
-* `static` will match static routes. This will not match default routes.
-* `kernel` will match kernel routes. This will not match default routes.
-* `originated` will match originated routes. This will not match default routes.
+* `kernel` will match kernel routes. This will also set the default for all kernel_* options.
+* `kernel_blackhole` will match kernel blackhole routes.
+* `kernel_default` will match kernel default routes.
+* `static` will match static routes. This will also set the default for all static_* options.
+* `static_blackhole` will match static blackhole routes.
+* `static_default` will match static default routes.
+* `originated` will match originated routes. This will also set the default for all originated_* options.
+* `originated_default` will match originated routes default routes.
 
 Internal route types...
 
-* `bgp` will match all BGP routes.
-* `bgp_own` will match BGP routes that originated from our ASN.
-* `bgp_customer` will match our customer routes.
+* `bgp` will set the default value for all bgp_* options.
+* `bgp_blackhole` will set the default value for all bgp_*_blackhole options.
+* `bgp_default` will set the default value for all bgp_*_default options.
+* `bgp_own` will match BGP routes that originated from our ASN. This will also set the default for all bgp_own_* options.
+* `bgp_own_blackhole` will match BGP blackhole routes that originated from our ASN.
+* `bgp_own_default` will match BGP default routes that originated from our ASN.
+* `bgp_customer` will match our customer routes. This will set the default for all bgp_customer_* options.
+* `bgp_customer_blackhole` will match BGP blackhole routes received from customers.
 * `bgp_peering` will match our peers routes.
-* `bgp_transit` will match our transit providers routes.
+* `bgp_transit` will match our transit providers routes. This will set the default for all bgp_transit_* options.
+* `bgp_transit_default` will match BGP default routes received from transit providers.
+
 
 An example of this is below...
 ```yaml
+...
+bgp:
   peers:
     peer1:
       asn: 65000
       description: Some peer
       outgoing_large_communities:
         static:
-          - 65000:5000:1
+          - 65000:99:98
         bgp_customer:
-          - 65000:5000:2
+          - 65000:99:99
+...
 ```
 
 
@@ -1069,249 +854,6 @@ bgp:
 ```
 
 
-## prefix_import_maxlen4
-
-Maximum IPv4 prefix length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_import_maxlen4: 25
-...
-```
-
-
-## prefix_import_minlen4
-
-Minimum IPv4 prefix length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_import_minlen4: 7
-...
-```
-
-
-## prefix_export_maxlen4
-
-Maximum IPv4 prefix length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_export_maxlen4: 25
-...
-```
-
-
-## prefix_export_minlen4
-
-Minimum IPv4 prefix length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_export_minlen4: 7
-...
-```
-
-
-## prefix_import_maxlen6
-
-Maximum IPv6 prefix length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_import_maxlen6: 47
-...
-```
-
-
-## prefix_import_minlen6
-
-Minimum IPv6 prefix length to import without filtering. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_import_minlen6: 15
-...
-```
-
-
-## prefix_export_maxlen6
-
-Maximum IPv6 prefix length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_export_maxlen6: 47
-...
-```
-
-
-## prefix_export_minlen6
-
-Minimum IPv6 prefix length to export. Defaults to global setting.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      prefix_export_minlen6: 15
-...
-```
-
-
-## aspath_import_maxlen
-
-Maximum AS-PATH length to allow without filtering. Defaults to global setting.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      aspath_import_maxlen: 90
-...
-```
-
-
-## aspath_import_minlen
-
-Minimum AS-PATH length to allow without filtering. Defaults to global setting.
-
-You probably NEVER want to change this.
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      aspath_import_minlen: 2
-...
-```
-
-
-## community_import_maxlen
-
-Maximum number of communities before the prefix gets filtered. Defaults to global setting.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      community_import_maxlen: 90
-...
-```
-
-
-## extended_community_import_maxlen
-
-Maximum number of extended communities before the prefix gets filtered. Defaults to global setting.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      extended_community_import_maxlen: 90
-...
-```
-
-
-## large_community_import_maxlen
-
-Maximum number of large communities before the prefix gets filtered. Defaults to global setting.
-
-You probably only want to change this if you know exactly what you're doing!
-
-An example of this usage is below...
-```yaml
-...
-
-bgp:
-  peers:
-    peer1:
-      asn: 65000
-      description: Some peer
-      large_community_import_maxlen: 90
-...
-```
-
-
 ## prepend
 
 This option controls AS-PATH prepending in various ways. The prepending count must be between 1 and 10.
@@ -1338,19 +880,31 @@ bgp:
 
 Route types...
 
-* `default` will match the default route.
+* `blackhole` will set the default value for all *_blackhole options.
+* `default` will set the default value for all *_default options.
 * `connected` will match connected routes.
-* `static` will match static routes. This will not match default routes.
-* `kernel` will match kernel routes. This will not match default routes.
-* `originated` will match originated routes. This will not match default routes.
+* `kernel` will match kernel routes. This will also set the default for all kernel_* options.
+* `kernel_blackhole` will match kernel blackhole routes.
+* `kernel_default` will match kernel default routes.
+* `static` will match static routes. This will also set the default for all static_* options.
+* `static_blackhole` will match static blackhole routes.
+* `static_default` will match static default routes.
+* `originated` will match originated routes. This will also set the default for all originated_* options.
+* `originated_default` will match originated routes default routes.
 
 Internal route types...
 
-* `bgp` will match all BGP routes.
-* `bgp_own` will match BGP routes that originated from our ASN.
-* `bgp_customer` will match our customer routes.
+* `bgp` will set the default value for all bgp_* options.
+* `bgp_blackhole` will set the default value for all bgp_*_blackhole options.
+* `bgp_default` will set the default value for all bgp_*_default options.
+* `bgp_own` will match BGP routes that originated from our ASN. This will also set the default for all bgp_own_* options.
+* `bgp_own_blackhole` will match BGP blackhole routes that originated from our ASN.
+* `bgp_own_default` will match BGP default routes that originated from our ASN.
+* `bgp_customer` will match our customer routes. This will set the default for all bgp_customer_* options.
+* `bgp_customer_blackhole` will match BGP blackhole routes received from customers.
 * `bgp_peering` will match our peers routes.
-* `bgp_transit` will match our transit providers routes.
+* `bgp_transit` will match our transit providers routes. This will set the default for all bgp_transit_* options.
+* `bgp_transit_default` will match BGP default routes received from transit providers.
 
 An example of this is below...
 ```yaml
@@ -1388,26 +942,47 @@ bgp:
 
 Types of routes to redistribute to the peer, valid options are detailed below...
 
-* `default` will redistribute the default route, the type of route also needs to be redistributed. eg. `static`. Defaults to `False` except
-for peer type `rrserver-rrserver` which defaults to `True`.
+Locally originated route redistribution...
+
 * `connected` will redistribute connected routes. Defaults to `False`.
 * `kernel` will redistribute kernel routes. Defaults to `False`.
-* `kernel_blackhole` will redistribute kernel blackhole routes. Defaults to `False`.
+* `kernel_blackhole` will redistribute kernel blackhole routes. Defaults to `False`. If set to True, kernel blackhole routes will
+  be redistributed regardless of the blackhole large community function value.
+* `kernel_default` will redistribute kernel default routes. Defaults to `False`.
 * `static` will redistribute static routes in our global static configuration. Defaults to `False`.
-* `static_blackhole` will redistribute static blackhole routes in our global static configuration. Defaults to `False`.
+* `static_blackhole` will redistribute static blackhole routes in our global static configuration. Defaults to `False`. If set to
+  True, static blackhole routes will be redistributed regardless of the blackhole large community function value.
+* `static_default` will redistribute static default routes. Defaults to `False`.
 * `originated` will redistribute originated routes. Defaults to `False`.
+* `originated_default` will redistribute originated default routes. Defaults to `False`.
 
-Internal redistribution options and how they are used... (do not use unless you know exactly you're doing)
+BGP "all" route redistribution...
 
-* `bgp` will redistribute BGP routes. Automatically set to `True` for peer types of `rrclient`, `rrserver` and `rrserver-rrserver`. This is a VERY dangerous setting as it does not by default filter outbound routes.
-* `bgp_own` will redistribute our own BGP routes based on an internal large community `OWN_ASN:3:1`. Automatically set to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
-* `bgp_customer` will redistribute our customers BGP routes based on an internal large community `OWN_ASN:3:2`. Automatically set to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
-* `bgp_peering` will redistribute peering session routes based on an internal large community `OWN_ASN:3:3`. Automatically set to `True` for peer types of `customer`.
-* `bgp_transit` will redistribute transit routes based on an internal large community `OWN_ASN:3:4`. Automatically set to `True` for peer types of `customer`.
+* `bgp` will set the default option for all bgp_* options if specified. If set to `False`, one can then individually enable redistribution of various types of BGP routes using the options below. Setting this option to `True` will be pointless as
+it will just result in the defaults being used.
 
-NB: Peers using peer type `rrserver-rrserver` will by default redistribute default routes should they be received via BGP, but will not by default
-redistribute default routes if received via `kernel`, `static` or `originated` sources. For these sources to be redistributed you need to configure
-`redistribute:default` as `True`.
+BGP route source redistribution...
+
+* `bgp_own` will redistribute our own BGP routes based on an internal large community `OWN_ASN:3:1`. This will set the default value for `bgp_own_blackhole` and `bgp_own_default` to `False` if explicitly set to `False`.
+Defaults to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
+* `bgp_customer` will redistribute our customers BGP routes based on an internal large community `OWN_ASN:3:2`. This will set the default value
+for `bgp_customer_blackhole` to `False` if explicitly set to `False`.
+Defaults to `True` for peer types of `customer`, `routecollector`, `routeserver`, `peer` and `upstream`.
+* `bgp_peering` will redistribute peering session routes based on an internal large community `OWN_ASN:3:3`.
+Defaults to `True` for peer types of `customer`.
+* `bgp_transit` will redistribute transit routes based on an internal large community `OWN_ASN:3:4`. This will set the default value
+for `bgp_transit_default` to `False` if explicitly set to `False`.
+Defaults to `True` for peer types of `customer`.
+
+BGP blackhole redistribution...
+
+* `bgp_customer_blackhole` will redistribute BGP default routes. Defaults to `True` for peer types `internal`, `routecollector`, `routeserver`, `rrclient`, `rrserver`, `rrserver-rrserver`, `transit`.
+* `bgp_own_blackhole` will redistribute BGP default routes. Defaults to `True` for peer types `internal`, `routecollector`, `routeserver`, `rrclient`, `rrserver`, `rrserver-rrserver`, `transit`.
+
+BGP default route redistribution...
+
+* `bgp_own_default` will redistribute BGP default routes. Defaults to `True` for peer types of `rrserver-rrserver`.
+* `bgp_transit_default` will redistribute BGP default routes. Defaults to `True` for peer types of `rrserver-rrserver`.
 
 
 An example of using redistribute can be found below...
@@ -1437,6 +1012,9 @@ This is only valid for peer types of `customer` and `internal`.
 This will result in a large community being added to the prefix, which will end up in the AS-PATH being replaced on all eBGP peers.
 
 All private ASN's will be replaced up to a limit of 10, any AS-PATH longer than this will be truncated.
+
+Using this option will set the `constraints` profile to `customer.private` and apply the relevant adjusted limits.
+
 
 An example is below...
 ```yaml

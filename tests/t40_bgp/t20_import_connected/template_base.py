@@ -32,8 +32,8 @@ class TemplateBase(BirdPlanBaseTestCase):
     routers = ["r1", "r2"]
 
     r1_interfaces = ["eth0", "eth1", "eth2", "eth10"]
-    r1_interface_eth2 = {"mac": "02:01:02:00:00:01", "ips": ["100.201.0.1/24", "fc00:201::1/64"]}
-    r1_interface_eth10 = {"mac": "02:01:10:00:00:01", "ips": ["100.211.0.1/24", "fc00:211::1/64"]}
+    r1_interface_eth2 = {"mac": "02:01:02:00:00:01", "ips": ["100.201.0.1/24", "fc00:201::1/48"]}
+    r1_interface_eth10 = {"mac": "02:01:10:00:00:01", "ips": ["100.211.0.1/24", "fc00:211::1/48"]}
 
     r2_interfaces = ["eth0"]
 
@@ -43,31 +43,28 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
+    def test_add_kernel_routes(self, sim):
+        """Add kernel routes to BIRD instances."""
+
+        # Add gateway'd kernel routes
+        sim.node("r1").run_ip(["route", "add", "100.121.0.0/24", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "fc00:121::/48", "via", "fc00:201::3"])
+
+        # Add kernel device routes
+        sim.node("r1").run_ip(["route", "add", "100.122.0.0/24", "dev", "eth2"])
+        sim.node("r1").run_ip(["route", "add", "fc00:122::/48", "dev", "eth2"])
+
+        # Add kernel default routes
+        sim.node("r1").run_ip(["route", "add", "default", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "default", "via", "fc00:201::3"])
+
+        # Add kernel blackhole routes
+        sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
+        sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
+
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)
-
-    def test_bird_tables_direct4_bgp(self, sim):
-        """Test BIRD t_direct4_bgp table."""
-        if self.has_direct_table:
-            self._test_bird_routers_table("t_direct4_bgp", sim, routers=["r1"])
-        else:
-            with pytest.raises(
-                BirdClientError,
-                match=r"BIRD client error: syntax error, unexpected CF_SYM_UNDEFINED, expecting CF_SYM_KNOWN or ALL",
-            ):
-                self._test_bird_routers_table("t_direct4_bgp", sim, routers=["r1"])
-
-    def test_bird_tables_direct6_bgp(self, sim):
-        """Test BIRD t_direct6_bgp table."""
-        if self.has_direct_table:
-            self._test_bird_routers_table("t_direct6_bgp", sim, routers=["r1"])
-        else:
-            with pytest.raises(
-                BirdClientError,
-                match=r"BIRD client error: syntax error, unexpected CF_SYM_UNDEFINED, expecting CF_SYM_KNOWN or ALL",
-            ):
-                self._test_bird_routers_table("t_direct6_bgp", sim, routers=["r1"])
 
     def test_bird_tables_bgp4_peer(self, sim):
         """Test BIRD BGP4 peer table."""
@@ -92,6 +89,36 @@ class TemplateBase(BirdPlanBaseTestCase):
     def test_bird_tables_master6(self, sim):
         """Test BIRD master6 table."""
         self._test_bird_routers_table("master6", sim)
+
+    def test_bird_tables_direct4_bgp(self, sim):
+        """Test BIRD t_direct4_bgp table."""
+        if self.has_direct_table:
+            self._test_bird_routers_table("t_direct4_bgp", sim, routers=["r1"])
+        else:
+            with pytest.raises(
+                BirdClientError,
+                match=r"BIRD client error: syntax error, unexpected CF_SYM_UNDEFINED, expecting CF_SYM_KNOWN or ALL",
+            ):
+                self._test_bird_routers_table("t_direct4_bgp", sim, routers=["r1"])
+
+    def test_bird_tables_direct6_bgp(self, sim):
+        """Test BIRD t_direct6_bgp table."""
+        if self.has_direct_table:
+            self._test_bird_routers_table("t_direct6_bgp", sim, routers=["r1"])
+        else:
+            with pytest.raises(
+                BirdClientError,
+                match=r"BIRD client error: syntax error, unexpected CF_SYM_UNDEFINED, expecting CF_SYM_KNOWN or ALL",
+            ):
+                self._test_bird_routers_table("t_direct6_bgp", sim, routers=["r1"])
+
+    def test_bird_tables_static4(self, sim):
+        """Test BIRD static4 table."""
+        self._test_bird_routers_table("t_static4", sim, routers=["r1"])
+
+    def test_bird_tables_static6(self, sim):
+        """Test BIRD static6 table."""
+        self._test_bird_routers_table("t_static6", sim, routers=["r1"])
 
     def test_bird_tables_kernel4(self, sim):
         """Test BIRD kernel4 table."""

@@ -29,8 +29,9 @@ class TemplateBase(BirdPlanBaseTestCase):
 
     routers = ["r1", "r2"]
 
-    r1_interfaces = ["eth0", "eth1"]
-    r1_interface_eth1 = {"mac": "02:01:00:00:00:02", "ips": ["192.168.1.1/24", "fc01::1/64"]}
+    r1_interfaces = ["eth0", "eth2"]
+
+    r1_interface_eth2 = {"mac": "02:01:02:00:00:01", "ips": ["100.201.0.1/24", "fc00:201::1/48"]}
 
     r2_interfaces = ["eth0"]
 
@@ -38,17 +39,31 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
+    def test_add_kernel_routes(self, sim):
+        """Add kernel routes to BIRD instances."""
+
+        if "r1" in self.routers_config_exception:
+            return
+
+        # Add gateway'd kernel routes
+        sim.node("r1").run_ip(["route", "add", "100.121.0.0/24", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "fc00:121::/48", "via", "fc00:201::3"])
+
+        # Add kernel device routes
+        sim.node("r1").run_ip(["route", "add", "100.122.0.0/24", "dev", "eth2"])
+        sim.node("r1").run_ip(["route", "add", "fc00:122::/48", "dev", "eth2"])
+
+        # Add kernel default routes
+        sim.node("r1").run_ip(["route", "add", "default", "via", "100.201.0.3"])
+        sim.node("r1").run_ip(["route", "add", "default", "via", "fc00:201::3"])
+
+        # Add kernel blackhole routes
+        sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
+        sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
+
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)
-
-    def test_bird_tables_originate4(self, sim):
-        """Test BIRD originate4 table."""
-        self._test_bird_routers_table("t_bgp_originate4", sim, routers=["r1"])
-
-    def test_bird_tables_originate6(self, sim):
-        """Test BIRD originate6 table."""
-        self._test_bird_routers_table("t_bgp_originate6", sim, routers=["r1"])
 
     def test_bird_tables_bgp4_peer(self, sim):
         """Test BIRD BGP4 peer table."""
@@ -73,6 +88,14 @@ class TemplateBase(BirdPlanBaseTestCase):
     def test_bird_tables_master6(self, sim):
         """Test BIRD master6 table."""
         self._test_bird_routers_table("master6", sim)
+
+    def test_bird_tables_originate4(self, sim):
+        """Test BIRD originate4 table."""
+        self._test_bird_routers_table("t_bgp_originate4", sim, routers=["r1"])
+
+    def test_bird_tables_originate6(self, sim):
+        """Test BIRD originate6 table."""
+        self._test_bird_routers_table("t_bgp_originate6", sim, routers=["r1"])
 
     def test_bird_tables_kernel4(self, sim):
         """Test BIRD kernel4 table."""

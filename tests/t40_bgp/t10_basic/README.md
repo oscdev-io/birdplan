@@ -3,13 +3,13 @@
 
 ExaBGP e1 should be announcing its route to r1 for testing each peer type.
 
-In terms of test "bgp":  **(default)**
+In terms of test `bgp`:  **(default)**
   - Router r1 should install BGP routes into OS RIB as this is default behavior.
 
-In terms of test "export_kernel_bgp_false":
+In terms of test `export_kernel_bgp_false`:
   - Router r1 should not install BGP routes into OS RIB as `export:kernel` is set to False.
 
-In terms of test "export_kernel_bgp_true":
+In terms of test `export_kernel_bgp_true`:
   - Router r1 should install BGP routes into OS RIB as `export:kernel` is set to True.
 
 
@@ -32,10 +32,6 @@ class "ExaBGP: e1" {
   .. Interface: eth0 ..
 - 100.64.0.2/24
 - fc00:100::2/64
-
-  .. BGP Announce ..
-- 100.64.101.0/24 next-hop 100.101.0.2
-- fc00:101::/48 next-hop fc00:101::2
 }
 
 

@@ -21,7 +21,7 @@
 
 """BGP community functions test case template."""
 
-from .template_base import TemplateBase
+from ..template_base import TemplateBase
 
 
 class Template(TemplateBase):
@@ -35,7 +35,7 @@ class Template(TemplateBase):
             sim,
             "e1",
             [
-                "neighbor 100.64.0.1 announce route 100.64.101.0/29 next-hop 100.64.0.100 "
+                "neighbor 100.64.0.1 announce route 100.64.104.0/29 next-hop 100.64.0.100 "
                 f"large-community [ {self.e1_template_large_communities} {self.e1_extra_large_communities} ] "
                 "community [ 65535:666 ] "
             ],
@@ -44,13 +44,13 @@ class Template(TemplateBase):
             sim,
             "e1",
             [
-                "neighbor fc00:100::1 announce route fc00:101::/96 next-hop fc00:100::100 "
+                "neighbor fc00:100::1 announce route fc00:104::/96 next-hop fc00:100::100 "
                 f"large-community [ {self.e1_template_large_communities} {self.e1_extra_large_communities} ] "
                 "community [ 65535:666 ] "
             ],
         )
 
-        # Large size
+        # Normal size
         self._exabgpcli(
             sim,
             "e1",

@@ -13,33 +13,9 @@ Peer costs are minus'd from the below preference values.
 | BGP_PREF_TRANSIT | 150 | Transit routes |
 
 
-# Prefix Sizes
+# Prefix Size Constraints
 
-These are globals which can be overridden in configuration.
-
-| Constant | Size | Description |
-| --- | --- | --- |
-| PREFIX_IMPORT_MAXLEN4 | 24 | Maximum IPv4 CIDR length to import |
-| PREFIX_IMPORT_MINLEN4 | 8 | Minimum IPv4 CIDR length to import |
-| PREFIX_EXPORT_MAXLEN4 | 24 | Maximum IPv4 CIDR length to export |
-| PREFIX_EXPORT_MINLEN4 | 8 | Minimum IPv4 CIDR length to export |
-| PREFIX_IMPORT_MAXLEN6 | 48 | Maximum IPv6 CIDR length to import |
-| PREFIX_IMPORT_MINLEN6 | 16 | Minimum IPv6 CIDR length to import |
-| PREFIX_EXPORT_MAXLEN6 | 48 | Maximum IPv6 CIDR length to export |
-| PREFIX_EXPORT_MINLEN6 | 16 | Minimum IPv6 CIDR length to export |
-
-When using the `replace_aspath` feature, the minimum and maximum prefix lengths we import and export are adjusted as follows. This allows a peer using this feature to advertise a /29 IPv4 and /64 IPv6 prefix to us.
-
-| Constant | Size | Description |
-| --- | --- | --- |
-| PREFIX_IMPORT_MAXLEN4 | 29 | Maximum IPv4 CIDR length to import |
-| PREFIX_IMPORT_MINLEN4 | 16 | Minimum IPv4 CIDR length to import |
-| PREFIX_EXPORT_MAXLEN4 | 29 | Maximum IPv4 CIDR length to export |
-| PREFIX_EXPORT_MINLEN4 | 16 | Minimum IPv4 CIDR length to export |
-| PREFIX_IMPORT_MAXLEN6 | 64 | Maximum IPv6 CIDR length to import |
-| PREFIX_IMPORT_MINLEN6 | 32 | Minimum IPv6 CIDR length to import |
-| PREFIX_EXPORT_MAXLEN6 | 64 | Maximum IPv6 CIDR length to export |
-| PREFIX_EXPORT_MINLEN6 | 32 | Minimum IPv6 CIDR length to export |
+See `constraints` under [protocol-bgp](protocol-bgp.md).
 
 
 # Communities
@@ -55,6 +31,15 @@ In terms of a `customer` peer type the permissable prefix size is between /32 an
 In terms of a `internal` peer type the permissable prefix size is between /32 and /24 and is not restricted.
 
 This can be combined with the large community function (OWN_ASN, 666, XXX) to propagate export to peer types `transit`, `routeserver`, `routecollector` that support blackholing.
+
+## NO_EXPORT 65535:65281
+
+The NO_EXPORT community 65535:65281 is supported for all peer types.
+
+## NO_ADVERTISE 65535:65282
+
+The NO_ADVERTISE community 65535:65282 is supported for all peer types.
+
 
 # Large Communities
 

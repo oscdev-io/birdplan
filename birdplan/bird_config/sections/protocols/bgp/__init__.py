@@ -21,7 +21,7 @@
 # pylint: disable=too-many-lines
 
 from typing import Dict, List, Optional
-from .bgp_attributes import BGPAttributes, BGPRoutePolicyAccept, BGPRoutePolicyImport
+from .bgp_attributes import BGPAttributes, BGPPeertypeConstraints, BGPRoutePolicyAccept, BGPRoutePolicyImport
 from .bgp_functions import BGPFunctions
 from .peer import ProtocolBGPPeer
 from .typing import BGPPeerConfig
@@ -72,27 +72,6 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self._bgp_attributes = BGPAttributes()
         # Setup BGP functions
         self._bgp_functions = BGPFunctions(self.birdconfig_globals, self.functions)
-
-        # For test mode we need to slightly adjust our prefix lengths that we permit
-        if self.birdconfig_globals.test_mode:
-            self.aspath_import_maxlen = 25
-            self.community_import_maxlen = 25
-            self.extended_community_import_maxlen = 25
-            self.large_community_import_maxlen = 25
-
-            self.blackhole_import_maxlen4 = 31
-            self.blackhole_export_maxlen4 = 31
-
-            self.blackhole_import_maxlen6 = 127
-            self.blackhole_export_maxlen6 = 127
-
-            self.prefix_import_minlen4 = 16
-            self.prefix_export_minlen4 = 16
-
-            self.prefix_import_maxlen6 = 64
-            self.prefix_import_minlen6 = 32
-            self.prefix_export_maxlen6 = 64
-            self.prefix_export_minlen6 = 32
 
     def configure(self) -> None:
         """Configure the BGP protocol."""
@@ -182,6 +161,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     def peer(self, name: str) -> ProtocolBGPPeer:
         """Return a BGP peer configuration object."""
         return self.peers[name]
+
+    def constraints(self, peer_type: str) -> BGPPeertypeConstraints:
+        """Return the prefix limits for a specific peer type."""
+        if peer_type not in self.bgp_attributes.peertype_constraints:
+            raise BirdPlanError(f"Peer type '{peer_type}' has no implemented global prefix limits")
+        return self.bgp_attributes.peertype_constraints[peer_type]
 
     def _configure_constants_bgp(self) -> None:  # pylint: disable=too-many-statements
         """Configure BGP constants."""
@@ -452,29 +437,29 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add("string filter_name;")
         self.conf.add("{")
         self.conf.add(f'  filter_name = "{filter_name}";')
-        # Check if we accept the default route, if not block it
-        if not self.route_policy_accept.default:
-            self.conf.add("  # Do not export default routes to the master table")
-            self.conf.add(f"  if {self.functions.is_default()} then {{")
-            self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " to master table (not accepting default routes)";')
-            self.conf.add("    reject;")
-            self.conf.add("  }")
-        # Check if we accept blackhole routes, if not block it
-        if not self.route_policy_accept.blackhole:
-            self.conf.add("  # Do not export blackhole routes to the master table")
-            self.conf.add(f"  if {self.bgp_functions.is_blackhole()} then {{")
-            self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " to master table (not accepting blackhole routes)";')
-            self.conf.add("    reject;")
-            self.conf.add("  }")
         # Accept BGP routes into the master routing table
-        self.conf.add("  # Export BGP routes to the master table")
-        self.conf.add("  if (source = RTS_BGP) then accept;")
-        # Accept BGP originated routes into the master routing table
+        self.conf.add(f"  {self.bgp_functions.accept_bgp()};")
+        # Check if we accept customer blackhole routes, if not block it
+        if self.route_policy_accept.bgp_customer_blackhole:
+            self.conf.add(f"  {self.bgp_functions.accept_customer_blackhole()};")
+        # Check if we accept our own blackhole routes, if not block it
+        if self.route_policy_accept.bgp_own_blackhole:
+            self.conf.add(f"  {self.bgp_functions.accept_own_blackhole()};")
+        # Check if we accept default routes originated from within our federation, if not block it
+        if self.route_policy_accept.bgp_own_default:
+            self.conf.add(f"  {self.bgp_functions.accept_bgp_own_default()};")
+        # Check if we accept default routes originated from transit peers, if not block it
+        if self.route_policy_accept.bgp_transit_default:
+            self.conf.add(f"  {self.bgp_functions.accept_bgp_transit_default()};")
+        # Check if we accept originated routes, if not block it
         if self.route_policy_accept.originated:
-            self.conf.add("  # Accept originated routes into the master table")
-            self.conf.add(f"  if {self.bgp_functions.is_originated()} then accept;")
+            self.conf.add(f"  {self.bgp_functions.accept_originated()};")
+        # Check if we accept originated routes, if not block it
+        if self.route_policy_accept.originated_default:
+            self.conf.add(f"  {self.bgp_functions.accept_originated_default()};")
         # Default to reject
-        self.conf.add("  # Reject everything else;")
+        self.conf.add("  if DEBUG then")
+        self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from t_bgp to master (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
@@ -490,37 +475,25 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add(f'  filter_name = "{filter_name}";')
         # BGP importation of kernel routes
         if self.route_policy_import.kernel:
-            self.conf.add("  # Import kernel routes into BGP")
-            self.conf.add("  if (source = RTS_INHERIT && dest != RTD_BLACKHOLE) then {")
-            self.conf.add(f"    {self.bgp_functions.import_own(5)};")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.bgp_functions.import_kernel()};")
         # BGP importation of kernel blackhole routes
         if self.route_policy_import.kernel_blackhole:
-            self.conf.add("  # Import kernel blackhole routes into BGP")
-            self.conf.add("  if (source = RTS_INHERIT && dest = RTD_BLACKHOLE) then {")
-            self.conf.add(f"    {self.bgp_functions.import_own(5)};")
-            self.conf.add("    bgp_community.add(BGP_COMMUNITY_BLACKHOLE);")
-            self.conf.add("    bgp_community.add(BGP_COMMUNITY_NOEXPORT);")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.bgp_functions.import_kernel_blackhole()};")
+        # BGP importation of kernel default routes
+        if self.route_policy_import.kernel_default:
+            self.conf.add(f"  {self.bgp_functions.import_kernel_default()};")
         # BGP importation of static routes
         if self.route_policy_import.static:
-            self.conf.add("  # Import static routes into BGP")
-            self.conf.add("  if (source = RTS_STATIC && dest != RTD_BLACKHOLE) then {")
-            self.conf.add(f"    {self.bgp_functions.import_own(10)};")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
+            self.conf.add(f"  {self.bgp_functions.import_static()};")
         # BGP importation of static blackhole routes
         if self.route_policy_import.static_blackhole:
-            self.conf.add("  # Import static blackhole routes into BGP")
-            self.conf.add("  if (source = RTS_STATIC && dest = RTD_BLACKHOLE) then {")
-            self.conf.add(f"    {self.bgp_functions.import_own(10)};")
-            self.conf.add("    bgp_community.add(BGP_COMMUNITY_BLACKHOLE);")
-            self.conf.add("    bgp_community.add(BGP_COMMUNITY_NOEXPORT);")
-            self.conf.add("    accept;")
-            self.conf.add("  }")
-        # Else accept
+            self.conf.add(f"  {self.bgp_functions.import_static_blackhole()};")
+        # BGP importation of static default routes
+        if self.route_policy_import.static_default:
+            self.conf.add(f"  {self.bgp_functions.import_static_default()};")
+        # Else reject
+        self.conf.add("  if DEBUG then")
+        self.conf.add(f'    print "[{filter_name}] Rejecting ", net, " from master to t_bgp (fallthrough)";')
         self.conf.add("  reject;")
         self.conf.add("};")
         self.conf.add("")
@@ -534,7 +507,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.conf.add("string filter_name;")
         self.conf.add("{")
         self.conf.add(f'  filter_name = "{filter_name}";')
-        self.conf.add("  # Origination import")
+        self.conf.add("  # Import connected routes")
         self.conf.add(f"  {self.bgp_functions.import_own(10)};")
         self.conf.add("  accept;")
         self.conf.add("};")
@@ -563,6 +536,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.bgp_attributes.asn = asn
         # Enable bogon constants
         self.constants.need_bogons = True
+
+    @property
+    def peertype_constraints(self) -> Dict[str, BGPPeertypeConstraints]:
+        """Return our peertype constraints."""
+        return self.bgp_attributes.peertype_constraints
 
     @property
     def graceful_shutdown(self) -> bool:
@@ -608,233 +586,3 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     def originated_routes(self) -> BGPOriginatedRoutes:
         """Return our originated routes."""
         return self._originated_routes
-
-    # IPV4 BLACKHOLE IMPORT PREFIX LENGTHS
-
-    @property
-    def blackhole_import_maxlen4(self) -> int:
-        """Return the current value of blackhole_import_maxlen4."""
-        return self.bgp_attributes.blackhole_import_maxlen4
-
-    @blackhole_import_maxlen4.setter
-    def blackhole_import_maxlen4(self, blackhole_import_maxlen4: int) -> None:
-        """Setter for blackhole_import_maxlen4."""
-        self.bgp_attributes.blackhole_import_maxlen4 = blackhole_import_maxlen4
-
-    @property
-    def blackhole_import_minlen4(self) -> int:
-        """Return the current value of blackhole_import_minlen4."""
-        return self.bgp_attributes.blackhole_import_minlen4
-
-    @blackhole_import_minlen4.setter
-    def blackhole_import_minlen4(self, blackhole_import_minlen4: int) -> None:
-        """Setter for blackhole_import_minlen4."""
-        self.bgp_attributes.blackhole_import_minlen4 = blackhole_import_minlen4
-
-    # IPV4 BLACKHOLE EXPORT PREFIX LENGTHS
-
-    @property
-    def blackhole_export_maxlen4(self) -> int:
-        """Return the current value of blackhole_export_maxlen4."""
-        return self.bgp_attributes.blackhole_export_maxlen4
-
-    @blackhole_export_maxlen4.setter
-    def blackhole_export_maxlen4(self, blackhole_export_maxlen4: int) -> None:
-        """Setter for blackhole_export_maxlen4."""
-        self.bgp_attributes.blackhole_export_maxlen4 = blackhole_export_maxlen4
-
-    @property
-    def blackhole_export_minlen4(self) -> int:
-        """Return the current value of blackhole_export_minlen4."""
-        return self.bgp_attributes.blackhole_export_minlen4
-
-    @blackhole_export_minlen4.setter
-    def blackhole_export_minlen4(self, blackhole_export_minlen4: int) -> None:
-        """Setter for blackhole_export_minlen4."""
-        self.bgp_attributes.blackhole_export_minlen4 = blackhole_export_minlen4
-
-    # IPV6 BLACKHOLE IMPORT PREFIX LENGTHS
-
-    @property
-    def blackhole_import_maxlen6(self) -> int:
-        """Return the current value of blackhole_import_maxlen6."""
-        return self.bgp_attributes.blackhole_import_maxlen6
-
-    @blackhole_import_maxlen6.setter
-    def blackhole_import_maxlen6(self, blackhole_import_maxlen6: int) -> None:
-        """Setter for blackhole_import_maxlen6."""
-        self.bgp_attributes.blackhole_import_maxlen6 = blackhole_import_maxlen6
-
-    @property
-    def blackhole_import_minlen6(self) -> int:
-        """Return the current value of blackhole_import_minlen6."""
-        return self.bgp_attributes.blackhole_import_minlen6
-
-    @blackhole_import_minlen6.setter
-    def blackhole_import_minlen6(self, blackhole_import_minlen6: int) -> None:
-        """Setter for blackhole_import_minlen6."""
-        self.bgp_attributes.blackhole_import_minlen6 = blackhole_import_minlen6
-
-    # IPV6 BLACKHOLE EXPORT PREFIX LENGTHS
-
-    @property
-    def blackhole_export_maxlen6(self) -> int:
-        """Return the current value of blackhole_export_maxlen6."""
-        return self.bgp_attributes.blackhole_export_maxlen6
-
-    @blackhole_export_maxlen6.setter
-    def blackhole_export_maxlen6(self, blackhole_export_maxlen6: int) -> None:
-        """Setter for blackhole_export_maxlen6."""
-        self.bgp_attributes.blackhole_export_maxlen6 = blackhole_export_maxlen6
-
-    @property
-    def blackhole_export_minlen6(self) -> int:
-        """Return the current value of blackhole_export_minlen6."""
-        return self.bgp_attributes.blackhole_export_minlen6
-
-    @blackhole_export_minlen6.setter
-    def blackhole_export_minlen6(self, blackhole_export_minlen6: int) -> None:
-        """Setter for blackhole_export_minlen6."""
-        self.bgp_attributes.blackhole_export_minlen6 = blackhole_export_minlen6
-
-    # IPV4 IMPORT PREFIX LENGTHS
-
-    @property
-    def prefix_import_maxlen4(self) -> int:
-        """Return the current value of prefix_import_maxlen4."""
-        return self.bgp_attributes.prefix_import_maxlen4
-
-    @prefix_import_maxlen4.setter
-    def prefix_import_maxlen4(self, prefix_import_maxlen4: int) -> None:
-        """Setter for prefix_import_maxlen4."""
-        self.bgp_attributes.prefix_import_maxlen4 = prefix_import_maxlen4
-
-    @property
-    def prefix_import_minlen4(self) -> int:
-        """Return the current value of prefix_import_minlen4."""
-        return self.bgp_attributes.prefix_import_minlen4
-
-    @prefix_import_minlen4.setter
-    def prefix_import_minlen4(self, prefix_import_minlen4: int) -> None:
-        """Setter for prefix_import_minlen4."""
-        self.bgp_attributes.prefix_import_minlen4 = prefix_import_minlen4
-
-    # IPV4 EXPORT PREFIX LENGHTS
-
-    @property
-    def prefix_export_maxlen4(self) -> int:
-        """Return the current value of prefix_export_maxlen4."""
-        return self.bgp_attributes.prefix_export_maxlen4
-
-    @prefix_export_maxlen4.setter
-    def prefix_export_maxlen4(self, prefix_export_maxlen4: int) -> None:
-        """Setter for prefix_export_maxlen4."""
-        self.bgp_attributes.prefix_export_maxlen4 = prefix_export_maxlen4
-
-    @property
-    def prefix_export_minlen4(self) -> int:
-        """Return the current value of prefix_export_minlen4."""
-        return self.bgp_attributes.prefix_export_minlen4
-
-    @prefix_export_minlen4.setter
-    def prefix_export_minlen4(self, prefix_export_minlen4: int) -> None:
-        """Setter for prefix_export_minlen4."""
-        self.bgp_attributes.prefix_export_minlen4 = prefix_export_minlen4
-
-    # IPV6 IMPORT LENGTHS
-
-    @property
-    def prefix_import_maxlen6(self) -> int:
-        """Return the current value of prefix_import_maxlen6."""
-        return self.bgp_attributes.prefix_import_maxlen6
-
-    @prefix_import_maxlen6.setter
-    def prefix_import_maxlen6(self, prefix_import_maxlen6: int) -> None:
-        """Setter for prefix_import_maxlen6."""
-        self.bgp_attributes.prefix_import_maxlen6 = prefix_import_maxlen6
-
-    @property
-    def prefix_import_minlen6(self) -> int:
-        """Return the current value of prefix_import_minlen6."""
-        return self.bgp_attributes.prefix_import_minlen6
-
-    @prefix_import_minlen6.setter
-    def prefix_import_minlen6(self, prefix_import_minlen6: int) -> None:
-        """Setter for prefix_import_minlen6."""
-        self.bgp_attributes.prefix_import_minlen6 = prefix_import_minlen6
-
-    # IPV6 EXPORT LENGTHS
-
-    @property
-    def prefix_export_minlen6(self) -> int:
-        """Return the current value of prefix_export_minlen6."""
-        return self.bgp_attributes.prefix_export_minlen6
-
-    @prefix_export_minlen6.setter
-    def prefix_export_minlen6(self, prefix_export_minlen6: int) -> None:
-        """Setter for prefix_export_minlen6."""
-        self.bgp_attributes.prefix_export_minlen6 = prefix_export_minlen6
-
-    @property
-    def prefix_export_maxlen6(self) -> int:
-        """Return the current value of prefix_export_maxlen6."""
-        return self.bgp_attributes.prefix_export_maxlen6
-
-    @prefix_export_maxlen6.setter
-    def prefix_export_maxlen6(self, prefix_export_maxlen6: int) -> None:
-        """Setter for prefix_export_maxlen6."""
-        self.bgp_attributes.prefix_export_maxlen6 = prefix_export_maxlen6
-
-    # AS PATH LENGTHS
-
-    @property
-    def aspath_import_minlen(self) -> int:
-        """Return the current value of aspath_import_minlen."""
-        return self.bgp_attributes.aspath_import_minlen
-
-    @aspath_import_minlen.setter
-    def aspath_import_minlen(self, aspath_import_minlen: int) -> None:
-        """Set the AS path minlen."""
-        self.bgp_attributes.aspath_import_minlen = aspath_import_minlen
-
-    @property
-    def aspath_import_maxlen(self) -> int:
-        """Return the current value of aspath_import_maxlen."""
-        return self.bgp_attributes.aspath_import_maxlen
-
-    @aspath_import_maxlen.setter
-    def aspath_import_maxlen(self, aspath_import_maxlen: int) -> None:
-        """Set the AS path maxlen."""
-        self.bgp_attributes.aspath_import_maxlen = aspath_import_maxlen
-
-    # COMMUNITY LENGTHS
-
-    @property
-    def community_import_maxlen(self) -> int:
-        """Return the current value of community_import_maxlen."""
-        return self.bgp_attributes.community_import_maxlen
-
-    @community_import_maxlen.setter
-    def community_import_maxlen(self, community_import_maxlen: int) -> None:
-        """Set the value of community_import_maxlen."""
-        self.bgp_attributes.community_import_maxlen = community_import_maxlen
-
-    @property
-    def extended_community_import_maxlen(self) -> int:
-        """Return the current value of extended_community_import_maxlen."""
-        return self.bgp_attributes.extended_community_import_maxlen
-
-    @extended_community_import_maxlen.setter
-    def extended_community_import_maxlen(self, extended_community_import_maxlen: int) -> None:
-        """Set the value of extended_community_import_maxlen."""
-        self.bgp_attributes.extended_community_import_maxlen = extended_community_import_maxlen
-
-    @property
-    def large_community_import_maxlen(self) -> int:
-        """Return the current value of large_community_import_maxlen."""
-        return self.bgp_attributes.large_community_import_maxlen
-
-    @large_community_import_maxlen.setter
-    def large_community_import_maxlen(self, large_community_import_maxlen: int) -> None:
-        """Set the value of large_community_import_maxlen."""
-        self.bgp_attributes.large_community_import_maxlen = large_community_import_maxlen

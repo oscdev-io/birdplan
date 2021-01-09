@@ -1,9 +1,6 @@
 # BGP prefix limit tests
 
-Tests below may vary slightly depending on peer type.
-
-
-In terms of test "test_bgp_prefix_limit":
+In terms of test `test_bgp_prefix_limit`:
   - Exabgp e1 should be sending too many prefixes to r1 causing the session to be torn down.
 
 

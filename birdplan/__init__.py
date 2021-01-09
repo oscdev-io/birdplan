@@ -18,8 +18,11 @@
 
 """BirdPlan package."""
 
+# pylint: disable=too-many-lines
+
 from typing import Any, Dict, List, Optional, Union
 import os
+import jinja2
 import yaml
 from .bird_config import BirdConfig
 from .exceptions import BirdPlanError
@@ -57,11 +60,22 @@ class BirdPlan:
 
         """
 
-        # Read in configuration file
+        # Create search paths for Jinja2
+        search_paths = [os.path.dirname(plan_file)]
+        # We need to pass Jinja2 our filename, as it is in the search path
+        plan_file_fname = os.path.basename(plan_file)
+
+        # Render first with jinja
+        template_env = jinja2.Environment(  # nosec
+            loader=jinja2.FileSystemLoader(searchpath=search_paths),
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+
+        # Check if we can load the configuration
         try:
-            with open(plan_file, "r") as file:
-                raw_config = file.read()
-        except OSError as err:
+            raw_config = template_env.get_template(plan_file_fname).render()
+        except jinja2.TemplateError as err:
             raise BirdPlanError(f"Failed to read BirdPlan file '{plan_file}': {err}") from None
 
         # Load configuration using YAML
@@ -107,7 +121,7 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config:
-            if config_item not in ["router_id", "log_file", "debug", "static", "export_kernel", "bgp", "rip", "ospf"]:
+            if config_item not in ("router_id", "log_file", "debug", "static", "export_kernel", "bgp", "rip", "ospf"):
                 raise BirdPlanError(f"The config item '{config_item}' is not supported")
 
         # Configure sections
@@ -350,7 +364,7 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config["rip"]:
-            if config_item not in ["accept", "redistribute", "interfaces"]:
+            if config_item not in ("accept", "redistribute", "interfaces"):
                 raise BirdPlanError(f"The 'rip' config item '{config_item}' is not supported")
 
         self._config_rip_accept()
@@ -393,28 +407,34 @@ class BirdPlan:
                 elif isinstance(redistribute_config, dict):
                     # Check it has an "interfaces" key
                     if "interfaces" not in redistribute_config:
-                        raise BirdPlanError(f"Configurion item '{redistribute}' has no 'interfaces' option in bgp:redistribute")
+                        raise BirdPlanError(f"Configurion item '{redistribute}' has no 'interfaces' option in rip:redistribute")
                     # If it does, check that it is a list
                     if not isinstance(redistribute_config["interfaces"], list):
-                        raise BirdPlanError(f"Configurion item '{redistribute}:interfaces' has an invalid type in bgp:redistribute")
+                        raise BirdPlanError(f"Configurion item '{redistribute}:interfaces' has an invalid type in rip:redistribute")
                     # Set redistribute_connected as the interface list
                     redistribute_connected = redistribute_config["interfaces"]
                 else:
                     raise BirdPlanError(f"Configurion item '{redistribute}' has an unsupported value")
                 # Add configuration
                 self.birdconf.protocols.rip.route_policy_redistribute.connected = redistribute_connected
-            # Add static route redistribution
-            elif redistribute == "static":
-                self.birdconf.protocols.rip.route_policy_redistribute.static = redistribute_config
             # Add kernel route redistribution
             elif redistribute == "kernel":
                 self.birdconf.protocols.rip.route_policy_redistribute.kernel = redistribute_config
-            # Allow redistribution of the default route
-            elif redistribute == "default":
-                self.birdconf.protocols.rip.route_policy_redistribute.default = redistribute_config
+            # Add kernel default route redistribution
+            elif redistribute == "kernel_default":
+                self.birdconf.protocols.rip.route_policy_redistribute.kernel_default = redistribute_config
             # Allow redistribution of RIP routes
             elif redistribute == "rip":
                 self.birdconf.protocols.rip.route_policy_redistribute.rip = redistribute_config
+            # Allow redistribution of RIP default routes
+            elif redistribute == "rip_default":
+                self.birdconf.protocols.rip.route_policy_redistribute.rip_default = redistribute_config
+            # Add static route redistribution
+            elif redistribute == "static":
+                self.birdconf.protocols.rip.route_policy_redistribute.static = redistribute_config
+            # Add static default route redistribution
+            elif redistribute == "static_default":
+                self.birdconf.protocols.rip.route_policy_redistribute.static_default = redistribute_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in rip:redistribute")
@@ -449,7 +469,7 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config["ospf"]:
-            if config_item not in ["accept", "redistribute", "areas"]:
+            if config_item not in ("accept", "redistribute", "areas"):
                 raise BirdPlanError(f"The 'ospf' config item '{config_item}' is not supported")
 
         self._config_ospf_accept()
@@ -495,10 +515,12 @@ class BirdPlan:
                 elif isinstance(redistribute_config, dict):
                     # Check it has an "interfaces" key
                     if "interfaces" not in redistribute_config:
-                        raise BirdPlanError(f"Configurion item '{redistribute}' has no 'interfaces' option in bgp:redistribute")
+                        raise BirdPlanError(f"Configurion item '{redistribute}' has no 'interfaces' option in ospf:redistribute")
                     # If it does, check that it is a list
                     if not isinstance(redistribute_config["interfaces"], list):
-                        raise BirdPlanError(f"Configurion item '{redistribute}:interfaces' has an invalid type in bgp:redistribute")
+                        raise BirdPlanError(
+                            f"Configurion item '{redistribute}:interfaces' has an invalid type in ospf:redistribute"
+                        )
                     # Set redistribute_connected as the interface list
                     redistribute_connected = redistribute_config["interfaces"]
                 else:
@@ -508,9 +530,15 @@ class BirdPlan:
             # Add kernel route redistribution
             elif redistribute == "kernel":
                 self.birdconf.protocols.ospf.route_policy_redistribute.kernel = redistribute_config
-            # Allow redistribution of the default route
-            elif redistribute == "default":
-                self.birdconf.protocols.ospf.route_policy_redistribute.default = redistribute_config
+            # Add kernel default route redistribution
+            elif redistribute == "kernel_default":
+                self.birdconf.protocols.ospf.route_policy_redistribute.kernel_default = redistribute_config
+            # Add static route redistribution
+            elif redistribute == "static":
+                self.birdconf.protocols.ospf.route_policy_redistribute.static = redistribute_config
+            # Add static default route redistribution
+            elif redistribute == "static_default":
+                self.birdconf.protocols.ospf.route_policy_redistribute.static_default = redistribute_config
             # If we don't understand this 'redistribute' entry, throw an error
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")
@@ -566,41 +594,22 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config["bgp"]:
-            if config_item not in [
+            if config_item not in (
                 # Globals
                 "asn",
                 "graceful_shutdown",
-                "blackhole_import_maxlen4",
-                "blackhole_import_minlen4",
-                "blackhole_export_maxlen4",
-                "blackhole_export_minlen4",
-                "blackhole_import_maxlen6",
-                "blackhole_import_minlen6",
-                "blackhole_export_maxlen6",
-                "blackhole_export_minlen6",
-                "prefix_import_maxlen4",
-                "prefix_export_maxlen4",
-                "prefix_import_minlen4",
-                "prefix_export_minlen4",
-                "prefix_import_maxlen6",
-                "prefix_export_maxlen6",
-                "prefix_import_minlen6",
-                "prefix_export_minlen6",
-                "aspath_import_maxlen",
-                "aspath_import_minlen",
-                "community_import_maxlen",
-                "extended_community_import_maxlen",
-                "large_community_import_maxlen",
+                "peertype_constraints",
                 "originate",  # Origination
                 "accept",
                 "import",
                 "rr_cluster_id",
                 "peers",
-            ]:
+            ):
                 raise BirdPlanError(f"The 'bgp' config item '{config_item}' is not supported")
 
         self._config_bgp_accept()
         self._config_bgp_globals()
+        self._config_bgp_peertype_constraints()
         self._config_bgp_originate()
 
         self._config_bgp_import()
@@ -616,7 +625,14 @@ class BirdPlan:
         # Loop with accept items
         for accept, accept_config in self.config["bgp"]["accept"].items():
             # Check if we need to accept some kinds of routes
-            if accept in ("default", "blackhole", "originated"):
+            if accept in (
+                "bgp_customer_blackhole",
+                "bgp_own_blackhole",
+                "bgp_own_default",
+                "bgp_transit_default",
+                "originated",
+                "originated_default",
+            ):
                 setattr(self.birdconf.protocols.bgp.route_policy_accept, accept, accept_config)
             # If we don't understand this 'accept' entry, throw an error
             else:
@@ -625,37 +641,116 @@ class BirdPlan:
     def _config_bgp_globals(self) -> None:
         """Configure bgp globals."""
 
-        # Setup prefix lengths
-        for item in [
-            "graceful_shutdown",
-            "blackhole_import_maxlen4",
-            "blackhole_import_minlen4",
-            "blackhole_export_maxlen4",
-            "blackhole_export_minlen4",
-            "blackhole_import_maxlen6",
-            "blackhole_import_minlen6",
-            "blackhole_export_maxlen6",
-            "blackhole_export_minlen6",
-            "prefix_import_maxlen4",
-            "prefix_export_maxlen4",
-            "prefix_import_minlen4",
-            "prefix_export_minlen4",
-            "prefix_import_maxlen6",
-            "prefix_export_maxlen6",
-            "prefix_import_minlen6",
-            "prefix_export_minlen6",
-            "aspath_import_maxlen",
-            "aspath_import_minlen",
-            "community_import_maxlen",
-            "extended_community_import_maxlen",
-            "large_community_import_maxlen",
-        ]:
-            if item in self.config["bgp"]:
-                setattr(self.birdconf.protocols.bgp, item, self.config["bgp"][item])
+        # Setup graceful shutdown if specified
+        if "graceful_shutdown" in self.config["bgp"]:
+            self.birdconf.protocols.bgp.graceful_shutdown = self.config["bgp"]["graceful_shutdown"]
 
         # Set our route reflector cluster id
         if "rr_cluster_id" in self.config["bgp"]:
             self.birdconf.protocols.bgp.rr_cluster_id = self.config["bgp"]["rr_cluster_id"]
+
+    def _config_bgp_peertype_constraints(self) -> None:
+        """Configure bgp:peertype_constraints section."""
+
+        # If we don't have a peertype_constraints section, just return
+        if "peertype_constraints" not in self.config["bgp"]:
+            return
+
+        for peer_type in self.config["bgp"]["peertype_constraints"]:
+            # Make sure we have a valid peer type
+            if peer_type not in (
+                "customer",
+                "customer.private",
+                "internal",
+                "peer",
+                "routecollector",
+                "routeserver",
+                "rrclient",
+                "rrserver",
+                "rrserver-rrserver",
+                "transit",
+            ):
+                raise BirdPlanError(f"The 'bgp:peertype_constraints' config item '{peer_type}' is not supported")
+            # Loop with constraint items
+            for constraint_name in self.config["bgp"]["peertype_constraints"][peer_type]:
+                # Make sure we have a valid constraint to set
+                if constraint_name not in (
+                    "blackhole_import_maxlen4",
+                    "blackhole_import_minlen4",
+                    "blackhole_export_maxlen4",
+                    "blackhole_export_minlen4",
+                    "blackhole_import_maxlen6",
+                    "blackhole_import_minlen6",
+                    "blackhole_export_maxlen6",
+                    "blackhole_export_minlen6",
+                    "import_maxlen4",
+                    "export_maxlen4",
+                    "import_minlen4",
+                    "export_minlen4",
+                    "import_maxlen6",
+                    "export_maxlen6",
+                    "import_minlen6",
+                    "export_minlen6",
+                    "aspath_import_maxlen",
+                    "aspath_import_minlen",
+                    "community_import_maxlen",
+                    "extended_community_import_maxlen",
+                    "large_community_import_maxlen",
+                ):
+                    raise BirdPlanError(
+                        f"The 'bgp:peertype_constraints:{peer_type}' config item '{constraint_name}' is not supported"
+                    )
+                # Make sure this peer supports blackhole imports
+                if constraint_name.startswith("blackhole_import_"):
+                    if peer_type not in (
+                        "customer",
+                        "internal",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                    ):
+                        raise BirdPlanError(
+                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' "
+                            "makes no sense"
+                        )
+                # Make sure this peer accepts blackhole exports
+                if constraint_name.startswith("blackhole_export_"):
+                    if peer_type not in (
+                        "internal",
+                        "routeserver",
+                        "routecollector",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                        "transit",
+                    ):
+                        raise BirdPlanError(
+                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' "
+                            "makes no sense"
+                        )
+                # Make sure this peer supports imports
+                if "import" in constraint_name:
+                    if peer_type not in (
+                        "customer",
+                        "customer.private",
+                        "internal",
+                        "peer",
+                        "routeserver",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                        "transit",
+                    ):
+                        raise BirdPlanError(
+                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' "
+                            "makes no sense"
+                        )
+                # Finally set the constraint item
+                setattr(
+                    self.birdconf.protocols.bgp.constraints(peer_type),
+                    constraint_name,
+                    self.config["bgp"]["peertype_constraints"][peer_type][constraint_name],
+                )
 
     def _config_bgp_originate(self) -> None:
         """Configure bgp:originate section."""
@@ -705,6 +800,9 @@ class BirdPlan:
             # Import kernel blackhole routes into the main BGP table
             elif import_type == "kernel_blackhole":
                 self.birdconf.protocols.bgp.route_policy_import.kernel_blackhole = import_config
+            # Import kernel default routes into the main BGP table
+            elif import_type == "kernel_default":
+                self.birdconf.protocols.bgp.route_policy_import.kernel_default = import_config
 
             # Import static routes into the main BGP table
             elif import_type == "static":
@@ -712,6 +810,9 @@ class BirdPlan:
             # Import static blackhole routes into the main BGP table
             elif import_type == "static_blackhole":
                 self.birdconf.protocols.bgp.route_policy_import.static_blackhole = import_config
+            # Import static default routes into the main BGP table
+            elif import_type == "static_default":
+                self.birdconf.protocols.bgp.route_policy_import.static_default = import_config
 
             # If we don't understand this 'redistribute' entry, throw an error
             else:
@@ -756,31 +857,9 @@ class BirdPlan:
                 "quarantine",
                 "replace_aspath",
                 "incoming_large_communities",
-                "outgoing_large_communities",
                 "cost",
                 "graceful_shutdown",
                 "blackhole_community",
-                "blackhole_import_maxlen4",
-                "blackhole_import_minlen4",
-                "blackhole_export_maxlen4",
-                "blackhole_export_minlen4",
-                "blackhole_import_maxlen6",
-                "blackhole_import_minlen6",
-                "blackhole_export_maxlen6",
-                "blackhole_export_minlen6",
-                "prefix_import_maxlen4",
-                "prefix_import_minlen4",
-                "prefix_export_maxlen4",
-                "prefix_export_minlen4",
-                "prefix_import_maxlen6",
-                "prefix_import_minlen6",
-                "prefix_export_maxlen6",
-                "prefix_export_minlen6",
-                "aspath_import_maxlen",
-                "aspath_import_minlen",
-                "community_import_maxlen",
-                "extended_community_import_maxlen",
-                "large_community_import_maxlen",
             ):
                 peer[config_item] = config_value
             # Peer location configuration
@@ -788,87 +867,185 @@ class BirdPlan:
                 peer["location"] = {}
                 # Loop with location configuration items
                 for location_type, location_config in config_value.items():
-                    if location_type in ["iso3166", "unm49"]:
-                        peer["location"][location_type] = location_config
-                    # If we don't understand this 'location' entry, throw an error
-                    else:
+                    if location_type not in ("iso3166", "unm49"):
                         raise BirdPlanError(
                             f"Configuration item '{location_type}' not understood in bgp:peers:{peer_name}:location"
                         )
+                    peer["location"][location_type] = location_config
             # Work out redistribution
             elif config_item == "redistribute":
                 peer["redistribute"] = {}
                 # Loop with redistribution items
                 for redistribute_type, redistribute_config in config_value.items():
-                    if redistribute_type in (
-                        "default",
+                    if redistribute_type not in (
                         "connected",
                         "kernel",
                         "kernel_blackhole",
+                        "kernel_default",
                         "static",
                         "static_blackhole",
+                        "static_default",
                         "originated",
+                        "originated_default",
                         "bgp",
-                        "bgp_own",
                         "bgp_customer",
+                        "bgp_customer_blackhole",
+                        "bgp_own",
+                        "bgp_own_blackhole",
+                        "bgp_own_default",
                         "bgp_peering",
                         "bgp_transit",
+                        "bgp_transit_default",
                     ):
-                        peer["redistribute"][redistribute_type] = redistribute_config
-                    # If we don't understand this 'redistribute' entry, throw an error
-                    else:
                         raise BirdPlanError(
                             f"Configuration item '{redistribute_type}' not understood in bgp:peers:{peer_name} redistribute"
                         )
+                    peer["redistribute"][redistribute_type] = redistribute_config
+
             # Work out acceptance of routes
             elif config_item == "accept":
                 peer["accept"] = {}
                 # Loop with acceptance items
                 for accept, accept_config in config_value.items():
-                    if accept in ["blackhole", "default"]:
-                        peer["accept"][accept] = accept_config
-                    # If we don't understand this 'accept' entry, throw an error
-                    else:
+                    if accept not in (
+                        "bgp_customer_blackhole",
+                        "bgp_own_blackhole",
+                        "bgp_own_default",
+                        "bgp_transit_default",
+                    ):
                         raise BirdPlanError(f"Configuration item '{accept}' not understood in bgp:peers:{peer_name}:accept")
+                    peer["accept"][accept] = accept_config
             # Work out filters
             elif config_item == "filter":
                 peer["filter"] = {}
                 # Loop with filter configuration items
                 for filter_type, filter_config in config_value.items():
-                    if filter_type in ["prefixes", "origin_asns", "peer_asns", "as-set"]:
-                        peer["filter"][filter_type] = filter_config
-                    # If we don't understand this 'filter' entry, throw an error
-                    else:
+                    if filter_type not in ("prefixes", "origin_asns", "peer_asns", "as-set"):
                         raise BirdPlanError(f"Configuration item '{filter_type}' not understood in bgp:peers:{peer_name}:filter")
+                    peer["filter"][filter_type] = filter_config
+
+            # Work out outgoing large community options
+            elif config_item == "outgoing_large_communities":
+                if isinstance(config_value, dict):
+                    # Loop with outgoing large community configuration items
+                    for lc_type, lc_config in config_value.items():
+                        if lc_type not in (
+                            "blackhole",
+                            "default",
+                            "connected",
+                            "kernel",
+                            "kernel_blackhole",
+                            "kernel_default",
+                            "static",
+                            "static_blackhole",
+                            "static_default",
+                            "originated",
+                            "originated_default",
+                            "bgp",
+                            "bgp_own",
+                            "bgp_own_blackhole",
+                            "bgp_own_default",
+                            "bgp_customer",
+                            "bgp_customer_blackhole",
+                            "bgp_peering",
+                            "bgp_transit",
+                            "bgp_transit_default",
+                            "bgp_blackhole",
+                            "bgp_default",
+                        ):
+                            raise BirdPlanError(
+                                f"Configuration item '{lc_type}' not understood in bgp:peers:{peer_name}:outgoing_large_communities"
+                            )
+                        # Make sure we have a prepend key
+                        if "outgoing_large_communities" not in peer:
+                            peer["outgoing_large_communities"] = {}
+                        # Then add the config...
+                        peer["outgoing_large_communities"][lc_type] = lc_config
+
+                # Check in the case it is a list
+                elif isinstance(config_value, list):
+                    peer["outgoing_large_communities"] = config_value
+
+                # Else if we don't know what it is, then throw an exception
+                else:
+                    raise BirdPlanError(f"Configuration item bgp:peers:{peer_name}:outgoing_large_communities has incorrect type")
+
             # Work out prepending options
             elif config_item == "prepend":
                 if isinstance(config_value, dict):
                     # Loop with prepend configuration items
                     for prepend_type, prepend_config in config_value.items():
-                        if prepend_type in [
+                        if prepend_type not in (
+                            "blackhole",
                             "default",
                             "connected",
-                            "static",
                             "kernel",
+                            "kernel_blackhole",
+                            "kernel_default",
+                            "static",
+                            "static_blackhole",
+                            "static_default",
                             "originated",
+                            "originated_default",
                             "bgp",
                             "bgp_own",
+                            "bgp_own_blackhole",
+                            "bgp_own_default",
                             "bgp_customer",
+                            "bgp_customer_blackhole",
                             "bgp_peering",
                             "bgp_transit",
-                        ]:
-                            # Make sure we have a prepend key
-                            if "prepend" not in peer:
-                                peer["prepend"] = {}
-                            # Then add the config...
-                            peer["prepend"][prepend_type] = prepend_config
-                        # If we don't understand this 'prepend' entry, throw an error
-                        else:
+                            "bgp_transit_default",
+                            "bgp_blackhole",
+                            "bgp_default",
+                        ):
                             raise BirdPlanError(
                                 f"Configuration item '{prepend_type}' not understood in bgp:peers:{peer_name}:prepend"
                             )
+                        # Make sure we have a prepend key
+                        if "prepend" not in peer:
+                            peer["prepend"] = {}
+                        # Then add the config...
+                        peer["prepend"][prepend_type] = prepend_config
                 else:
                     peer["prepend"] = config_value
+
+            # Work out our constraints
+            elif config_item == "constraints":
+                # Loop with constraint configuration items
+                for constraint_name, constraint_value in config_value.items():
+                    if constraint_name not in (
+                        "blackhole_import_maxlen4",
+                        "blackhole_import_minlen4",
+                        "blackhole_export_maxlen4",
+                        "blackhole_export_minlen4",
+                        "blackhole_import_maxlen6",
+                        "blackhole_import_minlen6",
+                        "blackhole_export_maxlen6",
+                        "blackhole_export_minlen6",
+                        "import_maxlen4",
+                        "export_maxlen4",
+                        "import_minlen4",
+                        "export_minlen4",
+                        "import_maxlen6",
+                        "export_maxlen6",
+                        "import_minlen6",
+                        "export_minlen6",
+                        "aspath_import_maxlen",
+                        "aspath_import_minlen",
+                        "community_import_maxlen",
+                        "extended_community_import_maxlen",
+                        "large_community_import_maxlen",
+                    ):
+                        raise BirdPlanError(
+                            f"Configuration item '{constraint_name}' not understood in bgp:peers:{peer_name}:prepend"
+                        )
+                    # Make sure we have a prepend key
+                    if "constraints" not in peer:
+                        peer["constraints"] = {}
+                    # Then add the config...
+                    peer["constraints"][constraint_name] = constraint_value
+
             else:
                 raise BirdPlanError(f"Configuration item '{config_item}' not understood in bgp:peers:{peer_name}")
 

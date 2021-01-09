@@ -20,6 +20,10 @@ class "Router: r1" {
   .. Interface: eth1 (stub) ..
 - 100.101.0.1/24
 + fc00:101::1/64
+
+  .. Interface: eth2 ..
+- 100.201.0.1/24
++ fc00:201::1/64
 }
 
 
@@ -36,7 +40,7 @@ class "Switch: s1" {}
 
 "Router: r1" -> "Switch: s1": r1 eth0
 "Switch: s1" -> "Router: r2": r2 eth0
-"Router: r1" --() NC: r1 eth1
+"Router: r1" --() NC: r1 eth2
 
 @enduml
 ```

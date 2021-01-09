@@ -23,7 +23,7 @@ r1_t_bgp4_AS65100_e1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.64.101.0/29": [
+    "100.64.104.0/24": [
         {
             "asn": "AS65100",
             "attributes": {
@@ -43,7 +43,7 @@ r1_t_bgp4_AS65100_e1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "100.64.104.0/24": [
+    "100.64.104.0/29": [
         {
             "asn": "AS65100",
             "attributes": {
@@ -102,7 +102,7 @@ r9_t_bgp4_AS65000_r1_peer = {}
 r10_t_bgp4_AS65000_r1_peer = {}
 
 r1_t_bgp6_AS65100_e1_peer = {
-    "fc00:101::/64": [
+    "fc00:101::/48": [
         {
             "asn": "AS65100",
             "attributes": {
@@ -121,7 +121,7 @@ r1_t_bgp6_AS65100_e1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:101::/96": [
+    "fc00:104::/64": [
         {
             "asn": "AS65100",
             "attributes": {
@@ -141,7 +141,7 @@ r1_t_bgp6_AS65100_e1_peer = {
             "type": ["BGP", "univ"],
         }
     ],
-    "fc00:104::/64": [
+    "fc00:104::/96": [
         {
             "asn": "AS65100",
             "attributes": {

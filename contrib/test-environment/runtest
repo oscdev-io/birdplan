@@ -6,4 +6,5 @@ echo "RUNNING: python setup.py test --addopt \"-v $*\""
 
 export PYTHONPATH
 
-python setup.py test --addopt "-v $*"
+nice python setup.py test --addopt "-v $*"
+

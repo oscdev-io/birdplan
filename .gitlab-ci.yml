@@ -17,13 +17,13 @@ test_job:
   - pacman -Syu --noconfirm
   - pacman -S --noconfirm grep python
   - pacman -S --noconfirm python-pytest-runner python-pytest-cov python-pytest-black python-pytest-flake8 python-pytest-pycodestyle python-pytest-pydocstyle python-pytest-pylint python-pytest-mypy python-pytest-xdist python-yaml
-  - pacman -S --noconfirm python-yaml python-requests iproute2 bird exabgp
+  - pacman -S --noconfirm python-jinja python-yaml python-requests iproute2 bird exabgp
   # Create Python environment
   - pacman -S --noconfirm python-pip git
   - pip install git+https://oscdev.io/software/birdclient.git
   - pip install git+https://oscdev.io/software/nsnetsim.git
   # Run tests
-  - if [ -n "$EXTRA_TEST_OPTS" ]; then python setup.py test --addopt "$EXTRA_TEST_OPTS"; else python setup.py test; fi
+  - if [ -n "$EXTRA_TEST_OPTS" ]; then echo "EXTRA_TEST_OPTS => $EXTRA_TEST_OPTS"; python setup.py test --addopt "$EXTRA_TEST_OPTS"; else python setup.py test; fi
 
 prepare_release:
   stage: prepare_release

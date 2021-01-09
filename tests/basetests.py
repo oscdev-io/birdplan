@@ -64,6 +64,9 @@ class BirdPlanBaseTestCase:
     # Routers configuration exception catching
     routers_config_exception = {}
 
+    # Extra macros to pull in
+    template_macros = []
+
     # Supported attributes include:
     # rX_asn
     # rX_peer_asn
@@ -99,6 +102,11 @@ class BirdPlanBaseTestCase:
     e1_interfaces = ["eth0"]
     e1_interface_eth0 = {"mac": "02:e1:00:00:00:01", "ips": ["100.64.0.2/24", "fc00:100::2/64"]}
     e1_switch_eth0 = "s1"
+
+    e2_asn = 65001
+    e2_interfaces = ["eth0"]
+    e2_interface_eth0 = {"mac": "02:e2:00:00:00:01", "ips": ["100.64.0.3/24", "fc00:100::3/64"]}
+    e2_switch_eth0 = "s1"
 
     def _test_setup(self, sim, testpath, tmpdir):  # pylint: disable=too-many-locals
         """Set up a BIRD test scenario using our attributes."""
@@ -273,7 +281,7 @@ class BirdPlanBaseTestCase:
         # setting it to None
         expect_count = None
         if isinstance(expected_data, dict):
-            expect_count = len(expected_data) or None
+            expect_count = sum(len(v) for v in expected_data.values()) or None
 
         # Save the start time
         time_start = time.time()
@@ -285,7 +293,7 @@ class BirdPlanBaseTestCase:
 
             # Grab the routers table from BIRD
             result = self._bird_route_table(sim, router, table_name)
-            result_len = len(result)
+            result_len = sum(len(v) for v in result.values())
 
             count_matches = False
             content_matches = False
@@ -316,6 +324,10 @@ class BirdPlanBaseTestCase:
                 break
 
             time.sleep(0.5)
+
+        # Sort nexthops by protocol
+        for nexthops in result.values():
+            nexthops.sort(key=lambda item: item["protocol"])
 
         # Add report
         report = f"{table_variable_name} = " + pprint.pformat(result)
@@ -351,7 +363,9 @@ class BirdPlanBaseTestCase:
             time_start = time.time()
 
             # Grab expected count and start with blank result
-            expect_count = len(expected_data)
+            expect_count = None
+            if isinstance(expected_data, dict):
+                expect_count = len(expected_data) or None
             expect_timeout = 10
             result = []
             while True:
@@ -447,15 +461,13 @@ class BirdPlanBaseTestCase:
 
         # Loop with each ExaBGP
         for exabgp in self.exabgps:
-            # Grab ExaBGP's ASN
-            exabgp_asn = getattr(self, f"{exabgp}_asn")
-
             # Grab the configuration filename we're going to be using
             exabgp_conffile = f"{tmpdir}/exabgp.conf.{exabgp}"
 
             # Loop with supported attributes that translate into macros
             internal_macros = {}
             for attr in [
+                "asn",
                 "exabgp_config",
                 "exabgp_config_neighbor1",
                 "exabgp_config_neighbor2",
@@ -480,6 +492,9 @@ class BirdPlanBaseTestCase:
                 # Add our macro
                 internal_macros[f"@{attr.upper()}@"] = value
 
+            # Grab ExaBGP's ASN
+            exabgp_asn = internal_macros["@ASN@"]
+
             # Work out config file name, going 2 levels up in the test directory
             exabgp_config_file = None
             for conffile_path in [
@@ -501,7 +516,7 @@ class BirdPlanBaseTestCase:
                     break
             # If we didn't get a configuration file that exists, then raise an exception
             if not exabgp_config_file:
-                raise RuntimeError("No ExaBGP configuration file found")
+                raise RuntimeError(f"No ExaBGP configuration file found for ExaBGP '{exabgp}' with ASN '{exabgp_asn}'")
 
             # Read in configuration file
             with open(exabgp_config_file, "r") as file:
@@ -516,7 +531,7 @@ class BirdPlanBaseTestCase:
                 file.write(raw_config)
 
             # Add config file to our simulation so we get a report for it
-            sim.add_conffile(f"EXABGP_CONFFILE({exabgp})", exabgp_conffile)
+            sim.add_conffile(f"exabgp.conf.{exabgp}", exabgp_conffile)
 
     def _birdplan_run(  # pylint: disable=too-many-arguments,too-many-locals
         self, sim: Simulation, tmpdir: str, router: str, args: List[str]
@@ -529,9 +544,8 @@ class BirdPlanBaseTestCase:
         bird_statefile = f"{tmpdir}/bird.state.{router}"
         bird_logfile = f"{tmpdir}/bird.log.{router}"
 
-        # Loop with supported attributes that translate into macros
-        internal_macros = {}
-        for attr in [
+        # Work out what attributes we support for macros
+        attr_list = [
             "asn",
             "peer_asn",
             "peer_type",
@@ -544,8 +558,16 @@ class BirdPlanBaseTestCase:
             "template_extra_config",
             "template_global_config",
             "template_peer_config",
+            "template_peer_extra_config",
             "template_allpeer_config",
-        ]:
+        ]
+        extra_attr_list = getattr(self, "template_macros")
+        if extra_attr_list:
+            attr_list.extend(extra_attr_list)
+
+        # Loop with supported attributes that translate into macros
+        internal_macros = {}
+        for attr in attr_list:
             # Router specific lookup for an attribute to add a macro for
             router_attr = f"{router}_{attr}"
             if hasattr(self, router_attr):
@@ -586,6 +608,9 @@ class BirdPlanBaseTestCase:
         for macro, value in macros.items():
             if isinstance(value, int):
                 value = f"{value}"
+            # Check for odd issues...
+            if value is None:
+                raise RuntimeError(f"Macro '{macro}' for router '{router}' has value None")
             raw_config = raw_config.replace(macro, value)
         # Write out new BirdPlan file with macros replaced
         with open(birdplan_file, "w") as file:
@@ -619,9 +644,9 @@ class BirdPlanBaseTestCase:
         result = birdplan_cmdline.run(cmdline_args)
 
         # Add test report sections
-        sim.add_conffile(f"BIRDPLAN_CONFFILE({router})", birdplan_file)
-        sim.add_conffile(f"BIRD_CONFFILE({router})", bird_conffile)
-        sim.add_logfile(f"BIRD_LOGFILE({router})", bird_logfile)
+        sim.add_conffile(f"birdplan.yaml.{router}", birdplan_file)
+        sim.add_conffile(f"bird.conf.{router}", bird_conffile)
+        sim.add_logfile(f"bird.log.{router}", bird_logfile)
 
         # Add the birdplan configuration object to the simulation
         if args[0] == "configure":
@@ -673,7 +698,7 @@ class BirdPlanBaseTestCase:
     def _bird_log_matches(self, sim: Simulation, router: str, matches: str) -> bool:
         """Check if the BIRD log file contains a string."""
 
-        logname = f"BIRD_LOGFILE({router})"
+        logname = f"bird.log.{router}"
         # Make sure the log name exists
         if logname not in sim.logfiles:
             raise RuntimeError(f"Log name not found: {logname}")

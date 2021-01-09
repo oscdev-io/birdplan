@@ -48,29 +48,38 @@ class RIPRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
     connected : Union[bool, List[str]]
         Redistribute connected routes to the main RIP table. This attribute is indexed by interface name with a boolean option.
         The interface name can be an exact interface match, or a wildcard with a *.
-    default: bool
-        Redistribute the default to the main RIP table. Defaults to `False`.
     kernel : bool
         Redistribute kernel routes to the main RIP table. Defaults to `False`.
+    kernel_default : bool
+        Redistribute kernel default routes to the main RIP table. Defaults to `False`.
     rip : bool
-        Redistribute rip routes to the main RIP table. Defaults to `False`.
+        Redistribute RIP routes. Defaults to `True`.
+    rip_default : bool
+        Redistribute RIP default routes. Defaults to `False`.
     static : bool
         Redistribute static routes to the main RIP table. Defaults to `False`.
+    static_default : bool
+        Redistribute static default routes to the main RIP table. Defaults to `False`.
 
     """
 
     connected: Union[bool, List[str]]
-    default: bool
     kernel: bool
+    kernel_default: bool
+    rip: bool
+    rip_default: bool
     static: bool
+    static_default: bool
 
     def __init__(self) -> None:
         """Initialize object."""
         self.connected = False
-        self.default = False
         self.kernel = False
+        self.kernel_default = False
         self.rip = True
+        self.rip_default = False
         self.static = False
+        self.static_default = False
 
 
 class RIPAttributes:  # pylint: disable=too-few-public-methods

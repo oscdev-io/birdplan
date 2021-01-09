@@ -1,0 +1,154 @@
+router_id: 0.0.0.1
+log_file: "@LOGFILE@"
+debug: True
+
+bgp:
+  asn: 65000
+  rr_cluster_id: 0.0.0.1
+@TEMPLATE_GLOBAL_CONFIG@
+@GLOBAL_CONFIG@
+  peers:
+
+    r2:
+      asn: @R2_ASN@
+      description: BGP session to r2
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.2
+      neighbor6: fc00:100::2
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      type: customer
+      filter:
+        origin_asns:
+          - @R2_ASN@
+@EXTRA_R2_CONFIG@
+@TEMPLATE_R2_CONFIG@
+
+    r3:
+      asn: 65000
+      description: BGP session to r3
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.3
+      neighbor6: fc00:100::3
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      type: internal
+@TEMPLATE_R3_CONFIG@
+
+    r4:
+      asn: 65003
+      description: BGP session to r4
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.4
+      neighbor6: fc00:100::4
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      type: peer
+@TEMPLATE_R4_CONFIG@
+
+    r5:
+      asn: 65004
+      description: BGP session to r5
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.5
+      neighbor6: fc00:100::5
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      type: routecollector
+@TEMPLATE_R5_CONFIG@
+@TEMPLATE_EXTRA_CONFIG@
+
+    r6:
+      asn: 65005
+      description: BGP session to r6
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.6
+      neighbor6: fc00:100::6
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      type: routeserver
+@TEMPLATE_R6_CONFIG@
+@TEMPLATE_EXTRA_CONFIG@
+
+    r7:
+      asn: 65000
+      description: BGP session to r7
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.7
+      neighbor6: fc00:100::7
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      type: rrclient
+@TEMPLATE_R7_CONFIG@
+
+    r8:
+      asn: 65000
+      description: BGP session to r8
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.8
+      neighbor6: fc00:100::8
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      type: rrserver
+@TEMPLATE_R8_CONFIG@
+
+    r9:
+      asn: 65000
+      description: BGP session to r9
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.9
+      neighbor6: fc00:100::9
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      type: rrserver-rrserver
+@TEMPLATE_R9_CONFIG@
+
+    r10:
+      asn: 65009
+      description: BGP session to r10
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.10
+      neighbor6: fc00:100::10
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      type: transit
+@TEMPLATE_R10_CONFIG@
+@TEMPLATE_EXTRA_CONFIG@
+
+    e1:
+      asn: 65000
+      description: BGP session to e1
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.100
+      neighbor6: fc00:100::100
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      type: rrserver
+      constraints:
+        import_minlen4: 7
+        import_maxlen4: 32
+        import_minlen6: 15
+        import_maxlen6: 128
+@PEER_CONFIG@
+@TEMPLATE_PEER_CONFIG@
+@PEER_EXTRA_CONFIG@

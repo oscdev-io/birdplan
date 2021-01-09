@@ -28,15 +28,85 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
     _section: str = "RIP Functions"
 
-    @bird_function("rip_accept_connected_route")
-    def accept_connected_route(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
-        """BIRD rip_accept_connected_route function."""
+    @bird_function("rip_accept_connected")
+    def accept_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD rip_accept_connected function."""
 
-        return """\
+        return f"""\
             # Accept RIP connected routes
-            function rip_accept_connected_route(string filter_name) {
-                if (proto != "direct4_rip" && proto != "direct6_rip") then return false;
+            function rip_accept_connected(string filter_name) {{
+                if ((proto != "direct4_rip" && proto != "direct6_rip") || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
-                    " [rip_accept_connected_route] Accepting RIP connected route ", net;
+                    " [rip_accept_connected] Accepting RIP connected route ", {self.functions.route_info()},
+                    " due to connected route match";
                 accept;
-            }"""
+            }}"""
+
+    @bird_function("rip_accept_rip_default")
+    def accept_rip_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD rip_accept_rip_default function."""
+
+        return f"""\
+            # Accept RIP route
+            function rip_accept_rip_default(string filter_name) {{
+                if (source != RTS_RIP || !{self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [rip_accept_rip_default] Accepting RIP default route ", {self.functions.route_info()},
+                    " due to default route match";
+                accept;
+            }}"""
+
+    @bird_function("rip_accept_rip")
+    def accept_rip(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD rip_accept_rip function."""
+
+        return f"""\
+            # Accept RIP route
+            function rip_accept_rip(string filter_name) {{
+                if (source != RTS_RIP || {self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [rip_accept_rip] Accepting RIP route ", {self.functions.route_info()}, " due to RIP route match";
+                accept;
+            }}"""
+
+    @bird_function("rip_redistribute_connected")
+    def redistribute_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD rip_redistribute_connected function."""
+
+        return f"""\
+            # Accept RIP connected routes
+            function rip_redistribute_connected(string filter_name) {{
+                if ((proto != "direct4_rip" && proto != "direct6_rip") || {self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [rip_redistribute_connected] Redistributing RIP connected route ", {self.functions.route_info()},
+                    " due to connected route match";
+                accept;
+            }}"""
+
+    @bird_function("rip_redistribute_rip_default")
+    def redistribute_rip_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD rip_redistribute_rip_default function."""
+
+        return f"""\
+            # Accept RIP route
+            function rip_redistribute_rip_default(string filter_name) {{
+                if (source != RTS_RIP || !{self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [rip_redistribute_rip_default] Redistributing RIP default route ", {self.functions.route_info()},
+                    " due to RIP default route match";
+                accept;
+            }}"""
+
+    @bird_function("rip_redistribute_rip")
+    def redistribute_rip(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD rip_redistribute_rip function."""
+
+        return f"""\
+            # Accept RIP route
+            function rip_redistribute_rip(string filter_name) {{
+                if (source != RTS_RIP || {self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [rip_redistribute_rip] Redistributing RIP route ", {self.functions.route_info()},
+                    " due to RIP route match";
+                accept;
+            }}"""
