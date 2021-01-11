@@ -163,6 +163,12 @@ In terms of test `test_bgp_filtering_quarantine`:
 - ExaBGP e1 should export a route where the a relation large community is not present and should be filtered.
 
 
+## Tests for BGP AS-SET filtering
+
+In terms of test `test_bgp_filtering_as_sets`:
+- ExaBGP e1 should be exporting various prefixes, depending on the test we'll be filtering some out.
+
+
 ## Diagram
 
 ```plantuml

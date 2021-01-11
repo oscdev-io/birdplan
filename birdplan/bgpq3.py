@@ -18,10 +18,29 @@
 
 """BGPQ3 support class."""
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 import ipaddress
 import json
 import subprocess  # nosec
+import time
+
+from .exceptions import BirdPlanError
+
+
+# Keep a cache for results returned while loaded into memory
+#
+# Example:
+# bgpq3_cache = {
+#     'whois.radb.net:43': {
+#         'objects': {
+#             'AS174': {
+#               '_timestamp': 0000000000,
+#               'value': xxxxxx,
+#             }
+#         }
+#     }
+# }
+bgpq3_cache: Dict[str, Dict[str, Any]] = {}
 
 
 class BGPQ3:
@@ -50,17 +69,23 @@ class BGPQ3:
             objects.extend(as_sets)
 
         # Grab ASNs
-        asns_bgpq3 = {}
+        asns_bgpq3: Dict[str, List[str]] = {}
         for obj in objects:
-            asns_bgpq3.update(self._bgpq3(["-l", "asns", "-t", "-3", obj]))
+            # Try pull result from our cache
+            result: Any = self._cache(f"asns:{obj}")
+            # If we can't, grab the result from BGPQ3 live
+            if not result:
+                result = self._bgpq3(["-l", "asns", "-t", "-3", obj])
+                # Cache the result we got
+                self._cache(f"asns:{obj}", result)
+            # Update return value with result
+            asns_bgpq3.update(result)
 
-        # Loop with ASN's and generate ASN list
-        asn_list = []
-        if "asns" in asns_bgpq3:
-            for asn in asns_bgpq3:
-                asn_list.append(asn)
+        # If we don't have "asns" returned in the JSON structure, raise an exception
+        if "asns" not in asns_bgpq3:  # pragma: no cover
+            raise BirdPlanError(f"BGPQ3 output error, expecting 'asns': {asns_bgpq3}")
 
-        return asn_list
+        return asns_bgpq3["asns"]
 
     def get_prefixes(self, as_sets: Union[str, List[str]]) -> Dict[str, List[str]]:
         """Get prefixes."""
@@ -73,10 +98,19 @@ class BGPQ3:
             objects.extend(as_sets)
 
         # Grab IPv4 and IPv6 prefixes
-        prefixes_bgpq3 = {}
+        prefixes_bgpq3: Dict[str, List[Dict[str, Any]]] = {}
         for obj in objects:
-            prefixes_bgpq3.update(self._bgpq3(["-l", "ipv4", "-m", "24", "-4", "-A", obj]))
-            prefixes_bgpq3.update(self._bgpq3(["-l", "ipv6", "-m", "48", "-6", "-A", obj]))
+            # Try pull result from our cache
+            result: Any = self._cache(f"prefixes:{obj}")
+            # If we can't, grab the result from BGPQ3 live
+            if not result:
+                result = {}
+                result.update(self._bgpq3(["-l", "ipv4", "-m", "24", "-4", "-A", obj]))
+                result.update(self._bgpq3(["-l", "ipv6", "-m", "48", "-6", "-A", obj]))
+                # Cache the result we got
+                self._cache(f"prefixes:{obj}", result)
+            # Update return value with result
+            prefixes_bgpq3.update(result)
 
         # Start out with no prefixes
         prefixes: Dict[str, List[str]] = {"ipv4": [], "ipv6": []}
@@ -101,7 +135,7 @@ class BGPQ3:
         """Run bgpq3."""
 
         # Run the IP tool with JSON output
-        cmd_args = ["bgpq3", "-h", self.server, "-j"]
+        cmd_args = ["/usr/bin/bgpq3", "-h", self.server, "-j"]
         # Add our args
         cmd_args.extend(args)
 
@@ -110,6 +144,34 @@ class BGPQ3:
 
         # Return the decoded json output
         return json.loads(result)
+
+    def _cache(self, obj: str, value: Optional[Any] = None) -> Optional[Any]:
+        """Retrieve or store value in cache."""
+
+        if self.server not in bgpq3_cache:
+            bgpq3_cache[self.server] = {
+                'objects': {}
+            }
+
+        if not value:
+            # If the cached obj does not exist, return None
+            if obj not in bgpq3_cache[self.server]["objects"]:
+                return None
+            # Grab the cached object
+            cached = bgpq3_cache[self.server]["objects"][obj]
+            # Make sure its timestamp is within 60s of being retrieved, if not, return None
+            if cached["_timestamp"] + 60 < time.time():  # pragma: no cover
+                return None
+            # Else its valid, return the cached value
+            return cached["value"]
+
+        # Set the cached value
+        bgpq3_cache[self.server]["objects"][obj] = {
+            "_timestamp": time.time(),
+            "value": value,
+        }
+
+        return value
 
     @property
     def server(self) -> str:

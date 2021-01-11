@@ -1035,11 +1035,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         asns = []
         # Add ASN list with comments
         if self.filter_policy.origin_asns:
-            asns.append(f"# {len(self.filter_policy.origin_asns)} statically defined")
+            asns.append(f"# Explicitly defined {len(self.filter_policy.origin_asns)} items")
             for asn in self.filter_policy.origin_asns:
                 asns.append(f"{asn}")
         if irr_asns:
-            asns.append(f"# {len(irr_asns)} from IRR with object '{self.filter_policy.as_sets}'")
+            asns.append(f"# Retrieved {len(irr_asns)} items from IRR with object '{self.filter_policy.as_sets}'")
             for asn in irr_asns:
                 asns.append(f"{asn}")
         # Join into one string, so we get the commas
@@ -1065,7 +1065,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         asns = []
         # Add ASN list with comments
         if self.filter_policy.peer_asns:
-            asns.append(f"# {len(self.filter_policy.peer_asns)} statically defined")
+            asns.append(f"# Explicitly defined {len(self.filter_policy.peer_asns)} items")
             for asn in self.filter_policy.peer_asns:
                 asns.append(f"{asn}")
         # Join into one string, so we get the commas
@@ -1111,7 +1111,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 prefixes.extend(prefix_list)
             # Add prefix list from IRR
             if prefix_list_irr:
-                prefixes.append(f"# {len(prefix_list_irr)} from IRR with object '{self.filter_policy.as_sets}'")
+                prefixes.append(f"# Retrieved {len(prefix_list_irr)} items from IRR with object '{self.filter_policy.as_sets}'")
                 prefixes.extend(prefix_list_irr)
             # Join into one string, so we get the commas
             prefixes_str = ",\n".join(prefixes)
@@ -1707,15 +1707,15 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # For customer and peer, it is an ALLOW list
         if self.peer_type in ("customer", "peer"):
             # Check if we're filtering allowed origin ASNs
-            if self.filter_policy.origin_asns:
+            if self.has_origin_asn_filter:
                 self.conf.add("  # Filter on the allowed origin ASNs")
                 self.conf.add(f"  {self.bgp_functions.peer_filter_origin_asns_allow(BirdVariable(self.origin_asn_list_name))};")
             # Check if we're filtering allowed peer ASNs
-            if self.filter_policy.peer_asns:
+            if self.has_peer_asn_filter:
                 self.conf.add("  # Filter on the allowed peer ASNs")
                 self.conf.add(f"  {self.bgp_functions.peer_filter_asns_allow(BirdVariable(self.peer_asn_list_name))};")
             # Check if we're filtering allowed prefixes
-            if self.filter_policy.prefixes:
+            if self.has_prefix_filter:
                 self.conf.add("  # Filter on the allowed prefixes")
                 # Check if we have IPv4 support and output the filter
                 if self.has_ipv4:
@@ -1732,15 +1732,15 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # For everything else it is a DENY list
         elif self.peer_type != "routecollector":
             # Check if we're filtering denied origin ASNs
-            if self.filter_policy.origin_asns:
+            if self.has_origin_asn_filter:
                 self.conf.add("  # Filter on the denied origin ASNs")
                 self.conf.add(f"  {self.bgp_functions.peer_filter_origin_asns_deny(BirdVariable(self.origin_asn_list_name))};")
             # Check if we're filtering denied peer ASNs
-            if self.filter_policy.peer_asns:
+            if self.has_peer_asn_filter:
                 self.conf.add("  # Filter on the denied peer ASNs")
                 self.conf.add(f"  {self.bgp_functions.peer_filter_asns_deny(BirdVariable(self.peer_asn_list_name))};")
             # Check if we're filtering denied prefixes
-            if self.filter_policy.prefixes:
+            if self.has_prefix_filter:
                 self.conf.add("  # Filter on the denied prefixes")
                 # Check if we have IPv4 support and output the filter
                 if self.has_ipv4:
