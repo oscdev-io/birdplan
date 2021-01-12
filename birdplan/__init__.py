@@ -920,7 +920,7 @@ class BirdPlan:
                 peer["filter"] = {}
                 # Loop with filter configuration items
                 for filter_type, filter_config in config_value.items():
-                    if filter_type not in ("prefixes", "origin_asns", "peer_asns", "as_sets"):
+                    if filter_type not in ("as_sets", "aspath_asns", "origin_asns", "peer_asns", "prefixes"):
                         raise BirdPlanError(f"Configuration item '{filter_type}' not understood in bgp:peers:{peer_name}:filter")
                     peer["filter"][filter_type] = filter_config
 

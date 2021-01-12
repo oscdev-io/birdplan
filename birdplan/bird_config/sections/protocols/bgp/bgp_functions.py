@@ -598,6 +598,34 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_FIRST_AS_NOT_PEER_AS);
             }}"""
 
+    @bird_function("bgp_peer_filter_aspath_allow")
+    def peer_filter_aspath_allow(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_filter_aspath_allow function."""
+
+        return f"""\
+            function bgp_peer_filter_aspath_allow(string filter_name; int set asn_list) {{
+                if (bgp_path = filter(bgp_path, asn_list)) then return false;
+                if (bgp_large_community ~ [BGP_LC_FILTERED_ORIGIN_AS, BGP_LC_FILTERED_PEER_AS]) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_filter_aspath_allow] Adding BGP_LC_FILTERED_ASPATH_NOT_ALLOWED to ",
+                    {self.functions.route_info()};
+                bgp_large_community.add(BGP_LC_FILTERED_ASPATH_NOT_ALLOWED);
+            }}"""
+
+    @bird_function("bgp_peer_filter_aspath_deny")
+    def peer_filter_aspath_deny(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_filter_aspath_deny function."""
+
+        return f"""\
+            function bgp_peer_filter_aspath_deny(string filter_name; int set asn_list) {{
+                if (bgp_path !~ asn_list) then return false;
+                if (bgp_large_community ~ [BGP_LC_FILTERED_ORIGIN_AS, BGP_LC_FILTERED_PEER_AS]) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_filter_aspath_deny] Adding BGP_LC_FILTERED_ASPATH_NOT_ALLOWED to ",
+                    {self.functions.route_info()};
+                bgp_large_community.add(BGP_LC_FILTERED_ASPATH_NOT_ALLOWED);
+            }}"""
+
     @bird_function("bgp_peer_filter_asn_private")
     def peer_filter_asn_private(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
         """BIRD bgp_peer_filter_asn_private function."""
