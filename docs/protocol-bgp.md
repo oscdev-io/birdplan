@@ -538,27 +538,37 @@ bgp:
 
 Filtering of routes received from a peer. Options available are below...
 
-* `prefixes` will filter on a list of allowed prefixes
-* `origin_asns` will filter on a list of allowed origin ASN's
+* `prefixes` will filter on a list of allowed prefixes.
+* `aspath_asns` will filter on a list of ASNs in the AS-PATH.
+* `origin_asns` will filter on a list of allowed origin ASN's.
 * `peer_asns` will filter on the first ASN in the AS-PATH, but only really makes sense for `routeserver`.
-* `as_sets` will filter on a list of as-sets, resolving them at the same time.
+* `as_sets` will filter on a list of as-sets, resolving them at the same time. This only makes sense for `customer` and `peer`.
 
-In the context of peer types `customer` and `peer` the above forms the ALLOW list. Everything other than what is specified will be filtered.
+In the context of peer types `customer` and `peer`...
 
-In the context of peer types `transit` and `routeserver` the above forms the DENY list. Everything specified will be filtered.
+* The above forms the ALLOW list. Everything other than what is specified will be filtered.
+* When specifing `as_sets`, the `origin_asns` and `aspath_asns` will be populated with the IRR ASN list.
+* When specifying `origin_asns`, the `aspath_asns` filter will be populated with `origin_asns` and the peer ASN.
 
-In the context of peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` and `routecollector` the above makes no sense. But will form a DENY list.
+In the context of peer types `transit` and `routeserver`:
+
+* The above forms the DENY list. Everything specified will be filtered.
+* When specifing `as_sets`, the `origin_asns` will be populated with the IRR ASN list.
+* When specifying `aspath_asns` if any of the ASNs are within the path, the prefix will be filtered.
+
+In the context of peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`:
+
+* The above forms the DENY list. Everything specified will be filtered.
+* When specifing `as_sets`, the `origin_asns` will be populated with the IRR ASN list.
+* When specifying `aspath_asns` if any of the ASNs are within the path, the prefix will be filtered.
 
 Examples of `prefixes` filter:
 * `192.168.0.0/22+` - Matches /22 or any subset of the /22
-* `192.168.0.0/24` - Matches exactly /24 (but does not work with blackholing)
+* `192.168.0.0/24` - Matches exactly /24
 
 Currently only the above two methods of specifying IP ranges are accepted.
 
-The prefix sizes are controlled by the blackhole and prefix length options, so one does not specify the min and max sizes here.
-
-If one does not use a `+` at the end of the line, it will prevent blackholing from working correctly as we need to permit prefixes
-smaller than the range assigned to the client.
+The prefix sizes are controlled by the prefix and blackhole length constraints, so one does not need to specify the min and max sizes here.
 
 
 An example is however below...

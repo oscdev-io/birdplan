@@ -21,6 +21,7 @@
 # pylint: disable=too-many-lines
 
 from typing import Dict, List, Optional, Union
+import re
 import requests
 
 from .peer_attributes import (
@@ -578,7 +579,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 raise BirdPlanError(f"Having 'filter' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
             # Add filters
             for filter_type, filter_config in peer_config["filter"].items():
-                if filter_type not in ("prefixes", "origin_asns", "peer_asns", "as_sets"):
+                if filter_type not in ("as_sets", "aspath_asns", "origin_asns", "peer_asns", "prefixes"):
                     raise BirdPlanError(
                         f"BGP peer 'filter' configuration '{filter_type}' for peer '{self.name}' with type '{self.peer_type}' "
                         "is invalid"
@@ -595,7 +596,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.route_policy_accept.bgp_own_blackhole = True
             self.route_policy_accept.bgp_customer_blackhole = True
         # Check if we should be accepting customer blackhole routes
-        if self.peer_type == "customer" and self.filter_policy.prefixes:
+        if self.peer_type == "customer" and self.has_prefix_filter:
             self.route_policy_accept.bgp_customer_blackhole = True
 
         # If this is a rrserver to rrserver peer, we need to by default redistribute the default route (if we have one)
@@ -644,10 +645,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 )
         # Check if this is a customer with blackholing and without a prefix filter set
         if self.peer_type == "customer":
-            if self.route_policy_accept.bgp_customer_blackhole and not self.filter_policy.prefixes:
+            if self.route_policy_accept.bgp_customer_blackhole and not self.has_prefix_filter:
                 raise BirdPlanError(
                     f"Having 'accept:bgp_customer_blackhole' set to True for peer '{self.name}' with type '{self.peer_type}' "
-                    "and without 'filter:prefixes' set makes no sense"
+                    "and without 'filter:prefixes' or 'filter:as_sets' set makes no sense"
                 )
 
         #
@@ -947,6 +948,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self._setup_peer_tables()
 
         # Setup ASN lists
+        self._setup_aspath_asns()
         self._setup_origin_asns()
         self._setup_peer_asns()
 
@@ -1009,6 +1011,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         """Return our prefix list name."""
         return f"bgp{ipv}_AS{self.asn}_{self.name}_prefixes_import"
 
+    def import_blackhole_prefix_list_name(self, ipv: str) -> str:
+        """Return our blackhole prefix list name."""
+        return f"bgp{ipv}_AS{self.asn}_{self.name}_blackhole_prefixes_import"
+
     def _setup_peer_tables(self) -> None:
         """Peering routing table setup."""
         self.tables.conf.append(f"# BGP Peer Tables: {self.asn} - {self.name}")
@@ -1018,6 +1024,69 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.tables.conf.append(f"ipv6 table {self.bgp_table_name('6')};")
         self.tables.conf.append("")
 
+    def _setup_aspath_asns(self) -> None:
+        """AS-PATH ASN list setup."""
+
+        # Short circuit and exit if we have none
+        if not self.has_aspath_asn_filter:
+            return
+
+        aspath_asns = []
+
+        # If we're a "customer" or "peer", make sure the aspath_asns list has our own ASN
+        if self.peer_type in ("customer", "peer"):
+            aspath_asns.append("# Peer ASN automatically added")
+            aspath_asns.append(f"{self.asn}")
+
+        # Populate AS-PATH ASN list
+        if self.filter_policy.aspath_asns:
+            # Loop with ASNs specified in configuration
+            for asn in self.filter_policy.aspath_asns:
+                if asn not in aspath_asns:
+                    aspath_asns.append(f"{asn}")
+            aspath_asns.insert(0, f"# Explicitly defined {len(aspath_asns)} items")
+
+        # If we're a "customer" or "peer", pull in the origin_asns and irr_asns lists
+        if self.peer_type in ("customer", "peer"):
+            # Check if we can add our ORIGIN ASNs
+            if self.filter_policy.origin_asns:
+                extra_aspath_asns = []
+                # Loop with ASNs specified in configuration
+                for asn in self.filter_policy.origin_asns:
+                    # Make sure we don't add duplicates
+                    if asn not in aspath_asns and asn not in extra_aspath_asns:
+                        extra_aspath_asns.append(f"{asn}")
+                # If we're a "customer" or "peer", pull in the origin_asns into our aspath_asns list
+                aspath_asns.append(f"# Explicitly defined {len(extra_aspath_asns)} items")
+                aspath_asns.extend(extra_aspath_asns)
+
+            # Grab IRR ASN's
+            irr_asns = []
+            if self.filter_policy.as_sets:
+                bgpq3 = BGPQ3()
+                irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
+            # Check if we got results, if so add the IRR ASNs to the aspath_asns list
+            if irr_asns:
+                extra_aspath_asns = []
+                # Loop with ASNs retrieved from IRR records
+                for asn in irr_asns:
+                    if asn not in aspath_asns and asn not in extra_aspath_asns:
+                        extra_aspath_asns.append(f"{asn}")
+                    aspath_asns.append(
+                        f"# Retrieved {len(extra_aspath_asns)} items from IRR with object '{self.filter_policy.as_sets}'"
+                    )
+                    aspath_asns.extend(extra_aspath_asns)
+
+        self.conf.add(f"define {self.aspath_asn_list_name} = [")
+        # Loop with each line and add commas where needed
+        for count, asn in enumerate(aspath_asns):
+            asn_str = f"  {asn}"
+            if not asn.startswith("#") and count < len(aspath_asns) - 1:
+                asn_str += ","
+            self.conf.add(asn_str)
+        self.conf.add("];")
+        self.conf.add("")
+
     def _setup_origin_asns(self) -> None:
         """Origin ASN list setup."""
 
@@ -1025,32 +1094,41 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if not self.has_origin_asn_filter:
             return
 
+        origin_asns = []
+
+        # Populate our origin ASN list from configuration
+        if self.filter_policy.origin_asns:
+            extra_origin_asns = []
+            # Loop with ASNs specified in configuration
+            for asn in self.filter_policy.origin_asns:
+                # Make sure we don't add duplicates
+                if asn not in origin_asns and asn not in extra_origin_asns:
+                    extra_origin_asns.append(f"{asn}")
+            origin_asns.append(f"# Explicitly defined {len(extra_origin_asns)} items")
+            origin_asns.extend(extra_origin_asns)
+
         # Grab IRR prefixes
         irr_asns = []
         if self.filter_policy.as_sets:
             bgpq3 = BGPQ3()
             irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
+        # If we have results populate our origin ASN list
+        if irr_asns:
+            extra_origin_asns = []
+            # Loop with ASNs retrieved from IRR records
+            for asn in irr_asns:
+                if asn not in origin_asns and asn not in extra_origin_asns:
+                    extra_origin_asns.append(f"{asn}")
+            origin_asns.append(f"# Retrieved {len(extra_origin_asns)} items from IRR with object '{self.filter_policy.as_sets}'")
+            origin_asns.extend(extra_origin_asns)
 
         self.conf.add(f"define {self.origin_asn_list_name} = [")
-        asns = []
-        # Add ASN list with comments
-        if self.filter_policy.origin_asns:
-            asns.append(f"# {len(self.filter_policy.origin_asns)} statically defined")
-            for asn in self.filter_policy.origin_asns:
-                asns.append(f"{asn}")
-        if irr_asns:
-            asns.append(f"# {len(irr_asns)} from IRR with object '{self.filter_policy.as_sets}'")
-            for asn in irr_asns:
-                asns.append(f"{asn}")
-        # Join into one string, so we get the commas
-        asns_str = ",\n".join(asns)
-        # Loop with each line
-        for line in asns_str.splitlines():
-            # Remove comma from the comments
-            if "#" in line:
-                line = line[:-1]
-            # Add line to our output
-            self.conf.add("  " + line)
+        # Loop with each line and add commas where needed
+        for count, asn in enumerate(origin_asns):
+            asn_str = f"  {asn}"
+            if not asn.startswith("#") and count < len(origin_asns) - 1:
+                asn_str += ","
+            self.conf.add(asn_str)
         self.conf.add("];")
         self.conf.add("")
 
@@ -1061,22 +1139,20 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if not self.has_peer_asn_filter:
             return
 
-        self.conf.add(f"define {self.peer_asn_list_name} = [")
-        asns = []
+        peer_asns = []
         # Add ASN list with comments
         if self.filter_policy.peer_asns:
-            asns.append(f"# {len(self.filter_policy.peer_asns)} statically defined")
+            peer_asns.append(f"# Explicitly defined {len(self.filter_policy.peer_asns)} items")
             for asn in self.filter_policy.peer_asns:
-                asns.append(f"{asn}")
-        # Join into one string, so we get the commas
-        asns_str = ",\n".join(asns)
-        # Loop with each line
-        for line in asns_str.splitlines():
-            # Remove comma from the comments
-            if "#" in line:
-                line = line[:-1]
-            # Add line to our output
-            self.conf.add("  " + line)
+                peer_asns.append(f"{asn}")
+
+        self.conf.add(f"define {self.peer_asn_list_name} = [")
+        # Loop with each line and add commas where needed
+        for count, asn in enumerate(peer_asns):
+            asn_str = f"  {asn}"
+            if not asn.startswith("#") and count < len(peer_asns) - 1:
+                asn_str += ","
+            self.conf.add(asn_str)
         self.conf.add("];")
         self.conf.add("")
 
@@ -1104,28 +1180,67 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         for ipv in ["4", "6"]:
             prefix_list = prefix_lists[ipv]
             prefix_list_irr = irr_prefixes[f"ipv{ipv}"]
+
             prefixes = []
+            blackholes = []
+
             # Add statically defined prefix list
             if prefix_list:
-                prefixes.append(f"# {len(prefix_list)} explicitly defined")
-                prefixes.extend(prefix_list)
+                for prefix in prefix_list:
+                    prefixes.append(prefix)
+                    # Add blackhole
+                    blackhole = "%s+" % re.split(r"[{+]", prefix, 1)[0]
+                    blackholes.append(blackhole)
+            # Sort and unique our results
+            prefixes = sorted(set(prefixes))
+            blackholes = sorted(set(blackholes))
+            # Add title for this section
+            prefixes.insert(0, f"# {len(prefix_list)} explicitly defined")
+            blackholes.insert(0, f"# {len(prefix_list)} explicitly defined")
+
             # Add prefix list from IRR
             if prefix_list_irr:
-                prefixes.append(f"# {len(prefix_list_irr)} from IRR with object '{self.filter_policy.as_sets}'")
-                prefixes.extend(prefix_list_irr)
-            # Join into one string, so we get the commas
-            prefixes_str = ",\n".join(prefixes)
+                prefixes_irr = []
+                blackholes_irr = []
+
+                # Loop with each prefix we got from IRR
+                for prefix in prefix_list_irr:
+                    # Make sure we're not making duplicates
+                    if prefix not in prefixes:
+                        prefixes_irr.append(prefix)
+                    # Add blackhole, and make sure we're not duplicating here either
+                    blackhole = "%s+" % prefix.split("{", 1)[0]
+                    if blackhole not in blackholes:
+                        blackholes_irr.append(blackhole)
+
+                # Add title to top of prefixes retrieved via IRR
+                prefixes.append(f"# Retrieved {len(prefixes_irr)} items from IRR with object '{self.filter_policy.as_sets}'")
+                blackholes.append(f"# Retrieved {len(blackholes_irr)} items from IRR with object '{self.filter_policy.as_sets}'")
+                # Extend our lists
+                prefixes.extend(prefixes_irr)
+                blackholes.extend(blackholes_irr)
 
             self.conf.add(f"define {self.import_prefix_list_name(ipv)} = [")
-            # Loop with each line
-            for line in prefixes_str.splitlines():
-                # Remove comma from the comments
-                if "#" in line:
-                    line = line[:-1]
-                # Add line to our output
-                self.conf.add(f"  {line}")
+            # Loop with each line and add commas where needed
+            for count, prefix in enumerate(prefixes):
+                prefix_str = f"  {prefix}"
+                if not prefix.startswith("#") and count < len(prefixes) - 1:
+                    prefix_str += ","
+                self.conf.add(prefix_str)
             self.conf.add("];")
             self.conf.add("")
+
+            # We only need to output the blackhole list if the peer is a peertype that we support receiving blackhole prefixes from
+            if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+                self.conf.add(f"define {self.import_blackhole_prefix_list_name(ipv)} = [")
+                # Loop with each line and add commas where needed
+                for count, blackhole in enumerate(blackholes):
+                    blackhole_str = f"  {blackhole}"
+                    if not blackhole.startswith("#") and count < len(blackholes) - 1:
+                        blackhole_str += ","
+                    self.conf.add(blackhole_str)
+                self.conf.add("];")
+                self.conf.add("")
 
     def _peer_to_bgp_export_filter(self) -> None:
         """Export filters into our main BGP routing table from the BGP peer table."""
@@ -1521,7 +1636,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("    # Finally accept")
         self.conf.add("    if DEBUG then")
         self.conf.add(
-            f'     print "[{filter_name}] Accepting ", {self.functions.route_info()}, " from t_bgp to t_bgp_peer (fallthrough)";'
+            f'      print "[{filter_name}] Accepting ", {self.functions.route_info()}, " from t_bgp to t_bgp_peer (fallthrough)";'
         )
         self.conf.add("    accept;")
         self.conf.add("  }")
@@ -1530,7 +1645,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("  # Reject by default")
         self.conf.add("  if DEBUG then")
         self.conf.add(
-            f'   print "[{filter_name}] Rejecting ", {self.functions.route_info()}, " from t_bgp to t_bgp_peer (fallthrough)";'
+            f'    print "[{filter_name}] Rejecting ", {self.functions.route_info()}, " from t_bgp to t_bgp_peer (fallthrough)";'
         )
         self.conf.add("  reject;")
         self.conf.add("};")
@@ -1707,53 +1822,56 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # For customer and peer, it is an ALLOW list
         if self.peer_type in ("customer", "peer"):
             # Check if we're filtering allowed origin ASNs
-            if self.filter_policy.origin_asns:
-                self.conf.add("  # Filter on the allowed origin ASNs")
+            if self.has_origin_asn_filter:
                 self.conf.add(f"  {self.bgp_functions.peer_filter_origin_asns_allow(BirdVariable(self.origin_asn_list_name))};")
             # Check if we're filtering allowed peer ASNs
-            if self.filter_policy.peer_asns:
-                self.conf.add("  # Filter on the allowed peer ASNs")
+            if self.has_peer_asn_filter:
                 self.conf.add(f"  {self.bgp_functions.peer_filter_asns_allow(BirdVariable(self.peer_asn_list_name))};")
+            # Check if we're filtering allowed AS-PATH ASNs
+            if self.has_aspath_asn_filter:
+                self.conf.add(f"  {self.bgp_functions.peer_filter_aspath_allow(BirdVariable(self.aspath_asn_list_name))};")
             # Check if we're filtering allowed prefixes
-            if self.filter_policy.prefixes:
+            if self.has_prefix_filter:
                 self.conf.add("  # Filter on the allowed prefixes")
                 # Check if we have IPv4 support and output the filter
-                if self.has_ipv4:
-                    self.conf.add("  if (net.type = NET_IP4) then")
-                    self.conf.add(
-                        f"    {self.bgp_functions.peer_filter_prefixes_allow(BirdVariable(self.import_prefix_list_name('4')))};"
+                peer_filter_prefixes_allow = self.bgp_functions.peer_filter_prefixes_allow(
+                    BirdVariable(self.import_prefix_list_name("4")), BirdVariable(self.import_prefix_list_name("6"))
+                )
+                self.conf.add(f"  {peer_filter_prefixes_allow};")
+
+                # For peer types that support blackholes, add the blackhole filter
+                if self.peer_type == "customer":
+                    peer_filter_blackholes_allow = self.bgp_functions.peer_filter_prefixes_blackhole_allow(
+                        BirdVariable(self.import_blackhole_prefix_list_name("4")),
+                        BirdVariable(self.import_blackhole_prefix_list_name("6")),
                     )
-                # Check if we have IPv6 support and output the filter
-                if self.has_ipv6:
-                    self.conf.add("  if (net.type = NET_IP6) then")
-                    self.conf.add(
-                        f"    {self.bgp_functions.peer_filter_prefixes_allow(BirdVariable(self.import_prefix_list_name('6')))};"
-                    )
+                    self.conf.add(f"  {peer_filter_blackholes_allow};")
+
         # For everything else it is a DENY list
         elif self.peer_type != "routecollector":
             # Check if we're filtering denied origin ASNs
-            if self.filter_policy.origin_asns:
-                self.conf.add("  # Filter on the denied origin ASNs")
+            if self.has_origin_asn_filter:
                 self.conf.add(f"  {self.bgp_functions.peer_filter_origin_asns_deny(BirdVariable(self.origin_asn_list_name))};")
             # Check if we're filtering denied peer ASNs
-            if self.filter_policy.peer_asns:
-                self.conf.add("  # Filter on the denied peer ASNs")
+            if self.has_peer_asn_filter:
                 self.conf.add(f"  {self.bgp_functions.peer_filter_asns_deny(BirdVariable(self.peer_asn_list_name))};")
+            # Check if we're filtering allowed AS-PATH ASNs
+            if self.has_aspath_asn_filter:
+                self.conf.add(f"  {self.bgp_functions.peer_filter_aspath_deny(BirdVariable(self.aspath_asn_list_name))};")
             # Check if we're filtering denied prefixes
-            if self.filter_policy.prefixes:
-                self.conf.add("  # Filter on the denied prefixes")
-                # Check if we have IPv4 support and output the filter
-                if self.has_ipv4:
-                    self.conf.add("  if (net.type = NET_IP4) then")
-                    self.conf.add(
-                        f"    {self.bgp_functions.peer_filter_prefixes_deny(BirdVariable(self.import_prefix_list_name('4')))};"
+            if self.has_prefix_filter:
+                peer_filter_prefixes_deny = self.bgp_functions.peer_filter_prefixes_deny(
+                    BirdVariable(self.import_prefix_list_name("4")), BirdVariable(self.import_prefix_list_name("6"))
+                )
+                self.conf.add(f"  {peer_filter_prefixes_deny};")
+
+                # For peer types that support blackholes, add the blackhole filter
+                if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+                    peer_filter_blackholes_deny = self.bgp_functions.peer_filter_prefixes_blackhole_deny(
+                        BirdVariable(self.import_blackhole_prefix_list_name("4")),
+                        BirdVariable(self.import_blackhole_prefix_list_name("6")),
                     )
-                # Check if we have IPv6 support and output the filter
-                if self.has_ipv6:
-                    self.conf.add("  if (net.type = NET_IP6) then")
-                    self.conf.add(
-                        f"    {self.bgp_functions.peer_filter_prefixes_deny(BirdVariable(self.import_prefix_list_name('6')))};"
-                    )
+                    self.conf.add(f"  {peer_filter_blackholes_deny};")
 
         # Quarantine mode...
         # NK: We don't quarantine route collectors as they are automagically filtered
@@ -2423,6 +2541,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     #
 
     @property
+    def aspath_asn_list_name(self) -> str:
+        """Return our AS-PATH ASN list name."""
+        return f"bgp_AS{self.asn}_{self.name}_aspath_asns"
+
+    @property
     def origin_asn_list_name(self) -> str:
         """Return our origin ASN list name."""
         return f"bgp_AS{self.asn}_{self.name}_origin_asns"
@@ -2431,6 +2554,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def peer_asn_list_name(self) -> str:
         """Return our peer ASN list name."""
         return f"bgp_AS{self.asn}_{self.name}_peer_asns"
+
+    @property
+    def has_aspath_asn_filter(self) -> BGPPeerFilterItem:
+        """Return if we filter on ASNs in the AS-PATH."""
+
+        # We pull in "origin_asns" here to populate the aspath_asns for better filtering
+        if self.peer_type in ("customer", "peer"):
+            return self.filter_policy.aspath_asns or self.filter_policy.origin_asns or self.filter_policy.as_sets
+
+        return self.filter_policy.aspath_asns
 
     @property
     def has_origin_asn_filter(self) -> BGPPeerFilterItem:

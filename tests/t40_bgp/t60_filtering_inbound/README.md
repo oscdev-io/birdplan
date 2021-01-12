@@ -114,6 +114,14 @@ In terms of test `test_bgp_filtering_first_as_not_peer_as`:
 In terms of test `test_bgp_filtering_next_hop_not_peer_ip`:
 - ExaBGP e1 should export a route where the next hop IP is not the peer IP.
 
+## Tests for BGP AS-PATH ASN filtered
+
+In terms of test `test_bgp_filtering_aspath_asn_filtered_with_match`:
+- ExaBGP e1 should export a route where a specific set of ASN is listed in the filter.
+
+In terms of test `test_bgp_filtering_aspath_asn_filtered_without_match`:
+- ExaBGP e1 should export a route where a specific set of ASN is listed in the filter.
+
 
 ## Tests for BGP origin AS filtered
 
@@ -161,6 +169,12 @@ In terms of test `test_replace_aspath_notallowed_aspath`:
 
 In terms of test `test_bgp_filtering_quarantine`:
 - ExaBGP e1 should export a route where the a relation large community is not present and should be filtered.
+
+
+## Tests for BGP AS-SET filtering
+
+In terms of test `test_bgp_filtering_as_sets`:
+- ExaBGP e1 should be exporting various prefixes, depending on the test we'll be filtering some out.
 
 
 ## Diagram

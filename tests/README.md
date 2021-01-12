@@ -4,6 +4,7 @@
 # Basic
 
 [Static Routing](t10_basic/t10_static/README.md)
+[Internal - BGPQ3](t10_basic/t80_bgpq3/README.md)
 
 
 # RIP

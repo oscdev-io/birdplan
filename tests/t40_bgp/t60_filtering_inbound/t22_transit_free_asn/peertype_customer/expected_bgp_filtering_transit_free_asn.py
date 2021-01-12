@@ -9,7 +9,7 @@ r1_t_bgp4_AS65001_e1_peer = {
             "asn": "AS65002",
             "attributes": {
                 "BGP.as_path": [65001, 174, 65002],
-                "BGP.large_community": [(65000, 3, 2), (65000, 1101, 15)],
+                "BGP.large_community": [(65000, 3, 2), (65000, 1101, 15), (65000, 1101, 22)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["100.64.0.2"],
                 "BGP.origin": "IGP",
@@ -31,7 +31,7 @@ r1_t_bgp6_AS65001_e1_peer = {
             "asn": "AS65002",
             "attributes": {
                 "BGP.as_path": [65001, 174, 65002],
-                "BGP.large_community": [(65000, 3, 2), (65000, 1101, 15)],
+                "BGP.large_community": [(65000, 3, 2), (65000, 1101, 15), (65000, 1101, 22)],
                 "BGP.local_pref": 750,
                 "BGP.next_hop": ["fc00:100::2"],
                 "BGP.origin": "IGP",

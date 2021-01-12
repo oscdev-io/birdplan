@@ -21,8 +21,6 @@
 """Testing stuff."""
 
 import re
-import os
-import shutil
 import pytest
 from .simulation import Simulation
 
@@ -198,12 +196,19 @@ def fixture_sim(request):
             expected_file.write('"""Expected test result data."""\n\n')
             expected_file.write(simulation.variables)
 
-        # Grab the expected data file directory
-        expected_dir = os.path.dirname(simulation.expected_path)
+        # Grab the expected configuration file
+        expected_conffile = simulation.expected_path.replace(".py", ".conf")
         for conffile_name, sim_conffile_path in simulation.conffiles.items():
             # If this is a birdplan config file, write it out
             if "birdplan" in conffile_name:
-                shutil.copyfile(sim_conffile_path, f"{expected_dir}/expected_{conffile_name}")
+                # We need to replace some options that are variable so files don't change between runs
+                with open(sim_conffile_path, "r") as config_file:
+                    conf_lines = config_file.readlines()
+                with open(expected_conffile, "w") as config_file:
+                    for line in conf_lines:
+                        if "log_file:" in line:
+                            line = "log_file: /var/log/birdplan.log\n"
+                        config_file.write(line)
 
     # Destroy simulation
     simulation.destroy()
