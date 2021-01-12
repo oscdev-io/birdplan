@@ -21,8 +21,6 @@
 """Testing stuff."""
 
 import re
-import os
-import shutil
 import pytest
 from .simulation import Simulation
 
