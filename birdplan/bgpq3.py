@@ -149,9 +149,7 @@ class BGPQ3:
         """Retrieve or store value in cache."""
 
         if self.server not in bgpq3_cache:
-            bgpq3_cache[self.server] = {
-                'objects': {}
-            }
+            bgpq3_cache[self.server] = {"objects": {}}
 
         if not value:
             # If the cached obj does not exist, return None

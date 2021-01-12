@@ -21,6 +21,7 @@
 # pylint: disable=too-many-lines
 
 from typing import Dict, List, Optional, Union
+import re
 import requests
 
 from .peer_attributes import (
@@ -595,7 +596,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.route_policy_accept.bgp_own_blackhole = True
             self.route_policy_accept.bgp_customer_blackhole = True
         # Check if we should be accepting customer blackhole routes
-        if self.peer_type == "customer" and self.filter_policy.prefixes:
+        if self.peer_type == "customer" and self.has_prefix_filter:
             self.route_policy_accept.bgp_customer_blackhole = True
 
         # If this is a rrserver to rrserver peer, we need to by default redistribute the default route (if we have one)
@@ -644,10 +645,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 )
         # Check if this is a customer with blackholing and without a prefix filter set
         if self.peer_type == "customer":
-            if self.route_policy_accept.bgp_customer_blackhole and not self.filter_policy.prefixes:
+            if self.route_policy_accept.bgp_customer_blackhole and not self.has_prefix_filter:
                 raise BirdPlanError(
                     f"Having 'accept:bgp_customer_blackhole' set to True for peer '{self.name}' with type '{self.peer_type}' "
-                    "and without 'filter:prefixes' set makes no sense"
+                    "and without 'filter:prefixes' or 'filter:as_sets' set makes no sense"
                 )
 
         #
@@ -1009,6 +1010,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         """Return our prefix list name."""
         return f"bgp{ipv}_AS{self.asn}_{self.name}_prefixes_import"
 
+    def import_blackhole_prefix_list_name(self, ipv: str) -> str:
+        """Return our blackhole prefix list name."""
+        return f"bgp{ipv}_AS{self.asn}_{self.name}_blackhole_prefixes_import"
+
     def _setup_peer_tables(self) -> None:
         """Peering routing table setup."""
         self.tables.conf.append(f"# BGP Peer Tables: {self.asn} - {self.name}")
@@ -1104,17 +1109,49 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         for ipv in ["4", "6"]:
             prefix_list = prefix_lists[ipv]
             prefix_list_irr = irr_prefixes[f"ipv{ipv}"]
+
             prefixes = []
+            blackholes = []
+
             # Add statically defined prefix list
             if prefix_list:
-                prefixes.append(f"# {len(prefix_list)} explicitly defined")
-                prefixes.extend(prefix_list)
+                for prefix in prefix_list:
+                    prefixes.append(prefix)
+                    # Add blackhole
+                    blackhole = "%s+" % re.split(r"[{+]", prefix, 1)[0]
+                    blackholes.append(blackhole)
+            # Sort and unique our results
+            prefixes = sorted(set(prefixes))
+            blackholes = sorted(set(blackholes))
+            # Add title for this section
+            prefixes.insert(0, f"# {len(prefix_list)} explicitly defined")
+            blackholes.insert(0, f"# {len(prefix_list)} explicitly defined")
+
             # Add prefix list from IRR
             if prefix_list_irr:
-                prefixes.append(f"# Retrieved {len(prefix_list_irr)} items from IRR with object '{self.filter_policy.as_sets}'")
-                prefixes.extend(prefix_list_irr)
+                prefixes_irr = []
+                blackholes_irr = []
+
+                # Loop with each prefix we got from IRR
+                for prefix in prefix_list_irr:
+                    # Make sure we're not making duplicates
+                    if prefix not in prefixes:
+                        prefixes_irr.append(prefix)
+                    # Add blackhole, and make sure we're not duplicating here either
+                    blackhole = "%s+" % prefix.split("{", 1)[0]
+                    if blackhole not in blackholes:
+                        blackholes_irr.append(blackhole)
+
+                # Add title to top of prefixes retrieved via IRR
+                prefixes.append(f"# Retrieved {len(prefixes_irr)} items from IRR with object '{self.filter_policy.as_sets}'")
+                blackholes.append(f"# Retrieved {len(blackholes_irr)} items from IRR with object '{self.filter_policy.as_sets}'")
+                # Extend our lists
+                prefixes.extend(prefixes_irr)
+                blackholes.extend(blackholes_irr)
+
             # Join into one string, so we get the commas
             prefixes_str = ",\n".join(prefixes)
+            blackholes_str = ",\n".join(blackholes)
 
             self.conf.add(f"define {self.import_prefix_list_name(ipv)} = [")
             # Loop with each line
@@ -1126,6 +1163,19 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.conf.add(f"  {line}")
             self.conf.add("];")
             self.conf.add("")
+
+            # We only need to output the blackhole list if the peer is a peertype that we support receiving blackhole prefixes from
+            if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+                self.conf.add(f"define {self.import_blackhole_prefix_list_name(ipv)} = [")
+                # Loop with each line
+                for line in blackholes_str.splitlines():
+                    # Remove comma from the comments
+                    if "#" in line:
+                        line = line[:-1]
+                    # Add line to our output
+                    self.conf.add(f"  {line}")
+                self.conf.add("];")
+                self.conf.add("")
 
     def _peer_to_bgp_export_filter(self) -> None:
         """Export filters into our main BGP routing table from the BGP peer table."""
@@ -1718,17 +1768,19 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             if self.has_prefix_filter:
                 self.conf.add("  # Filter on the allowed prefixes")
                 # Check if we have IPv4 support and output the filter
-                if self.has_ipv4:
-                    self.conf.add("  if (net.type = NET_IP4) then")
-                    self.conf.add(
-                        f"    {self.bgp_functions.peer_filter_prefixes_allow(BirdVariable(self.import_prefix_list_name('4')))};"
+                peer_filter_prefixes_allow = self.bgp_functions.peer_filter_prefixes_allow(
+                    BirdVariable(self.import_prefix_list_name("4")), BirdVariable(self.import_prefix_list_name("6"))
+                )
+                self.conf.add(f"  {peer_filter_prefixes_allow};")
+
+                # For peer types that support blackholes, add the blackhole filter
+                if self.peer_type == "customer":
+                    peer_filter_blackholes_allow = self.bgp_functions.peer_filter_prefixes_blackhole_allow(
+                        BirdVariable(self.import_blackhole_prefix_list_name("4")),
+                        BirdVariable(self.import_blackhole_prefix_list_name("6")),
                     )
-                # Check if we have IPv6 support and output the filter
-                if self.has_ipv6:
-                    self.conf.add("  if (net.type = NET_IP6) then")
-                    self.conf.add(
-                        f"    {self.bgp_functions.peer_filter_prefixes_allow(BirdVariable(self.import_prefix_list_name('6')))};"
-                    )
+                    self.conf.add(f"  {peer_filter_blackholes_allow};")
+
         # For everything else it is a DENY list
         elif self.peer_type != "routecollector":
             # Check if we're filtering denied origin ASNs
@@ -1742,18 +1794,18 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Check if we're filtering denied prefixes
             if self.has_prefix_filter:
                 self.conf.add("  # Filter on the denied prefixes")
-                # Check if we have IPv4 support and output the filter
-                if self.has_ipv4:
-                    self.conf.add("  if (net.type = NET_IP4) then")
-                    self.conf.add(
-                        f"    {self.bgp_functions.peer_filter_prefixes_deny(BirdVariable(self.import_prefix_list_name('4')))};"
+                peer_filter_prefixes_deny = self.bgp_functions.peer_filter_prefixes_deny(
+                    BirdVariable(self.import_prefix_list_name("4")), BirdVariable(self.import_prefix_list_name("6"))
+                )
+                self.conf.add(f"  {peer_filter_prefixes_deny};")
+
+                # For peer types that support blackholes, add the blackhole filter
+                if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+                    peer_filter_blackholes_deny = self.bgp_functions.peer_filter_prefixes_blackhole_deny(
+                        BirdVariable(self.import_blackhole_prefix_list_name("4")),
+                        BirdVariable(self.import_blackhole_prefix_list_name("6")),
                     )
-                # Check if we have IPv6 support and output the filter
-                if self.has_ipv6:
-                    self.conf.add("  if (net.type = NET_IP6) then")
-                    self.conf.add(
-                        f"    {self.bgp_functions.peer_filter_prefixes_deny(BirdVariable(self.import_prefix_list_name('6')))};"
-                    )
+                    self.conf.add(f"  {peer_filter_blackholes_deny};")
 
         # Quarantine mode...
         # NK: We don't quarantine route collectors as they are automagically filtered

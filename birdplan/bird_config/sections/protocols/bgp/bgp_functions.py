@@ -964,8 +964,13 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter prefixes (ALLOW)
-            function bgp_peer_filter_prefixes_allow(string filter_name; prefix set prefix_list) {{
-                if (net ~ prefix_list) then return false;
+            function bgp_peer_filter_prefixes_allow(
+                string filter_name;
+                prefix set prefix_list4; prefix set prefix_list6
+            ) {{
+                if {self.is_blackhole()} then return false;
+                if (net.type = NET_IP4 && net ~ prefix_list4) then return false;
+                if (net.type = NET_IP6 && net ~ prefix_list6) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_prefixes_allow] Adding BGP_LC_FILTERED_PREFIX_FILTERED to ", {self.functions.route_info()};
                 bgp_large_community.add(BGP_LC_FILTERED_PREFIX_FILTERED);
@@ -977,11 +982,58 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter prefixes (DENY)
-            function bgp_peer_filter_prefixes_deny(string filter_name; prefix set prefix_list) {{
-                if (net !~ prefix_list) then return false;
+            function bgp_peer_filter_prefixes_deny(
+                string filter_name;
+                prefix set prefix_list4; prefix set prefix_list6
+            ) {{
+                if {self.is_blackhole()} then return false;
+                if (net.type = NET_IP4 && net !~ prefix_list4) then return false;
+                if (net.type = NET_IP6 && net !~ prefix_list6) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_prefixes_deny] Adding BGP_LC_FILTERED_PREFIX_FILTERED to ", {self.functions.route_info()};
                 bgp_large_community.add(BGP_LC_FILTERED_PREFIX_FILTERED);
+            }}"""
+
+    @bird_function("bgp_peer_filter_prefixes_blackhole_allow")
+    def peer_filter_prefixes_blackhole_allow(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_filter_prefixes_blackhole_allow function."""
+
+        return f"""\
+            # Filter blackholes (ALLOW)
+            function bgp_peer_filter_prefixes_blackhole_allow(
+                string filter_name;
+                prefix set prefix_list4; prefix set prefix_list6
+            ) {{
+                if !{self.is_blackhole()} then return false;
+                if (net.type = NET_IP4 && net ~ prefix_list4) then return false;
+                if (net.type = NET_IP6 && net ~ prefix_list6) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_filter_prefixes_blackhole_allow] Adding BGP_LC_FILTERED_PREFIX_FILTERED, ",
+                    "BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED to ",
+                    {self.functions.route_info()};
+                bgp_large_community.add(BGP_LC_FILTERED_PREFIX_FILTERED);
+                bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED);
+            }}"""
+
+    @bird_function("bgp_peer_filter_prefixes_blackhole_deny")
+    def peer_filter_prefixes_blackhole_deny(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+        """BIRD bgp_peer_filter_prefixes_blackhole_deny function."""
+
+        return f"""\
+            # Filter blackholes (DENY)
+            function bgp_peer_filter_prefixes_blackhole_deny(
+                string filter_name;
+                prefix set prefix_list4; prefix set prefix_list6
+            ) {{
+                if !{self.is_blackhole()} then return false;
+                if (net.type = NET_IP4 && net !~ prefix_list4) then return false;
+                if (net.type = NET_IP6 && net !~ prefix_list6) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_filter_prefixes_blackhole_deny] Adding BGP_LC_FILTERED_PREFIX_FILTERED, ",
+                    "BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED to ",
+                    {self.functions.route_info()};
+                bgp_large_community.add(BGP_LC_FILTERED_PREFIX_FILTERED);
+                bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED);
             }}"""
 
     @bird_function("bgp_peer_filter_routecollector_all")

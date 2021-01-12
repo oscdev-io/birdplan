@@ -48,16 +48,16 @@ class Template(TemplateBase):
             sim,
             "e1",
             [
-                "neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 as-path [ 65001 ] "
-                f"large-community [{large_communities}]"
+                "neighbor 100.64.0.1 announce route 100.64.101.0/32 next-hop 100.64.0.2 as-path [ 65001 ] "
+                f"large-community [{large_communities}] community [65535:666]"
             ],
         )
         self._exabgpcli(
             sim,
             "e1",
             [
-                "neighbor fc00:100::1 announce route fc00:0:101::/48 next-hop fc00:100::2 as-path [ 65001 ] "
-                f"large-community [{large_communities}]"
+                "neighbor fc00:100::1 announce route fc00:0:101::/128 next-hop fc00:100::2 as-path [ 65001 ] "
+                f"large-community [{large_communities}] community [65535:666]"
             ],
         )
 
@@ -66,16 +66,16 @@ class Template(TemplateBase):
             sim,
             "e1",
             [
-                "neighbor 100.64.0.1 announce route 100.64.102.0/24 next-hop 100.64.0.2 as-path [ 65001 65002 ] "
-                f"large-community [{large_communities}]"
+                "neighbor 100.64.0.1 announce route 100.64.102.0/32 next-hop 100.64.0.2 as-path [ 65001 65002 ] "
+                f"large-community [{large_communities}] community [65535:666]"
             ],
         )
         self._exabgpcli(
             sim,
             "e1",
             [
-                "neighbor fc00:100::1 announce route fc00:0:102::/48 next-hop fc00:100::2 as-path [ 65001 65002 ] "
-                f"large-community [{large_communities}]"
+                "neighbor fc00:100::1 announce route fc00:0:102::/128 next-hop fc00:100::2 as-path [ 65001 65002 ] "
+                f"large-community [{large_communities}] community [65535:666]"
             ],
         )
 
@@ -84,16 +84,16 @@ class Template(TemplateBase):
             sim,
             "e1",
             [
-                "neighbor 100.64.0.1 announce route 100.64.121.0/24 next-hop 100.64.0.2 as-path [ 65001 65003 ] "
-                f"large-community [{large_communities}]"
+                "neighbor 100.64.0.1 announce route 100.64.121.0/32 next-hop 100.64.0.2 as-path [ 65001 65003 ] "
+                f"large-community [{large_communities}] community [65535:666]"
             ],
         )
         self._exabgpcli(
             sim,
             "e1",
             [
-                "neighbor fc00:100::1 announce route fc00:0:121::/48 next-hop fc00:100::2 as-path [ 65001 65003 ] "
-                f"large-community [{large_communities}]"
+                "neighbor fc00:100::1 announce route fc00:0:121::/128 next-hop fc00:100::2 as-path [ 65001 65003 ] "
+                f"large-community [{large_communities}] community [65535:666]"
             ],
         )
 
@@ -102,15 +102,15 @@ class Template(TemplateBase):
             sim,
             "e1",
             [
-                "neighbor 100.64.0.1 announce route 100.64.131.0/24 next-hop 100.64.0.2 as-path [ 65001 ] "
-                f"large-community [{large_communities}]"
+                "neighbor 100.64.0.1 announce route 100.64.131.0/32 next-hop 100.64.0.2 as-path [ 65001 ] "
+                f"large-community [{large_communities}] community [65535:666]"
             ],
         )
         self._exabgpcli(
             sim,
             "e1",
             [
-                "neighbor fc00:100::1 announce route fc00:0:131::/48 next-hop fc00:100::2 as-path [ 65001 ] "
-                f"large-community [{large_communities}]"
+                "neighbor fc00:100::1 announce route fc00:0:131::/128 next-hop fc00:100::2 as-path [ 65001 ] "
+                f"large-community [{large_communities}] community [65535:666]"
             ],
         )
