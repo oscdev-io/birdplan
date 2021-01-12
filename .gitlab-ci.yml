@@ -17,7 +17,7 @@ test_job:
   - pacman -Syu --noconfirm
   - pacman -S --noconfirm grep python
   - pacman -S --noconfirm python-pytest-runner python-pytest-cov python-pytest-black python-pytest-flake8 python-pytest-pycodestyle python-pytest-pydocstyle python-pytest-pylint python-pytest-mypy python-pytest-xdist python-yaml
-  - pacman -S --noconfirm python-jinja python-yaml python-requests iproute2 bird exabgp
+  - pacman -S --noconfirm python-jinja python-yaml python-requests iproute2 bird exabgp bgpq3
   # Create Python environment
   - pacman -S --noconfirm python-pip git
   - pip install git+https://oscdev.io/software/birdclient.git
