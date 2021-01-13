@@ -22,8 +22,8 @@
 
 from typing import Any, Dict, List, Optional, Union
 import os
-import jinja2
 import re
+import jinja2
 import yaml
 from .bird_config import BirdConfig
 from .exceptions import BirdPlanError

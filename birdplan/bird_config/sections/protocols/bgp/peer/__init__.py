@@ -1074,12 +1074,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Only create an IPv4 table if we have IPv4 configuration
         if self.has_ipv4:
             self.tables.conf.append(f"ipv4 table {self.bgp_table_name('4')};")
-            state_tables["ipv4"] = self.bgp_table_name('4')
+            state_tables["ipv4"] = self.bgp_table_name("4")
 
         # Only create an IPv6 table if we have IPv6 configuration
         if self.has_ipv6:
             self.tables.conf.append(f"ipv6 table {self.bgp_table_name('6')};")
-            state_tables["ipv6"] = self.bgp_table_name('6')
+            state_tables["ipv6"] = self.bgp_table_name("6")
 
         self.tables.conf.append("")
 
@@ -2170,7 +2170,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def peer_attributes(self) -> BGPPeerAttributes:
         """Return our attributes."""
         return self._peer_attributes
-
 
     @property
     def state(self) -> Dict[str, Any]:
