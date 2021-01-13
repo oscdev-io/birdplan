@@ -23,6 +23,7 @@
 from typing import Any, Dict, List, Optional, Union
 import os
 import jinja2
+import re
 import yaml
 from .bird_config import BirdConfig
 from .exceptions import BirdPlanError
@@ -826,6 +827,10 @@ class BirdPlan:
 
         # Loop with peer ASN and config
         for peer_name, peer_config in self.config["bgp"]["peers"].items():
+            # Make sure peer name is valid
+            if not re.match(r"^[a-z0-9]+$", peer_name):
+                raise BirdPlanError(f"The peer name '{peer_name}' specified in 'bgp:peers' is not valid, use [a-z0-9]")
+            # Configure peer
             self._config_bgp_peers_peer(peer_name, peer_config)
 
     def _config_bgp_peers_peer(
