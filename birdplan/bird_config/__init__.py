@@ -18,7 +18,7 @@
 
 """Bird configuration package."""
 
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from .globals import BirdConfigGlobals
 from .sections import Sections
@@ -72,6 +72,16 @@ class BirdConfig:
     def debug(self, debug: bool) -> None:
         """Set debugging mode."""
         self.birdconfig_globals.debug = debug
+
+    @property
+    def state(self) -> Dict[str, Any]:
+        """Return the state to use."""
+        return self.birdconfig_globals.state
+
+    @state.setter
+    def state(self, state: Dict[str, Any]) -> None:
+        """Set the log file to use."""
+        self.birdconfig_globals.state = state
 
     @property
     def test_mode(self) -> bool:

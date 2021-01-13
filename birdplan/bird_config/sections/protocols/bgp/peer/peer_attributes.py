@@ -286,6 +286,10 @@ class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
         List of peer ASNs to filter on.
     prefixes : BGPPeerFilterItem
         List of prefixes to filter on.
+    origin_asns_irr : List[str]
+        INTERNAL ONLY. These ASNs are resolved from the `as_sets` attribute.
+    prefixes_irr : List[str]
+        INTERNAL ONLY. These prefixes are resolved from the `as_sets` attribute.
 
     """
 
@@ -294,6 +298,8 @@ class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
     origin_asns: BGPPeerFilterItem
     peer_asns: BGPPeerFilterItem
     prefixes: BGPPeerFilterItem
+    origin_asns_irr: List[str]
+    prefixes_irr: List[str]
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -302,6 +308,9 @@ class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
         self.origin_asns = []
         self.peer_asns = []
         self.prefixes = []
+        # INTERNAL attributes, these are populated during initialization
+        self.origin_asns_irr = []
+        self.prefixes_irr = []
 
 
 class BGPPeerLocation:  # pylint: disable=too-few-public-methods

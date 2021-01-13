@@ -445,8 +445,14 @@ class BirdPlanCommandLine:
 
     def _birdplan_commit_state(self) -> None:
         """Commit BirdPlan state."""
-        # Try commit our state
+
+        # Try commit our state if we were called from the commandline
         if __name__ == "__main__":
+            # If we didn't get a state file specified, then just display a notice we're not going to write it out
+            if not self.args.birdplan_state_file[0]:
+                print("NOTICE: State file not written!", file=sys.stderr)
+                return
+            # Try commit state
             try:
                 self.birdplan.commit_state()
             except BirdPlanError as err:
@@ -490,7 +496,7 @@ class BirdPlanCommandLine:
             "--birdplan-state-file",
             nargs=1,
             metavar="BIRDPLAN_STATE_FILE",
-            default=[BIRDPLAN_STATE_FILE],
+            default=[None],
             help=f"BirdPlan state file to use (default: {BIRDPLAN_STATE_FILE})",
         )
 
