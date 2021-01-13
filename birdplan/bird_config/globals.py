@@ -18,7 +18,7 @@
 
 """BirdConfig configuration globals."""
 
-from typing import Optional
+from typing import Any, Dict, Optional
 
 
 class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
@@ -31,6 +31,8 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
         BIRD log file
     debug : bool
         Enable additional output from BIRD while running
+    state : Dict[str, Any]
+        Current configuration state, used for persistent data storage.
     test_mode : bool
         Enable test mode, this modifies some internals to allow for better and more complete testing
 
@@ -38,6 +40,7 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
 
     log_file: Optional[str]
     debug: bool
+    state: Dict[str, Any]
     test_mode: bool
 
     def __init__(self, test_mode: bool = False) -> None:
@@ -49,3 +52,6 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
         # Debugging
         self.debug = False
         self.test_mode = test_mode
+
+        # State
+        self.state = {}

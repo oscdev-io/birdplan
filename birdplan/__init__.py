@@ -22,6 +22,7 @@
 
 from typing import Any, Dict, List, Optional, Union
 import os
+import re
 import jinja2
 import yaml
 from .bird_config import BirdConfig
@@ -36,7 +37,6 @@ class BirdPlan:
 
     _birdconf: BirdConfig
     _config: Dict[str, Any]
-    _state: Dict[str, Any]
     _state_file: Optional[str]
 
     def __init__(self, test_mode: bool = False) -> None:
@@ -44,7 +44,6 @@ class BirdPlan:
 
         self._birdconf = BirdConfig(test_mode=test_mode)
         self._config = {}
-        self._state = {}
         self._state_file = None
 
     def load(self, plan_file: str, state_file: Optional[str] = None) -> None:
@@ -826,6 +825,10 @@ class BirdPlan:
 
         # Loop with peer ASN and config
         for peer_name, peer_config in self.config["bgp"]["peers"].items():
+            # Make sure peer name is valid
+            if not re.match(r"^[a-z0-9]+$", peer_name):
+                raise BirdPlanError(f"The peer name '{peer_name}' specified in 'bgp:peers' is not valid, use [a-z0-9]")
+            # Configure peer
             self._config_bgp_peers_peer(peer_name, peer_config)
 
     def _config_bgp_peers_peer(
@@ -1117,12 +1120,12 @@ class BirdPlan:
     @property
     def state(self) -> Dict[str, Any]:
         """Return our state."""
-        return self._state
+        return self.birdconf.state
 
     @state.setter
     def state(self, state: Dict[str, Any]) -> None:
         """Set our state."""
-        self._state = state
+        self.birdconf.state = state
 
     @property
     def state_file(self) -> Optional[str]:

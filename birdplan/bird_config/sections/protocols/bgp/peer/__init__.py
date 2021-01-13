@@ -20,7 +20,7 @@
 
 # pylint: disable=too-many-lines
 
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 import re
 import requests
 
@@ -58,6 +58,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     _bgp_attributes: BGPAttributes
     _bgp_functions: BGPFunctions
     _peer_attributes: BGPPeerAttributes
+    _state: Dict[str, Any]
 
     def __init__(
         self,
@@ -77,6 +78,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self._bgp_attributes = bgp_attributes
         self._bgp_functions = bgp_functions
         self._peer_attributes = BGPPeerAttributes()
+        self._state = {}
 
         # Save our name and configuration
         self.name = peer_name
@@ -566,11 +568,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     f"Having 'prefix_limit6' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
             self.prefix_limit6 = peer_config["prefix_limit6"]
-        # Work out the prefix limits...
-        if self.has_ipv4 and self.prefix_limit4 and self.prefix_limit4 == "peeringdb":
-            self.prefix_limit4 = self.peeringdb["info_prefixes4"]
-        if self.has_ipv6 and self.prefix_limit6 and self.prefix_limit6 == "peeringdb":
-            self.prefix_limit6 = self.peeringdb["info_prefixes6"]
 
         # Check for filters we need to setup
         if "filter" in peer_config:
@@ -936,9 +933,51 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 # Set constraint
                 setattr(self.constraints, constraint_name, constraint_value)
 
+        #
+        # NETWORK RELATED QUERIES
+        #
+
+        # Work out the prefix limits...
+        if self.has_ipv4 and self.prefix_limit4 and self.prefix_limit4 == "peeringdb":
+            self.prefix_limit4 = self.peeringdb["info_prefixes4"]
+        if self.has_ipv6 and self.prefix_limit6 and self.prefix_limit6 == "peeringdb":
+            self.prefix_limit6 = self.peeringdb["info_prefixes6"]
+
+        # Check if we're going to be pulling in AS-SET information
+        if self.filter_policy.as_sets:
+            # Grab BGPQ3 object to use below
+            bgpq3 = BGPQ3()
+
+            # Grab ASNs from IRR
+            irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
+            # If we have results populate our IRR origin ASN list
+            if irr_asns:
+                self.filter_policy.origin_asns_irr.extend(irr_asns)
+
+            # Grab IRR prefixes
+            irr_prefixes = bgpq3.get_prefixes(self.filter_policy.as_sets)
+            if irr_prefixes["ipv4"]:
+                self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv4"])
+            if irr_prefixes["ipv6"]:
+                self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv6"])
+
     def configure(self) -> None:
         """Configure BGP peer."""
         super().configure()
+
+        # Save basic peer information
+        self.state["asn"] = self.asn
+        self.state["description"] = self.description
+
+        # Check for some config options we also need to save
+        if self.prefix_limit4:
+            if "prefix_limit" not in self.state:
+                self.state["prefix_limit"] = {}
+            self.state["prefix_limit"]["ipv4"] = self.prefix_limit4
+        if self.prefix_limit6:
+            if "prefix_limit" not in self.state:
+                self.state["prefix_limit"] = {}
+            self.state["prefix_limit"]["ipv6"] = self.prefix_limit6
 
         self.conf.add("")
         self.conf.add(f"# Peer type: {self.peer_type}")
@@ -979,6 +1018,15 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # End of peer
         self.conf.add("")
 
+        # Make sure our state exists
+        if "bgp" not in self.birdconfig_globals.state:
+            self.birdconfig_globals.state["bgp"] = {}
+        if "peers" not in self.birdconfig_globals.state["bgp"]:
+            self.birdconfig_globals.state["bgp"]["peers"] = {}
+
+        # Save our configuration
+        self.birdconfig_globals.state["bgp"]["peers"][self.name] = self.state
+
     def protocol_name(self, ipv: str) -> str:
         """Return the IP versioned protocol name."""
         return f"bgp{ipv}_AS{self.asn}_{self.name}"
@@ -1017,12 +1065,26 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
     def _setup_peer_tables(self) -> None:
         """Peering routing table setup."""
+
+        # Start with no tables as we can have IPv4 and/or IPv6 tables below
+        state_tables = {}
+
         self.tables.conf.append(f"# BGP Peer Tables: {self.asn} - {self.name}")
+
+        # Only create an IPv4 table if we have IPv4 configuration
         if self.has_ipv4:
             self.tables.conf.append(f"ipv4 table {self.bgp_table_name('4')};")
+            state_tables["ipv4"] = self.bgp_table_name("4")
+
+        # Only create an IPv6 table if we have IPv6 configuration
         if self.has_ipv6:
             self.tables.conf.append(f"ipv6 table {self.bgp_table_name('6')};")
+            state_tables["ipv6"] = self.bgp_table_name("6")
+
         self.tables.conf.append("")
+
+        # Store our BGP table names
+        self.state["tables"] = state_tables
 
     def _setup_aspath_asns(self) -> None:
         """AS-PATH ASN list setup."""
@@ -1031,7 +1093,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if not self.has_aspath_asn_filter:
             return
 
+        state = {}
+
         aspath_asns = []
+        calculated_aspath_asns = []
 
         # If we're a "customer" or "peer", make sure the aspath_asns list has our own ASN
         if self.peer_type in ("customer", "peer"):
@@ -1040,10 +1105,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Populate AS-PATH ASN list
         if self.filter_policy.aspath_asns:
+            # Store static filter info in our state
+            state["static"] = self.filter_policy.aspath_asns
             # Loop with ASNs specified in configuration
             for asn in self.filter_policy.aspath_asns:
                 if asn not in aspath_asns:
                     aspath_asns.append(f"{asn}")
+                if asn not in calculated_aspath_asns:
+                    calculated_aspath_asns.append(asn)
             aspath_asns.insert(0, f"# Explicitly defined {len(aspath_asns)} items")
 
         # If we're a "customer" or "peer", pull in the origin_asns and irr_asns lists
@@ -1056,22 +1125,21 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     # Make sure we don't add duplicates
                     if asn not in aspath_asns and asn not in extra_aspath_asns:
                         extra_aspath_asns.append(f"{asn}")
+                    if asn not in calculated_aspath_asns:
+                        calculated_aspath_asns.append(asn)
                 # If we're a "customer" or "peer", pull in the origin_asns into our aspath_asns list
                 aspath_asns.append(f"# Explicitly defined {len(extra_aspath_asns)} items")
                 aspath_asns.extend(extra_aspath_asns)
 
-            # Grab IRR ASN's
-            irr_asns = []
-            if self.filter_policy.as_sets:
-                bgpq3 = BGPQ3()
-                irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
             # Check if we got results, if so add the IRR ASNs to the aspath_asns list
-            if irr_asns:
+            if self.filter_policy.origin_asns_irr:
                 extra_aspath_asns = []
                 # Loop with ASNs retrieved from IRR records
-                for asn in irr_asns:
+                for asn in self.filter_policy.origin_asns_irr:
                     if asn not in aspath_asns and asn not in extra_aspath_asns:
                         extra_aspath_asns.append(f"{asn}")
+                    if asn not in calculated_aspath_asns:
+                        calculated_aspath_asns.append(asn)
                     aspath_asns.append(
                         f"# Retrieved {len(extra_aspath_asns)} items from IRR with object '{self.filter_policy.as_sets}'"
                     )
@@ -1087,6 +1155,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("];")
         self.conf.add("")
 
+        # Store calculated aspath filter info in our state
+        state["calculated"] = calculated_aspath_asns
+
+        # Save state
+        if "filter" not in self.state:
+            self.state["filter"] = {}
+        self.state["filter"]["aspath_asns"] = state
+
     def _setup_origin_asns(self) -> None:
         """Origin ASN list setup."""
 
@@ -1094,12 +1170,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if not self.has_origin_asn_filter:
             return
 
+        state = {}
+
         origin_asns = []
 
         # Populate our origin ASN list from configuration
         if self.filter_policy.origin_asns:
-            extra_origin_asns = []
+            # Store filter info in our state
+            state["static"] = self.filter_policy.origin_asns
             # Loop with ASNs specified in configuration
+            extra_origin_asns = []
             for asn in self.filter_policy.origin_asns:
                 # Make sure we don't add duplicates
                 if asn not in origin_asns and asn not in extra_origin_asns:
@@ -1107,16 +1187,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             origin_asns.append(f"# Explicitly defined {len(extra_origin_asns)} items")
             origin_asns.extend(extra_origin_asns)
 
-        # Grab IRR prefixes
-        irr_asns = []
-        if self.filter_policy.as_sets:
-            bgpq3 = BGPQ3()
-            irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
-        # If we have results populate our origin ASN list
-        if irr_asns:
-            extra_origin_asns = []
+        # Grab IRR ASNs
+        if self.filter_policy.origin_asns_irr:
+            # Store filter info in our state
+            state["irr"] = self.filter_policy.origin_asns_irr
             # Loop with ASNs retrieved from IRR records
-            for asn in irr_asns:
+            extra_origin_asns = []
+            for asn in self.filter_policy.origin_asns_irr:
                 if asn not in origin_asns and asn not in extra_origin_asns:
                     extra_origin_asns.append(f"{asn}")
             origin_asns.append(f"# Retrieved {len(extra_origin_asns)} items from IRR with object '{self.filter_policy.as_sets}'")
@@ -1132,6 +1209,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("];")
         self.conf.add("")
 
+        # Save state
+        if "filter" not in self.state:
+            self.state["filter"] = {}
+        self.state["filter"]["origin_asns"] = state
+
     def _setup_peer_asns(self) -> None:
         """Peer ASN list setup."""
 
@@ -1139,9 +1221,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if not self.has_peer_asn_filter:
             return
 
+        state = {}
+
         peer_asns = []
+
         # Add ASN list with comments
         if self.filter_policy.peer_asns:
+            # Save our peer ASN list in our state
+            state["static"] = self.filter_policy.peer_asns
             peer_asns.append(f"# Explicitly defined {len(self.filter_policy.peer_asns)} items")
             for asn in self.filter_policy.peer_asns:
                 peer_asns.append(f"{asn}")
@@ -1156,11 +1243,19 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("];")
         self.conf.add("")
 
+        # Save state
+        if "filter" not in self.state:
+            self.state["filter"] = {}
+        self.state["filter"]["peer_asns"] = state
+
     def _setup_peer_prefixes(self) -> None:
         """Prefix list setup."""
+
         # Short circuit and exit if we have none
         if not self.has_prefix_filter:
             return
+
+        state: Dict[str, Dict[str, Any]] = {}
 
         # Work out prefixes
         prefix_lists: Dict[str, List[str]] = {"4": [], "6": []}
@@ -1169,23 +1264,28 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 prefix_lists["6"].append(prefix)
             else:
                 prefix_lists["4"].append(prefix)
-
-        # Grab IRR prefixes
-        irr_prefixes: Dict[str, List[str]] = {"ipv4": [], "ipv6": []}
-        if self.filter_policy.as_sets:
-            bgpq3 = BGPQ3()
-            irr_prefixes = bgpq3.get_prefixes(self.filter_policy.as_sets)
+        prefix_lists_irr: Dict[str, List[str]] = {"4": [], "6": []}
+        for prefix in sorted(self.filter_policy.prefixes_irr):
+            if ":" in prefix:
+                prefix_lists_irr["6"].append(prefix)
+            else:
+                prefix_lists_irr["4"].append(prefix)
 
         # Output prefix definitions
         for ipv in ["4", "6"]:
             prefix_list = prefix_lists[ipv]
-            prefix_list_irr = irr_prefixes[f"ipv{ipv}"]
+            prefix_list_irr = prefix_lists_irr[ipv]
 
             prefixes = []
             blackholes = []
 
             # Add statically defined prefix list
             if prefix_list:
+                # Save prefix list in our state
+                if "static" not in state:
+                    state["static"] = {}
+                state["static"][f"ipv{ipv}"] = prefix_list
+
                 for prefix in prefix_list:
                     prefixes.append(prefix)
                     # Add blackhole
@@ -1200,6 +1300,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
             # Add prefix list from IRR
             if prefix_list_irr:
+                # Save prefix list in our state
+                if "irr" not in state:
+                    state["irr"] = {}
+                state["irr"][f"ipv{ipv}"] = prefix_list_irr
+
                 prefixes_irr = []
                 blackholes_irr = []
 
@@ -1241,6 +1346,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     self.conf.add(blackhole_str)
                 self.conf.add("];")
                 self.conf.add("")
+
+        # Save state
+        if "filter" not in self.state:
+            self.state["filter"] = {}
+        self.state["filter"]["prefixes"] = state
 
     def _peer_to_bgp_export_filter(self) -> None:
         """Export filters into our main BGP routing table from the BGP peer table."""
@@ -1923,6 +2033,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def _setup_peer_protocol(self, ipv: str) -> None:
         """Peer protocol setup for a single protocol."""
 
+        protocol_state = {}
+
+        # Save the current protocol name
+        protocol_state["name"] = self.protocol_name(ipv)
+
         # Get our source and neighbor addresses
         source_address = getattr(self, f"source_address{ipv}")
         neighbor = getattr(self, f"neighbor{ipv}")
@@ -1936,7 +2051,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add(f"  neighbor {neighbor} as {self.asn};")
         # Check if this is a passive peer
         if self.passive:
+            protocol_state["mode"] = "passive"
             self.conf.add("  passive;")
+        else:
+            protocol_state["mode"] = "active"
 
         # Add various tunables
         if self.connect_delay_time:
@@ -1976,6 +2094,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("  };")
         self.conf.add("}")
         self.conf.add("")
+
+        # Make sure we have protocols in our state
+        if "protocols" not in self.state:
+            self.state["protocols"] = {}
+
+        # Save protocol state
+        self.state["protocols"][f"ipv{ipv}"] = protocol_state
 
     def _setup_peer_protocols(self) -> None:
         """Peer protocols setup."""
@@ -2045,6 +2170,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def peer_attributes(self) -> BGPPeerAttributes:
         """Return our attributes."""
         return self._peer_attributes
+
+    @property
+    def state(self) -> Dict[str, Any]:
+        """Return our state info."""
+        return self._state
+
+    @state.setter
+    def state(self, state: Dict[str, Any]) -> None:
+        """Set our state."""
+        self.state = state
 
     @property
     def name(self) -> str:
