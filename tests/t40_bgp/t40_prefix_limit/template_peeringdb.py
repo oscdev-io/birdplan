@@ -48,10 +48,21 @@ class Template(BirdPlanBaseTestCase):
                 },
             }
         }
+
+        # Save the global we have
+        limit_save = peeringdb.PEERINGDB_16BIT_LOWER
+
         # Trigger a lookup for our private ASN
         peeringdb.PEERINGDB_16BIT_LOWER = 65002
 
-        return super()._birdplan_run(sim, tmpdir, router, args)
+        # Grab return result
+        res = super()._birdplan_run(sim, tmpdir, router, args)
+
+        # Restore global
+        peeringdb.PEERINGDB_16BIT_LOWER = limit_save
+
+        return res
+
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
