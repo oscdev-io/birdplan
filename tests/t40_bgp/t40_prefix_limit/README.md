@@ -1,7 +1,16 @@
 # BGP prefix limit tests
 
-In terms of test `test_bgp_prefix_limit`:
+In terms of test `t10_user_defined`:
   - Exabgp e1 should be sending too many prefixes to r1 causing the session to be torn down.
+  - The configuration for prefix limits is specified statically by the user.
+
+In terms of test `t20_peeringdb`:
+  - Exabgp e1 should be sending too many prefixes to r1 causing the session to be torn down.
+  - The configuration for prefix limits is automatically pulled from PeeringDB.
+
+In terms of test `t22_peeringdb_changes`:
+  - Exabgp e1 should be sending too many prefixes to r1 causing the session to be torn down.
+  - Tests exceptions raised during substantial prefix limit changes.
 
 
 ## Diagram
