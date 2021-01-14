@@ -21,7 +21,7 @@
 
 """BGP prefix limit test case."""
 
-from ..template import Template
+from ..template_static import Template
 from ...config.peertype_transit.e1r1 import PeerTypeConfig
 
 

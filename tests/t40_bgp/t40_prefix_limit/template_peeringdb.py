@@ -21,7 +21,11 @@
 
 """BGP prefix limit test template."""
 
+from typing import Any, List
+import time
+from birdplan import peeringdb
 from ...basetests import BirdPlanBaseTestCase
+from ...simulation import Simulation
 
 
 class Template(BirdPlanBaseTestCase):
@@ -30,10 +34,24 @@ class Template(BirdPlanBaseTestCase):
     routers = ["r1"]
     exabgps = ["e1"]
 
-    r1_template_peer_config = """
-      prefix_limit4: 5
-      prefix_limit6: 5
-"""
+    def _birdplan_run(  # pylint: disable=too-many-arguments,too-many-locals
+        self, sim: Simulation, tmpdir: str, router: str, args: List[str]
+    ) -> Any:
+        """Run BirdPlan for a given router."""
+
+        # Pre-populate cache
+        peeringdb.peeringdb_cache = {
+            "objects": {
+                "asn:65001": {
+                    "_timestamp": time.time() + 3600,
+                    "value": {"info_prefixes4": 5, "info_prefixes6": 5},
+                },
+            }
+        }
+        # Trigger a lookup for our private ASN
+        peeringdb.PEERINGDB_16BIT_LOWER = 65002
+
+        return super()._birdplan_run(sim, tmpdir, router, args)
 
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
@@ -75,8 +93,10 @@ class Template(BirdPlanBaseTestCase):
         if "r1" in self.routers_config_exception and self.routers_config_exception:
             return
 
-        route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp4_AS6500[01]_e1: Route limit exceeded, shutting down")
-        assert route_limit_exceeded, "Failed to shut down IPv4 connection when route limit exceeded"
+        # We're only interested in testing out customer and peer peer types
+        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+            route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp4_AS65001_e1: Route limit exceeded, shutting down")
+            assert route_limit_exceeded, "Failed to shut down IPv4 connection when route limit exceeded"
 
-        route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp6_AS6500[01]_e1: Route limit exceeded, shutting down")
-        assert route_limit_exceeded, "Failed to shut down IPv6 connection when route limit exceeded"
+            route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp6_AS65001_e1: Route limit exceeded, shutting down")
+            assert route_limit_exceeded, "Failed to shut down IPv6 connection when route limit exceeded"
