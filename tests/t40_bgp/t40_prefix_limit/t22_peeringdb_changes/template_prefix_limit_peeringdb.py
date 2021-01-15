@@ -86,7 +86,7 @@ class Template(BirdPlanBaseTestCase):
         # Restore global
         peeringdb.PEERINGDB_16BIT_LOWER = limit_save
 
-    def test_peeringdb_increase(self, sim, tmpdir):
+    def test_peeringdb_ipv4_increase(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Populate cache with reduced values
@@ -94,7 +94,7 @@ class Template(BirdPlanBaseTestCase):
             "objects": {
                 "asn:65001": {
                     "_timestamp": time.time() + 3600,
-                    "value": {"info_prefixes4": 250, "info_prefixes6": 250},
+                    "value": {"info_prefixes4": 250, "info_prefixes6": 100},
                 },
             }
         }
@@ -108,14 +108,14 @@ class Template(BirdPlanBaseTestCase):
         if getattr(self, "r1_peer_type") in ("customer", "peer"):
             with pytest.raises(
                 BirdPlanError,
-                match=r"PeeringDB prefix limit for peer 'e1' increased substantially from previous run: last=100, now=250",
+                match=r"PeeringDB IPv4 prefix limit for peer 'e1' increased substantially from previous run: last=100, now=250",
             ):
                 super()._birdplan_run(sim, tmpdir, "r1", ["configure"])
 
         # Restore global
         peeringdb.PEERINGDB_16BIT_LOWER = limit_save
 
-    def test_peeringdb_reduced(self, sim, tmpdir):
+    def test_peeringdb_ipv6_increase(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Populate cache with reduced values
@@ -123,7 +123,7 @@ class Template(BirdPlanBaseTestCase):
             "objects": {
                 "asn:65001": {
                     "_timestamp": time.time() + 3600,
-                    "value": {"info_prefixes4": 40, "info_prefixes6": 40},
+                    "value": {"info_prefixes4": 100, "info_prefixes6": 250},
                 },
             }
         }
@@ -137,7 +137,65 @@ class Template(BirdPlanBaseTestCase):
         if getattr(self, "r1_peer_type") in ("customer", "peer"):
             with pytest.raises(
                 BirdPlanError,
-                match=r"PeeringDB prefix limit for peer 'e1' reduced substantially from previous run: last=100, now=40",
+                match=r"PeeringDB IPv6 prefix limit for peer 'e1' increased substantially from previous run: last=100, now=250",
+            ):
+                super()._birdplan_run(sim, tmpdir, "r1", ["configure"])
+
+        # Restore global
+        peeringdb.PEERINGDB_16BIT_LOWER = limit_save
+
+    def test_peeringdb_ipv4_reduced(self, sim, tmpdir):
+        """Graceful shutdown test to customize template."""
+
+        # Populate cache with reduced values
+        peeringdb.peeringdb_cache = {
+            "objects": {
+                "asn:65001": {
+                    "_timestamp": time.time() + 3600,
+                    "value": {"info_prefixes4": 40, "info_prefixes6": 100},
+                },
+            }
+        }
+
+        # Save the global we have
+        limit_save = peeringdb.PEERINGDB_16BIT_LOWER
+        # Trigger a lookup for our private ASN
+        peeringdb.PEERINGDB_16BIT_LOWER = 65002
+
+        # Check if we get an exception now during reconfiguration
+        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+            with pytest.raises(
+                BirdPlanError,
+                match=r"PeeringDB IPv4 prefix limit for peer 'e1' decreased substantially from previous run: last=100, now=40",
+            ):
+                super()._birdplan_run(sim, tmpdir, "r1", ["configure"])
+
+        # Restore global
+        peeringdb.PEERINGDB_16BIT_LOWER = limit_save
+
+    def test_peeringdb_ipv6_reduced(self, sim, tmpdir):
+        """Graceful shutdown test to customize template."""
+
+        # Populate cache with reduced values
+        peeringdb.peeringdb_cache = {
+            "objects": {
+                "asn:65001": {
+                    "_timestamp": time.time() + 3600,
+                    "value": {"info_prefixes4": 100, "info_prefixes6": 40},
+                },
+            }
+        }
+
+        # Save the global we have
+        limit_save = peeringdb.PEERINGDB_16BIT_LOWER
+        # Trigger a lookup for our private ASN
+        peeringdb.PEERINGDB_16BIT_LOWER = 65002
+
+        # Check if we get an exception now during reconfiguration
+        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+            with pytest.raises(
+                BirdPlanError,
+                match=r"PeeringDB IPv6 prefix limit for peer 'e1' decreased substantially from previous run: last=100, now=40",
             ):
                 super()._birdplan_run(sim, tmpdir, "r1", ["configure"])
 

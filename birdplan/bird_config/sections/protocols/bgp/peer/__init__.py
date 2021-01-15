@@ -961,13 +961,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     # Check if there was a substantial reduction in number of prefixes allowed
                     if peeringdb_info["info_prefixes4"] * 2 < prev_state["prefix_limit"]["peeringdb"]["ipv4"]:
                         raise BirdPlanError(
-                            f"PeeringDB prefix limit for peer '{self.name}' reduced substantially from previous run: "
+                            f"PeeringDB IPv4 prefix limit for peer '{self.name}' decreased substantially from previous run: "
                             "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv4"], peeringdb_info["info_prefixes4"])
                         )
                     # Check if there was a substantial increase in number of prefixes allowed
                     if peeringdb_info["info_prefixes4"] / 2 > prev_state["prefix_limit"]["peeringdb"]["ipv4"]:
                         raise BirdPlanError(
-                            f"PeeringDB prefix limit for peer '{self.name}' increased substantially from previous run: "
+                            f"PeeringDB IPv4 prefix limit for peer '{self.name}' increased substantially from previous run: "
                             "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv4"], peeringdb_info["info_prefixes4"])
                         )
                 # Set the limits
@@ -985,13 +985,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     # Check if there was a substantial reduction in number of prefixes allowed
                     if peeringdb_info["info_prefixes6"] * 2 < prev_state["prefix_limit"]["peeringdb"]["ipv6"]:
                         raise BirdPlanError(
-                            f"PeeringDB prefix limit for peer '{self.name}' reduced substantially from previous run: "
+                            f"PeeringDB IPv6 prefix limit for peer '{self.name}' decreased substantially from previous run: "
                             "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv6"], peeringdb_info["info_prefixes6"])
                         )
                     # Check if there was a substantial increase in number of prefixes allowed
                     if peeringdb_info["info_prefixes6"] / 2 > prev_state["prefix_limit"]["peeringdb"]["ipv6"]:
                         raise BirdPlanError(
-                            f"PeeringDB prefix limit for peer '{self.name}' increased substantially from previous run: "
+                            f"PeeringDB IPv6 prefix limit for peer '{self.name}' increased substantially from previous run: "
                             "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv6"], peeringdb_info["info_prefixes6"])
                         )
                 # Set the limits
@@ -1011,9 +1011,55 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
             # Grab IRR prefixes
             irr_prefixes = bgpq3.get_prefixes(self.filter_policy.as_sets)
+            # Lets work out what to do with the IPv4 prefixes
             if irr_prefixes["ipv4"]:
+                # Sanity checks for IPv4 network count
+                if (
+                    "filter" in prev_state
+                    and "prefixes" in prev_state["filter"]
+                    and "irr" in prev_state["filter"]["prefixes"]
+                    and "ipv4" in prev_state["filter"]["prefixes"]["irr"]
+                ):
+                    # Check if there was a substantial reduction in number of prefixes allowed
+                    new_network_count = util.network_count(irr_prefixes["ipv4"])
+                    old_network_count = util.network_count(prev_state["filter"]["prefixes"]["irr"]["ipv4"])
+                    if new_network_count * 2 < old_network_count:
+                        raise BirdPlanError(
+                            f"IRR IPv4 network count for peer '{self.name}' decreased substantially from previous run: "
+                            "last=%s, now=%s" % (old_network_count, new_network_count)
+                        )
+                    # Check if there was a substantial increase in number of prefixes allowed
+                    if new_network_count / 2 > old_network_count:
+                        raise BirdPlanError(
+                            f"IRR IPv4 network count for peer '{self.name}' increased substantially from previous run: "
+                            "last=%s, now=%s" % (old_network_count, new_network_count)
+                        )
+                # All looks good, add them
                 self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv4"])
+            # Lets work out what to do with the IPv6 prefixes
             if irr_prefixes["ipv6"]:
+                # Sanity checks for IPv6 network count
+                if (
+                    "filter" in prev_state
+                    and "prefixes" in prev_state["filter"]
+                    and "irr" in prev_state["filter"]["prefixes"]
+                    and "ipv6" in prev_state["filter"]["prefixes"]["irr"]
+                ):
+                    # Check if there was a substantial reduction in number of prefixes allowed
+                    new_network_count = util.network_count(irr_prefixes["ipv6"])
+                    old_network_count = util.network_count(prev_state["filter"]["prefixes"]["irr"]["ipv6"])
+                    if new_network_count * 2 < old_network_count:
+                        raise BirdPlanError(
+                            f"IRR IPv6 network count for peer '{self.name}' decreased substantially from previous run: "
+                            "last=%s, now=%s" % (old_network_count, new_network_count)
+                        )
+                    # Check if there was a substantial increase in number of prefixes allowed
+                    if new_network_count / 2 > old_network_count:
+                        raise BirdPlanError(
+                            f"IRR IPv6 network count for peer '{self.name}' increased substantially from previous run: "
+                            "last=%s, now=%s" % (old_network_count, new_network_count)
+                        )
+                # All looks good, add them
                 self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv6"])
 
     def configure(self) -> None:
