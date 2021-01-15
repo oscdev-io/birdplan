@@ -5,6 +5,7 @@
 
 [Static Routing](t10_basic/t10_static/README.md)
 [Internal - BGPQ3](t10_basic/t80_bgpq3/README.md)
+[Internal - PeeringDB](t10_basic/t82_peeringdb/README.md)
 
 
 # RIP

@@ -18,7 +18,7 @@
 
 """BIRD BGP protocol attributes."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 from birdplan.exceptions import BirdPlanError
 
 # This type is a string as we can have it set to "peeringdb"
@@ -26,7 +26,6 @@ BGPPeerPrefixLimit = Optional[str]
 
 BGPPeerFilterItem = Union[str, List[str]]
 BGPPeerFilter = Dict[str, BGPPeerFilterItem]
-BGPPeerPeeringDB = Dict[str, Any]
 
 
 class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
@@ -584,6 +583,10 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         Prefix limit for IPv4.
     prefix_limit6 : BGPPeerPrefixLimit
         Prefix limit for IPv6.
+    prefix_limit4_peeringdb : BGPPeerPrefixLimit
+        Prefix limit for IPv4.
+    prefix_limit6_peeringdb : BGPPeerPrefixLimit
+        Prefix limit for IPv6.
     replace_aspath : Optional[int]
         ASN to substitute in the AS-PATH.
     route_policy_accept : BGPPeerRoutePolicyAccept
@@ -592,8 +595,6 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         Route policy for redistribution of routes to the BGP peer.
     filter: BGPPeerFilter
         BGP peer filtering options.
-    peeringdb: Optional[BGPPeerPeeringDB]
-        BGP peer peeringdb entry.
     constraints: BGPPeerConstraints
         BGP peer constraint overrides.
 
@@ -633,14 +634,15 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     prefix_limit4: BGPPeerPrefixLimit
     prefix_limit6: BGPPeerPrefixLimit
 
+    prefix_limit4_peeringdb: BGPPeerPrefixLimit
+    prefix_limit6_peeringdb: BGPPeerPrefixLimit
+
     replace_aspath: bool
 
     route_policy_accept: BGPPeerRoutePolicyAccept
     route_policy_redistribute: BGPPeerRoutePolicyRedistribute
 
     filter_policy: BGPPeerFilterPolicy
-
-    peeringdb: Optional[BGPPeerPeeringDB]
 
     blackhole_community: Optional[Union[List[str], bool]]
 
@@ -683,6 +685,9 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.prefix_limit4 = None
         self.prefix_limit6 = None
 
+        self.prefix_limit4_peeringdb = None
+        self.prefix_limit6_peeringdb = None
+
         self.replace_aspath = False
 
         # Route policies
@@ -690,8 +695,6 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.route_policy_redistribute = BGPPeerRoutePolicyRedistribute()
 
         self.filter_policy = BGPPeerFilterPolicy()
-
-        self.peeringdb = None
 
         self.blackhole_community = None
 

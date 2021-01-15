@@ -22,7 +22,6 @@
 
 from typing import Any, Dict, List, Optional, Union
 import re
-import requests
 
 from .peer_attributes import (
     BGPPeerAttributes,
@@ -30,7 +29,6 @@ from .peer_attributes import (
     BGPPeerFilterItem,
     BGPPeerLargeCommunities,
     BGPPeerLocation,
-    BGPPeerPeeringDB,
     BGPPeerPrefixLimit,
     BGPPeerPrepend,
     BGPPeerRoutePolicyAccept,
@@ -50,6 +48,7 @@ from ..... import util
 from .....globals import BirdConfigGlobals
 from ......bgpq3 import BGPQ3
 from ......exceptions import BirdPlanError
+from ......peeringdb import PeeringDB
 
 
 class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
@@ -549,25 +548,26 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # If the peer is a customer or peer, check if we have a prefix limit, if not add it from peeringdb
         if self.peer_type in ("customer", "peer"):
-            if self.has_ipv4 and ("prefix_limit4" not in peer_config):
-                self.prefix_limit4 = "peeringdb"
-            if self.has_ipv6 and ("prefix_limit6" not in peer_config):
-                self.prefix_limit6 = "peeringdb"
-        # Check for peer config, this should override the above
-        if self.has_ipv4 and "prefix_limit4" in peer_config:
-            # Having a prefix limit set for anything other than these peer types
-            if self.peer_type not in ("customer", "peer"):
+            if self.has_ipv4:
+                if "prefix_limit4" not in peer_config:
+                    self.prefix_limit4 = "peeringdb"
+                else:
+                    self.prefix_limit4 = peer_config["prefix_limit4"]
+            if self.has_ipv6:
+                if "prefix_limit6" not in peer_config:
+                    self.prefix_limit6 = "peeringdb"
+                else:
+                    self.prefix_limit6 = peer_config["prefix_limit6"]
+        # Having a prefix limit set for anything other than the above peer types makes no sense
+        else:
+            if "prefix_limit4" in peer_config:
                 raise BirdPlanError(
                     f"Having 'prefix_limit4' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
-            self.prefix_limit4 = peer_config["prefix_limit4"]
-        if self.has_ipv6 and "prefix_limit6" in peer_config:
-            # Having a prefix limit set for anything other than these peer types
-            if self.peer_type not in ("customer", "peer"):
+            if "prefix_limit6" in peer_config:
                 raise BirdPlanError(
                     f"Having 'prefix_limit6' set for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
-            self.prefix_limit6 = peer_config["prefix_limit6"]
 
         # Check for filters we need to setup
         if "filter" in peer_config:
@@ -936,12 +936,67 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         #
         # NETWORK RELATED QUERIES
         #
+        prev_state = {}
+        if (
+            "bgp" in self.birdconfig_globals.state
+            and "peers" in self.birdconfig_globals.state["bgp"]
+            and self.name in self.birdconfig_globals.state["bgp"]["peers"]
+        ):
+            prev_state = self.birdconfig_globals.state["bgp"]["peers"][self.name]
 
         # Work out the prefix limits...
-        if self.has_ipv4 and self.prefix_limit4 and self.prefix_limit4 == "peeringdb":
-            self.prefix_limit4 = self.peeringdb["info_prefixes4"]
-        if self.has_ipv6 and self.prefix_limit6 and self.prefix_limit6 == "peeringdb":
-            self.prefix_limit6 = self.peeringdb["info_prefixes6"]
+        if self.prefix_limit4 == "peeringdb" or self.prefix_limit6 == "peeringdb":
+            # Grab PeeringDB entries
+            peeringdb = PeeringDB()
+            peeringdb_info = peeringdb.get_prefix_limits(self.asn)
+
+            # Check if we're setting our IPv4 prefix limit from peeringdb
+            if self.prefix_limit4 == "peeringdb":
+                # Sanity checks
+                if (
+                    "prefix_limit" in prev_state
+                    and "peeringdb" in prev_state["prefix_limit"]
+                    and "ipv4" in prev_state["prefix_limit"]["peeringdb"]
+                ):
+                    # Check if there was a substantial reduction in number of prefixes allowed
+                    if peeringdb_info["info_prefixes4"] * 2 < prev_state["prefix_limit"]["peeringdb"]["ipv4"]:
+                        raise BirdPlanError(
+                            f"PeeringDB IPv4 prefix limit for peer '{self.name}' decreased substantially from previous run: "
+                            "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv4"], peeringdb_info["info_prefixes4"])
+                        )
+                    # Check if there was a substantial increase in number of prefixes allowed
+                    if peeringdb_info["info_prefixes4"] / 2 > prev_state["prefix_limit"]["peeringdb"]["ipv4"]:
+                        raise BirdPlanError(
+                            f"PeeringDB IPv4 prefix limit for peer '{self.name}' increased substantially from previous run: "
+                            "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv4"], peeringdb_info["info_prefixes4"])
+                        )
+                # Set the limits
+                self.prefix_limit4 = None
+                self.prefix_limit4_peeringdb = peeringdb_info["info_prefixes4"]
+
+            # Check if we're setting our IPv6 prefix limit from peeringdb
+            if self.prefix_limit6 == "peeringdb":
+                # Sanity checks
+                if (
+                    "prefix_limit" in prev_state
+                    and "peeringdb" in prev_state["prefix_limit"]
+                    and "ipv6" in prev_state["prefix_limit"]["peeringdb"]
+                ):
+                    # Check if there was a substantial reduction in number of prefixes allowed
+                    if peeringdb_info["info_prefixes6"] * 2 < prev_state["prefix_limit"]["peeringdb"]["ipv6"]:
+                        raise BirdPlanError(
+                            f"PeeringDB IPv6 prefix limit for peer '{self.name}' decreased substantially from previous run: "
+                            "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv6"], peeringdb_info["info_prefixes6"])
+                        )
+                    # Check if there was a substantial increase in number of prefixes allowed
+                    if peeringdb_info["info_prefixes6"] / 2 > prev_state["prefix_limit"]["peeringdb"]["ipv6"]:
+                        raise BirdPlanError(
+                            f"PeeringDB IPv6 prefix limit for peer '{self.name}' increased substantially from previous run: "
+                            "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv6"], peeringdb_info["info_prefixes6"])
+                        )
+                # Set the limits
+                self.prefix_limit6 = None
+                self.prefix_limit6_peeringdb = peeringdb_info["info_prefixes6"]
 
         # Check if we're going to be pulling in AS-SET information
         if self.filter_policy.as_sets:
@@ -956,9 +1011,55 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
             # Grab IRR prefixes
             irr_prefixes = bgpq3.get_prefixes(self.filter_policy.as_sets)
+            # Lets work out what to do with the IPv4 prefixes
             if irr_prefixes["ipv4"]:
+                # Sanity checks for IPv4 network count
+                if (
+                    "filter" in prev_state
+                    and "prefixes" in prev_state["filter"]
+                    and "irr" in prev_state["filter"]["prefixes"]
+                    and "ipv4" in prev_state["filter"]["prefixes"]["irr"]
+                ):
+                    # Check if there was a substantial reduction in number of prefixes allowed
+                    new_network_count = util.network_count(irr_prefixes["ipv4"])
+                    old_network_count = util.network_count(prev_state["filter"]["prefixes"]["irr"]["ipv4"])
+                    if new_network_count * 2 < old_network_count:
+                        raise BirdPlanError(
+                            f"IRR IPv4 network count for peer '{self.name}' decreased substantially from previous run: "
+                            "last=%s, now=%s" % (old_network_count, new_network_count)
+                        )
+                    # Check if there was a substantial increase in number of prefixes allowed
+                    if new_network_count / 2 > old_network_count:
+                        raise BirdPlanError(
+                            f"IRR IPv4 network count for peer '{self.name}' increased substantially from previous run: "
+                            "last=%s, now=%s" % (old_network_count, new_network_count)
+                        )
+                # All looks good, add them
                 self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv4"])
+            # Lets work out what to do with the IPv6 prefixes
             if irr_prefixes["ipv6"]:
+                # Sanity checks for IPv6 network count
+                if (
+                    "filter" in prev_state
+                    and "prefixes" in prev_state["filter"]
+                    and "irr" in prev_state["filter"]["prefixes"]
+                    and "ipv6" in prev_state["filter"]["prefixes"]["irr"]
+                ):
+                    # Check if there was a substantial reduction in number of prefixes allowed
+                    new_network_count = util.network_count(irr_prefixes["ipv6"])
+                    old_network_count = util.network_count(prev_state["filter"]["prefixes"]["irr"]["ipv6"])
+                    if new_network_count * 2 < old_network_count:
+                        raise BirdPlanError(
+                            f"IRR IPv6 network count for peer '{self.name}' decreased substantially from previous run: "
+                            "last=%s, now=%s" % (old_network_count, new_network_count)
+                        )
+                    # Check if there was a substantial increase in number of prefixes allowed
+                    if new_network_count / 2 > old_network_count:
+                        raise BirdPlanError(
+                            f"IRR IPv6 network count for peer '{self.name}' increased substantially from previous run: "
+                            "last=%s, now=%s" % (old_network_count, new_network_count)
+                        )
+                # All looks good, add them
                 self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv6"])
 
     def configure(self) -> None:
@@ -973,11 +1074,33 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.prefix_limit4:
             if "prefix_limit" not in self.state:
                 self.state["prefix_limit"] = {}
-            self.state["prefix_limit"]["ipv4"] = self.prefix_limit4
+            if self.prefix_limit4_peeringdb:
+                # Make sure we have a peeringdb attribute
+                if "peeringdb" not in self.state["prefix_limit"]:
+                    self.state["prefix_limit"]["peeringdb"] = {}
+                # Add our peeringdb IPv4 limit
+                self.state["prefix_limit"]["peeringdb"]["ipv4"] = self.prefix_limit4_peeringdb
+            else:
+                # Make sure we have a static attribute
+                if "static" not in self.state["prefix_limit"]:
+                    self.state["prefix_limit"]["static"] = {}
+                # Add our static IPv4 limit
+                self.state["prefix_limit"]["static"]["ipv4"] = self.prefix_limit4
         if self.prefix_limit6:
             if "prefix_limit" not in self.state:
                 self.state["prefix_limit"] = {}
-            self.state["prefix_limit"]["ipv6"] = self.prefix_limit6
+            if self.prefix_limit6_peeringdb:
+                # Make sure we have a peeringdb attribute
+                if "peeringdb" not in self.state["prefix_limit"]:
+                    self.state["prefix_limit"]["peeringdb"] = {}
+                # Add our peeringdb IPv6 limit
+                self.state["prefix_limit"]["peeringdb"]["ipv6"] = self.prefix_limit6_peeringdb
+            else:
+                # Make sure we have a static attribute
+                if "static" not in self.state["prefix_limit"]:
+                    self.state["prefix_limit"]["static"] = {}
+                # Add our static IPv6 limit
+                self.state["prefix_limit"]["static"]["ipv6"] = self.prefix_limit6
 
         self.conf.add("")
         self.conf.add(f"# Peer type: {self.peer_type}")
@@ -2374,22 +2497,42 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     @property
     def prefix_limit4(self) -> BGPPeerPrefixLimit:
         """Return our IPv4 prefix limit."""
-        return self.peer_attributes.prefix_limit4
+        return self.peer_attributes.prefix_limit4 or self.peer_attributes.prefix_limit4_peeringdb
 
     @prefix_limit4.setter
-    def prefix_limit4(self, prefix_limit4: str) -> None:
+    def prefix_limit4(self, prefix_limit4: Optional[str]) -> None:
         """Set our IPv4 prefix limit."""
         self.peer_attributes.prefix_limit4 = prefix_limit4
 
     @property
     def prefix_limit6(self) -> BGPPeerPrefixLimit:
         """Return our IPv4 prefix limit."""
-        return self.peer_attributes.prefix_limit6
+        return self.peer_attributes.prefix_limit6 or self.peer_attributes.prefix_limit6_peeringdb
 
     @prefix_limit6.setter
-    def prefix_limit6(self, prefix_limit6: str) -> None:
+    def prefix_limit6(self, prefix_limit6: Optional[str]) -> None:
         """Set our IPv6 prefix limit."""
         self.peer_attributes.prefix_limit6 = prefix_limit6
+
+    @property
+    def prefix_limit4_peeringdb(self) -> BGPPeerPrefixLimit:
+        """Return our IPv4 prefix limit from PeeringDB."""
+        return self.peer_attributes.prefix_limit4_peeringdb
+
+    @prefix_limit4_peeringdb.setter
+    def prefix_limit4_peeringdb(self, prefix_limit4: Optional[str]) -> None:
+        """Set our IPv4 prefix limit from PeeringDB."""
+        self.peer_attributes.prefix_limit4_peeringdb = prefix_limit4
+
+    @property
+    def prefix_limit6_peeringdb(self) -> BGPPeerPrefixLimit:
+        """Return our IPv6 prefix limit from PeeringDB."""
+        return self.peer_attributes.prefix_limit6_peeringdb
+
+    @prefix_limit6_peeringdb.setter
+    def prefix_limit6_peeringdb(self, prefix_limit6: Optional[str]) -> None:
+        """Set our IPv6 prefix limit from PeeringDB."""
+        self.peer_attributes.prefix_limit6_peeringdb = prefix_limit6
 
     @property
     def replace_aspath(self) -> bool:
@@ -2400,21 +2543,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def replace_aspath(self, replace_aspath: bool) -> None:
         """Set the ASN which will replace the AS-PATH."""
         self.peer_attributes.replace_aspath = replace_aspath
-
-    @property
-    def peeringdb(self) -> BGPPeerPeeringDB:
-        """Return our peeringdb entry, if there is one."""
-        # We cannot do lookups on private ASN's
-        if (self.asn >= 64512 and self.asn <= 65534) or (self.asn >= 4200000000 and self.asn <= 4294967294):
-            return {"info_prefixes4": None, "info_prefixes6": None}
-        # If we don't having peerindb info, grab it
-        if not self.peer_attributes.peeringdb:
-            self.peer_attributes.peeringdb = requests.get(f"https://www.peeringdb.com/api/net?asn__in={self.asn}").json()["data"][0]
-        # Check the result of peeringdb is not empty
-        if not self.peer_attributes.peeringdb:
-            raise BirdPlanError("PeeringDB returned and empty result")
-        # Lastly return it
-        return self.peer_attributes.peeringdb
 
     @property
     def blackhole_community(self) -> Optional[Union[bool, List[str]]]:

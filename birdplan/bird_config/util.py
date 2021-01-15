@@ -19,6 +19,7 @@
 """Bird configuration utility functions."""
 
 from typing import List
+import ipaddress
 
 
 def sanitize_community(community: str) -> str:
@@ -38,3 +39,26 @@ def sanitize_community_list(communities: List[str]) -> List[str]:
         result.append(sanitize_community(community))
 
     return result
+
+
+def network_count(ip_networks: List[str]) -> int:
+    """Get the number of ISP networks within a list of IP networks."""
+
+    # Loop with the networks we got
+    count = 0
+    for prefix_raw in ip_networks:
+        # Split off possible network size constraints
+        prefix = prefix_raw.split("{", 1)[0]
+        # Grab network object
+        ipnetwork = ipaddress.ip_network(prefix)
+        # Check which IP version this is
+        if ipnetwork.version == 4:
+            # Split on /24 for IPv4
+            prefix_count = len(list(ipnetwork.subnets(new_prefix=24)))
+        else:
+            # Split on /48 for IPv6
+            prefix_count = len(list(ipnetwork.subnets(new_prefix=48)))
+        # Add to counter
+        count += prefix_count
+
+    return count

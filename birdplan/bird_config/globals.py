@@ -27,7 +27,7 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
 
     Attributes
     ----------
-    log_File : Optional[str]
+    log_file : Optional[str]
         BIRD log file
     debug : bool
         Enable additional output from BIRD while running
