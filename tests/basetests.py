@@ -616,6 +616,9 @@ class BirdPlanBaseTestCase:
         with open(birdplan_file, "w") as file:
             file.write(raw_config)
 
+        # Add YAML file early incase we need to check it when configuration fails
+        sim.add_conffile(f"birdplan.yaml.{router}", birdplan_file)
+
         # Invoke by simulating the commandline...
         birdplan_cmdline = BirdPlanCommandLine(test_mode=True)
         # Disable logging for filelog
@@ -644,7 +647,6 @@ class BirdPlanBaseTestCase:
         result = birdplan_cmdline.run(cmdline_args)
 
         # Add test report sections
-        sim.add_conffile(f"birdplan.yaml.{router}", birdplan_file)
         sim.add_conffile(f"bird.conf.{router}", bird_conffile)
         sim.add_logfile(f"bird.log.{router}", bird_logfile)
 
