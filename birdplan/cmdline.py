@@ -474,9 +474,7 @@ class BirdPlanCommandLine:
         """Add configure arguments."""
 
         # Ignore IRR changes
-        arg_group.add_argument(
-            "--ignore-irr-changes", action="store_true", help="Ignore IRR changes between last run and this run"
-        )
+        arg_group.add_argument("--ignore-irr-changes", action="store_true", help="Ignore IRR changes between last run and this run")
 
         # Ignore PeeringDB changes
         arg_group.add_argument(
