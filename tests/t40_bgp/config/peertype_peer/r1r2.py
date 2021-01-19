@@ -26,5 +26,13 @@ class PeerTypeConfig:
     """BGP configuration for basic setup between r1 and r2."""
 
     r1_peer_type = "peer"
+    r1_peer_config = """
+      prefix_limit4: 100
+      prefix_limit6: 100
+"""
 
     r2_peer_type = "peer"
+    r2_peer_config = """
+      prefix_limit4: 100
+      prefix_limit6: 100
+"""

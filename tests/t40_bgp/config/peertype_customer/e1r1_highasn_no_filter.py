@@ -19,26 +19,18 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods,no-self-use
 
-"""BGP configuration for basic setup between r1 and r2."""
+"""BGP configuration for basic setup between e1 and r1."""
 
 
 class PeerTypeConfig:
-    """BGP configuration for basic setup between r1 and r2."""
+    """BGP configuration for basic setup between e1 and r1."""
+
+    e1_asn = 4200000000
+
+    r1_peer_asn = 4200000000
 
     r1_peer_type = "customer"
     r1_peer_config = """
       prefix_limit4: 100
       prefix_limit6: 100
-      passive: False
-      filter:
-        origin_asns: [65001]
-"""
-
-    r2_peer_type = "customer"
-    r2_peer_config = """
-      prefix_limit4: 100
-      prefix_limit6: 100
-      passive: False
-      filter:
-        origin_asns: [65000]
 """

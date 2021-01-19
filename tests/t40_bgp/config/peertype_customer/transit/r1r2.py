@@ -28,6 +28,8 @@ class PeerTypeConfig:
     r1_peer_type = "customer"
     r1_peer_config = """
       passive: False
+      prefix_limit4: 100
+      prefix_limit6: 100
       filter:
         origin_asns: [65001]
 """
