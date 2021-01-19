@@ -1,8 +1,10 @@
 # BGP AS-SET change tests
 
-In terms of test `bgp_filtering_as_sets_changes`:
+In terms of test `t10_as_sets_changes`:
   - Test exceptions raised during substantial AS-SET prefix filter changes.
 
+In terms of test `t12_as_sets_changes_ignore`:
+  - Test ignoring exceptions raised during substantial AS-SET prefix filter changes.
 
 ## Diagram
 

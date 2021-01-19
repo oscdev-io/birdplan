@@ -78,6 +78,7 @@ bgp:
       connect_delay_time: 2
       connect_retry_time: 2
       error_wait_time: 2,5
+@PEER_CONFIG@
 @TEMPLATE_EXTRA_CONFIG@
 @TEMPLATE_PEER_CONFIG@
-@PEER_CONFIG@
+

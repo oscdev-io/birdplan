@@ -27,11 +27,3 @@ from ....config.peertype_customer.transit.r1r2 import PeerTypeConfig
 
 class Test(PeerTypeConfig, Template):
     """BGP redistribution test case."""
-
-    r1_peer_type = "customer"
-    r1_peer_config = """
-      filter:
-        origin_asns: [65001]
-"""
-
-    r2_peer_type = "transit"

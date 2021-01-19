@@ -22,7 +22,7 @@
 """BGP prefix limit test case."""
 
 from ..template_prefix_limit_peeringdb import Template
-from ....config.peertype_customer.e1r1 import PeerTypeConfig
+from ....config.peertype_customer.e1r1_no_limit import PeerTypeConfig
 
 
 class Test(PeerTypeConfig, Template):

@@ -9,9 +9,10 @@ In terms of test `t20_peeringdb`:
   - The configuration for prefix limits is automatically pulled from PeeringDB.
 
 In terms of test `t22_peeringdb_changes`:
-  - Exabgp e1 should be sending too many prefixes to r1 causing the session to be torn down.
   - Tests exceptions raised during substantial prefix limit changes.
 
+In terms of test `t24_peeringdb_changes_ignore`:
+  - Tests ignoring of exceptions raised during substantial prefix limit changes.
 
 ## Diagram
 

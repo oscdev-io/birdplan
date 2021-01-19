@@ -65,6 +65,8 @@
 
 [Prefix Limit](t40_bgp/t40_prefix_limit/README.md)
 
+[AS-SETs (IRR)](t40_bgp/t41_as_sets/README.md)
+
 [Peer Cost](t40_bgp/t42_peer_cost/README.md)
 
 [Community Stripping](t40_bgp/t50_community_stripping/README.md)
