@@ -40,14 +40,19 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
 
     log_file: Optional[str]
     debug: bool
+    ignore_irr_changes: bool
+    ignore_peeringdb_changes: bool
+    use_cached: bool
     state: Dict[str, Any]
     test_mode: bool
 
     def __init__(self, test_mode: bool = False) -> None:
         """Initialize object."""
 
-        # Log file
         self.log_file = None
+        self.ignore_irr_changes = False
+        self.ignore_peeringdb_changes = False
+        self.use_cached = False
 
         # Debugging
         self.debug = False

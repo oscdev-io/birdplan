@@ -433,6 +433,15 @@ class BirdPlanCommandLine:
 
     def _birdplan_configure(self) -> None:
         """Configure BirdPlan."""
+
+        # Setup globals based on options provided
+        if self.args.ignore_irr_changes:
+            self.birdplan.birdconf.birdconfig_globals.ignore_irr_changes = True
+        if self.args.ignore_peeringdb_changes:
+            self.birdplan.birdconf.birdconfig_globals.ignore_peeringdb_changes = True
+        if self.args.use_cached:
+            self.birdplan.birdconf.birdconfig_globals.use_cached = True
+
         # Try load configuration
         if __name__ == "__main__":
             try:
@@ -463,6 +472,21 @@ class BirdPlanCommandLine:
 
     def _add_configure_arguments(self, arg_group: argparse.ArgumentParser) -> None:
         """Add configure arguments."""
+
+        # Ignore IRR changes
+        arg_group.add_argument(
+            "--ignore-irr-changes", action="store_true", help="Ignore IRR changes between last run and this run"
+        )
+
+        # Ignore PeeringDB changes
+        arg_group.add_argument(
+            "--ignore-peeringdb-changes", action="store_true", help="Ignore PeeringDB changes between last run and this run"
+        )
+
+        # Use last cached data
+        arg_group.add_argument(
+            "--use-cached", action="store_true", help="Use cached IRR and PeeringDB data instead of doing network requests"
+        )
 
     def _add_main_arguments(self) -> None:
         """Add main commandline arguments."""
