@@ -14,6 +14,9 @@ In terms of test `t22_peeringdb_changes`:
 In terms of test `t24_peeringdb_changes_ignore`:
   - Tests ignoring of exceptions raised during substantial prefix limit changes.
 
+In terms of test `t24_peeringdb_use_cached`:
+  - Test using previous cached PeeringDB data when generating peer configuration.
+
 ## Diagram
 
 ```plantuml
