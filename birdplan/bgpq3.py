@@ -75,7 +75,11 @@ class BGPQ3:
             result: Any = self._cache(f"asns:{obj}")
             # If we can't, grab the result from BGPQ3 live
             if not result:
-                result = self._bgpq3(["-l", "asns", "-t", "-3", obj])
+                # Try query object
+                try:
+                    result = self._bgpq3(["-l", "asns", "-t", "-3", obj])
+                except subprocess.CalledProcessError as err:
+                    raise BirdPlanError(f"Failed to query IRR ASNs from object '{obj}':\n%s" % err.output.decode("UTF-8")) from None
                 # Cache the result we got
                 self._cache(f"asns:{obj}", result)
             # Update return value with result
@@ -105,8 +109,19 @@ class BGPQ3:
             # If we can't, grab the result from BGPQ3 live
             if not result:
                 result = {}
-                result.update(self._bgpq3(["-l", "ipv4", "-m", "24", "-4", "-A", obj]))
-                result.update(self._bgpq3(["-l", "ipv6", "-m", "48", "-6", "-A", obj]))
+                # Lets see if we get results back from our IRR queries
+                try:
+                    result.update(self._bgpq3(["-l", "ipv4", "-m", "24", "-4", "-A", obj]))
+                except subprocess.CalledProcessError as err:
+                    raise BirdPlanError(
+                        f"Failed to query IRR IPv4 prefixes from object '{obj}':\n%s" % err.output.decode("UTF-8")
+                    ) from None
+                try:
+                    result.update(self._bgpq3(["-l", "ipv6", "-m", "48", "-6", "-A", obj]))
+                except subprocess.CalledProcessError as err:
+                    raise BirdPlanError(
+                        f"Failed to query IRR IPv6 prefixes from object '{obj}':\n%s" % err.output.decode("UTF-8")
+                    ) from None
                 # Cache the result we got
                 self._cache(f"prefixes:{obj}", result)
             # Update return value with result
@@ -140,7 +155,7 @@ class BGPQ3:
         cmd_args.extend(args)
 
         # Grab result from process execution
-        result = subprocess.check_output(cmd_args)  # nosec
+        result = subprocess.check_output(cmd_args, stderr=subprocess.STDOUT)  # nosec
 
         # Return the decoded json output
         return json.loads(result)
