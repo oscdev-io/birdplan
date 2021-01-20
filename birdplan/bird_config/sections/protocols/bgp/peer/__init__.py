@@ -946,6 +946,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Work out the prefix limits...
         if self.prefix_limit4 == "peeringdb" or self.prefix_limit6 == "peeringdb":
+            # Setup our peeringdb info
             peeringdb_info: Dict[str, Any] = {}
 
             # Check if we're using cached values or not
@@ -959,7 +960,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     ):
                         raise BirdPlanError(
                             f"No PeeringDB information in cache for peer '{self.name}' "
-                            f"with type '{self.peer_type}' IPv4 prefix limit"
+                            f"with type '{self.peer_type}' for IPv4 prefix limit"
                         )
                     # Pull entry from cache
                     peeringdb_info["info_prefixes4"] = prev_state["prefix_limit"]["peeringdb"]["ipv4"]
@@ -972,7 +973,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     ):
                         raise BirdPlanError(
                             f"No PeeringDB information in cache for peer '{self.name}' "
-                            f"with type '{self.peer_type}' IPv6 prefix limit"
+                            f"with type '{self.peer_type}' for IPv6 prefix limit"
                         )
                     # Pull entry from cache
                     peeringdb_info["info_prefixes6"] = prev_state["prefix_limit"]["peeringdb"]["ipv6"]
@@ -1045,17 +1046,71 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Check if we're going to be pulling in AS-SET information
         if self.filter_policy.as_sets:
-            # Grab BGPQ3 object to use below
-            bgpq3 = BGPQ3()
+            # Setup our IRR info
+            irr_asns: List[str] = []
+            irr_prefixes: Dict[str, Any] = {"ipv4": [], "ipv6": []}
 
-            # Grab ASNs from IRR
-            irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
-            # If we have results populate our IRR origin ASN list
-            if irr_asns:
-                self.filter_policy.origin_asns_irr.extend(irr_asns)
+            # Check if we're using cached values or not
+            if self.birdconfig_globals.use_cached:
+                # Grab IRR ASNs from previous state
+                if not (
+                    "filter" in prev_state
+                    and "origin_asns" in prev_state["filter"]
+                    and "irr" in prev_state["filter"]["origin_asns"]
+                ):
+                    raise BirdPlanError(
+                        f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR origin ASNs"
+                    )
+                # Populate irr_asns
+                irr_asns = prev_state["filter"]["origin_asns"]["irr"]
 
-            # Grab IRR prefixes
-            irr_prefixes = bgpq3.get_prefixes(self.filter_policy.as_sets)
+                # Grab IRR prefixes for IPv4 from previous state
+                if not (
+                    "filter" in prev_state
+                    and "prefixes" in prev_state["filter"]
+                    and "irr" in prev_state["filter"]["prefixes"]
+                    and "ipv4" in prev_state["filter"]["prefixes"]["irr"]
+                ):
+                    raise BirdPlanError(
+                        f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR IPv4 prefixes"
+                    )
+                # Populate IRR IPv4 prefixes
+                irr_prefixes["ipv4"] = prev_state["filter"]["prefixes"]["irr"]["ipv4"]
+
+                # Grab IRR prefixes for IPv6 from previous state
+                if not (
+                    "filter" in prev_state
+                    and "prefixes" in prev_state["filter"]
+                    and "irr" in prev_state["filter"]["prefixes"]
+                    and "ipv6" in prev_state["filter"]["prefixes"]["irr"]
+                ):
+                    raise BirdPlanError(
+                        f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR IPv6 prefixes"
+                    )
+                # Populate IRR IPv6 prefixes
+                irr_prefixes["ipv6"] = prev_state["filter"]["prefixes"]["irr"]["ipv6"]
+
+            else:
+                # Grab BGPQ3 object to use below
+                bgpq3 = BGPQ3()
+
+                # Grab ASNs from IRR
+                irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
+                # Make sure we got IRR ASNs back from BGPQ3
+                if not irr_asns:
+                    raise BirdPlanError(f"No IRR ASNs found for peer '{self.name}' with type '{self.peer_type}'")
+
+                # Grab IRR prefixes
+                irr_prefixes = bgpq3.get_prefixes(self.filter_policy.as_sets)
+                # Make sure we got IRR prefixes back from BGPQ3
+                if ("ipv4" not in irr_prefixes or not irr_prefixes["ipv4"]) and (
+                    "ipv6" not in irr_prefixes or not irr_prefixes["ipv6"]
+                ):
+                    raise BirdPlanError(f"No IRR prefixes found for peer '{self.name}' with type '{self.peer_type}'")
+
+            # Add our ASN's onto the filter policy origin ASNs list
+            self.filter_policy.origin_asns_irr.extend(irr_asns)
+
             # Lets work out what to do with the IPv4 prefixes
             if irr_prefixes["ipv4"]:
                 # Sanity checks for IPv4 network count
@@ -1082,6 +1137,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                             "increased substantially from previous run: "
                             "last=%s, now=%s" % (old_network_count, new_network_count)
                         )
+
                 # All looks good, add them
                 self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv4"])
             # Lets work out what to do with the IPv6 prefixes
