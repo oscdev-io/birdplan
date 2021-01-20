@@ -82,13 +82,13 @@ class Template(BirdPlanBaseTestCase):
         """Test BIRD status."""
         self._test_bird_status(sim)
 
-    def test_as_set_reload(self, sim, tmpdir):
+    def test_as_sets_reload(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Rewrite configuration file
         super()._birdplan_run(sim, tmpdir, "r1", ["configure"])
 
-    def test_peeringdb_ipv4_increase(self, sim, tmpdir):
+    def test_as_sets_ipv4_increase(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Pre-populate cache
@@ -120,7 +120,7 @@ class Template(BirdPlanBaseTestCase):
         if getattr(self, "r1_peer_type") in ("customer", "peer"):
             super()._birdplan_run(sim, tmpdir, "r1", ["configure", "--ignore-irr-changes"])
 
-    def test_peeringdb_ipv6_increase(self, sim, tmpdir):
+    def test_as_sets_ipv6_increase(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Pre-populate cache
@@ -152,7 +152,7 @@ class Template(BirdPlanBaseTestCase):
         if getattr(self, "r1_peer_type") in ("customer", "peer"):
             super()._birdplan_run(sim, tmpdir, "r1", ["configure", "--ignore-irr-changes"])
 
-    def test_peeringdb_ipv4_decrease(self, sim, tmpdir):
+    def test_as_sets_ipv4_decrease(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Pre-populate cache
@@ -184,7 +184,7 @@ class Template(BirdPlanBaseTestCase):
         if getattr(self, "r1_peer_type") in ("customer", "peer"):
             super()._birdplan_run(sim, tmpdir, "r1", ["configure", "--ignore-irr-changes"])
 
-    def test_peeringdb_ipv6_decrease(self, sim, tmpdir):
+    def test_as_sets_ipv6_decrease(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Pre-populate cache

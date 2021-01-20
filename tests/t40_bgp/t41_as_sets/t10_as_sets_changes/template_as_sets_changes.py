@@ -90,7 +90,7 @@ class Template(BirdPlanBaseTestCase):
         # Rewrite configuration file
         super()._birdplan_run(sim, tmpdir, "r1", ["configure"])
 
-    def test_peeringdb_ipv4_increase(self, sim, tmpdir):
+    def test_as_sets_ipv4_increase(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Pre-populate cache
@@ -128,7 +128,7 @@ class Template(BirdPlanBaseTestCase):
             ):
                 super()._birdplan_run(sim, tmpdir, "r1", ["configure"])
 
-    def test_peeringdb_ipv6_increase(self, sim, tmpdir):
+    def test_as_sets_ipv6_increase(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Pre-populate cache
@@ -166,7 +166,7 @@ class Template(BirdPlanBaseTestCase):
             ):
                 super()._birdplan_run(sim, tmpdir, "r1", ["configure"])
 
-    def test_peeringdb_ipv4_decrease(self, sim, tmpdir):
+    def test_as_sets_ipv4_decrease(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Pre-populate cache
@@ -204,7 +204,7 @@ class Template(BirdPlanBaseTestCase):
             ):
                 super()._birdplan_run(sim, tmpdir, "r1", ["configure"])
 
-    def test_peeringdb_ipv6_decrease(self, sim, tmpdir):
+    def test_as_sets_ipv6_decrease(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Pre-populate cache
