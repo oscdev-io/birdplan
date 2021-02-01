@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2020, AllWorldIT
+# Copyright (c) 2019-2021, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -569,6 +569,32 @@ class BirdPlanCommandLine:
     def birdplan(self) -> BirdPlan:
         """Return our BirdPlan instance."""
         return self._birdplan
+
+    @property
+    def is_console(self) -> bool:
+        """
+        Property indicating True or False if we're being called from the commandline.
+
+        Returns
+        -------
+        bool indicating if we were called from the commandline.
+
+        """
+        return __name__ == "__main__"
+
+    @property
+    def is_json(self) -> bool:
+        """
+        Property indicating that we should output in JSON on the commandline.
+
+        Returns
+        -------
+        bool : indicating if we should output in JSON from the commandline.
+
+        """
+        if self.args.json:
+            return True
+        return False
 
 
 if __name__ == "__main__":
