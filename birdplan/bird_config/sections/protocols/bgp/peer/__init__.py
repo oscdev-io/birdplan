@@ -214,12 +214,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 raise BirdPlanError(f"Having 'cost' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
             self.cost = peer_config["cost"]
 
-        # Check if we're in graceful_shutdown mode
-        if self.bgp_attributes.graceful_shutdown:
-            self.graceful_shutdown = True
-        if "graceful_shutdown" in peer_config:
-            self.graceful_shutdown = peer_config["graceful_shutdown"]
-
         # Check if we are adding a large community to outgoing routes
         if "incoming_large_communities" in peer_config:
             # Raise an exception if incoming large communities makes no sense for this peer type
@@ -826,10 +820,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.prepend.static_blackhole.own_asn = prepend_option
                 self.prepend.static_default.own_asn = prepend_option
 
-        # Check if we're quarantined
-        if "quarantine" in peer_config and peer_config["quarantine"]:
-            self.quarantined = True
-
         # Check if we have a blackhole community
         if "blackhole_community" in peer_config:
             if self.peer_type not in ("routeserver", "routecollector", "transit"):
@@ -945,8 +935,20 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 # Set constraint
                 setattr(self.constraints, constraint_name, constraint_value)
 
+        # Check if we're in graceful_shutdown mode
+        if self.bgp_attributes.graceful_shutdown:
+            self.graceful_shutdown = True
+        if "graceful_shutdown" in peer_config:
+            self.graceful_shutdown = peer_config["graceful_shutdown"]
+
+        # Check if we're quarantined
+        if self.bgp_attributes.quarantine:
+            self.quarantine = True
+        if "quarantine" in peer_config:
+            self.quarantine = peer_config["quarantine"]
+
         #
-        # NETWORK RELATED QUERIES
+        # NETWORK AND STATE (CACHE) RELATED QUERIES
         #
 
         # Work out the prefix limits...

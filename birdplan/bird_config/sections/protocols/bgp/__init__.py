@@ -560,6 +560,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.bgp_attributes.graceful_shutdown = graceful_shutdown
 
     @property
+    def quarantine(self) -> bool:
+        """Global BGP peer quarantine state."""
+        return self.bgp_attributes.quarantine
+
+    @quarantine.setter
+    def quarantine(self, quarantine: bool) -> None:
+        """Global BGP peer quarantine state."""
+        self.bgp_attributes.quarantine = quarantine
+
+    @property
     def rr_cluster_id(self) -> Optional[str]:
         """Return route reflector cluster ID."""
         return self.bgp_attributes.rr_cluster_id

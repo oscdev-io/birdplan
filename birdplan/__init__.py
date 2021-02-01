@@ -796,14 +796,15 @@ class BirdPlan:
         for config_item in self.config["bgp"]:
             if config_item not in (
                 # Globals
+                "accept",
                 "asn",
                 "graceful_shutdown",
-                "peertype_constraints",
-                "originate",  # Origination
-                "accept",
                 "import",
-                "rr_cluster_id",
+                "originate",  # Origination
                 "peers",
+                "peertype_constraints",
+                "quarantine",
+                "rr_cluster_id",
             ):
                 raise BirdPlanError(f"The 'bgp' config item '{config_item}' is not supported")
 
@@ -844,6 +845,10 @@ class BirdPlan:
         # Setup graceful shutdown if specified
         if "graceful_shutdown" in self.config["bgp"]:
             self.birdconf.protocols.bgp.graceful_shutdown = self.config["bgp"]["graceful_shutdown"]
+
+        # Setup graceful shutdown if specified
+        if "quarantine" in self.config["bgp"]:
+            self.birdconf.protocols.bgp.quarantine = self.config["bgp"]["quarantine"]
 
         # Set our route reflector cluster id
         if "rr_cluster_id" in self.config["bgp"]:

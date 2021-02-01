@@ -45,12 +45,12 @@ class TemplateBase(BirdPlanBaseTestCase):
 
     # Test configuration of quarantine
     def test_quarantine(self, sim, tmpdir):
-        """Quarantine test to customize template."""
+        """Graceful shutdown test to customize template."""
         self._test_quarantine(sim, tmpdir)
 
     # Here is where the customizations take place per testcase
     def _test_quarantine(self, sim, tmpdir):
-        """Quarantine test to customize template."""
+        """Graceful shutdown test to customize template."""
         raise NotImplementedError("This needs to be overridden")
 
     def test_bird_tables_bgp4_peer(self, sim):
