@@ -149,7 +149,7 @@ class ProtocolOSPF(SectionProtocolBase):
                     BirdPlanError(f"The OSPF default config for interface '{interface_name}' item 'stub' is 'false'")
                 config.append({key: value})
             else:
-                raise BirdPlanError(f"The OSPF config for interface '{interface_name}' item '{key}' hasnt been added to Salt yet")
+                raise BirdPlanError(f"The OSPF config for interface '{interface_name}' item '{key}' isn't supported")
 
     def _area_config(self) -> List[str]:
         """Generate area configuration."""
