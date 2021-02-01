@@ -31,6 +31,10 @@ from .exceptions import BirdPlanError
 
 __VERSION__ = "0.0.1"
 
+# Some types we need
+BirdPlanGracefulShutdownStatus = Dict[str, Dict[str, bool]]
+BirdPlanQuarantineStatus = Dict[str, Dict[str, bool]]
+
 
 class BirdPlan:
     """Main BirdPlan class."""
@@ -46,7 +50,7 @@ class BirdPlan:
         self._config = {}
         self._state_file = None
 
-    def load(self, plan_file: str, state_file: Optional[str] = None) -> None:
+    def load(self, **kwargs: Any) -> None:  # noqa: C901
         """
         Initialize object.
 
@@ -54,10 +58,31 @@ class BirdPlan:
         ----------
         plan_file : str
             Source plan file to generate configuration from.
+
         state_file : Optional[str]
-            Optional state file, used for commands like BGP graceful shutdown
+            Optional state file, used for commands like BGP graceful shutdown.
+
+        ignore_irr_changes : bool
+            Optional parameter to ignore IRR lookups during configuration load.
+
+        ignore_peeringdb_changes : bool
+            Optional parameter to ignore peering DB lookups during configuraiton load.
+
+        use_cached : bool
+            Optional parameter to use cached values from state during configuration load.
 
         """
+
+        # Grab parameters
+        plan_file: Optional[str] = kwargs.get("plan_file")
+        state_file: Optional[str] = kwargs.get("state_file")
+        ignore_irr_changes: bool = kwargs.get("ignore_irr_changes", False)
+        ignore_peeringdb_changes: bool = kwargs.get("ignore_peeringdb_changes", False)
+        use_cached: bool = kwargs.get("use_cached", False)
+
+        # Make sure we have the parameters we need
+        if not plan_file:
+            raise BirdPlanError("Required parameter 'plan_file' not found")
 
         # Create search paths for Jinja2
         search_paths = [os.path.dirname(plan_file)]
@@ -102,18 +127,6 @@ class BirdPlan:
                 except ImportError as err:  # pragma: no cover
                     raise BirdPlanError(f" Failed to load BirdPlan state '{state_file}': {err}") from None
 
-    def configure(self, output_filename: Optional[str] = None) -> str:
-        """
-        Create configuration for BIRD.
-
-        Parameters
-        ----------
-        output_filename : Optional[str]
-            Optional filename to write the configuration to. If this is not specified we'll just return the
-            configuration.
-
-        """
-
         # Make sure we have configuration...
         if not self.config:
             raise BirdPlanError("No configuration found")
@@ -123,6 +136,11 @@ class BirdPlan:
             if config_item not in ("router_id", "log_file", "debug", "static", "export_kernel", "bgp", "rip", "ospf"):
                 raise BirdPlanError(f"The config item '{config_item}' is not supported")
 
+        # Setup globals we need
+        self.birdconf.birdconfig_globals.ignore_irr_changes = ignore_irr_changes
+        self.birdconf.birdconfig_globals.ignore_peeringdb_changes = ignore_peeringdb_changes
+        self.birdconf.birdconfig_globals.use_cached = use_cached
+
         # Configure sections
         self._config_global()
         self._config_static()
@@ -131,21 +149,16 @@ class BirdPlan:
         self._config_ospf()
         self._config_bgp()
 
-        # Generate the configuration
-        config_str = "\n".join(self.birdconf.get_config())
+    def configure(self) -> str:
+        """
+        Create BIRD configuration.
 
-        # If we have a filename, write out
-        if output_filename:
-            if output_filename == "-":
-                print(config_str)
-            else:
-                try:
-                    with open(output_filename, "w") as config_file:
-                        config_file.write(config_str)
-                except OSError as err:  # pragma: no cover
-                    raise BirdPlanError(f"Failed to open '{output_filename}' for writing: {err}") from None
+        Returns
+        -------
+            str : Bird configuration as a string.
 
-        return config_str
+        """
+        return "\n".join(self.birdconf.get_config())
 
     def commit_state(self) -> None:
         """Commit our current state."""
@@ -164,149 +177,337 @@ class BirdPlan:
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.state_file}' for writing: {err}") from None
 
-    def bgp_graceful_shutdown_add_peer(self, peer: str) -> None:
+    def state_bgp_graceful_shutdown_set_peer(self, peer: str, value: bool) -> None:
         """
-        Add a peer to the BGP graceful shutdown list.
+        Set the BGP graceful shutdown override state for a peer.
 
         Parameters
         ----------
         peer : str
-            Peer name to add to BGP graceful shutdown list.
+            Peer name to set to BGP graceful shutdown state for.
+            Pattern matches can be specified with '*'.
+
+        value : bool
+            State of the graceful shutdown option for this peer.
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP graceful shutdown requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP graceful shutdown override requires a state file, none loaded")
 
         # Prepare the state structure if its not got what we need
         if "bgp" not in self.state:
             self.state["bgp"] = {}
+
+        # Make sure we have the global setting
         if "graceful_shutdown" not in self.state["bgp"]:
-            self.state["bgp"]["graceful_shutdown"] = []
+            self.state["bgp"]["graceful_shutdown"] = {}
+        # Set the global setting for this pattern
+        self.state["bgp"]["graceful_shutdown"][peer] = value
 
-        # If the peer is not in the list, then add it
-        if peer not in self.state["bgp"]["graceful_shutdown"]:
-            self.state["bgp"]["graceful_shutdown"].append(peer)
-        else:
-            raise BirdPlanError("BGP peer already in graceful_shutdown list")
-
-    def bgp_graceful_shutdown_remove_peer(self, peer: str) -> None:
+    def state_bgp_graceful_shutdown_remove_peer(self, peer: str) -> None:
         """
-        Remove a peer from the BGP graceful shutdown list.
+        Remove a BGP graceful shutdown override flag from a peer or pattern.
 
         Parameters
         ----------
         peer : str
-            Peer name to remove from BGP graceful shutdown list.
+            Peer name or pattern to remove the BGP graceful shutdown override flag from.
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP graceful shutdown requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP graceful shutdown override requires a state file, none loaded")
 
         # Prepare the state structure if its not got what we need
-        if (
-            "bgp" not in self.state
-            or "graceful_shutdown" not in self.state["bgp"]
-            or peer not in self.state["bgp"]["graceful_shutdown"]
-        ):
-            raise BirdPlanError("BGP peer not in graceful_shutdown list")
+        if "bgp" not in self.state:
+            return
 
-        # Remove peer from graceful_shutdown list
-        self.state["bgp"]["graceful_shutdown"].remove(peer)
+        # Remove from the global settings
+        if "graceful_shutdown" in self.state["bgp"]:
+            # Check it exists first, if not raise an exception
+            if peer not in self.state["bgp"]["graceful_shutdown"]:
+                raise BirdPlanError(f"BGP peer '{peer}' does not exist in graceful shutdown override list")
+            # Remove peer from graceful shutdown list
+            del self.state["bgp"]["graceful_shutdown"][peer]
+            # If the result is an empty dict, just delete it too
+            if not self.state["bgp"]["graceful_shutdown"]:
+                del self.state["bgp"]["graceful_shutdown"]
 
-    def bgp_graceful_shutdown_peer_list(self) -> List[str]:
+    def state_bgp_graceful_shutdown_status(self) -> BirdPlanGracefulShutdownStatus:
         """
-        Return the list of peers that are currently set for graceful shutdown.
+        Return the list of peers that currently have a graceful shutdown override.
 
         Returns
         -------
-        List[str]
-            List of BGP peers set for graceful shutdown.
+        BirdPlanGracefulShutdownStatus
+            Dictionary containing the status of overrides and peers.
+
+            eg.
+            {
+                'overrides': {
+                    'p*': True,
+                    'peer1': False,
+                }
+                'peers': {
+                    'peer1': False,
+                }
+            }
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP graceful shutdown requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP graceful shutdown override requires a state file, none loaded")
 
-        # Prepare the state structure if its not got what we need
-        if "bgp" not in self.state or "graceful_shutdown" not in self.state["bgp"]:
-            return []
+        # Initialize our return structure
+        ret: BirdPlanGracefulShutdownStatus = {
+            "overrides": {},
+            "current": {},
+            "pending": {},
+        }
 
-        return [f"{x}" for x in self.state["bgp"]["graceful_shutdown"]]
+        # Return if we don't have any BGP state
+        if "bgp" not in self.state:
+            return ret
 
-    def bgp_quarantine_add_peer(self, peer: str) -> None:
+        # Pull in any overrides we may have
+        if "graceful_shutdown" in self.state["bgp"]:
+            ret["overrides"] = self.state["bgp"]["graceful_shutdown"]
+
+        # Check if we have any peers in our state
+        if "peers" in self.state["bgp"]:
+            # If we do loop with them
+            for peer, peer_state in self.state["bgp"]["peers"].items():
+                # And check if they have a graceful shutdown state or not
+                if "graceful_shutdown" in peer_state:
+                    ret["current"][peer] = peer_state["graceful_shutdown"]
+                else:
+                    ret["current"][peer] = False
+
+        # Generate the override status as if we were doing a configure
+        for peer in self.birdconf.protocols.bgp.peers:
+            ret["pending"][peer] = self.birdconf.protocols.bgp.peer(peer).graceful_shutdown
+
+        return ret
+
+    def state_bgp_quarantine_set_peer(self, peer: str, value: bool) -> None:
         """
-        Add a peer to the BGP quarantine list.
+        Set the BGP quarantine override state for a peer.
 
         Parameters
         ----------
         peer : str
-            Peer name to add to BGP quarantine list.
+            Peer name to set to BGP quarantine state for.
+            Pattern matches can be specified with '*'.
+
+        value : bool
+            State of the quarantine option for this peer.
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP quarantine requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP quarantine override requires a state file, none loaded")
 
         # Prepare the state structure if its not got what we need
         if "bgp" not in self.state:
             self.state["bgp"] = {}
+
+        # Make sure we have the global setting
         if "quarantine" not in self.state["bgp"]:
-            self.state["bgp"]["quarantine"] = []
+            self.state["bgp"]["quarantine"] = {}
+        # Set the global setting for this pattern
+        self.state["bgp"]["quarantine"][peer] = value
 
-        # If the peer is not in the list, then add it
-        if peer not in self.state["bgp"]["quarantine"]:
-            self.state["bgp"]["quarantine"].append(peer)
-        else:
-            raise BirdPlanError("BGP peer already in quarantine list")
-
-    def bgp_quarantine_remove_peer(self, peer: str) -> None:
+    def state_bgp_quarantine_remove_peer(self, peer: str) -> None:
         """
-        Remove a peer from the BGP quarantine list.
+        Remove a BGP quarantine override flag from a peer or pattern.
 
         Parameters
         ----------
         peer : str
-            Peer name to remove from BGP quarantine list.
+            Peer name or pattern to remove the BGP quarantine override flag from.
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP quarantine requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP quarantine override requires a state file, none loaded")
 
         # Prepare the state structure if its not got what we need
-        if "bgp" not in self.state or "quarantine" not in self.state["bgp"] or peer not in self.state["bgp"]["quarantine"]:
-            raise BirdPlanError("BGP peer not in quarantine list")
+        if "bgp" not in self.state:
+            return
 
-        # Remove peer from quarantine list
-        self.state["bgp"]["quarantine"].remove(peer)
+        # Remove from the global settings
+        if "quarantine" in self.state["bgp"]:
+            # Check it exists first, if not raise an exception
+            if peer not in self.state["bgp"]["quarantine"]:
+                raise BirdPlanError(f"BGP peer '{peer}' does not exist in quarantine override list")
+            # Remove peer from quarantine list
+            del self.state["bgp"]["quarantine"][peer]
+            # If the result is an empty dict, just delete it too
+            if not self.state["bgp"]["quarantine"]:
+                del self.state["bgp"]["quarantine"]
 
-    def bgp_quarantine_peer_list(self) -> List[str]:
+    def state_bgp_quarantine_status(self) -> BirdPlanQuarantineStatus:
         """
-        Return the list of peers that are currently set for quarantine.
+        Return the list of peers that currently have a quarantine override.
 
         Returns
         -------
-        List[str]
-            List of BGP peers set for quarantine.
+        BirdPlanQuarantineStatus
+            Dictionary containing the status of overrides and peers.
+
+            eg.
+            {
+                'overrides': {
+                    'p*': True,
+                    'peer1': False,
+                }
+                'peers': {
+                    'peer1': False,
+                }
+            }
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP quarantine requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP quarantine override requires a state file, none loaded")
+
+        # Initialize our return structure
+        ret: BirdPlanQuarantineStatus = {
+            "overrides": {},
+            "current": {},
+            "pending": {},
+        }
+
+        # Return if we don't have any BGP state
+        if "bgp" not in self.state:
+            return ret
+
+        # Pull in any overrides we may have
+        if "quarantine" in self.state["bgp"]:
+            ret["overrides"] = self.state["bgp"]["quarantine"]
+
+        # Check if we have any peers in our state
+        if "peers" in self.state["bgp"]:
+            # If we do loop with them
+            for peer, peer_state in self.state["bgp"]["peers"].items():
+                # And check if they have a quarantine state or not
+                if "quarantine" in peer_state:
+                    ret["current"][peer] = peer_state["quarantine"]
+                else:
+                    ret["current"][peer] = False
+
+        # Generate the override status as if we were doing a configure
+        for peer in self.birdconf.protocols.bgp.peers:
+            ret["pending"][peer] = self.birdconf.protocols.bgp.peer(peer).quarantine
+
+        return ret
+
+    def state_ospf_set_interface_cost(self, interface: str, cost: int) -> None:
+        """
+        Set an OSPF interface cost override.
+
+        Parameters
+        ----------
+        interface : str
+            Interface to set the OSPF cost for.
+        cost : int
+            OSPF interface cost.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF interface cost override requires a state file, none loaded")
 
         # Prepare the state structure if its not got what we need
-        if "bgp" not in self.state or "quarantine" not in self.state["bgp"]:
-            return []
+        if "ospf" not in self.state:
+            self.state["ospf"] = {}
+        if "interfaces" not in self.state["ospf"]:
+            self.state["ospf"]["interfaces"] = {}
+        if interface not in self.state["ospf"]["interfaces"]:
+            self.state["ospf"]["interfaces"][interface] = {}
 
-        return [f"{x}" for x in self.state["bgp"]["quarantine"]]
+        # Set the interface cost value
+        self.state["ospf"]["interfaces"][interface]["cost"] = cost
+
+    def state_ospf_remove_interface_cost(self, interface: str) -> None:
+        """
+        Remove an OSPF interface cost override.
+
+        Parameters
+        ----------
+        interface : str
+            Interface to remove the OSPF cost for.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF interface cost override requires a state file, none loaded")
+
+        # Prepare the state structure if its not got what we need
+        if "ospf" not in self.state or "interfaces" not in self.state["ospf"] or interface not in self.state["ospf"]["interfaces"]:
+            raise BirdPlanError("OSPF interface cost override not found")
+
+        # Remove OSPF interface cost from state
+        del self.state["ospf"]["interfaces"][interface]["cost"]
+
+    def state_ospf_set_interface_ecmp_weight(self, interface: str, ecmp_weight: int) -> None:
+        """
+        Set an OSPF interface ECMP weight override.
+
+        Parameters
+        ----------
+        interface : str
+            Interface to set the OSPF ECMP weight for.
+        ecmp_weight : int
+            OSPF interface ECMP weight.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF interface ECMP weight override requires a state file, none loaded")
+
+        # Prepare the state structure if its not got what we need
+        if "ospf" not in self.state:
+            self.state["ospf"] = {}
+        if "interfaces" not in self.state["ospf"]:
+            self.state["ospf"]["interfaces"] = {}
+        if interface not in self.state["ospf"]["interfaces"]:
+            self.state["ospf"]["interfaces"][interface] = {}
+
+        # Set the interface ECMP weight value
+        self.state["ospf"]["interfaces"][interface]["ecmp_weight"] = ecmp_weight
+
+    def state_ospf_remove_interface_ecmp_weight(self, interface: str) -> None:
+        """
+        Remove an OSPF interface ECMP weight override.
+
+        Parameters
+        ----------
+        interface : str
+            Interface to remove the OSPF ECMP weight for.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF interface ECMP weight override requires a state file, none loaded")
+
+        # Check we have a state structure
+        if "ospf" not in self.state or "interfaces" not in self.state["ospf"] or interface not in self.state["ospf"]["interfaces"]:
+            raise BirdPlanError("OSPF interface ECMP weight override not found")
+
+        # Remove OSPF interface ECMP weight from state
+        del self.state["ospf"]["interfaces"][interface]["ecmp_weight"]
 
     def _config_global(self) -> None:
         """Configure global options."""
@@ -1051,18 +1252,6 @@ class BirdPlan:
 
             else:
                 raise BirdPlanError(f"Configuration item '{config_item}' not understood in bgp:peers:{peer_name}")
-
-        # Check if we have a graceful shutdown state
-        if "bgp" in self.state and "graceful_shutdown" in self.state["bgp"]:
-            # If we do, then check if this peer is in it
-            if peer_name in self.state["bgp"]["graceful_shutdown"] or "*" in self.state["bgp"]["graceful_shutdown"]:
-                peer["graceful_shutdown"] = self.state["bgp"]["graceful_shutdown"]
-
-        # Check if we have a quarantine state
-        if "bgp" in self.state and "quarantine" in self.state["bgp"]:
-            # If we do, then check if this peer is in it
-            if peer_name in self.state["bgp"]["quarantine"]:
-                peer["quarantine"] = self.state["bgp"]["quarantine"]
 
         # Check items we need
         for required_item in ["asn", "description", "type"]:
