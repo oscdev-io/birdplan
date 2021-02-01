@@ -587,7 +587,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in RIP accept")
 
-    def _config_rip_redistribute(self) -> None:
+    def _config_rip_redistribute(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
         """Configure rip:redistribute section."""
 
         # If we don't have a redistribute section just return
@@ -692,7 +692,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in ospf:accept")
 
-    def _config_ospf_redistribute(self) -> None:
+    def _config_ospf_redistribute(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
         """Configure ospf:redistribute section."""
 
         # If we don't have a redistribute section just return
@@ -743,7 +743,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")
 
-    def _config_ospf_areas(self) -> None:
+    def _config_ospf_areas(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
         """Configure ospf:interfaces section."""
 
         # If we don't have areas in our ospf section, just return
@@ -849,7 +849,7 @@ class BirdPlan:
         if "rr_cluster_id" in self.config["bgp"]:
             self.birdconf.protocols.bgp.rr_cluster_id = self.config["bgp"]["rr_cluster_id"]
 
-    def _config_bgp_peertype_constraints(self) -> None:
+    def _config_bgp_peertype_constraints(self) -> None:  # noqa: C901
         """Configure bgp:peertype_constraints section."""
 
         # If we don't have a peertype_constraints section, just return
@@ -963,7 +963,7 @@ class BirdPlan:
         for route in self.config["bgp"]["originate"]:
             self.birdconf.protocols.bgp.add_originated_route(route)
 
-    def _config_bgp_import(self) -> None:
+    def _config_bgp_import(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
         """Configure bgp:import section."""
 
         # If we don't have the option then just return
@@ -1032,9 +1032,9 @@ class BirdPlan:
             # Configure peer
             self._config_bgp_peers_peer(peer_name, peer_config)
 
-    def _config_bgp_peers_peer(
+    def _config_bgp_peers_peer(   # noqa: C901, pylint: disable=too-many-branches,too-many-locals,too-many-statements
         self, peer_name: str, peer_config: Dict[str, Any]
-    ) -> None:  # pylint: disable=too-many-branches # noqa: C901
+    ) -> None:
         """Configure bgp:peers single peer."""
 
         # Start with no peer config
