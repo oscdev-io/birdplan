@@ -1209,6 +1209,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 # Add our static IPv6 limit
                 self.state["prefix_limit"]["static"]["ipv6"] = self.prefix_limit6
 
+        # Make sure we keep our graceful shutdown state
+        self.state["graceful_shutdown"] = self.graceful_shutdown
+
+        # Make sure we keep our quarantine state
+        self.state["quarantine"] = self.quarantine
+
         self.conf.add("")
         self.conf.add(f"# Peer type: {self.peer_type}")
         self.conf.add("")
@@ -2000,7 +2006,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("# Export filter TO the BGP peer from the peer BGP table")
         self.conf.add(f"filter {filter_name} {{")
         # Check if we're quarantined, if we are reject routes to the peer
-        if self.quarantined:
+        if self.quarantine:
             self.conf.add("  # Peer is quarantined so reject exporting of routes")
             self.conf.add("  if DEBUG then")
             self.conf.add(
@@ -2215,7 +2221,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Quarantine mode...
         # NK: We don't quarantine route collectors as they are automagically filtered
-        if self.quarantined and self.peer_type != "routecollector":
+        if self.quarantine and self.peer_type != "routecollector":
             # Quarantine prefixes
             self.conf.add("  # Quarantine all prefixes received")
             self.conf.add(f"  {self.bgp_functions.peer_quarantine()};")
@@ -2558,12 +2564,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
     @property
     def graceful_shutdown(self) -> bool:
-        """Return the value of graceful_shutdown."""
+        """Peer graceful_shutdown property."""
         return self.peer_attributes.graceful_shutdown
 
     @graceful_shutdown.setter
     def graceful_shutdown(self, graceful_shutdown: bool) -> None:
-        """Set the value of graceful_shutdown."""
+        """Set the graceful_shutdown state of the peer."""
         self.peer_attributes.graceful_shutdown = graceful_shutdown
 
     @property
@@ -2640,6 +2646,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def prefix_limit6_peeringdb(self, prefix_limit6: Optional[str]) -> None:
         """Set our IPv6 prefix limit from PeeringDB."""
         self.peer_attributes.prefix_limit6_peeringdb = prefix_limit6
+
+    @property
+    def quarantine(self) -> bool:
+        """Peer quarantine property."""
+        return self.peer_attributes.quarantine
+
+    @quarantine.setter
+    def quarantine(self, quarantine: bool) -> None:
+        """Set the quarantine state of the peer."""
+        self.peer_attributes.quarantine = quarantine
 
     @property
     def replace_aspath(self) -> bool:
@@ -2952,20 +2968,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
     @property
     def has_ipv6(self) -> bool:
-        """Return if we have IPv6."""
+        """Peer is configured with IPv6."""
         return self.neighbor6 is not None
 
     @property
     def has_prefix_filter(self) -> BGPPeerFilterItem:
-        """Return if we filter on prefixes."""
+        """Peer has a prefix filter."""
         return self.filter_policy.prefixes or self.filter_policy.as_sets
-
-    @property
-    def quarantined(self) -> bool:
-        """Return if we're quarantined."""
-        return self.peer_attributes.quarantined
-
-    @quarantined.setter
-    def quarantined(self, quarantined: bool) -> None:
-        """Set quarantined status."""
-        self.peer_attributes.quarantined = quarantined

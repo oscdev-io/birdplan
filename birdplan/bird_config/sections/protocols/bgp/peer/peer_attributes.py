@@ -541,60 +541,88 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     ----------
     name : str
         Peer name.
+
     description : str
         Description of the peer.
+
     location : BGPPeerLocation
         Peer location.
+
     peer_type : str
         Peer type.
+
     asn : int
         Peers ASN.
+
     neighbor4: Optional[str]
         Neighbor IPv4 address.
+
     neighbor6: Optional[str]
         Neighbor IPv6 address.
+
     source_address4: Optional[str]
         Source IPv4 address.
+
     source_address6: Optional[str]
         Source IPv6 address.
+
     connect_delay_time: Optional[str]
         BGP connect delay time.
+
     connect_retry_time: Optional[str]
         BGP connection retry time.
+
     error_wait_time: Optional[str]
         BGP error wait time.
+
     multihop: Optional[str]
         BGP multihop value.
+
     password: Optional[str]
         BGP password.
+
     cost : int
         Cost of this peer, this is the number minused from the local_pref.
+
     graceful_shutdown : bool
-        Set peer in GRACEFUL_SHUTDOWN mode if set to True.
+        Set peer in GRACEFUL_SHUTDOWN mode.
+
     large_communities: BGPPeerLargeCommunities
         Incoming and outgoing large communities.
+
     prepend:
         AS-PATH prepending.
+
     passive : bool
         Indicate if this is a passive peer or not.
-    quarantined : bool
+
+    quarantine : bool
         Set if the peer is quarantined.
+
     prefix_limit4 : BGPPeerPrefixLimit
         Prefix limit for IPv4.
+
     prefix_limit6 : BGPPeerPrefixLimit
         Prefix limit for IPv6.
+
     prefix_limit4_peeringdb : BGPPeerPrefixLimit
         Prefix limit for IPv4.
+
     prefix_limit6_peeringdb : BGPPeerPrefixLimit
         Prefix limit for IPv6.
+
     replace_aspath : Optional[int]
         ASN to substitute in the AS-PATH.
+
     route_policy_accept : BGPPeerRoutePolicyAccept
         Route policy for acceptance of routes from BGP peers into our main BGP table.
+
     route_policy_redistribute : BGPPeerRoutePolicyRedistribute
         Route policy for redistribution of routes to the BGP peer.
+
     filter: BGPPeerFilter
         BGP peer filtering options.
+
     constraints: BGPPeerConstraints
         BGP peer constraint overrides.
 
@@ -629,7 +657,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     # Default to disabling passive mode
     passive: bool
 
-    quarantined: bool
+    quarantine: bool
 
     prefix_limit4: BGPPeerPrefixLimit
     prefix_limit6: BGPPeerPrefixLimit
@@ -680,7 +708,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         # Default to disabling passive mode
         self.passive = False
 
-        self.quarantined = False
+        self.quarantine = False
 
         self.prefix_limit4 = None
         self.prefix_limit6 = None
