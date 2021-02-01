@@ -155,12 +155,12 @@ class BirdPlan:
             raise BirdPlanError("Commit of BirdPlan state requires a state file, none loaded")
 
         # Dump the state in pretty YAML
-        raw_state = yaml.dump(self.state, default_flow_style=False)
+        yaml_output = yaml.dump(self.state, default_flow_style=False)
 
         # Write out state file
         try:
             with open(self.state_file, "w") as file:
-                file.write(raw_state)
+                file.write(yaml_output)
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.state_file}' for writing: {err}") from None
 
