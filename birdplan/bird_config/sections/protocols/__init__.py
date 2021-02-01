@@ -92,7 +92,7 @@ class SectionProtocols(SectionBase):
             self.conf.add(self.ospf)
 
         # If we have BGP peers, pull in the BGP configuration
-        if self.bgp.peers_config:
+        if self.bgp.peers:
             self.conf.add(self.bgp)
 
     @property
