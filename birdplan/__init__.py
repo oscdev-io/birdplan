@@ -201,10 +201,10 @@ class BirdPlan:
             self.state["bgp"] = {}
 
         # Make sure we have the global setting
-        if "graceful_shutdown" not in self.state["bgp"]:
-            self.state["bgp"]["graceful_shutdown"] = {}
+        if "+graceful_shutdown" not in self.state["bgp"]:
+            self.state["bgp"]["+graceful_shutdown"] = {}
         # Set the global setting for this pattern
-        self.state["bgp"]["graceful_shutdown"][peer] = value
+        self.state["bgp"]["+graceful_shutdown"][peer] = value
 
     def state_bgp_graceful_shutdown_remove_peer(self, peer: str) -> None:
         """
@@ -226,15 +226,15 @@ class BirdPlan:
             return
 
         # Remove from the global settings
-        if "graceful_shutdown" in self.state["bgp"]:
+        if "+graceful_shutdown" in self.state["bgp"]:
             # Check it exists first, if not raise an exception
-            if peer not in self.state["bgp"]["graceful_shutdown"]:
+            if peer not in self.state["bgp"]["+graceful_shutdown"]:
                 raise BirdPlanError(f"BGP peer '{peer}' does not exist in graceful shutdown override list")
             # Remove peer from graceful shutdown list
-            del self.state["bgp"]["graceful_shutdown"][peer]
+            del self.state["bgp"]["+graceful_shutdown"][peer]
             # If the result is an empty dict, just delete it too
-            if not self.state["bgp"]["graceful_shutdown"]:
-                del self.state["bgp"]["graceful_shutdown"]
+            if not self.state["bgp"]["+graceful_shutdown"]:
+                del self.state["bgp"]["+graceful_shutdown"]
 
     def state_bgp_graceful_shutdown_status(self) -> BirdPlanGracefulShutdownStatus:
         """
@@ -274,8 +274,8 @@ class BirdPlan:
             return ret
 
         # Pull in any overrides we may have
-        if "graceful_shutdown" in self.state["bgp"]:
-            ret["overrides"] = self.state["bgp"]["graceful_shutdown"]
+        if "+graceful_shutdown" in self.state["bgp"]:
+            ret["overrides"] = self.state["bgp"]["+graceful_shutdown"]
 
         # Check if we have any peers in our state
         if "peers" in self.state["bgp"]:
@@ -317,10 +317,10 @@ class BirdPlan:
             self.state["bgp"] = {}
 
         # Make sure we have the global setting
-        if "quarantine" not in self.state["bgp"]:
-            self.state["bgp"]["quarantine"] = {}
+        if "+quarantine" not in self.state["bgp"]:
+            self.state["bgp"]["+quarantine"] = {}
         # Set the global setting for this pattern
-        self.state["bgp"]["quarantine"][peer] = value
+        self.state["bgp"]["+quarantine"][peer] = value
 
     def state_bgp_quarantine_remove_peer(self, peer: str) -> None:
         """
@@ -342,15 +342,15 @@ class BirdPlan:
             return
 
         # Remove from the global settings
-        if "quarantine" in self.state["bgp"]:
+        if "+quarantine" in self.state["bgp"]:
             # Check it exists first, if not raise an exception
-            if peer not in self.state["bgp"]["quarantine"]:
+            if peer not in self.state["bgp"]["+quarantine"]:
                 raise BirdPlanError(f"BGP peer '{peer}' does not exist in quarantine override list")
             # Remove peer from quarantine list
-            del self.state["bgp"]["quarantine"][peer]
+            del self.state["bgp"]["+quarantine"][peer]
             # If the result is an empty dict, just delete it too
-            if not self.state["bgp"]["quarantine"]:
-                del self.state["bgp"]["quarantine"]
+            if not self.state["bgp"]["+quarantine"]:
+                del self.state["bgp"]["+quarantine"]
 
     def state_bgp_quarantine_status(self) -> BirdPlanQuarantineStatus:
         """
@@ -390,8 +390,8 @@ class BirdPlan:
             return ret
 
         # Pull in any overrides we may have
-        if "quarantine" in self.state["bgp"]:
-            ret["overrides"] = self.state["bgp"]["quarantine"]
+        if "+quarantine" in self.state["bgp"]:
+            ret["overrides"] = self.state["bgp"]["+quarantine"]
 
         # Check if we have any peers in our state
         if "peers" in self.state["bgp"]:
@@ -429,13 +429,13 @@ class BirdPlan:
         # Prepare the state structure if its not got what we need
         if "ospf" not in self.state:
             self.state["ospf"] = {}
-        if "interfaces" not in self.state["ospf"]:
-            self.state["ospf"]["interfaces"] = {}
-        if interface not in self.state["ospf"]["interfaces"]:
-            self.state["ospf"]["interfaces"][interface] = {}
+        if "+interfaces" not in self.state["ospf"]:
+            self.state["ospf"]["+interfaces"] = {}
+        if interface not in self.state["ospf"]["+interfaces"]:
+            self.state["ospf"]["+interfaces"][interface] = {}
 
         # Set the interface cost value
-        self.state["ospf"]["interfaces"][interface]["cost"] = cost
+        self.state["ospf"]["+interfaces"][interface]["cost"] = cost
 
     def state_ospf_remove_interface_cost(self, interface: str) -> None:
         """
@@ -452,12 +452,16 @@ class BirdPlan:
         if self.state_file is None:
             raise BirdPlanError("The use of OSPF interface cost override requires a state file, none loaded")
 
-        # Prepare the state structure if its not got what we need
-        if "ospf" not in self.state or "interfaces" not in self.state["ospf"] or interface not in self.state["ospf"]["interfaces"]:
+        # Check if this cost override exists
+        if (
+            "ospf" not in self.state
+            or "+interfaces" not in self.state["ospf"]
+            or interface not in self.state["ospf"]["+interfaces"]
+        ):
             raise BirdPlanError("OSPF interface cost override not found")
 
         # Remove OSPF interface cost from state
-        del self.state["ospf"]["interfaces"][interface]["cost"]
+        del self.state["ospf"]["+interfaces"][interface]["cost"]
 
     def state_ospf_set_interface_ecmp_weight(self, interface: str, ecmp_weight: int) -> None:
         """
@@ -479,13 +483,13 @@ class BirdPlan:
         # Prepare the state structure if its not got what we need
         if "ospf" not in self.state:
             self.state["ospf"] = {}
-        if "interfaces" not in self.state["ospf"]:
-            self.state["ospf"]["interfaces"] = {}
-        if interface not in self.state["ospf"]["interfaces"]:
-            self.state["ospf"]["interfaces"][interface] = {}
+        if "+interfaces" not in self.state["ospf"]:
+            self.state["ospf"]["+interfaces"] = {}
+        if interface not in self.state["ospf"]["+interfaces"]:
+            self.state["ospf"]["+interfaces"][interface] = {}
 
         # Set the interface ECMP weight value
-        self.state["ospf"]["interfaces"][interface]["ecmp_weight"] = ecmp_weight
+        self.state["ospf"]["+interfaces"][interface]["ecmp_weight"] = ecmp_weight
 
     def state_ospf_remove_interface_ecmp_weight(self, interface: str) -> None:
         """
@@ -503,11 +507,15 @@ class BirdPlan:
             raise BirdPlanError("The use of OSPF interface ECMP weight override requires a state file, none loaded")
 
         # Check we have a state structure
-        if "ospf" not in self.state or "interfaces" not in self.state["ospf"] or interface not in self.state["ospf"]["interfaces"]:
+        if (
+            "ospf" not in self.state
+            or "+interfaces" not in self.state["ospf"]
+            or interface not in self.state["ospf"]["+interfaces"]
+        ):
             raise BirdPlanError("OSPF interface ECMP weight override not found")
 
         # Remove OSPF interface ECMP weight from state
-        del self.state["ospf"]["interfaces"][interface]["ecmp_weight"]
+        del self.state["ospf"]["+interfaces"][interface]["ecmp_weight"]
 
     def _config_global(self) -> None:
         """Configure global options."""
@@ -1037,7 +1045,7 @@ class BirdPlan:
             # Configure peer
             self._config_bgp_peers_peer(peer_name, peer_config)
 
-    def _config_bgp_peers_peer(   # noqa: C901, pylint: disable=too-many-branches,too-many-locals,too-many-statements
+    def _config_bgp_peers_peer(  # noqa: C901, pylint: disable=too-many-branches,too-many-locals,too-many-statements
         self, peer_name: str, peer_config: Dict[str, Any]
     ) -> None:
         """Configure bgp:peers single peer."""

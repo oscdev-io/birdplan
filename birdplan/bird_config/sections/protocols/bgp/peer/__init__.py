@@ -1190,34 +1190,34 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv6"])
 
         # Check if we have a graceful shutdown override
-        if ("bgp" in self.birdconfig_globals.state) and ("graceful_shutdown" in self.birdconfig_globals.state["bgp"]):
+        if ("bgp" in self.birdconfig_globals.state) and ("+graceful_shutdown" in self.birdconfig_globals.state["bgp"]):
             # Then check if we have an explicit setting
-            if self.name in self.birdconfig_globals.state["bgp"]["graceful_shutdown"]:
-                self.graceful_shutdown = self.birdconfig_globals.state["bgp"]["graceful_shutdown"][self.name]
+            if self.name in self.birdconfig_globals.state["bgp"]["+graceful_shutdown"]:
+                self.graceful_shutdown = self.birdconfig_globals.state["bgp"]["+graceful_shutdown"][self.name]
             # If not we process the patterns
             else:
-                for item in sorted(self.birdconfig_globals.state["bgp"]["graceful_shutdown"]):
+                for item in sorted(self.birdconfig_globals.state["bgp"]["+graceful_shutdown"]):
                     # Skip non patterns
                     if "*" not in item:
                         continue
                     # If pattern matches peer name, set the value for graceful shutdown
                     if fnmatch.fnmatch(self.name, item):
-                        self.graceful_shutdown = self.birdconfig_globals.state["bgp"]["graceful_shutdown"][item]
+                        self.graceful_shutdown = self.birdconfig_globals.state["bgp"]["+graceful_shutdown"][item]
 
         # Check if we have a quarantine override
-        if ("bgp" in self.birdconfig_globals.state) and ("quarantine" in self.birdconfig_globals.state["bgp"]):
+        if ("bgp" in self.birdconfig_globals.state) and ("+quarantine" in self.birdconfig_globals.state["bgp"]):
             # Then check if we have an explicit setting
-            if self.name in self.birdconfig_globals.state["bgp"]["quarantine"]:
-                self.quarantine = self.birdconfig_globals.state["bgp"]["quarantine"][self.name]
+            if self.name in self.birdconfig_globals.state["bgp"]["+quarantine"]:
+                self.quarantine = self.birdconfig_globals.state["bgp"]["+quarantine"][self.name]
             # If not we process the patterns
             else:
-                for item in sorted(self.birdconfig_globals.state["bgp"]["quarantine"]):
+                for item in sorted(self.birdconfig_globals.state["bgp"]["+quarantine"]):
                     # Skip non patterns
                     if "*" not in item:
                         continue
                     # If pattern matches peer name, set the value for quarantine
                     if fnmatch.fnmatch(self.name, item):
-                        self.quarantine = self.birdconfig_globals.state["bgp"]["quarantine"][item]
+                        self.quarantine = self.birdconfig_globals.state["bgp"]["+quarantine"][item]
 
     def configure(self) -> None:
         """Configure BGP peer."""

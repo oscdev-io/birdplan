@@ -53,9 +53,7 @@ class BirdplanCmdlineBGPQuarantineAdd(BirdplanCmdlinePluginBase):
         parent_subparsers = plugins.call_plugin("birdplan.plugins.cmdline.bgp.quarantine", "get_subparsers", {})
 
         # CMD: bgp quarantine set
-        subparser = parent_subparsers.add_parser(
-            "set", help="Override the BGP quarantine flag for a specific peer or pattern"
-        )
+        subparser = parent_subparsers.add_parser("set", help="Override the BGP quarantine flag for a specific peer or pattern")
         subparser.add_argument(
             "--action",
             action="store_const",
