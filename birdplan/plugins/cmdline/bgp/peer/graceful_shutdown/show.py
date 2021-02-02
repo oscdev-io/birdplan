@@ -113,10 +113,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdplanCmdlinePluginBase):
         # Loop with sorted override list
         for peer in sorted(graceful_shutdown_status["overrides"]):
             # Print out override
-            if graceful_shutdown_status["overrides"][peer]:
-                status = colored("Enabled", "red")
-            else:
-                status = colored("Disabled", "green")
+            status = colored("Enabled", "red") if graceful_shutdown_status["overrides"][peer] else colored("Disabled", "green")
             print(f"  {peer}: {status}")
         # If we have no overrides, just print out --none--
         if not graceful_shutdown_status["overrides"]:
@@ -136,10 +133,11 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdplanCmdlinePluginBase):
             statuses = []
 
             # Grab current status
-            if peer in graceful_shutdown_status["current"]:
-                current_status = nice_status(graceful_shutdown_status["current"][peer])
-            else:
-                current_status = colored("-new-", "yellow")
+            current_status = (
+                nice_status(graceful_shutdown_status["current"][peer])
+                if peer in graceful_shutdown_status["current"]
+                else colored("-new-", "yellow")
+            )
             statuses.append(f"current={current_status}")
 
             # Work out our pending status

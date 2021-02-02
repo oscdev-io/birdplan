@@ -111,10 +111,7 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdplanCmdlinePluginBase):
         # Loop with sorted override list
         for peer in sorted(quarantine_status["overrides"]):
             # Print out override
-            if quarantine_status["overrides"][peer]:
-                status = colored("Enabled", "red")
-            else:
-                status = colored("Disabled", "green")
+            status = colored("Enabled", "red") if quarantine_status["overrides"][peer] else colored("Disabled", "green")
             print(f"  {peer}: {status}")
         # If we have no overrides, just print out --none--
         if not quarantine_status["overrides"]:
@@ -134,10 +131,11 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdplanCmdlinePluginBase):
             statuses = []
 
             # Grab current status
-            if peer in quarantine_status["current"]:
-                current_status = nice_status(quarantine_status["current"][peer])
-            else:
-                current_status = colored("-new-", "yellow")
+            current_status = (
+                nice_status(quarantine_status["current"][peer])
+                if peer in quarantine_status["current"]
+                else colored("-new-", "yellow")
+            )
             statuses.append(f"current={current_status}")
 
             # Work out our pending status
