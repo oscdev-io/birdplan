@@ -122,10 +122,8 @@ class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdplanCmdlinePluginBase):
             try:
                 cmdline.birdplan.state_bgp_peer_graceful_shutdown_set(peer, value)
                 # Print some sort of nicer output instead of "True", "False"
-                if value:
-                    print(f"BGP graceful shutdown ENABLED for peer(s) matching '{peer}'")
-                else:
-                    print(f"BGP graceful shutdown DISABLED for peer(s) matching '{peer}'")
+                status = "ENABLED" if value else "DISABLED"
+                print(f"BGP graceful shutdown {status} for peer(s) matching '{peer}'")
             except BirdPlanError as err:
                 print(f"ERROR: {err}")
                 sys.exit(1)

@@ -229,7 +229,7 @@ class BirdPlan:
         if "+graceful_shutdown" in self.state["bgp"]:
             # Check it exists first, if not raise an exception
             if peer not in self.state["bgp"]["+graceful_shutdown"]:
-                raise BirdPlanError(f"BGP peer '{peer}' does not exist in graceful shutdown override list")
+                raise BirdPlanError(f"BGP peer '{peer}' graceful shutdown override not found")
             # Remove peer from graceful shutdown list
             del self.state["bgp"]["+graceful_shutdown"][peer]
             # If the result is an empty dict, just delete it too
@@ -345,7 +345,7 @@ class BirdPlan:
         if "+quarantine" in self.state["bgp"]:
             # Check it exists first, if not raise an exception
             if peer not in self.state["bgp"]["+quarantine"]:
-                raise BirdPlanError(f"BGP peer '{peer}' does not exist in quarantine override list")
+                raise BirdPlanError(f"BGP peer '{peer}' quarantine override not found")
             # Remove peer from quarantine list
             del self.state["bgp"]["+quarantine"][peer]
             # If the result is an empty dict, just delete it too

@@ -120,10 +120,8 @@ class BirdplanCmdlineBGPPeerQuarantineSet(BirdplanCmdlinePluginBase):
             try:
                 cmdline.birdplan.state_bgp_peer_quarantine_set(peer, value)
                 # Print some sort of nicer output instead of "True", "False"
-                if value:
-                    print(f"BGP quarantine ENABLED for peer(s) matching '{peer}'")
-                else:
-                    print(f"BGP quarantine DISABLED for peer(s) matching '{peer}'")
+                status = "ENABLED" if value else "DISABLED"
+                print(f"BGP quarantine {status} for peer(s) matching '{peer}'")
             except BirdPlanError as err:
                 print(f"ERROR: {err}")
                 sys.exit(1)
