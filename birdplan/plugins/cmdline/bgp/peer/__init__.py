@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BirdPlan commandline options for BGP quarantine."""
+"""BirdPlan commandline options for BGP peer."""
 
 from typing import Any, Dict
 import argparse
@@ -25,8 +25,8 @@ from ...cmdline_plugin import BirdplanCmdlinePluginBase
 from .....exceptions import BirdPlanError
 
 
-class BirdplanCmdlineBGPQuarantine(BirdplanCmdlinePluginBase):
-    """Birdplan "bgp quarantine" command."""
+class BirdplanCmdlineBGPPeer(BirdplanCmdlinePluginBase):
+    """Birdplan "bgp peer" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -34,7 +34,7 @@ class BirdplanCmdlineBGPQuarantine(BirdplanCmdlinePluginBase):
         super().__init__()
 
         # Plugin setup
-        self.plugin_description = "birdplan bgp quarantine"
+        self.plugin_description = "birdplan bgp peer"
         self.plugin_order = 20
 
     def register_parsers(self, args: Dict[str, Any]) -> None:
@@ -52,13 +52,13 @@ class BirdplanCmdlineBGPQuarantine(BirdplanCmdlinePluginBase):
 
         parent_subparsers = plugins.call_plugin("birdplan.plugins.cmdline.bgp", "get_subparsers", {})
 
-        # CMD: bgp quarantine
-        subparser = parent_subparsers.add_parser("quarantine", help="BGP quarantine commands")
+        # CMD: bgp peer
+        subparser = parent_subparsers.add_parser("peer", help="BGP peer commands")
         subparser.add_argument(
             "--action",
             action="store_const",
-            const="bgp_quarantine",
-            default="bgp_quarantine",
+            const="bgp_peer",
+            default="bgp_peer",
             help=argparse.SUPPRESS,
         )
 
@@ -66,9 +66,9 @@ class BirdplanCmdlineBGPQuarantine(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = subparser.add_subparsers()
 
-    def cmd_bgp_quarantine(self, args: Any) -> bool:
+    def cmd_bgp_peer(self, args: Any) -> bool:
         """
-        Birdplan "bgp quarantine" command.
+        Birdplan "bgp peer" command.
 
         Parameters
         ----------
@@ -86,4 +86,4 @@ class BirdplanCmdlineBGPQuarantine(BirdplanCmdlinePluginBase):
             self._subparser.print_help(file=sys.stderr)
             sys.exit(1)
 
-        raise BirdPlanError("No options specified to 'bgp quarantine' action")
+        raise BirdPlanError("No options specified to 'bgp peer' action")

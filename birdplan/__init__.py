@@ -32,8 +32,8 @@ from .exceptions import BirdPlanError
 __VERSION__ = "0.0.1"
 
 # Some types we need
-BirdPlanGracefulShutdownStatus = Dict[str, Dict[str, bool]]
-BirdPlanQuarantineStatus = Dict[str, Dict[str, bool]]
+BirdPlanBGPPeerGracefulShutdownStatus = Dict[str, Dict[str, bool]]
+BirdPlanBGPPeerQuarantineStatus = Dict[str, Dict[str, bool]]
 
 
 class BirdPlan:
@@ -177,7 +177,7 @@ class BirdPlan:
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.state_file}' for writing: {err}") from None
 
-    def state_bgp_graceful_shutdown_set_peer(self, peer: str, value: bool) -> None:
+    def state_bgp_peer_graceful_shutdown_set(self, peer: str, value: bool) -> None:
         """
         Set the BGP graceful shutdown override state for a peer.
 
@@ -206,7 +206,7 @@ class BirdPlan:
         # Set the global setting for this pattern
         self.state["bgp"]["+graceful_shutdown"][peer] = value
 
-    def state_bgp_graceful_shutdown_remove_peer(self, peer: str) -> None:
+    def state_bgp_peer_graceful_shutdown_remove(self, peer: str) -> None:
         """
         Remove a BGP graceful shutdown override flag from a peer or pattern.
 
@@ -236,7 +236,7 @@ class BirdPlan:
             if not self.state["bgp"]["+graceful_shutdown"]:
                 del self.state["bgp"]["+graceful_shutdown"]
 
-    def state_bgp_graceful_shutdown_status(self) -> BirdPlanGracefulShutdownStatus:
+    def state_bgp_peer_graceful_shutdown_status(self) -> BirdPlanBGPPeerGracefulShutdownStatus:
         """
         Return the list of peers that currently have a graceful shutdown override.
 
@@ -263,7 +263,7 @@ class BirdPlan:
             raise BirdPlanError("The use of BGP graceful shutdown override requires a state file, none loaded")
 
         # Initialize our return structure
-        ret: BirdPlanGracefulShutdownStatus = {
+        ret: BirdPlanBGPPeerGracefulShutdownStatus = {
             "overrides": {},
             "current": {},
             "pending": {},
@@ -293,7 +293,7 @@ class BirdPlan:
 
         return ret
 
-    def state_bgp_quarantine_set_peer(self, peer: str, value: bool) -> None:
+    def state_bgp_peer_quarantine_set(self, peer: str, value: bool) -> None:
         """
         Set the BGP quarantine override state for a peer.
 
@@ -322,7 +322,7 @@ class BirdPlan:
         # Set the global setting for this pattern
         self.state["bgp"]["+quarantine"][peer] = value
 
-    def state_bgp_quarantine_remove_peer(self, peer: str) -> None:
+    def state_bgp_peer_quarantine_remove(self, peer: str) -> None:
         """
         Remove a BGP quarantine override flag from a peer or pattern.
 
@@ -352,7 +352,7 @@ class BirdPlan:
             if not self.state["bgp"]["+quarantine"]:
                 del self.state["bgp"]["+quarantine"]
 
-    def state_bgp_quarantine_status(self) -> BirdPlanQuarantineStatus:
+    def state_bgp_peer_quarantine_status(self) -> BirdPlanBGPPeerQuarantineStatus:
         """
         Return the list of peers that currently have a quarantine override.
 
@@ -379,7 +379,7 @@ class BirdPlan:
             raise BirdPlanError("The use of BGP quarantine override requires a state file, none loaded")
 
         # Initialize our return structure
-        ret: BirdPlanQuarantineStatus = {
+        ret: BirdPlanBGPPeerQuarantineStatus = {
             "overrides": {},
             "current": {},
             "pending": {},

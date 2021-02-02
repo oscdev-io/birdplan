@@ -36,10 +36,10 @@ class Template(TemplateBase):
         """Graceful shutdown test to customize template."""
 
         # Disable quarantine on r2
-        self._birdplan_run(sim, tmpdir, "r2", ["bgp", "quarantine", "set", "r1", "false"])
+        self._birdplan_run(sim, tmpdir, "r2", ["bgp", "peer", "quarantine", "set", "r1", "false"])
 
         # Check r2 status
-        quarantine_status = self._birdplan_run(sim, tmpdir, "r2", ["bgp", "quarantine", "show"])
+        quarantine_status = self._birdplan_run(sim, tmpdir, "r2", ["bgp", "peer", "quarantine", "show"])
         assert quarantine_status == {
             "overrides": {"r1": False},
             "current": {"r1": True},
@@ -50,7 +50,7 @@ class Template(TemplateBase):
         self._birdplan_run(sim, tmpdir, "r2", ["configure"])
 
         # Check r2 status again
-        quarantine_status = self._birdplan_run(sim, tmpdir, "r2", ["bgp", "quarantine", "show"])
+        quarantine_status = self._birdplan_run(sim, tmpdir, "r2", ["bgp", "peer", "quarantine", "show"])
         assert quarantine_status == {
             "overrides": {"r1": False},
             "current": {"r1": False},

@@ -16,17 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BirdPlan commandline options for BGP graceful shutdown."""
+"""BirdPlan commandline options for BGP peer quarantine."""
 
 from typing import Any, Dict
 import argparse
 import sys
-from ...cmdline_plugin import BirdplanCmdlinePluginBase
-from .....exceptions import BirdPlanError
+from ....cmdline_plugin import BirdplanCmdlinePluginBase
+from ......exceptions import BirdPlanError
 
 
-class BirdplanCmdlineBGPGracefulShutdown(BirdplanCmdlinePluginBase):
-    """Birdplan "bgp graceful-shutdown" command."""
+class BirdplanCmdlineBGPPeerQuarantine(BirdplanCmdlinePluginBase):
+    """Birdplan "bgp peer quarantine" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -34,7 +34,7 @@ class BirdplanCmdlineBGPGracefulShutdown(BirdplanCmdlinePluginBase):
         super().__init__()
 
         # Plugin setup
-        self.plugin_description = "birdplan bgp graceful-shutdown"
+        self.plugin_description = "birdplan bgp peer quarantine"
         self.plugin_order = 20
 
     def register_parsers(self, args: Dict[str, Any]) -> None:
@@ -50,15 +50,15 @@ class BirdplanCmdlineBGPGracefulShutdown(BirdplanCmdlinePluginBase):
 
         plugins = args["plugins"]
 
-        parent_subparsers = plugins.call_plugin("birdplan.plugins.cmdline.bgp", "get_subparsers", {})
+        parent_subparsers = plugins.call_plugin("birdplan.plugins.cmdline.bgp.peer", "get_subparsers", {})
 
-        # CMD: bgp graceful-shutdown
-        subparser = parent_subparsers.add_parser("graceful-shutdown", help="BGP graceful shutdown commands")
+        # CMD: bgp peer quarantine
+        subparser = parent_subparsers.add_parser("quarantine", help="BGP peer quarantine commands")
         subparser.add_argument(
             "--action",
             action="store_const",
-            const="bgp_graceful_shutdown",
-            default="bgp_graceful_shutdown",
+            const="bgp_peer_quarantine",
+            default="bgp_peer_quarantine",
             help=argparse.SUPPRESS,
         )
 
@@ -66,9 +66,9 @@ class BirdplanCmdlineBGPGracefulShutdown(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = subparser.add_subparsers()
 
-    def cmd_bgp_graceful_shutdown(self, args: Any) -> bool:
+    def cmd_bgp_peer_quarantine(self, args: Any) -> bool:
         """
-        Birdplan "bgp graceful-shutdown" command.
+        Birdplan "bgp peer quarantine" command.
 
         Parameters
         ----------
@@ -86,4 +86,4 @@ class BirdplanCmdlineBGPGracefulShutdown(BirdplanCmdlinePluginBase):
             self._subparser.print_help(file=sys.stderr)
             sys.exit(1)
 
-        raise BirdPlanError("No options specified to 'bgp graceful-shutdown' action")
+        raise BirdPlanError("No options specified to 'bgp peer quarantine' action")

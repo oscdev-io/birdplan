@@ -16,17 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BirdPlan commandline options for BGP graceful shutdown remove."""
+"""BirdPlan commandline options for BGP peer graceful shutdown remove."""
 
 from typing import Any, Dict
 import argparse
 import sys
-from ...cmdline_plugin import BirdplanCmdlinePluginBase
-from .....exceptions import BirdPlanError
+from ....cmdline_plugin import BirdplanCmdlinePluginBase
+from ......exceptions import BirdPlanError
 
 
-class BirdplanCmdlineBGPGracefulShutdownRemove(BirdplanCmdlinePluginBase):
-    """Birdplan "bgp graceful-shutdown remove" command."""
+class BirdplanCmdlineBGPPeerGracefulShutdownRemove(BirdplanCmdlinePluginBase):
+    """Birdplan "bgp peer graceful-shutdown remove" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -34,7 +34,7 @@ class BirdplanCmdlineBGPGracefulShutdownRemove(BirdplanCmdlinePluginBase):
         super().__init__()
 
         # Plugin setup
-        self.plugin_description = "birdplan bgp graceful-shutdown remove"
+        self.plugin_description = "birdplan bgp peer graceful-shutdown remove"
         self.plugin_order = 30
 
     def register_parsers(self, args: Dict[str, Any]) -> None:
@@ -50,17 +50,17 @@ class BirdplanCmdlineBGPGracefulShutdownRemove(BirdplanCmdlinePluginBase):
 
         plugins = args["plugins"]
 
-        parent_subparsers = plugins.call_plugin("birdplan.plugins.cmdline.bgp.graceful_shutdown", "get_subparsers", {})
+        parent_subparsers = plugins.call_plugin("birdplan.plugins.cmdline.bgp.peer.graceful_shutdown", "get_subparsers", {})
 
-        # CMD: bgp graceful-shutdown remove
+        # CMD: bgp peer graceful-shutdown remove
         subparser = parent_subparsers.add_parser(
             "remove", help="Remove a BGP graceful shutdown override flag for a specific peer or pattern"
         )
         subparser.add_argument(
             "--action",
             action="store_const",
-            const="bgp_graceful_shutdown_remove",
-            default="bgp_graceful_shutdown_remove",
+            const="bgp_peer_graceful_shutdown_remove",
+            default="bgp_peer_graceful_shutdown_remove",
             help=argparse.SUPPRESS,
         )
         subparser.add_argument(
@@ -74,9 +74,9 @@ class BirdplanCmdlineBGPGracefulShutdownRemove(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_graceful_shutdown_remove(self, args: Any) -> bool:
+    def cmd_bgp_peer_graceful_shutdown_remove(self, args: Any) -> bool:
         """
-        Birdplan "bgp graceful-shutdown remove" command.
+        Birdplan "bgp peer graceful-shutdown remove" command.
 
         Parameters
         ----------
@@ -105,13 +105,13 @@ class BirdplanCmdlineBGPGracefulShutdownRemove(BirdplanCmdlinePluginBase):
         # Try remove graceful shutdown override flag
         if cmdline.is_console:
             try:
-                cmdline.birdplan.state_bgp_graceful_shutdown_remove_peer(peer)
+                cmdline.birdplan.state_bgp_peer_graceful_shutdown_remove(peer)
                 print(f"BGP graceful shutdown REMOVED from peer(s) matching '{peer}'")
             except BirdPlanError as err:
                 print(f"ERROR: {err}")
                 sys.exit(1)
         else:
-            cmdline.birdplan.state_bgp_graceful_shutdown_remove_peer(peer)
+            cmdline.birdplan.state_bgp_peer_graceful_shutdown_remove(peer)
 
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()

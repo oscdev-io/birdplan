@@ -16,17 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BirdPlan commandline options for BGP quarantine show."""
+"""BirdPlan commandline options for BGP peer graceful shutdown show."""
 
 from typing import Any, Dict
 import argparse
-from ...cmdline_plugin import BirdplanCmdlinePluginBase
-from ..... import BirdPlanQuarantineStatus
-from .....console.colors import colored
+from ....cmdline_plugin import BirdplanCmdlinePluginBase
+from ...... import BirdPlanBGPPeerGracefulShutdownStatus
+from ......console.colors import colored
 
 
-class BirdplanCmdlineBGPQuarantineShow(BirdplanCmdlinePluginBase):
-    """Birdplan "bgp quarantine show" command."""
+class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdplanCmdlinePluginBase):
+    """Birdplan "bgp peer graceful-shutdown show" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -34,7 +34,7 @@ class BirdplanCmdlineBGPQuarantineShow(BirdplanCmdlinePluginBase):
         super().__init__()
 
         # Plugin setup
-        self.plugin_description = "birdplan bgp quarantine show"
+        self.plugin_description = "birdplan bgp peer graceful-shutdown show"
         self.plugin_order = 30
 
     def register_parsers(self, args: Dict[str, Any]) -> None:
@@ -50,15 +50,15 @@ class BirdplanCmdlineBGPQuarantineShow(BirdplanCmdlinePluginBase):
 
         plugins = args["plugins"]
 
-        parent_subparsers = plugins.call_plugin("birdplan.plugins.cmdline.bgp.quarantine", "get_subparsers", {})
+        parent_subparsers = plugins.call_plugin("birdplan.plugins.cmdline.bgp.peer.graceful_shutdown", "get_subparsers", {})
 
-        # CMD: bgp quarantine show
-        subparser = parent_subparsers.add_parser("show", help="Show BGP quarantine peers")
+        # CMD: bgp peer graceful-shutdown show
+        subparser = parent_subparsers.add_parser("show", help="Show BGP peer graceful shutdown status")
         subparser.add_argument(
             "--action",
             action="store_const",
-            const="bgp_quarantine_show",
-            default="bgp_quarantine_show",
+            const="bgp_peer_graceful_shutdown_show",
+            default="bgp_peer_graceful_shutdown_show",
             help=argparse.SUPPRESS,
         )
 
@@ -66,9 +66,9 @@ class BirdplanCmdlineBGPQuarantineShow(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_quarantine_show(self, args: Any) -> BirdPlanQuarantineStatus:
+    def cmd_bgp_peer_graceful_shutdown_show(self, args: Any) -> BirdPlanBGPPeerGracefulShutdownStatus:
         """
-        Birdplan "bgp quarantine show" command.
+        Birdplan "bgp peer graceful-shutdown show" command.
 
         Parameters
         ----------
@@ -86,47 +86,49 @@ class BirdplanCmdlineBGPQuarantineShow(BirdplanCmdlinePluginBase):
         cmdline.birdplan_load_config(use_cached=True)
 
         # Grab peer list
-        quarantine_status: BirdPlanQuarantineStatus = cmdline.birdplan.state_bgp_quarantine_status()
+        graceful_shutdown_status: BirdPlanBGPPeerGracefulShutdownStatus = cmdline.birdplan.state_bgp_peer_graceful_shutdown_status()
 
         if cmdline.is_console:
             if cmdline.is_json:
-                self.output_json(quarantine_status)
+                self.output_json(graceful_shutdown_status)
             else:
-                self.show_output_text(quarantine_status)
+                self.show_output_text(graceful_shutdown_status)
 
-        return quarantine_status
+        return graceful_shutdown_status
 
-    def show_output_text(self, quarantine_status: BirdPlanQuarantineStatus) -> None:  # pylint: disable=no-self-use
+    def show_output_text(  # pylint: disable=no-self-use, too-many-branches
+        self, graceful_shutdown_status: BirdPlanBGPPeerGracefulShutdownStatus
+    ) -> None:
         """
         Show command output in text.
 
         Parameters
         ----------
-        quarantine_status : BirdplanCmdlineBGPQuarantineShow
+        graceful_shutdown_status : BirdPlanBGPPeerGracefulShutdownStatus
             Graceful shutdown status structure.
 
         """
 
-        print("Commandline quarantine overrides:")
+        print("BGP peer graceful shutdown overrides:")
         # Loop with sorted override list
-        for peer in sorted(quarantine_status["overrides"]):
+        for peer in sorted(graceful_shutdown_status["overrides"]):
             # Print out override
-            if quarantine_status["overrides"][peer]:
+            if graceful_shutdown_status["overrides"][peer]:
                 status = colored("Enabled", "red")
             else:
                 status = colored("Disabled", "green")
             print(f"  {peer}: {status}")
         # If we have no overrides, just print out --none--
-        if not quarantine_status["overrides"]:
+        if not graceful_shutdown_status["overrides"]:
             print("--none--")
 
         print("\n")
 
         # Get a list of all peers we know about
-        peers_all = list(quarantine_status["current"].keys()) + list(quarantine_status["pending"].keys())
+        peers_all = list(graceful_shutdown_status["current"].keys()) + list(graceful_shutdown_status["pending"].keys())
         peers_all = sorted(set(peers_all))
 
-        print("Quarantine status:")
+        print("BGP peer graceful shutdown status:")
         # Loop with sorted peer list
         for peer in peers_all:
             status_line = "  " + colored(peer, "cyan") + ": "
@@ -134,28 +136,28 @@ class BirdplanCmdlineBGPQuarantineShow(BirdplanCmdlinePluginBase):
             statuses = []
 
             # Grab current status
-            if peer in quarantine_status["current"]:
-                current_status = nice_status(quarantine_status["current"][peer])
+            if peer in graceful_shutdown_status["current"]:
+                current_status = nice_status(graceful_shutdown_status["current"][peer])
             else:
                 current_status = colored("-new-", "yellow")
             statuses.append(f"current={current_status}")
 
             # Work out our pending status
-            if peer in quarantine_status["pending"]:
+            if peer in graceful_shutdown_status["pending"]:
                 # If we had current configuration, then we can compare them to see if something changed
-                if peer in quarantine_status["current"]:
+                if peer in graceful_shutdown_status["current"]:
                     # Check if we changing from Disabled to Enabled
-                    if not quarantine_status["current"][peer] and quarantine_status["pending"][peer]:
-                        pending_status = nice_status_colored(quarantine_status["pending"][peer])
+                    if not graceful_shutdown_status["current"][peer] and graceful_shutdown_status["pending"][peer]:
+                        pending_status = nice_status_colored(graceful_shutdown_status["pending"][peer])
                     # Check if we changing from Enabled to Disabled
-                    elif quarantine_status["current"][peer] and not quarantine_status["pending"][peer]:
-                        pending_status = nice_status_colored(quarantine_status["pending"][peer])
+                    elif graceful_shutdown_status["current"][peer] and not graceful_shutdown_status["pending"][peer]:
+                        pending_status = nice_status_colored(graceful_shutdown_status["pending"][peer])
                     # No changes
                     else:
-                        pending_status = nice_status(quarantine_status["pending"][peer])
+                        pending_status = nice_status(graceful_shutdown_status["pending"][peer])
                 # Peer is new
                 else:
-                    pending_status = nice_status_colored(quarantine_status["pending"][peer])
+                    pending_status = nice_status_colored(graceful_shutdown_status["pending"][peer])
             else:
                 pending_status = colored("-removed-", "yellow")
             statuses.append(f"pending={pending_status}")

@@ -16,17 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BirdPlan commandline options for BGP quarantine set."""
+"""BirdPlan commandline options for "bgp peer graceful-shutdown set"."""
 
 from typing import Any, Dict
 import argparse
 import sys
-from ...cmdline_plugin import BirdplanCmdlinePluginBase
-from .....exceptions import BirdPlanError
+from ....cmdline_plugin import BirdplanCmdlinePluginBase
+from ......exceptions import BirdPlanError
 
 
-class BirdplanCmdlineBGPQuarantineAdd(BirdplanCmdlinePluginBase):
-    """Birdplan "bgp quarantine set" command."""
+class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdplanCmdlinePluginBase):
+    """Birdplan "bgp peer graceful-shutdown set" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -34,7 +34,7 @@ class BirdplanCmdlineBGPQuarantineAdd(BirdplanCmdlinePluginBase):
         super().__init__()
 
         # Plugin setup
-        self.plugin_description = "birdplan bgp quarantine set"
+        self.plugin_description = "birdplan bgp peer graceful-shutdown set"
         self.plugin_order = 30
 
     def register_parsers(self, args: Dict[str, Any]) -> None:
@@ -50,15 +50,17 @@ class BirdplanCmdlineBGPQuarantineAdd(BirdplanCmdlinePluginBase):
 
         plugins = args["plugins"]
 
-        parent_subparsers = plugins.call_plugin("birdplan.plugins.cmdline.bgp.quarantine", "get_subparsers", {})
+        parent_subparsers = plugins.call_plugin("birdplan.plugins.cmdline.bgp.peer.graceful_shutdown", "get_subparsers", {})
 
-        # CMD: bgp quarantine set
-        subparser = parent_subparsers.add_parser("set", help="Override the BGP quarantine flag for a specific peer or pattern")
+        # CMD: bgp peer graceful-shutdown set
+        subparser = parent_subparsers.add_parser(
+            "set", help="Override the BGP graceful shutdown flag for a specific peer or pattern"
+        )
         subparser.add_argument(
             "--action",
             action="store_const",
-            const="bgp_quarantine_set",
-            default="bgp_quarantine_set",
+            const="bgp_peer_graceful_shutdown_set",
+            default="bgp_peer_graceful_shutdown_set",
             help=argparse.SUPPRESS,
         )
         subparser.add_argument(
@@ -78,9 +80,9 @@ class BirdplanCmdlineBGPQuarantineAdd(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_quarantine_set(self, args: Any) -> bool:
+    def cmd_bgp_peer_graceful_shutdown_set(self, args: Any) -> bool:
         """
-        Birdplan "bgp quarantine set" command.
+        Birdplan "bgp peer graceful-shutdown set" command.
 
         Parameters
         ----------
@@ -97,38 +99,38 @@ class BirdplanCmdlineBGPQuarantineAdd(BirdplanCmdlinePluginBase):
         # Make sure we have a peer specified
         if not cmdline.args.peer:
             if cmdline.is_console:
-                print("ERROR: No peer or pattern specified to set the BGP quarantine override flag for", file=sys.stderr)
+                print("ERROR: No peer or pattern specified to set the BGP graceful shutdown override flag for", file=sys.stderr)
                 self._subparser.print_help(file=sys.stderr)
                 sys.exit(1)
-            raise BirdPlanError("No peer or pattern specified to set the BGP quarantine override flag for")
+            raise BirdPlanError("No peer or pattern specified to set the BGP graceful shutdown override flag for")
         peer = cmdline.args.peer[0]
 
         # Check value is valid
         if cmdline.args.value[0] not in ("true", "false"):
             if cmdline.is_console:
-                print("ERROR: BGP quarantine override flag value must be 'true' or 'false'", file=sys.stderr)
+                print("ERROR: BGP peer graceful shutdown override flag value must be 'true' or 'false'", file=sys.stderr)
                 self._subparser.print_help(file=sys.stderr)
                 sys.exit(1)
-            raise BirdPlanError("BGP quarantine override flag value must be 'true' or 'false'")
+            raise BirdPlanError("BGP peer graceful shutdown override flag value must be 'true' or 'false'")
         value = bool(cmdline.args.value[0] == "true")
 
         # Load BirdPlan configuration
         cmdline.birdplan_load_config()
 
-        # Try set quarantine flag
+        # Try set graceful shutdown flag
         if cmdline.is_console:
             try:
-                cmdline.birdplan.state_bgp_quarantine_set_peer(peer, value)
+                cmdline.birdplan.state_bgp_peer_graceful_shutdown_set(peer, value)
                 # Print some sort of nicer output instead of "True", "False"
                 if value:
-                    print(f"BGP quarantine ENABLED for peer(s) matching '{peer}'")
+                    print(f"BGP graceful shutdown ENABLED for peer(s) matching '{peer}'")
                 else:
-                    print(f"BGP quarantine DISABLED for peer(s) matching '{peer}'")
+                    print(f"BGP graceful shutdown DISABLED for peer(s) matching '{peer}'")
             except BirdPlanError as err:
                 print(f"ERROR: {err}")
                 sys.exit(1)
         else:
-            cmdline.birdplan.state_bgp_quarantine_set_peer(peer, value)
+            cmdline.birdplan.state_bgp_peer_graceful_shutdown_set(peer, value)
 
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
