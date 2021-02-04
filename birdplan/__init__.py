@@ -458,8 +458,9 @@ class BirdPlan:
             "ospf" not in self.state
             or "+interfaces" not in self.state["ospf"]
             or interface not in self.state["ospf"]["+interfaces"]
+            or "cost" not in self.state["ospf"]["+interfaces"][interface]
         ):
-            raise BirdPlanError("OSPF interface cost override not found")
+            raise BirdPlanError(f"OSPF interface '{interface}' cost override not found")
 
         # Remove OSPF interface cost from state
         del self.state["ospf"]["+interfaces"][interface]["cost"]
@@ -512,8 +513,9 @@ class BirdPlan:
             "ospf" not in self.state
             or "+interfaces" not in self.state["ospf"]
             or interface not in self.state["ospf"]["+interfaces"]
+            or "ecmp_weight" not in self.state["ospf"]["+interfaces"][interface]
         ):
-            raise BirdPlanError("OSPF interface ECMP weight override not found")
+            raise BirdPlanError(f"OSPF interface '{interface}' ECMP weight override not found")
 
         # Remove OSPF interface ECMP weight from state
         del self.state["ospf"]["+interfaces"][interface]["ecmp_weight"]
