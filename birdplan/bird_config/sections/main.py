@@ -18,13 +18,19 @@
 
 """BIRD main configuration section."""
 
+from birdplan.bird_config.globals import BirdConfigGlobals
 from .base import SectionBase
 
 
 class SectionMain(SectionBase):
     """BIRD main configuration section."""
 
-    _section = "Main"
+    def __init__(self, birdconfig_globals: BirdConfigGlobals):
+        """Initialize the object."""
+        super().__init__(birdconfig_globals)
+
+        # Set section header
+        self._section = "Main"
 
     def configure(self) -> None:
         """Configure main part of the config."""

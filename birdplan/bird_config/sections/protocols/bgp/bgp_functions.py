@@ -23,12 +23,17 @@
 from typing import Any
 from ..base_protocol_functions import ProtocolFunctionsBase
 from ...functions import BirdVariable, SectionFunctions, bird_function
+from ....globals import BirdConfigGlobals
 
 
 class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods
     """BGP protocol specific functions class."""
 
-    _section: str = "BGP Functions"
+    def __init__(self, birdconfig_globals: BirdConfigGlobals, functions: SectionFunctions):
+        """Initialize the object."""
+        super().__init__(birdconfig_globals, functions)
+
+        self._section = "BGP Functions"
 
     @bird_function("bgp_accept_bgp")
     def accept_bgp(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument

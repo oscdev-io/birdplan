@@ -37,8 +37,6 @@ RIPInterfaces = Dict[str, RIPInterfaceConfig]
 class ProtocolRIP(SectionProtocolBase):
     """BIRD RIP protocol configuration."""
 
-    _section = "RIP Protocol"
-
     _rip_interfaces: RIPInterfaces
 
     _rip_attributes: RIPAttributes
@@ -50,6 +48,9 @@ class ProtocolRIP(SectionProtocolBase):
     ) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals, constants, functions, tables)
+
+        # Set section header
+        self._section = "RIP Protocol"
 
         # Interfaces
         self._rip_interfaces = {}

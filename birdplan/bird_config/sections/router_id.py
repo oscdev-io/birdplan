@@ -25,13 +25,15 @@ from .base import SectionBase
 class SectionRouterID(SectionBase):
     """BIRD router ID configuration section."""
 
-    _section = "Router ID"
-
     _router_id: str
 
     def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize object."""
         super().__init__(birdconfig_globals)
+
+        # Set section header
+        self._section = "Router ID"
+
         self._router_id = "0.0.0.0"
 
     def configure(self) -> None:

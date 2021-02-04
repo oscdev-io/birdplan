@@ -33,8 +33,6 @@ StaticRoutes = Dict[str, str]
 class ProtocolStatic(SectionProtocolBase):
     """BIRD static protocol configuration."""
 
-    _section = "Static Protocol"
-
     _routes: StaticRoutes
 
     def __init__(
@@ -42,6 +40,9 @@ class ProtocolStatic(SectionProtocolBase):
     ):
         """Initialize the object."""
         super().__init__(birdconfig_globals, constants, functions, tables)
+
+        # Set section header
+        self._section = "Static Protocol"
 
         # Initialize our route list
         self._routes = {}

@@ -129,13 +129,13 @@ class bird_function:  # pylint: disable=invalid-name,too-few-public-methods
 class SectionFunctions(SectionBase):
     """BIRD functions configuration."""
 
-    _section: str = "Global Functions"
-
     bird_functions: Dict[str, str]
 
     def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize the object."""
         super().__init__(birdconfig_globals)
+
+        self._section = "Global Functions"
 
         self.bird_functions = OrderedDict()
 

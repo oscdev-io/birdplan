@@ -18,13 +18,19 @@
 
 """BIRD logging configuration."""
 
+from birdplan.bird_config.globals import BirdConfigGlobals
 from .base import SectionBase
 
 
 class SectionLogging(SectionBase):
     """BIRD logging configuration."""
 
-    _section: str = "Logging"
+    def __init__(self, birdconfig_globals: BirdConfigGlobals):
+        """Initialize the object."""
+        super().__init__(birdconfig_globals)
+
+        # Set section header
+        self._section = "Logging"
 
     def configure(self) -> None:
         """Configure logging."""

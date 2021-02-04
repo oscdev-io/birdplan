@@ -42,14 +42,12 @@ BGPOriginatedRoutes = Dict[str, str]
 class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-methods
     """BIRD BGP protocol configuration."""
 
-    _section = "BGP Protocol"
-
     # BGP protocol attributes
     _bgp_attributes: BGPAttributes
     # BGP functions
     _bgp_functions: BGPFunctions
 
-    # List of our peers after configuration
+    # BGP peers
     _peers: BGPPeers
 
     # Internal config before configuration happens
@@ -61,8 +59,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         """Initialize the object."""
         super().__init__(birdconfig_globals, constants, functions, tables)
 
-        # BGP
+        # Set section name
+        self._section = "BGP Protocol"
+
+        # BGP peers
         self._peers = {}
+
         # Routes originated from BGP
         self._originated_routes = {}
 

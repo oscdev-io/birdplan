@@ -27,14 +27,15 @@ from ..base import SectionBase
 class SectionTables(SectionBase):
     """BIRD routing tables section."""
 
-    _section = "Routing Tables"
-
     _kernel: TableKernel
     _master: TableMaster
 
     def __init__(self, birdconfig_globals: BirdConfigGlobals) -> None:
         """Initialize object."""
         super().__init__(birdconfig_globals)
+
+        # Set section header
+        self._section = "Routing Tables"
 
         self._kernel = TableKernel(birdconfig_globals)
         self._master = TableMaster(birdconfig_globals)

@@ -40,8 +40,6 @@ OSPFInterfaces = Dict[str, OSPFInterfaceConfig]
 class ProtocolOSPF(SectionProtocolBase):
     """BIRD OSPF protocol configuration."""
 
-    _section = "OSPF Protocol"
-
     _areas: OSPFAreas
     _interfaces: OSPFInterfaces
 
@@ -55,7 +53,10 @@ class ProtocolOSPF(SectionProtocolBase):
         """Initialize the object."""
         super().__init__(birdconfig_globals, constants, functions, tables)
 
-        # Areas and interfaces
+        # Set section name
+        self._section = "OSPF Protocol"
+
+        # OSPF areas
         self._areas = {}
         self._interfaces = {}
 

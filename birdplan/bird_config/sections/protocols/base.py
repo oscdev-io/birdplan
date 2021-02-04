@@ -28,8 +28,6 @@ from ...globals import BirdConfigGlobals
 class SectionProtocolBase(SectionBase):
     """BIRD protocol base class."""
 
-    _section = "BGP Protocol"
-
     # Global objects to inject configuration
     _constants: SectionConstants
     _functions: SectionFunctions
