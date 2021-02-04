@@ -731,7 +731,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     @property
     def name(self) -> str:
         """Return our name."""
-        if not self._name:
+        if self._name is None:
             raise BirdPlanError("Peer name must be set")
         return self._name
 
