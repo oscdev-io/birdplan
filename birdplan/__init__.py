@@ -762,34 +762,52 @@ class BirdPlan:
             return
 
         # Loop with each area and its config
-        for area_name, area in self.config["ospf"]["areas"].items():
+        for area_name, raw_area_config in self.config["ospf"]["areas"].items():
             # Make sure we have an interface for the area
-            if "interfaces" not in area:
+            if "interfaces" not in raw_area_config:
                 raise BirdPlanError(f"OSPF area '{area_name}' must contain 'interfaces'")
             # Loop with each config item
-            for config_item, config_value in area.items():
-                # Make sure this item is supported
-                if config_item not in ("config", "interfaces"):
-                    raise BirdPlanError(
-                        f"Configuration item '{config_item}' with value '{config_value}' not understood in ospf:areas"
-                    )
-            # See if we have area config
             area_config = {}
-            if "config" in area:
-                # Loop with each config item in the peer
-                for config_item, config_value in area["config"].items():
-                    # No items supported atm
-                    if config_item in ("xxxxx", "yyyy"):
-                        area_config[config_item] = config_value
-                    # If we don't understand this 'redistribute' entry, throw an error
-                    else:
-                        raise BirdPlanError("Configuration item '{config_item}' not understood in OSPF area")
+            for config_item, raw_config in raw_area_config.items():
+                # Make sure this item is supported
+                if config_item not in ("xxxxxxx", "interfaces"):
+                    raise BirdPlanError(
+                        f"Configuration item '{config_item}' with value '{raw_config}' not understood in ospf:areas"
+                    )
+                # Skip over interfaces
+                if config_item == "interfaces":
+                    continue
+                # Check for supported config options
+                if config_item in ("xxxxx", "yyyy"):
+                    area_config[config_item] = raw_config
+                # If we don't understand this 'redistribute' entry, throw an error
+                else:
+                    raise BirdPlanError(f"Configuration item '{config_item}' not understood in ospf:areas")
+
             # Add area
-            self.birdconf.protocols.ospf.add_area(area_name, area_config)
+            area = self.birdconf.protocols.ospf.add_area(area_name, area_config)
+
             # Loop with interfaces in area
-            for interface_name, interface_config in area["interfaces"].items():
+            for interface_name, raw_config in raw_area_config["interfaces"].items():
+                # Start with no special interface configuration
+                interface_config: Dict[str, Any] = {}
+                # Check what kind of config we've got...
+                if isinstance(raw_config, bool):
+                    pass
+                # Else if its a dict, we need to treat it a bit differently
+                elif isinstance(raw_config, dict):
+                    for raw_item, raw_value in raw_config.items():
+                        if raw_item in ("cost", "ecmp_weight", "hello", "stub", "wait"):
+                            interface_config[raw_item] = raw_value
+                        else:
+                            raise BirdPlanError(
+                                f"Configuration item '{raw_item}' not understood in OSPF interface '{interface_name}'"
+                            )
+                else:
+                    raise BirdPlanError(f"Configurion for OSPF interface name '{interface_name}' has an unsupported value")
+
                 # Add interface to area
-                self.birdconf.protocols.ospf.add_interface(area_name, interface_name, interface_config)
+                area.add_interface(interface_name, interface_config)
 
     def _config_bgp(self) -> None:
         """Configure bgp section."""

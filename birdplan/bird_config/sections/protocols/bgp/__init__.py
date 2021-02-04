@@ -138,6 +138,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             self.conf.add(bgp_direct_pipe)
 
         # Loop with BGP peers and configure them
+        self.conf.add("")
         for _, peer in self.peers.items():
             self.conf.add(peer)
 
