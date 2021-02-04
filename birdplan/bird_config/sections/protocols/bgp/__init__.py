@@ -169,6 +169,8 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
     def peer(self, name: str) -> ProtocolBGPPeer:
         """Return a BGP peer configuration object."""
+        if name not in self.peers:
+            raise BirdPlanError(f"Peer '{name}' not found")
         return self.peers[name]
 
     def constraints(self, peer_type: str) -> BGPPeertypeConstraints:
