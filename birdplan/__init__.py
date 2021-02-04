@@ -125,6 +125,7 @@ class BirdPlan:
                 try:
                     self.state = yaml.safe_load(raw_state)
                 except ImportError as err:  # pragma: no cover
+                    # We use the state_file here because the size of raw_state may be larger than 100MiB
                     raise BirdPlanError(f" Failed to load BirdPlan state '{state_file}': {err}") from None
 
         # Make sure we have configuration...

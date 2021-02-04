@@ -150,7 +150,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         """Add peer to BGP."""
 
         if peer_name in self.peers:
-            raise BirdPlanError(f"Peer '{peer_name}' already exists")
+            raise BirdPlanError(f"BGP peer '{peer_name}' already exists")
 
         # Create BGP peer object
         peer = ProtocolBGPPeer(
@@ -593,7 +593,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
     @property
     def peers(self) -> BGPPeers:
-        """Return BGP peers."""
+        """BGP peers."""
         return self._peers
 
     @property
