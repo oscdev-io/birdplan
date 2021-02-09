@@ -140,7 +140,7 @@ class ProtocolOSPF(SectionProtocolBase):
         )
 
         # Add area to OSPF
-        self.areas[area_name] = area
+        self.areas[area.name] = area  # Use the sanitized area name from the area object
 
         return area
 

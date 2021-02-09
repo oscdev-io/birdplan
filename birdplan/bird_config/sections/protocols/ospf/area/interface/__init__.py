@@ -21,6 +21,7 @@
 # pylint: disable=too-many-lines
 
 from typing import Optional
+import fnmatch
 from .interface_attributes import OSPFAreaInterfaceAttributes
 from .typing import OSPFAreaInterfaceConfig
 from ..area_attributes import OSPFAreaAttributes
@@ -82,6 +83,37 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
         if "stub" in interface_config:
             self.stub = interface_config["stub"]
 
+        # Check if we have a interface setting overrides
+        if (
+            "ospf" in self.birdconfig_globals.state
+            and "areas" in self.birdconfig_globals.state["ospf"]
+            and self.area_attributes.name in self.birdconfig_globals.state["ospf"]["areas"]
+            and "+interfaces" in self.birdconfig_globals.state["ospf"]["areas"][self.area_attributes.name]
+        ):
+            # Make things easier below
+            interface_overrides = self.birdconfig_globals.state["ospf"]["areas"][self.area_attributes.name]["+interfaces"]
+
+            # Check if this interface is in the override structure
+            if self.name in interface_overrides:
+                # Check if we have a cost override
+                if "cost" in interface_overrides[self.name]:
+                    self.cost = interface_overrides[self.name]["cost"]
+                # Check if we have an ecmp_weight override
+                if "ecmp_weight" in interface_overrides[self.name]:
+                    self.ecmp_weight = interface_overrides[self.name]["ecmp_weight"]
+            # If not we process the patterns
+            else:
+                for item in sorted(interface_overrides):
+                    # Skip non patterns
+                    if "*" not in item:
+                        continue
+                    # If pattern matches peer name, set the value for quarantine
+                    if fnmatch.fnmatch(self.name, item):
+                        if "cost" in interface_overrides[item]:
+                            self.cost = interface_overrides[item]["cost"]
+                        if "ecmp_weight" in interface_overrides[item]:
+                            self.ecmp_weight = interface_overrides[item]["ecmp_weight"]
+
     def configure(self) -> None:
         """Configure the OSPF interface."""
 
@@ -92,8 +124,14 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
         super().configure()
 
         # Blank the OSPF area interface state
-        if self.name not in self.birdconfig_globals.state["ospf"]["areas"]["interfaces"]:
-            self.birdconfig_globals.state["ospf"]["areas"]["interfaces"][self.name] = {}
+        area_interfaces_state = self.birdconfig_globals.state["ospf"]["areas"][self.area_attributes.name]["interfaces"]
+        if self.name not in area_interfaces_state:
+            area_interfaces_state[self.name] = {}
+
+        # Setup our state
+        interface_state = area_interfaces_state[self.name]
+        interface_state["cost"] = self.cost
+        interface_state["ecmp_weight"] = self.ecmp_weight
 
         # Start interface block
         self.conf.add(f'    interface "{self.name}" {{')
@@ -119,6 +157,11 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
     def is_stub(self) -> bool:
         """Return if interface is a stub."""
         return self.stub
+
+    @property
+    def area_attributes(self) -> OSPFAreaAttributes:
+        """OSPF area attributes."""
+        return self._area_attributes
 
     @property
     def interface_attributes(self) -> OSPFAreaInterfaceAttributes:

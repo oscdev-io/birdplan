@@ -34,6 +34,7 @@ __VERSION__ = "0.0.1"
 # Some types we need
 BirdPlanBGPPeerGracefulShutdownStatus = Dict[str, Dict[str, bool]]
 BirdPlanBGPPeerQuarantineStatus = Dict[str, Dict[str, bool]]
+BirdPlanOSPFInterfaceStatus = Dict[str, Dict[str, Dict[str, Any]]]
 
 
 class BirdPlan:
@@ -415,14 +416,18 @@ class BirdPlan:
 
         return ret
 
-    def state_ospf_set_interface_cost(self, interface: str, cost: int) -> None:
+    def state_ospf_set_interface_cost(self, area: str, interface: str, cost: int) -> None:
         """
         Set an OSPF interface cost override.
 
         Parameters
         ----------
+        area : str
+            Interface to set the OSPF cost for.
+
         interface : str
             Interface to set the OSPF cost for.
+
         cost : int
             OSPF interface cost.
 
@@ -435,20 +440,27 @@ class BirdPlan:
         # Prepare the state structure if its not got what we need
         if "ospf" not in self.state:
             self.state["ospf"] = {}
-        if "+interfaces" not in self.state["ospf"]:
-            self.state["ospf"]["+interfaces"] = {}
-        if interface not in self.state["ospf"]["+interfaces"]:
-            self.state["ospf"]["+interfaces"][interface] = {}
+        if "areas" not in self.state["ospf"]:
+            self.state["ospf"]["areas"] = {}
+        if area not in self.state["ospf"]["areas"]:
+            self.state["ospf"]["areas"][area] = {}
+        if "+interfaces" not in self.state["ospf"]["areas"][area]:
+            self.state["ospf"]["areas"][area]["+interfaces"] = {}
+        if interface not in self.state["ospf"]["areas"][area]["+interfaces"]:
+            self.state["ospf"]["areas"][area]["+interfaces"][interface] = {}
 
         # Set the interface cost value
-        self.state["ospf"]["+interfaces"][interface]["cost"] = cost
+        self.state["ospf"]["areas"][area]["+interfaces"][interface]["cost"] = cost
 
-    def state_ospf_remove_interface_cost(self, interface: str) -> None:
+    def state_ospf_remove_interface_cost(self, area: str, interface: str) -> None:
         """
         Remove an OSPF interface cost override.
 
         Parameters
         ----------
+        area : str
+            OSPF area which contains the interface.
+
         interface : str
             Interface to remove the OSPF cost for.
 
@@ -459,25 +471,36 @@ class BirdPlan:
             raise BirdPlanError("The use of OSPF interface cost override requires a state file, none loaded")
 
         # Check if this cost override exists
-        if (
+        if (  # pylint: disable=too-many-boolean-expressions
             "ospf" not in self.state
-            or "+interfaces" not in self.state["ospf"]
-            or interface not in self.state["ospf"]["+interfaces"]
-            or "cost" not in self.state["ospf"]["+interfaces"][interface]
+            or "areas" not in self.state["ospf"]
+            or area not in self.state["ospf"]["areas"]
+            or "+interfaces" not in self.state["ospf"]["areas"][area]
+            or interface not in self.state["ospf"]["areas"][area]["+interfaces"]
+            or "cost" not in self.state["ospf"]["areas"][area]["+interfaces"][interface]
         ):
-            raise BirdPlanError(f"OSPF interface '{interface}' cost override not found")
+            raise BirdPlanError(f"OSPF area '{area}' interface '{interface}' cost override not found")
 
         # Remove OSPF interface cost from state
-        del self.state["ospf"]["+interfaces"][interface]["cost"]
+        del self.state["ospf"]["areas"][area]["+interfaces"][interface]["cost"]
+        # Remove hanging data structure endpoint
+        if not self.state["ospf"]["areas"][area]["+interfaces"][interface]:
+            del self.state["ospf"]["areas"][area]["+interfaces"][interface]
+        if not self.state["ospf"]["areas"][area]["+interfaces"]:
+            del self.state["ospf"]["areas"][area]["+interfaces"]
 
-    def state_ospf_set_interface_ecmp_weight(self, interface: str, ecmp_weight: int) -> None:
+    def state_ospf_set_interface_ecmp_weight(self, area: str, interface: str, ecmp_weight: int) -> None:
         """
         Set an OSPF interface ECMP weight override.
 
         Parameters
         ----------
+        area : str
+            OSPF area which contains the interface.
+
         interface : str
             Interface to set the OSPF ECMP weight for.
+
         ecmp_weight : int
             OSPF interface ECMP weight.
 
@@ -490,20 +513,27 @@ class BirdPlan:
         # Prepare the state structure if its not got what we need
         if "ospf" not in self.state:
             self.state["ospf"] = {}
-        if "+interfaces" not in self.state["ospf"]:
-            self.state["ospf"]["+interfaces"] = {}
-        if interface not in self.state["ospf"]["+interfaces"]:
-            self.state["ospf"]["+interfaces"][interface] = {}
+        if "areas" not in self.state["ospf"]:
+            self.state["ospf"]["areas"] = {}
+        if area not in self.state["ospf"]["areas"]:
+            self.state["ospf"]["areas"][area] = {}
+        if "+interfaces" not in self.state["ospf"]["areas"][area]:
+            self.state["ospf"]["areas"][area]["+interfaces"] = {}
+        if interface not in self.state["ospf"]["areas"][area]["+interfaces"]:
+            self.state["ospf"]["areas"][area]["+interfaces"][interface] = {}
 
-        # Set the interface ECMP weight value
-        self.state["ospf"]["+interfaces"][interface]["ecmp_weight"] = ecmp_weight
+        # Set the interface ecmp_weight value
+        self.state["ospf"]["areas"][area]["+interfaces"][interface]["ecmp_weight"] = ecmp_weight
 
-    def state_ospf_remove_interface_ecmp_weight(self, interface: str) -> None:
+    def state_ospf_remove_interface_ecmp_weight(self, area: str, interface: str) -> None:
         """
         Remove an OSPF interface ECMP weight override.
 
         Parameters
         ----------
+        area : str
+            OSPF area which contains the interface.
+
         interface : str
             Interface to remove the OSPF ECMP weight for.
 
@@ -513,17 +543,142 @@ class BirdPlan:
         if self.state_file is None:
             raise BirdPlanError("The use of OSPF interface ECMP weight override requires a state file, none loaded")
 
-        # Check we have a state structure
-        if (
+        # Check if this ECMP weight override exists
+        if (  # pylint: disable=too-many-boolean-expressions
             "ospf" not in self.state
-            or "+interfaces" not in self.state["ospf"]
-            or interface not in self.state["ospf"]["+interfaces"]
-            or "ecmp_weight" not in self.state["ospf"]["+interfaces"][interface]
+            or "areas" not in self.state["ospf"]
+            or area not in self.state["ospf"]["areas"]
+            or "+interfaces" not in self.state["ospf"]["areas"][area]
+            or interface not in self.state["ospf"]["areas"][area]["+interfaces"]
+            or "ecmp_weight" not in self.state["ospf"]["areas"][area]["+interfaces"][interface]
         ):
-            raise BirdPlanError(f"OSPF interface '{interface}' ECMP weight override not found")
+            raise BirdPlanError(f"OSPF area '{area}' interface '{interface}' ECMP weight override not found")
 
         # Remove OSPF interface ECMP weight from state
-        del self.state["ospf"]["+interfaces"][interface]["ecmp_weight"]
+        del self.state["ospf"]["areas"][area]["+interfaces"][interface]["ecmp_weight"]
+        # Remove hanging data structure endpoint
+        if not self.state["ospf"]["areas"][area]["+interfaces"][interface]:
+            del self.state["ospf"]["areas"][area]["+interfaces"][interface]
+        if not self.state["ospf"]["areas"][area]["+interfaces"]:
+            del self.state["ospf"]["areas"][area]["+interfaces"]
+
+    def state_ospf_interface_status(self) -> BirdPlanOSPFInterfaceStatus:
+        """
+        Return the status of OSPF interfaces.
+
+        Returns
+        -------
+        BirdPlanOSPFInterfaceStatus
+            Dictionary containing the status of overrides and peers.
+
+            eg.
+            {
+                'overrides': {
+                    'areas': {
+                        '0': {
+                            'interfaces': {
+                                'eth0': {
+                                    'cost': 10,
+                                    'ecmp_weight': 100,
+                                }
+                            }
+                        }
+                    }
+                },
+                'current': {
+                    'areas': {
+                        '0': {
+                            'interfaces': {
+                                'eth0': {
+                                    'cost': 10,
+                                    'ecmp_weight': 100,
+                                }
+                            }
+                        }
+                    }
+                },
+                'pending': {
+                    'areas': {
+                        '0': {
+                            'interfaces': {
+                                'eth0': {
+                                    'cost': 10,
+                                    'ecmp_weight': 100,
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF interface override requires a state file, none loaded")
+
+        # Initialize our return structure
+        ret: BirdPlanOSPFInterfaceStatus = {
+            "overrides": {},
+            "current": {},
+            "pending": {},
+        }
+
+        # Return if we don't have any OSPF state
+        if "ospf" not in self.state or "areas" not in self.state["ospf"]:
+            return ret
+
+        # Process overrides
+        for area_name, area in self.state["ospf"]["areas"].items():
+            # Make sure we have interfaces in the area
+            if "+interfaces" not in area:
+                continue
+            # Loop with interfaces
+            for interface_name, interface in area["+interfaces"].items():
+                # Check our structure is setup
+                if "areas" not in ret["overrides"]:
+                    ret["overrides"]["areas"] = {}
+                if area_name not in ret["overrides"]["areas"]:
+                    ret["overrides"]["areas"][area_name] = {}
+                if "interfaces" not in ret["overrides"]["areas"][area_name]:
+                    ret["overrides"]["areas"][area_name]["interfaces"] = {}
+                # Link interface
+                ret["overrides"]["areas"][area_name]["interfaces"][interface_name] = interface
+
+        # Process current state
+        for area_name, area in self.state["ospf"]["areas"].items():
+            # Make sure we have interfaces in the area
+            if "interfaces" not in area:
+                continue
+            # Loop with interfaces
+            for interface_name, interface in area["interfaces"].items():
+                # Check our structure is setup
+                if "areas" not in ret["current"]:
+                    ret["current"]["areas"] = {}
+                if area_name not in ret["current"]["areas"]:
+                    ret["current"]["areas"][area_name] = {}
+                if "interfaces" not in ret["current"]["areas"][area_name]:
+                    ret["current"]["areas"][area_name]["interfaces"] = {}
+                # Link interface
+                ret["current"]["areas"][area_name]["interfaces"][interface_name] = interface
+
+        # Generate the override status as if we were doing a configure
+        for area_name, area in self.birdconf.protocols.ospf.areas.items():
+            for interface_name, interface in area.interfaces.items():
+                # Check our structure is setup
+                if "areas" not in ret["pending"]:
+                    ret["pending"]["areas"] = {}
+                if area_name not in ret["pending"]["areas"]:
+                    ret["pending"]["areas"][area_name] = {}
+                if "interfaces" not in ret["pending"]["areas"][area_name]:
+                    ret["pending"]["areas"][area_name]["interfaces"] = {}
+                if interface_name not in ret["pending"]["areas"][area_name]["interfaces"]:
+                    ret["pending"]["areas"][area_name]["interfaces"][interface_name] = {}
+                # Add attributes we need
+                ret["pending"]["areas"][area_name]["interfaces"][interface_name]["cost"] = interface.cost
+                ret["pending"]["areas"][area_name]["interfaces"][interface_name]["ecmp_weight"] = interface.ecmp_weight
+
+        return ret
 
     def _config_global(self) -> None:
         """Configure global options."""

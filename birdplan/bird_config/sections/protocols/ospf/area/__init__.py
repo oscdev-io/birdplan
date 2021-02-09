@@ -73,7 +73,7 @@ class ProtocolOSPFArea(SectionProtocolBase):  # pylint: disable=too-many-public-
         self._interfaces = {}
 
         # Set area name
-        self.name = area_name
+        self.name = str(area_name)
 
         if area_config:
             raise BirdPlanError("THIS SHOULD NOT HAPPEN UNTIL WE HAVE AREA CONFIG")
@@ -92,8 +92,10 @@ class ProtocolOSPFArea(SectionProtocolBase):  # pylint: disable=too-many-public-
             self.birdconfig_globals.state["ospf"] = {}
         if "areas" not in self.birdconfig_globals.state["ospf"]:
             self.birdconfig_globals.state["ospf"]["areas"] = {}
-        if "interfaces" not in self.birdconfig_globals.state["ospf"]["areas"]:
-            self.birdconfig_globals.state["ospf"]["areas"]["interfaces"] = {}
+        if self.name not in self.birdconfig_globals.state["ospf"]["areas"]:
+            self.birdconfig_globals.state["ospf"]["areas"][self.name] = {}
+        if "interfaces" not in self.birdconfig_globals.state["ospf"]["areas"][self.name]:
+            self.birdconfig_globals.state["ospf"]["areas"][self.name]["interfaces"] = {}
 
         # Add area config block
         self.conf.add(f"  area {self.name} {{")
