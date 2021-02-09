@@ -635,10 +635,7 @@ class BirdPlanBaseTestCase:
 
         # If this is the configure command, we need to output the configuration file
         if args[0] == "configure":
-            cmdline_args.extend([
-                "--output-file",
-                bird_conffile
-            ])
+            cmdline_args.extend(["--output-file", bird_conffile])
 
         # Check if we should get an exception or not
         if router in self.routers_config_exception:
