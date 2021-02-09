@@ -108,6 +108,8 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdplanCmdlinePluginBase):
         """
 
         print("BGP peer quarantine overrides:")
+        print("------------------------------")
+
         # Loop with sorted override list
         for peer in sorted(quarantine_status["overrides"]):
             # Print out override
@@ -124,54 +126,37 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdplanCmdlinePluginBase):
         peers_all = sorted(set(peers_all))
 
         print("BGP peer quarantine status:")
+        print("---------------------------")
+
         # Loop with sorted peer list
         for peer in peers_all:
-            status_line = "  " + colored(peer, "cyan") + ": "
 
-            statuses = []
+            # Grab pending status
+            pending_status = None
+            if peer in quarantine_status["pending"]:
+                pending_status = quarantine_status["pending"][peer]
 
             # Grab current status
-            current_status = (
-                nice_status(quarantine_status["current"][peer])
-                if peer in quarantine_status["current"]
-                else colored("-new-", "yellow")
-            )
-            statuses.append(f"current={current_status}")
+            current_status = None
+            if peer in quarantine_status["current"]:
+                current_status = quarantine_status["current"][peer]
 
-            # Work out our pending status
-            if peer in quarantine_status["pending"]:
-                # If we had current configuration, then we can compare them to see if something changed
-                if peer in quarantine_status["current"]:
-                    # Check if we changing from Disabled to Enabled
-                    if not quarantine_status["current"][peer] and quarantine_status["pending"][peer]:
-                        pending_status = nice_status_colored(quarantine_status["pending"][peer])
-                    # Check if we changing from Enabled to Disabled
-                    elif quarantine_status["current"][peer] and not quarantine_status["pending"][peer]:
-                        pending_status = nice_status_colored(quarantine_status["pending"][peer])
-                    # No changes
-                    else:
-                        pending_status = nice_status(quarantine_status["pending"][peer])
-                # Peer is new
-                else:
-                    pending_status = nice_status_colored(quarantine_status["pending"][peer])
+            # Work out our status string
+            status_str = ""
+            if pending_status is None:
+                status_str = colored("REMOVED", "magenta")
             else:
-                pending_status = colored("-removed-", "yellow")
-            statuses.append(f"pending={pending_status}")
-            # Output status line with each status separated with a ,
-            print(status_line + ", ".join(statuses))
-        # Add newline to end of output
-        print("\n")
+                if current_status and not pending_status:
+                    status_str = colored("PENDING-QUARANTINE-ENTER", "blue")
+                elif not current_status and pending_status:
+                    status_str = colored("PENDING-QUARANTINE-EXIT", "yellow")
+                elif current_status is None:
+                    status_str = colored("NEW", "green")
+                elif pending_status:
+                    status_str = colored("QUARANTINED", "red")
+                else:
+                    status_str = "OK"
 
-
-def nice_status(state: bool) -> str:
-    """Display a bool as a nicer status."""
-    if state:
-        return "Enabled"
-    return "Disabled"
-
-
-def nice_status_colored(state: bool) -> str:
-    """Display a bool as a nicer status."""
-    if state:
-        return colored("Enabled", "red")
-    return colored("Disabled", "green")
+            print("  Peer: " + colored(peer, "cyan"))
+            print(f"    State: {status_str}")
+            print("\n")

@@ -239,11 +239,11 @@ class BirdPlan:
 
     def state_bgp_peer_graceful_shutdown_status(self) -> BirdPlanBGPPeerGracefulShutdownStatus:
         """
-        Return the list of peers that currently have a graceful shutdown override.
+        Return the status of BGP peer graceful shutdown.
 
         Returns
         -------
-        BirdPlanGracefulShutdownStatus
+        BirdPlanBGPPeerGracefulShutdownStatus
             Dictionary containing the status of overrides and peers.
 
             eg.
@@ -252,7 +252,10 @@ class BirdPlan:
                     'p*': True,
                     'peer1': False,
                 }
-                'peers': {
+                'current': {
+                    'peer1': False,
+                }
+                'pending': {
                     'peer1': False,
                 }
             }
@@ -343,23 +346,22 @@ class BirdPlan:
             return
 
         # Remove from the global settings
-        if "+quarantine" in self.state["bgp"]:
-            # Check it exists first, if not raise an exception
-            if peer not in self.state["bgp"]["+quarantine"]:
-                raise BirdPlanError(f"BGP peer '{peer}' quarantine override not found")
-            # Remove peer from quarantine list
-            del self.state["bgp"]["+quarantine"][peer]
-            # If the result is an empty dict, just delete it too
-            if not self.state["bgp"]["+quarantine"]:
-                del self.state["bgp"]["+quarantine"]
+        if ("+quarantine" not in self.state["bgp"]) or (peer not in self.state["bgp"]["+quarantine"]):
+            raise BirdPlanError(f"BGP peer '{peer}' quarantine override not found")
+
+        # Remove peer from quarantine list
+        del self.state["bgp"]["+quarantine"][peer]
+        # If the result is an empty dict, just delete it too
+        if not self.state["bgp"]["+quarantine"]:
+            del self.state["bgp"]["+quarantine"]
 
     def state_bgp_peer_quarantine_status(self) -> BirdPlanBGPPeerQuarantineStatus:
         """
-        Return the list of peers that currently have a quarantine override.
+        Return the status of BGP peer quarantine.
 
         Returns
         -------
-        BirdPlanQuarantineStatus
+        BirdPlanBGPPeerQuarantineStatus
             Dictionary containing the status of overrides and peers.
 
             eg.
@@ -368,7 +370,10 @@ class BirdPlan:
                     'p*': True,
                     'peer1': False,
                 }
-                'peers': {
+                'current': {
+                    'peer1': False,
+                }
+                'pending': {
                     'peer1': False,
                 }
             }
