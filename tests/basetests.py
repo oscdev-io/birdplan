@@ -265,6 +265,22 @@ class BirdPlanBaseTestCase:
     def _get_bird_table_data(self, expected_module, router: str, table_name: str, sim) -> Tuple[Any, Any]:
         """Get the bird table received data and expected data."""
 
+        def nexthop_count(table: Dict[str, Any]) -> Optional[int]:
+            """Count nexthops in a table."""
+            count = 0
+            # Loop with prefixes
+            for prefixes in table.values():
+                # Loop with each route per prefix
+                for route in prefixes:
+                    # Add nexthop count
+                    if "nexthops" in route:
+                        count += len(route["nexthops"])
+                    # Or 1 if there are no nexthops
+                    else:
+                        count += 1
+            # Return None if we don't have a count
+            return count if count else None
+
         # Work out variable names
         table_variable_name = f"{router}_{table_name}"
         expect_content_variable_name = f"{table_variable_name}_expect_content"
@@ -281,7 +297,7 @@ class BirdPlanBaseTestCase:
         # setting it to None
         expect_count = None
         if isinstance(expected_data, dict):
-            expect_count = sum(len(v) for v in expected_data.values()) or None
+            expect_count = nexthop_count(expected_data)
 
         # Save the start time
         time_start = time.time()
@@ -293,7 +309,8 @@ class BirdPlanBaseTestCase:
 
             # Grab the routers table from BIRD
             result = self._bird_route_table(sim, router, table_name)
-            result_len = sum(len(v) for v in result.values())
+            # Change None back into 0
+            result_len = nexthop_count(result) or 0
 
             count_matches = False
             content_matches = False
