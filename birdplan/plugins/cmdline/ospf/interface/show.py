@@ -78,7 +78,7 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_ospf_interface_show(self, args: Any) -> bool:
+    def cmd_ospf_interface_show(self, args: Any) -> BirdPlanOSPFInterfaceStatus:
         """
         Birdplan "ospf interface show" command.
 
@@ -106,7 +106,7 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdplanCmdlinePluginBase):
             else:
                 self.show_output_text(interface_status)
 
-        return True
+        return interface_status
 
     def show_output_text(self, interface_status: BirdPlanOSPFInterfaceStatus) -> None:  # pylint: disable=no-self-use
         """
