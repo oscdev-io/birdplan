@@ -321,8 +321,8 @@ class BirdPlanBaseTestCase:
             # If expect_count is 0, we need to wait until its 0
             elif expect_count == 0 and result_len == expect_count:
                 count_matches = True
-            # If we are expecting a count, check to see if we have at least the number we need
-            elif result_len >= expect_count > 0:
+            # If we are expecting a count, check to see if we have have it
+            elif result_len == expect_count:
                 count_matches = True
 
             # If we don't have a content match, we match
