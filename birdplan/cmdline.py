@@ -265,4 +265,3 @@ if __name__ == "__main__":
         else:
             print(f"ERROR: {exception}", file=sys.stderr)
             sys.exit(2)
-

@@ -81,9 +81,7 @@ class BirdPlanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-metho
             raise RuntimeError
         return self._subparsers
 
-    def show_output_text(  # pylint: disable=no-self-use
-        self, data: Any
-    ) -> None:
+    def show_output_text(self, data: Any) -> None:  # pylint: disable=no-self-use
         """
         Show command output in text.
 
