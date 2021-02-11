@@ -468,8 +468,15 @@ class BirdPlanBaseTestCase:
         configured_routers = []
         for router in self.routers:
             # If we get a positive result, add the router to the list of configured routers
-            if self._birdplan_run(sim, tmpdir, router, ["configure"]):
-                configured_routers.append(router)
+            bird_config = self._birdplan_run(sim, tmpdir, router, ["configure"])
+            # If we have None it is expected
+            if bird_config is None:
+                continue
+            # If its however blank, raise exception
+            if not bird_config:
+                raise RuntimeError(f"BirdPlan failed to configure router '{router}'")
+            # Add router to list of configured routers
+            configured_routers.append(router)
 
         return configured_routers
 
