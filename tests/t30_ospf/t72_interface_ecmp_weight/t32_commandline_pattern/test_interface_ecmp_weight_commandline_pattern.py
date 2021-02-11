@@ -36,7 +36,7 @@ class Test(Template):
         """OSPF interface ECMP weight test to customize template."""
 
         # Change eth2 weight back to 1
-        self._birdplan_run(sim, tmpdir, "r2", ["ospf", "interface", "ecmp-weight", "set", "0", "eth2", "1"])
+        self._birdplan_run(sim, tmpdir, "r2", ["ospf", "interface", "ecmp-weight", "set", "0", "eth*", "1"])
 
         # Check router status
         interface_status = self._birdplan_run(sim, tmpdir, "r2", ["ospf", "interface", "show"])
@@ -54,7 +54,7 @@ class Test(Template):
                     }
                 }
             },
-            "overrides": {"areas": {"0": {"interfaces": {"eth2": {"ecmp_weight": 1}}}}},
+            "overrides": {"areas": {"0": {"interfaces": {"eth*": {"ecmp_weight": 1}}}}},
             "pending": {
                 "areas": {
                     "0": {
@@ -89,7 +89,7 @@ class Test(Template):
                     }
                 }
             },
-            "overrides": {"areas": {"0": {"interfaces": {"eth2": {"ecmp_weight": 1}}}}},
+            "overrides": {"areas": {"0": {"interfaces": {"eth*": {"ecmp_weight": 1}}}}},
             "pending": {
                 "areas": {
                     "0": {

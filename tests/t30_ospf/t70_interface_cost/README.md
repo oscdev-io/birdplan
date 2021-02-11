@@ -10,6 +10,9 @@ In the case of `t20_conffile`:
 In the case of `t30_commandline`:
   - Test OSPF interface cost when set in a configuration file.
 
+In the case of `t32_commandline_pattern`:
+  - Test OSPF interface cost when overridden from commandline using an interface pattern.
+
 
 ## Diagram
 

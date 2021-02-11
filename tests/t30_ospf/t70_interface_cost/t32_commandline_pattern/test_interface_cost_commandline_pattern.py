@@ -53,8 +53,7 @@ class Test(Template):
         """OSPF interface cost test to customize template."""
 
         # Change eth1 cost on r4 to 12
-        self._birdplan_run(sim, tmpdir, "r4", ["ospf", "interface", "cost", "set", "0", "eth0", "12"])
-        self._birdplan_run(sim, tmpdir, "r4", ["ospf", "interface", "cost", "set", "0", "eth1", "12"])
+        self._birdplan_run(sim, tmpdir, "r4", ["ospf", "interface", "cost", "set", "0", "eth*", "12"])
 
         # Check r4 status
         interface_status = self._birdplan_run(sim, tmpdir, "r4", ["ospf", "interface", "show"])
@@ -62,7 +61,7 @@ class Test(Template):
             "current": {
                 "areas": {"0": {"interfaces": {"eth0": {"cost": 14, "ecmp_weight": 1}, "eth1": {"cost": 14, "ecmp_weight": 1}}}}
             },
-            "overrides": {"areas": {"0": {"interfaces": {"eth0": {"cost": 12}, "eth1": {"cost": 12}}}}},
+            "overrides": {"areas": {"0": {"interfaces": {"eth*": {"cost": 12}}}}},
             "pending": {
                 "areas": {"0": {"interfaces": {"eth0": {"cost": 12, "ecmp_weight": 1}, "eth1": {"cost": 12, "ecmp_weight": 1}}}}
             },
@@ -77,7 +76,7 @@ class Test(Template):
             "current": {
                 "areas": {"0": {"interfaces": {"eth0": {"cost": 12, "ecmp_weight": 1}, "eth1": {"cost": 12, "ecmp_weight": 1}}}}
             },
-            "overrides": {"areas": {"0": {"interfaces": {"eth0": {"cost": 12}, "eth1": {"cost": 12}}}}},
+            "overrides": {"areas": {"0": {"interfaces": {"eth*": {"cost": 12}}}}},
             "pending": {
                 "areas": {"0": {"interfaces": {"eth0": {"cost": 12, "ecmp_weight": 1}, "eth1": {"cost": 12, "ecmp_weight": 1}}}}
             },

@@ -12,6 +12,9 @@ In the case of `t20_conffile`:
 In the case of `t30_commandline`:
   - Test OSPF interface ECMP weight when overridden from commandline.
 
+In the case of `t32_commandline_pattern`:
+  - Test OSPF interface ECMP weight when overridden from commandline using an interface pattern.
+
 
 ## Diagram
 
