@@ -22,7 +22,7 @@ import inspect
 import logging
 import os
 import pkgutil
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 class PluginMethodException(RuntimeError):
@@ -152,6 +152,31 @@ class PluginCollection:
 
         return results
 
+    def get_first(self, method_name: str) -> Optional[str]:
+        """
+        Get the first plugin method found that matches a specific method name.
+
+        Parameters
+        ----------
+        method_name : str
+            Method name to call.
+
+        Returns
+        -------
+        Any containing the result.
+
+        """
+
+        # Loop through plugins sorted
+        for plugin_name, plugin in sorted(self.plugins.items(), key=lambda kv: kv[1].plugin_order):
+            # Check if we're skipping this one if the method is not found
+            if not hasattr(plugin, method_name):
+                continue
+            # Return the first result we get
+            return plugin_name
+
+        return None
+
     def call_first(self, method_name: str, args: Any = None) -> Any:
         """
         Call the first plugin method found.
@@ -173,15 +198,15 @@ class PluginCollection:
 
         """
 
-        # Loop through plugins sorted
-        for plugin_name, plugin in sorted(self.plugins.items(), key=lambda kv: kv[1].plugin_order):
-            # Check if we're skipping this one if the method is not found
-            if not hasattr(plugin, method_name):
-                continue
-            # Return the first result we get
-            return self.call_plugin(plugin_name, method_name, args)
+        # Get first plugin which has our method
+        plugin_name = self.get_first(method_name)
 
-        return None
+        # Make sure we got a plugin back
+        if not plugin_name:
+            raise PluginNotFoundException(f"No plugin found for method name '{method_name}'")
+
+        # Return the result of the method call on the first plugin
+        return self.call_plugin(plugin_name, method_name, args)
 
     def call_plugin(self, plugin_name: str, method_name: str, args: Any = None) -> Any:
         """
