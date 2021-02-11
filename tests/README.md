@@ -36,6 +36,10 @@
 
 [Redistribute Default](t30_ospf/t60_redistribute_default/README.md)
 
+[Interface Cost](t30_ospf/t70_interface_cost/README.md)
+
+[Interface ECMP Weight](t30_ospf/t72_interface_ecmp_weight/README.md)
+
 
 # BGP
 

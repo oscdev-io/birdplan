@@ -1,0 +1,1 @@
+"""OSPF interface cost tests."""
