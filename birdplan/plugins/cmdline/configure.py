@@ -19,15 +19,18 @@
 """BirdPlan commandline options for "birdplan configure"."""
 
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 import argparse
-from .cmdline_plugin import BirdplanCmdlinePluginBase
+from .cmdline_plugin import BirdPlanCmdlinePluginBase
 from ...cmdline import BIRD_CONFIG_FILE
 from ...exceptions import BirdPlanError
 
 
-class BirdplanCmdlineConfigure(BirdplanCmdlinePluginBase):
+class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
     """Birdplan "configure" command."""
+
+    # Output config file
+    _config_filename: Optional[str]
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -37,6 +40,8 @@ class BirdplanCmdlineConfigure(BirdplanCmdlinePluginBase):
         # Plugin setup
         self.plugin_description = "birdplan configure"
         self.plugin_order = 10
+
+        self._config_filename = None
 
     def register_parsers(self, args: Dict[str, Any]) -> None:
         """
@@ -97,7 +102,7 @@ class BirdplanCmdlineConfigure(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_configure(self, args: Any) -> bool:
+    def cmd_configure(self, args: Any) -> Any:
         """
         Birdplan "configure" command.
 
@@ -117,23 +122,63 @@ class BirdplanCmdlineConfigure(BirdplanCmdlinePluginBase):
             use_cached=cmdline.args.use_cached,
         )
         # Generate BIRD configuration
-        bird_config = cmdline.birdplan_configure()
-
-        # If we were supplied with a bird configuration file on the commandline, write it out
-        output_filename = cmdline.args.output_file[0]
-        if output_filename:
-            # If we have - as a filename, print to stdout
-            if output_filename == "-":
-                print(bird_config)
-            # Else write out file
-            else:
-                try:
-                    with open(output_filename, "w") as config_file:
-                        config_file.write(bird_config)
-                except OSError as err:  # pragma: no cover
-                    raise BirdPlanError(f"Failed to open '{output_filename}' for writing: {err}") from None
+        bird_config = cmdline.birdplan.configure()
 
         # Commit BirdPlan state
         cmdline.birdplan_commit_state()
 
-        return True
+        # Save the output filename
+        self.config_filename = cmdline.args.output_file[0]
+
+        # If we're outputting to file, write it here
+        if self.config_filename and self.config_filename != "-":
+            self._write_config_file(bird_config)
+
+        return bird_config
+
+    def show_output_text(self, data: Any) -> None:
+        """
+        Show command output in text.
+
+        Parameters
+        ----------
+        data : str
+            Bird configuration
+
+        """
+        # Skip output when we're writing a config file
+        if self.config_filename and self.config_filename != "-":
+            return
+        # Output config
+        super().show_output_text(data)
+
+    def _write_config_file(self, data: Any) -> None:
+        """
+        Write out configuration file with data.
+
+        Parameters
+        ----------
+        data : str
+            Bird configuration
+
+        """
+
+        if not self.config_filename:
+            raise RuntimeError("Attribute 'config_filename' must be set")
+
+        # Write out config file
+        try:
+            with open(self.config_filename, "w") as config_file:
+                config_file.write(data)
+        except OSError as err:  # pragma: no cover
+            raise BirdPlanError(f"Failed to open '{self.config_filename}' for writing: {err}") from None
+
+    @property
+    def config_filename(self) -> Optional[str]:
+        """Config file name to write out."""
+        return self._config_filename
+
+    @config_filename.setter
+    def config_filename(self, config_filename: str) -> None:
+        """Config file name to write out."""
+        self._config_filename = config_filename

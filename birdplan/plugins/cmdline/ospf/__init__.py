@@ -20,12 +20,11 @@
 
 from typing import Any, Dict
 import argparse
-import sys
-from ..cmdline_plugin import BirdplanCmdlinePluginBase
-from ....exceptions import BirdPlanError
+from ..cmdline_plugin import BirdPlanCmdlinePluginBase
+from ....exceptions import BirdPlanErrorUsage
 
 
-class BirdplanCmdlineOSPF(BirdplanCmdlinePluginBase):
+class BirdplanCmdlineOSPF(BirdPlanCmdlinePluginBase):
     """Birdplan "ospf" command."""
 
     def __init__(self) -> None:
@@ -65,7 +64,7 @@ class BirdplanCmdlineOSPF(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = subparser.add_subparsers()
 
-    def cmd_ospf(self, args: Any) -> bool:
+    def cmd_ospf(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
         Birdplan "ospf" command.
 
@@ -79,10 +78,4 @@ class BirdplanCmdlineOSPF(BirdplanCmdlinePluginBase):
         if not self._subparser:
             raise RuntimeError()
 
-        cmdline = args["cmdline"]
-
-        if cmdline.is_console:
-            self._subparser.print_help(file=sys.stderr)
-            sys.exit(1)
-
-        raise BirdPlanError("No options specified to 'ospf' action")
+        raise BirdPlanErrorUsage("No options specified to 'ospf' action", self._subparser)

@@ -20,12 +20,10 @@
 
 from typing import Any, Dict
 import argparse
-import sys
-from ....cmdline_plugin import BirdplanCmdlinePluginBase
-from ......exceptions import BirdPlanError
+from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
-class BirdplanCmdlineBGPPeerGracefulShutdownRemove(BirdplanCmdlinePluginBase):
+class BirdplanCmdlineBGPPeerGracefulShutdownRemove(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer graceful-shutdown remove" command."""
 
     def __init__(self) -> None:
@@ -74,7 +72,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownRemove(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_peer_graceful_shutdown_remove(self, args: Any) -> bool:
+    def cmd_bgp_peer_graceful_shutdown_remove(self, args: Any) -> Any:
         """
         Birdplan "bgp peer graceful-shutdown remove" command.
 
@@ -90,30 +88,15 @@ class BirdplanCmdlineBGPPeerGracefulShutdownRemove(BirdplanCmdlinePluginBase):
 
         cmdline = args["cmdline"]
 
-        # Make sure we have a peer specified
-        if not cmdline.args.peer:
-            if cmdline.is_console:
-                print("ERROR: No peer or pattern specified to remove the BGP graceful shutdown override flag from", file=sys.stderr)
-                self._subparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            raise BirdPlanError("No peer or pattern specified to remove the BGP graceful shutdown override flag from")
         peer = cmdline.args.peer[0]
 
         # Load BirdPlan configuration
         cmdline.birdplan_load_config()
 
         # Try remove graceful shutdown override flag
-        if cmdline.is_console:
-            try:
-                cmdline.birdplan.state_bgp_peer_graceful_shutdown_remove(peer)
-                print(f"BGP graceful shutdown REMOVED from peer(s) matching '{peer}'")
-            except BirdPlanError as err:
-                print(f"ERROR: {err}")
-                sys.exit(1)
-        else:
-            cmdline.birdplan.state_bgp_peer_graceful_shutdown_remove(peer)
+        cmdline.birdplan.state_bgp_peer_graceful_shutdown_remove(peer)
 
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return True
+        return f"BGP graceful shutdown REMOVED from peer(s) matching '{peer}'"

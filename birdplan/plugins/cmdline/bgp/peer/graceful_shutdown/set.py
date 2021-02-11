@@ -20,12 +20,11 @@
 
 from typing import Any, Dict
 import argparse
-import sys
-from ....cmdline_plugin import BirdplanCmdlinePluginBase
-from ......exceptions import BirdPlanError
+from ....cmdline_plugin import BirdPlanCmdlinePluginBase
+from ......exceptions import BirdPlanErrorUsage
 
 
-class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdplanCmdlinePluginBase):
+class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer graceful-shutdown set" command."""
 
     def __init__(self) -> None:
@@ -80,7 +79,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_peer_graceful_shutdown_set(self, args: Any) -> bool:
+    def cmd_bgp_peer_graceful_shutdown_set(self, args: Any) -> Any:
         """
         Birdplan "bgp peer graceful-shutdown set" command.
 
@@ -96,41 +95,22 @@ class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdplanCmdlinePluginBase):
 
         cmdline = args["cmdline"]
 
-        # Make sure we have a peer specified
-        if not cmdline.args.peer:
-            if cmdline.is_console:
-                print("ERROR: No peer or pattern specified to set the BGP graceful shutdown override flag for", file=sys.stderr)
-                self._subparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            raise BirdPlanError("No peer or pattern specified to set the BGP graceful shutdown override flag for")
+        # Grab peer name
         peer = cmdline.args.peer[0]
 
         # Check value is valid
         if cmdline.args.value[0] not in ("true", "false"):
-            if cmdline.is_console:
-                print("ERROR: BGP peer graceful shutdown override flag value must be 'true' or 'false'", file=sys.stderr)
-                self._subparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            raise BirdPlanError("BGP peer graceful shutdown override flag value must be 'true' or 'false'")
+            raise BirdPlanErrorUsage("BGP peer graceful shutdown override flag value must be 'true' or 'false'", self._subparser)
         value = bool(cmdline.args.value[0] == "true")
 
         # Load BirdPlan configuration
         cmdline.birdplan_load_config()
 
         # Try set graceful shutdown flag
-        if cmdline.is_console:
-            try:
-                cmdline.birdplan.state_bgp_peer_graceful_shutdown_set(peer, value)
-                # Print some sort of nicer output instead of "True", "False"
-                status = "ENABLED" if value else "DISABLED"
-                print(f"BGP graceful shutdown {status} for peer(s) matching '{peer}'")
-            except BirdPlanError as err:
-                print(f"ERROR: {err}")
-                sys.exit(1)
-        else:
-            cmdline.birdplan.state_bgp_peer_graceful_shutdown_set(peer, value)
+        cmdline.birdplan.state_bgp_peer_graceful_shutdown_set(peer, value)
 
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return True
+        status = "ENABLED" if value else "DISABLED"
+        return f"BGP graceful shutdown {status} for peer(s) matching '{peer}'"

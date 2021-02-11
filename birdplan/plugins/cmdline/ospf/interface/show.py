@@ -20,12 +20,11 @@
 
 from typing import Any, Dict, List
 import argparse
-from ...cmdline_plugin import BirdplanCmdlinePluginBase
-from ..... import BirdPlanOSPFInterfaceStatus
+from ...cmdline_plugin import BirdPlanCmdlinePluginBase
 from .....console.colors import colored
 
 
-class BirdplanCmdlineOSPFInterfaceShow(BirdplanCmdlinePluginBase):
+class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
     """Birdplan "ospf interface show" command."""
 
     def __init__(self) -> None:
@@ -78,7 +77,7 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_ospf_interface_show(self, args: Any) -> BirdPlanOSPFInterfaceStatus:
+    def cmd_ospf_interface_show(self, args: Any) -> Any:
         """
         Birdplan "ospf interface show" command.
 
@@ -98,23 +97,17 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdplanCmdlinePluginBase):
         cmdline.birdplan_load_config(use_cached=True)
 
         # Grab peer list
-        interface_status: BirdPlanOSPFInterfaceStatus = cmdline.birdplan.state_ospf_interface_status()
+        return cmdline.birdplan.state_ospf_interface_status()
 
-        if cmdline.is_console:
-            if cmdline.is_json:
-                self.output_json(interface_status)
-            else:
-                self.show_output_text(interface_status)
-
-        return interface_status
-
-    def show_output_text(self, interface_status: BirdPlanOSPFInterfaceStatus) -> None:  # pylint: disable=no-self-use
+    def show_output_text(  # pylint: disable=no-self-use,too-many-locals,too-many-branches,too-many-statements
+        self, data: Any
+    ) -> None:
         """
         Show command output in text.
 
         Parameters
         ----------
-        interface_status : BirdPlanOSPFInterfaceStatus
+        data : BirdPlanOSPFInterfaceStatus
             OSPF interface status structure.
 
         """
@@ -122,8 +115,8 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdplanCmdlinePluginBase):
         print("OSPF interface overrides:")
         print("-------------------------")
         # Loop with sorted override list
-        if "areas" in interface_status["overrides"]:
-            for area_name, area in sorted(interface_status["overrides"]["areas"].items()):
+        if "areas" in data["overrides"]:
+            for area_name, area in sorted(data["overrides"]["areas"].items()):
                 # Skip if we have no interfaces
                 if ("interfaces" not in area) or (not area["interfaces"]):
                     continue
@@ -139,12 +132,12 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdplanCmdlinePluginBase):
                         print(f"      - ECMP Weight: {interface['ecmp_weight']}")
                 print("\n")
         # If we have no overrides, just print out --none--
-        if ("areas" not in interface_status["overrides"]) or (not interface_status["overrides"]["areas"]):
+        if ("areas" not in data["overrides"]) or (not data["overrides"]["areas"]):
             print("--none--")
             print("\n")
 
         # Get a list of all areas we know about
-        areas_all = list(interface_status["current"]["areas"].keys()) + list(interface_status["pending"]["areas"].keys())
+        areas_all = list(data["current"]["areas"].keys()) + list(data["pending"]["areas"].keys())
         areas_all = sorted(set(areas_all))
 
         # Work out the lists of unique interfaces per area
@@ -153,17 +146,11 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdplanCmdlinePluginBase):
             # Initailize this areas interface list
             interfaces_all[area_name] = []
             # Check if we have interfaces in the current configuration
-            if (
-                area_name in interface_status["current"]["areas"]
-                and "interfaces" in interface_status["current"]["areas"][area_name]
-            ):
-                interfaces_all[area_name] += interface_status["current"]["areas"][area_name]["interfaces"].keys()
+            if area_name in data["current"]["areas"] and "interfaces" in data["current"]["areas"][area_name]:
+                interfaces_all[area_name] += data["current"]["areas"][area_name]["interfaces"].keys()
             # Check if we have interfaces in the pending configuration
-            if (
-                area_name in interface_status["pending"]["areas"]
-                and "interfaces" in interface_status["pending"]["areas"][area_name]
-            ):
-                interfaces_all[area_name] += interface_status["pending"]["areas"][area_name]["interfaces"].keys()
+            if area_name in data["pending"]["areas"] and "interfaces" in data["pending"]["areas"][area_name]:
+                interfaces_all[area_name] += data["pending"]["areas"][area_name]["interfaces"].keys()
             # Make sure the interface list is unique and sorted
             interfaces_all[area_name] = sorted(set(interfaces_all[area_name]))
 
@@ -184,12 +171,9 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdplanCmdlinePluginBase):
                 # Check if we have pending values
                 pending_cost = None
                 pending_ecmp_weight = None
-                if (
-                    area_name in interface_status["pending"]["areas"]
-                    and interface in interface_status["pending"]["areas"][area_name]["interfaces"]
-                ):
+                if area_name in data["pending"]["areas"] and interface in data["pending"]["areas"][area_name]["interfaces"]:
                     # Make things easier
-                    pending_interface = interface_status["pending"]["areas"][area_name]["interfaces"][interface]
+                    pending_interface = data["pending"]["areas"][area_name]["interfaces"][interface]
 
                     pending_cost = pending_interface["cost"]
                     pending_ecmp_weight = pending_interface["ecmp_weight"]
@@ -202,12 +186,9 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdplanCmdlinePluginBase):
                 # Grab current cost status
                 current_cost = None
                 current_ecmp_weight = None
-                if (
-                    area_name in interface_status["current"]["areas"]
-                    and interface in interface_status["current"]["areas"][area_name]["interfaces"]
-                ):
+                if area_name in data["current"]["areas"] and interface in data["current"]["areas"][area_name]["interfaces"]:
                     # Make things easier below
-                    current_interface = interface_status["current"]["areas"][area_name]["interfaces"][interface]
+                    current_interface = data["current"]["areas"][area_name]["interfaces"][interface]
                     # Check if we have a current cost and ECMP weight
                     if "cost" in current_interface:
                         current_cost = current_interface["cost"]

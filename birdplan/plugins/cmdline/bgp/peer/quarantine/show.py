@@ -20,12 +20,12 @@
 
 from typing import Any, Dict
 import argparse
-from ....cmdline_plugin import BirdplanCmdlinePluginBase
+from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 from ...... import BirdPlanBGPPeerQuarantineStatus
 from ......console.colors import colored
 
 
-class BirdplanCmdlineBGPPeerQuarantineShow(BirdplanCmdlinePluginBase):
+class BirdplanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer quarantine show" command."""
 
     def __init__(self) -> None:
@@ -66,7 +66,7 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_peer_quarantine_show(self, args: Any) -> BirdPlanBGPPeerQuarantineStatus:
+    def cmd_bgp_peer_quarantine_show(self, args: Any) -> Any:
         """
         Birdplan "bgp peer quarantine show" command.
 
@@ -86,23 +86,15 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdplanCmdlinePluginBase):
         cmdline.birdplan_load_config(use_cached=True)
 
         # Grab peer list
-        quarantine_status: BirdPlanBGPPeerQuarantineStatus = cmdline.birdplan.state_bgp_peer_quarantine_status()
+        return cmdline.birdplan.state_bgp_peer_quarantine_status()
 
-        if cmdline.is_console:
-            if cmdline.is_json:
-                self.output_json(quarantine_status)
-            else:
-                self.show_output_text(quarantine_status)
-
-        return quarantine_status
-
-    def show_output_text(self, quarantine_status: BirdPlanBGPPeerQuarantineStatus) -> None:  # pylint: disable=no-self-use
+    def show_output_text(self, data: BirdPlanBGPPeerQuarantineStatus) -> None:  # pylint: disable=no-self-use
         """
         Show command output in text.
 
         Parameters
         ----------
-        quarantine_status : BirdPlanBGPPeerQuarantineStatus
+        data : BirdPlanBGPPeerQuarantineStatus
             Graceful shutdown status structure.
 
         """
@@ -111,18 +103,18 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdplanCmdlinePluginBase):
         print("------------------------------")
 
         # Loop with sorted override list
-        for peer in sorted(quarantine_status["overrides"]):
+        for peer in sorted(data["overrides"]):
             # Print out override
-            status = colored("Enabled", "red") if quarantine_status["overrides"][peer] else colored("Disabled", "green")
+            status = colored("Enabled", "red") if data["overrides"][peer] else colored("Disabled", "green")
             print(f"  {peer}: {status}")
         # If we have no overrides, just print out --none--
-        if not quarantine_status["overrides"]:
+        if not data["overrides"]:
             print("--none--")
 
         print("\n")
 
         # Get a list of all peers we know about
-        peers_all = list(quarantine_status["current"].keys()) + list(quarantine_status["pending"].keys())
+        peers_all = list(data["current"].keys()) + list(data["pending"].keys())
         peers_all = sorted(set(peers_all))
 
         print("BGP peer quarantine status:")
@@ -133,13 +125,13 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdplanCmdlinePluginBase):
 
             # Grab pending status
             pending_status = None
-            if peer in quarantine_status["pending"]:
-                pending_status = quarantine_status["pending"][peer]
+            if peer in data["pending"]:
+                pending_status = data["pending"][peer]
 
             # Grab current status
             current_status = None
-            if peer in quarantine_status["current"]:
-                current_status = quarantine_status["current"][peer]
+            if peer in data["current"]:
+                current_status = data["current"][peer]
 
             # Work out our status string
             status_str = ""

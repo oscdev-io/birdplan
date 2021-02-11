@@ -20,12 +20,10 @@
 
 from typing import Any, Dict
 import argparse
-import sys
-from ....cmdline_plugin import BirdplanCmdlinePluginBase
-from ......exceptions import BirdPlanError
+from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
-class BirdplanCmdlineOSPFInterfaceECMPWeightRemove(BirdplanCmdlinePluginBase):
+class BirdplanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
     """Birdplan "ospf interface ecmp-weight remove" command."""
 
     def __init__(self) -> None:
@@ -78,7 +76,7 @@ class BirdplanCmdlineOSPFInterfaceECMPWeightRemove(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_ospf_interface_ecmp_weight_remove(self, args: Any) -> bool:
+    def cmd_ospf_interface_ecmp_weight_remove(self, args: Any) -> Any:
         """
         Birdplan "ospf interface ecmp_weight remove" command.
 
@@ -94,39 +92,17 @@ class BirdplanCmdlineOSPFInterfaceECMPWeightRemove(BirdplanCmdlinePluginBase):
 
         cmdline = args["cmdline"]
 
-        # Make sure we have an area specified
-        if cmdline.args.area is None:
-            if cmdline.is_console:
-                print("ERROR: No OSPF area specified", file=sys.stderr)
-                self._subparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            raise BirdPlanError("No OSPF area specified")
+        # Grab args
         area = cmdline.args.area[0]
-
-        # Make sure we have an interface specified
-        if not cmdline.args.interface:
-            if cmdline.is_console:
-                print("ERROR: No OSPF interface name or pattern specified to remove ECMP weight override for", file=sys.stderr)
-                self._subparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            raise BirdPlanError("No OSPF interface name or pattern specified to remove ECMP weight override for")
         interface = cmdline.args.interface[0]
 
         # Load BirdPlan configuration
         cmdline.birdplan_load_config()
 
         # Check if we're on the console
-        if cmdline.is_console:
-            try:
-                cmdline.birdplan.state_ospf_remove_interface_ecmp_weight(area, interface)
-                print(f"Removed OSPF area '{area}' interface '{interface}' ECMP weight override")
-            except BirdPlanError as err:
-                print(f"ERROR: {err}")
-                sys.exit(1)
-        else:
-            cmdline.birdplan.state_ospf_remove_interface_ecmp_weight(area, interface)
+        cmdline.birdplan.state_ospf_remove_interface_ecmp_weight(area, interface)
 
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return True
+        return f"Removed OSPF area '{area}' interface '{interface}' ECMP weight override"

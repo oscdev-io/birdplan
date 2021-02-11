@@ -20,12 +20,11 @@
 
 from typing import Any, Dict
 import argparse
-from ....cmdline_plugin import BirdplanCmdlinePluginBase
-from ...... import BirdPlanBGPPeerGracefulShutdownStatus
+from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 from ......console.colors import colored
 
 
-class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdplanCmdlinePluginBase):
+class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer graceful-shutdown show" command."""
 
     def __init__(self) -> None:
@@ -66,7 +65,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_peer_graceful_shutdown_show(self, args: Any) -> BirdPlanBGPPeerGracefulShutdownStatus:
+    def cmd_bgp_peer_graceful_shutdown_show(self, args: Any) -> Any:
         """
         Birdplan "bgp peer graceful-shutdown show" command.
 
@@ -86,25 +85,15 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdplanCmdlinePluginBase):
         cmdline.birdplan_load_config(use_cached=True)
 
         # Grab peer list
-        graceful_shutdown_status: BirdPlanBGPPeerGracefulShutdownStatus = cmdline.birdplan.state_bgp_peer_graceful_shutdown_status()
+        return cmdline.birdplan.state_bgp_peer_graceful_shutdown_status()
 
-        if cmdline.is_console:
-            if cmdline.is_json:
-                self.output_json(graceful_shutdown_status)
-            else:
-                self.show_output_text(graceful_shutdown_status)
-
-        return graceful_shutdown_status
-
-    def show_output_text(  # pylint: disable=no-self-use, too-many-branches
-        self, graceful_shutdown_status: BirdPlanBGPPeerGracefulShutdownStatus
-    ) -> None:
+    def show_output_text(self, data: Any) -> None:   # pylint: disable=no-self-use, too-many-branches
         """
         Show command output in text.
 
         Parameters
         ----------
-        graceful_shutdown_status : BirdPlanBGPPeerGracefulShutdownStatus
+        data : Any
             Graceful shutdown status structure.
 
         """
@@ -113,18 +102,18 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdplanCmdlinePluginBase):
         print("-------------------------------------")
 
         # Loop with sorted override list
-        for peer in sorted(graceful_shutdown_status["overrides"]):
+        for peer in sorted(data["overrides"]):
             # Print out override
-            status = colored("Enabled", "red") if graceful_shutdown_status["overrides"][peer] else colored("Disabled", "green")
+            status = colored("Enabled", "red") if data["overrides"][peer] else colored("Disabled", "green")
             print(f"  {peer}: {status}")
         # If we have no overrides, just print out --none--
-        if not graceful_shutdown_status["overrides"]:
+        if not data["overrides"]:
             print("--none--")
 
         print("\n")
 
         # Get a list of all peers we know about
-        peers_all = list(graceful_shutdown_status["current"].keys()) + list(graceful_shutdown_status["pending"].keys())
+        peers_all = list(data["current"].keys()) + list(data["pending"].keys())
         peers_all = sorted(set(peers_all))
 
         print("BGP peer graceful shutdown status:")
@@ -135,13 +124,13 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdplanCmdlinePluginBase):
 
             # Grab pending status
             pending_status = None
-            if peer in graceful_shutdown_status["pending"]:
-                pending_status = graceful_shutdown_status["pending"][peer]
+            if peer in data["pending"]:
+                pending_status = data["pending"][peer]
 
             # Grab current status
             current_status = None
-            if peer in graceful_shutdown_status["current"]:
-                current_status = graceful_shutdown_status["current"][peer]
+            if peer in data["current"]:
+                current_status = data["current"][peer]
 
             # Work out our status string
             status_str = ""

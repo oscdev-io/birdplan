@@ -20,12 +20,10 @@
 
 from typing import Any, Dict
 import argparse
-import sys
-from ....cmdline_plugin import BirdplanCmdlinePluginBase
-from ......exceptions import BirdPlanError
+from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
-class BirdplanCmdlineOSPFInterfaceCostSet(BirdplanCmdlinePluginBase):
+class BirdplanCmdlineOSPFInterfaceCostSet(BirdPlanCmdlinePluginBase):
     """Birdplan "ospf interface cost set" command."""
 
     def __init__(self) -> None:
@@ -85,7 +83,7 @@ class BirdplanCmdlineOSPFInterfaceCostSet(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_ospf_interface_cost_set(self, args: Any) -> bool:
+    def cmd_ospf_interface_cost_set(self, args: Any) -> Any:
         """
         Birdplan "ospf interface cost set" command.
 
@@ -101,48 +99,18 @@ class BirdplanCmdlineOSPFInterfaceCostSet(BirdplanCmdlinePluginBase):
 
         cmdline = args["cmdline"]
 
-        # Make sure we have an area specified
-        if cmdline.args.area is None:
-            if cmdline.is_console:
-                print("ERROR: No OSPF area specified", file=sys.stderr)
-                self._subparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            raise BirdPlanError("No OSPF area specified")
+        # Grab args
         area = cmdline.args.area[0]
-
-        # Make sure we have an interface specified
-        if not cmdline.args.interface:
-            if cmdline.is_console:
-                print("ERROR: No OSPF interface specified to set cost override for", file=sys.stderr)
-                self._subparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            raise BirdPlanError("No OSPF interface specified to set cost override for")
         interface = cmdline.args.interface[0]
-
-        # Make sure we have a cost specified
-        if not cmdline.args.cost:
-            if cmdline.is_console:
-                print("ERROR: No OSPF interface cost specified", file=sys.stderr)
-                self._subparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            raise BirdPlanError("No OSPF interface cost specified")
         cost = cmdline.args.cost[0]
 
         # Load BirdPlan configuration
         cmdline.birdplan_load_config()
 
-        # Check if we're on the console
-        if cmdline.is_console:
-            try:
-                cmdline.birdplan.state_ospf_set_interface_cost(area, interface, cost)
-                print(f"OSPF area '{area}' interface '{interface}' cost override set to {cost}")
-            except BirdPlanError as err:
-                print(f"ERROR: {err}")
-                sys.exit(1)
-        else:
-            cmdline.birdplan.state_ospf_set_interface_cost(area, interface, cost)
+        # Set OSPF interface cost
+        cmdline.birdplan.state_ospf_set_interface_cost(area, interface, cost)
 
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return True
+        return f"OSPF area '{area}' interface '{interface}' cost override set to {cost}"

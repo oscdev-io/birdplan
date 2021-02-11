@@ -25,7 +25,7 @@ import json
 from ...plugin import Plugin
 
 
-class BirdplanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-methods
+class BirdPlanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-methods
     """Birdplan commandline plugin base class."""
 
     _subparser: Optional[argparse.ArgumentParser]
@@ -81,14 +81,28 @@ class BirdplanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-metho
             raise RuntimeError
         return self._subparsers
 
-    def output_json(self, data: Any) -> None:  # pylint: disable=no-self-use
+    def show_output_text(  # pylint: disable=no-self-use
+        self, data: Any
+    ) -> None:
+        """
+        Show command output in text.
+
+        Parameters
+        ----------
+        data : Any
+            Output data.
+
+        """
+        print(data)
+
+    def show_output_json(self, data: Any) -> None:  # pylint: disable=no-self-use
         """
         Show command output in json.
 
         Parameters
         ----------
         data : Any
-            Output data in JSON.
+            Output data.
 
         """
-        print(json.dumps(data))
+        print(json.dumps({"status": "success", "data": data}))

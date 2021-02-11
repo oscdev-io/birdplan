@@ -20,12 +20,10 @@
 
 from typing import Any, Dict
 import argparse
-import sys
-from ....cmdline_plugin import BirdplanCmdlinePluginBase
-from ......exceptions import BirdPlanError
+from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
-class BirdplanCmdlineOSPFInterfaceECMPWeightSet(BirdplanCmdlinePluginBase):
+class BirdplanCmdlineOSPFInterfaceECMPWeightSet(BirdPlanCmdlinePluginBase):
     """Birdplan "ospf interface ecmp-weight set" command."""
 
     def __init__(self) -> None:
@@ -85,7 +83,7 @@ class BirdplanCmdlineOSPFInterfaceECMPWeightSet(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_ospf_interface_ecmp_weight_set(self, args: Any) -> bool:
+    def cmd_ospf_interface_ecmp_weight_set(self, args: Any) -> Any:
         """
         Birdplan "ospf interface ecmp-weight set" command.
 
@@ -101,48 +99,18 @@ class BirdplanCmdlineOSPFInterfaceECMPWeightSet(BirdplanCmdlinePluginBase):
 
         cmdline = args["cmdline"]
 
-        # Make sure we have an area specified
-        if cmdline.args.area is None:
-            if cmdline.is_console:
-                print("ERROR: No OSPF area specified", file=sys.stderr)
-                self._subparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            raise BirdPlanError("No OSPF area specified")
+        # Grab our args
         area = cmdline.args.area[0]
-
-        # Make sure we have an interface specified
-        if not cmdline.args.interface:
-            if cmdline.is_console:
-                print("ERROR: No OSPF interface specified to set ECMP weight override for", file=sys.stderr)
-                self._subparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            raise BirdPlanError("No OSPF interface specified to set ECMP weight override for")
         interface = cmdline.args.interface[0]
-
-        # Make sure we have a ECMP weight specified
-        if not cmdline.args.ecmp_weight:
-            if cmdline.is_console:
-                print("ERROR: No OSPF interface ECMP weight specified", file=sys.stderr)
-                self._subparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            raise BirdPlanError("No OSPF interface ECMP weight specified")
         ecmp_weight = cmdline.args.ecmp_weight[0]
 
         # Load BirdPlan configuration
         cmdline.birdplan_load_config()
 
-        # Check if we're on the console
-        if cmdline.is_console:
-            try:
-                cmdline.birdplan.state_ospf_set_interface_ecmp_weight(area, interface, ecmp_weight)
-                print(f"OSPF area '{area}' interface '{interface}' ECMP weight override set to {ecmp_weight}")
-            except BirdPlanError as err:
-                print(f"ERROR: {err}")
-                sys.exit(1)
-        else:
-            cmdline.birdplan.state_ospf_set_interface_ecmp_weight(area, interface, ecmp_weight)
+        # Set OSPF interface ECMP weight
+        cmdline.birdplan.state_ospf_set_interface_ecmp_weight(area, interface, ecmp_weight)
 
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return True
+        return f"OSPF area '{area}' interface '{interface}' ECMP weight override set to {ecmp_weight}"

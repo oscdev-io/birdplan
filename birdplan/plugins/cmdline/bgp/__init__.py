@@ -20,12 +20,11 @@
 
 from typing import Any, Dict
 import argparse
-import sys
-from ..cmdline_plugin import BirdplanCmdlinePluginBase
-from ....exceptions import BirdPlanError
+from ..cmdline_plugin import BirdPlanCmdlinePluginBase
+from ....exceptions import BirdPlanErrorUsage
 
 
-class BirdplanCmdlineBGP(BirdplanCmdlinePluginBase):
+class BirdplanCmdlineBGP(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp" command."""
 
     def __init__(self) -> None:
@@ -65,7 +64,7 @@ class BirdplanCmdlineBGP(BirdplanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = subparser.add_subparsers()
 
-    def cmd_bgp(self, args: Any) -> bool:
+    def cmd_bgp(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
         Birdplan "bgp" command.
 
@@ -79,10 +78,4 @@ class BirdplanCmdlineBGP(BirdplanCmdlinePluginBase):
         if not self._subparser:
             raise RuntimeError()
 
-        cmdline = args["cmdline"]
-
-        if cmdline.is_console:
-            self._subparser.print_help(file=sys.stderr)
-            sys.exit(1)
-
-        raise BirdPlanError("No options specified to 'bgp' action")
+        raise BirdPlanErrorUsage("No options specified to 'bgp' action", self._subparser)

@@ -18,13 +18,14 @@
 
 """Entry point into Birdplan from the commandline."""
 
-from typing import Any, List, Optional
+from typing import Any, List, NoReturn, Optional
 import argparse
+import json
 import logging
 import logging.handlers
 import sys
 from . import __VERSION__, BirdPlan
-from .exceptions import BirdPlanError
+from .exceptions import BirdPlanError, BirdPlanErrorUsage
 from .plugin import PluginCollection
 
 
@@ -34,18 +35,34 @@ BIRD_CONFIG_FILE = "/etc/bird.conf"
 BIRDPLAN_STATE_FILE = "/var/lib/birdplan/birdplan.state"
 
 
+class BirdPlanArgumentParser(argparse.ArgumentParser):
+    """ArgumentParser override class to output errors slightly better."""
+
+    def error(self, message: str) -> NoReturn:
+        """
+        Slightly better error message handler for ArgumentParser.
+
+        Argument
+        --------
+        message : str
+            Error message.
+
+        """
+        raise BirdPlanErrorUsage(message, self)
+
+
 class BirdPlanCommandLine:
     """BirdPlan commandline handling class."""
 
     _args: argparse.Namespace
-    _argparser: argparse.ArgumentParser
+    _argparser: BirdPlanArgumentParser
     _birdplan: BirdPlan
 
     def __init__(self, test_mode: bool = False) -> None:
         """Instantiate object."""
 
         self._args = argparse.Namespace()
-        self._argparser = argparse.ArgumentParser(add_help=False)
+        self._argparser = BirdPlanArgumentParser(add_help=False)
         self._birdplan = BirdPlan(test_mode=test_mode)
 
     def run(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
@@ -54,110 +71,10 @@ class BirdPlanCommandLine:
         """Run BirdPlan from command line."""
 
         # Don't output copyright when we output in JSON format
-        if (__name__ == "__main__") and not ("--json" in sys.argv or "-j" in sys.argv):
+        if self.is_console and not self.is_json:
             print(f"BirdPlan v{__VERSION__} - Copyright © 2019-2021, AllWorldIT.\n", file=sys.stderr)
 
         # Add main commandline arguments
-        self._add_main_arguments()
-
-        # Add subparsers
-        subparsers = self.argparser.add_subparsers()
-
-        # configure
-        plugins = PluginCollection(["birdplan.plugins.cmdline"])
-
-        # Register commandline parsers
-        plugins.call_if_exists("register_parsers", {"root_parser": subparsers, "plugins": plugins})
-
-        # Parse commandline args
-        self._args = self.argparser.parse_args(raw_args)
-
-        # Setup logging
-        if __name__ == "__main__":
-            self._setup_logging()
-
-        # Make sure we have an action
-        if "action" not in self.args:
-            if __name__ == "__main__":
-                print("ERROR: No action specified!", file=sys.stderr)
-                self.argparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            else:
-                raise BirdPlanError("No action specified")
-
-        # Call first plugin that matches the commandline option
-        return plugins.call_first(f"cmd_{self.args.action}", {"cmdline": self})
-
-    def birdplan_load_config(self, **kwargs: Any) -> None:
-        """
-        Load BirdPlan configuration.
-
-        Parameters
-        ----------
-        ignore_irr_changes : bool
-            Optional parameter to ignore IRR lookups during configuration load.
-
-        ignore_peeringdb_changes : bool
-            Optional parameter to ignore peering DB lookups during configuraiton load.
-
-        use_cached : bool
-            Optional parameter to use cached values from state during configuration load.
-
-        """
-
-        # Try load configuration
-        if __name__ == "__main__":
-            try:
-                self.birdplan.load(
-                    plan_file=self.args.birdplan_file[0],
-                    state_file=self.args.birdplan_state_file[0],
-                    **kwargs,
-                )
-            except BirdPlanError as err:
-                print(f"ERROR: Failed to load BirdPlan configuration: {err}", file=sys.stderr)
-                sys.exit(1)
-        else:
-            self.birdplan.load(
-                plan_file=self.args.birdplan_file[0],
-                state_file=self.args.birdplan_state_file[0],
-                **kwargs,
-            )
-
-    def birdplan_configure(self) -> str:
-        """Configure BirdPlan."""
-
-        # Try load configuration
-        if __name__ == "__main__":
-            try:
-                bird_config = self.birdplan.configure()
-            except BirdPlanError as err:
-                print(f"ERROR: Failed to generate BirdPlan configuration: {err}", file=sys.stderr)
-                sys.exit(1)
-        else:
-            bird_config = self.birdplan.configure()
-
-        return bird_config
-
-    def birdplan_commit_state(self) -> None:
-        """Commit BirdPlan state."""
-
-        # Try commit our state if we were called from the commandline
-        if __name__ == "__main__":
-            # If we didn't get a state file specified, then just display a notice we're not going to write it out
-            if not self.args.birdplan_state_file[0]:
-                print("NOTICE: State file not written!", file=sys.stderr)
-                return
-            # Try commit state
-            try:
-                self.birdplan.commit_state()
-            except BirdPlanError as err:
-                print(f"ERROR: Failed to commit BirdPlan state: {err}")
-                sys.exit(1)
-        else:
-            self.birdplan.commit_state()
-
-    def _add_main_arguments(self) -> None:
-        """Add main commandline arguments."""
 
         optional_group = self.argparser.add_argument_group("Optional arguments")
         optional_group.add_argument("-h", "--help", action="help", help="Show this help message and exit")
@@ -181,6 +98,13 @@ class BirdPlanCommandLine:
             help=f"BirdPlan state file to use (default: {BIRDPLAN_STATE_FILE})",
         )
         optional_group.add_argument(
+            "-n",
+            "--no-write-state",
+            action="store_true",
+            default=False,
+            help="Disable writing state file",
+        )
+        optional_group.add_argument(
             "-j",
             "--json",
             action="store_true",
@@ -188,14 +112,82 @@ class BirdPlanCommandLine:
             help="Output in JSON",
         )
 
-    def _add_bgp_quarantine_peers_argument(self, arg_group: argparse.ArgumentParser) -> None:  # pylint: disable=no-self-use
-        """Add BGP qurantine arguments for a command that takes peers."""
-        arg_group.add_argument(
-            "peers",
-            nargs="+",
-            metavar="PEER",
-            help="Peer name",
+        # Add subparsers
+        subparsers = self.argparser.add_subparsers()
+
+        # configure
+        plugins = PluginCollection(["birdplan.plugins.cmdline"])
+
+        # Register commandline parsers
+        plugins.call_if_exists("register_parsers", {"root_parser": subparsers, "plugins": plugins})
+
+        # Parse commandline args
+        self._args = self.argparser.parse_args(raw_args)
+
+        # Setup logging
+        if __name__ == "__main__":
+            self._setup_logging()
+
+        # Make sure we have an action
+        if "action" not in self.args:
+            raise BirdPlanErrorUsage("No action specified", self.argparser)
+
+        # Generate the command line option method name
+        method_name = f"cmd_{self.args.action}"
+
+        # Grab the first plugin which has this method
+        plugin_name = plugins.get_first(method_name)
+        if not plugin_name:
+            raise BirdPlanError("Failed to find plugin to handle command line options")
+
+        # Grab the result from the command
+        result = plugins.call_plugin(plugin_name, method_name, {"cmdline": self})
+
+        # Check if we should output JSON
+        if self.is_console:
+            if self.is_json:
+                plugins.call_plugin(plugin_name, "show_output_json", result)
+            # If not, we need to output text
+            else:
+                plugins.call_plugin(plugin_name, "show_output_text", result)
+
+        return result
+
+    def birdplan_load_config(self, **kwargs: Any) -> None:
+        """
+        Load BirdPlan configuration.
+
+        Parameters
+        ----------
+        ignore_irr_changes : bool
+            Optional parameter to ignore IRR lookups during configuration load.
+
+        ignore_peeringdb_changes : bool
+            Optional parameter to ignore peering DB lookups during configuraiton load.
+
+        use_cached : bool
+            Optional parameter to use cached values from state during configuration load.
+
+        """
+
+        # Try load configuration
+        self.birdplan.load(
+            plan_file=self.args.birdplan_file[0],
+            state_file=self.args.birdplan_state_file[0],
+            **kwargs,
         )
+
+    def birdplan_commit_state(self) -> None:
+        """Commit BirdPlan state."""
+
+        # If we didn't get a state file specified, then just display a notice we're not going to write it out
+        if not self.args.birdplan_state_file[0]:
+            return
+        # Check if we need to skip writing the state
+        if self.args.no_write_state:
+            return
+
+        self.birdplan.commit_state()
 
     def _setup_logging(self) -> None:
         """Set up logging."""
@@ -249,7 +241,8 @@ class BirdPlanCommandLine:
         bool : indicating if we should output in JSON from the commandline.
 
         """
-        if self.args.json:
+
+        if ("--json" in sys.argv) or ("-j" in sys.argv):
             return True
         return False
 
@@ -260,4 +253,16 @@ if __name__ == "__main__":
     try:
         birdplan_cmdline.run()
     except BirdPlanError as exception:
-        print(f"ERROR: {exception}", file=sys.stderr)
+        if birdplan_cmdline.is_json:
+            print(json.dumps({"status": "error", "message": str(exception)}))
+        else:
+            print(f"ERROR: {exception}", file=sys.stderr)
+            sys.exit(1)
+
+    except BirdPlanErrorUsage as exception:
+        if birdplan_cmdline.is_json:
+            print(json.dumps({"status": "error", "message": exception.message}))
+        else:
+            print(f"ERROR: {exception}", file=sys.stderr)
+            sys.exit(2)
+
