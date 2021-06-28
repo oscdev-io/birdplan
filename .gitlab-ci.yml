@@ -16,15 +16,24 @@ test_job:
   # Create environment
   - pacman -Syu --noconfirm
   - pacman -S --noconfirm grep python
-  - pacman -S --noconfirm python-pytest-runner python-pytest-cov python-pytest-black python-pytest-flake8 python-pytest-pycodestyle python-pytest-pydocstyle python-pytest-pylint python-pytest-mypy python-pytest-xdist
-  - pacman -S --noconfirm \
-      python-colorama \
-      python-jinja \
-      python-yaml python-yaml-stubs \
-      python-requests python-requests-stubs \
-      iproute2 \
-      bird \
-      exabgp \
+  - pacman -S --noconfirm
+      python-pytest-runner
+      python-pytest-cov
+      python-pytest-black
+      python-pytest-flake8
+      python-pytest-pycodestyle
+      python-pytest-pydocstyle
+      python-pytest-pylint
+      python-pytest-mypy
+      python-pytest-xdist
+  - pacman -S --noconfirm
+      python-colorama
+      python-jinja
+      python-yaml python-yaml-stubs
+      python-requests python-requests-stubs
+      iproute2
+      bird
+      exabgp
       bgpq3
   # Create Python environment
   - pacman -S --noconfirm python-pip git
