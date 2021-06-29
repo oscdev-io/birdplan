@@ -18,7 +18,7 @@ r1_t_rip4 = {
 r2_t_rip4 = {
     "10.0.0.0/24": [
         {
-            "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
+            "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
             "metric1": 3,
             "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
             "pref": 120,
@@ -44,7 +44,7 @@ r1_t_rip6 = {
 r2_t_rip6 = {
     "fc10::/64": [
         {
-            "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
+            "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
             "metric1": 3,
             "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
             "pref": 120,
@@ -88,7 +88,7 @@ r1_master4 = {
 r2_master4 = {
     "10.0.0.0/24": [
         {
-            "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
+            "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
             "metric1": 3,
             "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
             "pref": 120,
@@ -150,7 +150,7 @@ r2_master6 = {
     ],
     "fc10::/64": [
         {
-            "attributes": {"RIP.metric": "3", "RIP.tag": "0000"},
+            "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
             "metric1": 3,
             "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
             "pref": 120,

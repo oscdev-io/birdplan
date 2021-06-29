@@ -24,11 +24,12 @@ from .base import SectionProtocolBase
 class ProtocolDevice(SectionProtocolBase):
     """BIRD device protocol configuration."""
 
-    _section = "Device Protocol"
-
     def configure(self) -> None:
         """Configure the device protocol."""
         super().configure()
+
+        # Set section heading
+        self._section = "Device Protocol"
 
         self.conf.add("protocol device {")
         self.conf.add('  description "Device protocol";')

@@ -16,8 +16,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Birdplan exceptions."""
+"""BirdPlan exceptions."""
+
+from typing import Any
+import argparse
 
 
 class BirdPlanError(RuntimeError):
     """BirdPlan runtime error."""
+
+
+class BirdPlanErrorUsage(RuntimeError):
+    """BirdPlan runtime error, raised when used incorrectly."""
+
+    message: str
+    parser: argparse.ArgumentParser
+
+    def __init__(self, *args: Any):
+        """Initialize object."""
+
+        super().__init__(*args)
+
+        self.message = args[0]
+        self.parser = args[1]
+
+    def __str__(self) -> str:
+        """Return string representation of the exception."""
+
+        return f"{self.message}\n\n{self.parser.format_help()}"

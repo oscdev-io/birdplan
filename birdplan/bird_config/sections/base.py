@@ -173,7 +173,7 @@ class SectionBase:
     """Base class for a BIRD configuration section."""
 
     # Section title
-    _section: str = ""
+    _section: str
 
     # Globals
     _birdconfig_globals: BirdConfigGlobals
@@ -191,6 +191,8 @@ class SectionBase:
         Nothing.
 
         """
+
+        self._section = ""
 
         self._birdconfig_globals = birdconfig_globals
 

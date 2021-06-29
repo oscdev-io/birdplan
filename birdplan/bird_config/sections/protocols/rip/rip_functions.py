@@ -20,13 +20,18 @@
 
 from typing import Any
 from ..base_protocol_functions import ProtocolFunctionsBase
-from ...functions import bird_function
+from ...functions import bird_function, SectionFunctions
+from ....globals import BirdConfigGlobals
 
 
 class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods
     """RIP protocol specific functions class."""
 
-    _section: str = "RIP Functions"
+    def __init__(self, birdconfig_globals: BirdConfigGlobals, functions: SectionFunctions):
+        """Initialize the object."""
+        super().__init__(birdconfig_globals, functions)
+
+        self._section = "RIP Functions"
 
     @bird_function("rip_accept_connected")
     def accept_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument

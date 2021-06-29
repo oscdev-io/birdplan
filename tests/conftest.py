@@ -197,10 +197,13 @@ def fixture_sim(request):
             expected_file.write(simulation.variables)
 
         # Grab the expected configuration file
-        expected_conffile = simulation.expected_path.replace(".py", ".conf")
+        expected_conffile_base = simulation.expected_path.replace(".py", "")
         for conffile_name, sim_conffile_path in simulation.conffiles.items():
+            expected_conffile = f"{expected_conffile_base}_{conffile_name}"
             # If this is a birdplan config file, write it out
             if "birdplan" in conffile_name:
+                # Cleanup filename
+                expected_conffile = expected_conffile.replace("_birdplan.yaml.", ".birdplan.") + ".conf"
                 # We need to replace some options that are variable so files don't change between runs
                 with open(sim_conffile_path, "r") as config_file:
                     conf_lines = config_file.readlines()

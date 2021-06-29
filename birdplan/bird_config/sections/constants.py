@@ -25,13 +25,14 @@ from .base import SectionBase
 class SectionConstants(SectionBase):
     """BIRD constants configuration."""
 
-    _section = "Global Constants"
-
     _need_bogons: bool
 
     def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize the object."""
         super().__init__(birdconfig_globals)
+
+        # Set section header
+        self._section = "Global Constants"
 
         # Add bogon constants to output
         self._need_bogons = False

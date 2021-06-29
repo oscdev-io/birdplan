@@ -22,14 +22,14 @@
 """BGP filtering test case."""
 
 from ..template_replace_aspath_notallowed_aspath import Template
-from ....config.peertype_customer.e1r1_highasn import PeerTypeConfig
+from ....config.peertype_customer.e1r1_highasn_no_filter import PeerTypeConfig
 
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
 
     # We need to add an additional ASN to the filter list
-    r1_peer_config = """
+    r1_peer_extra_config = """
       filter:
         origin_asns: [4200000000, 4200000002]
 """

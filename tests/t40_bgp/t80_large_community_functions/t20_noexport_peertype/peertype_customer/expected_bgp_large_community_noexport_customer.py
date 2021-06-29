@@ -3,50 +3,6 @@
 
 """Expected test result data."""
 
-r1_t_bgp4_AS65100_e1_peer = {
-    "100.64.101.0/24": [
-        {
-            "asn": "AS65100",
-            "attributes": {
-                "BGP.as_path": [65100],
-                "BGP.large_community": [(65000, 4, 65414), (65000, 3, 2)],
-                "BGP.local_pref": 750,
-                "BGP.next_hop": ["100.64.0.100"],
-                "BGP.origin": "IGP",
-            },
-            "bestpath": True,
-            "bgp_type": "i",
-            "nexthops": [{"gateway": "100.64.0.100", "interface": "eth0"}],
-            "pref": 100,
-            "prefix_type": "unicast",
-            "protocol": "bgp4_AS65100_e1",
-            "type": ["BGP", "univ"],
-        }
-    ]
-}
-
-r1_t_bgp4_AS65009_r10_peer = {
-    "100.64.101.0/24": [
-        {
-            "asn": "AS65100",
-            "attributes": {
-                "BGP.as_path": [65100],
-                "BGP.large_community": [(65000, 4, 65414), (65000, 3, 2)],
-                "BGP.local_pref": 750,
-                "BGP.next_hop": ["100.64.0.100"],
-                "BGP.origin": "IGP",
-            },
-            "bestpath": True,
-            "bgp_type": "i",
-            "nexthops": [{"gateway": "100.64.0.100", "interface": "eth0"}],
-            "pref": 100,
-            "prefix_type": "unicast",
-            "protocol": "bgp4_AS65100_e1",
-            "type": ["BGP", "univ"],
-        }
-    ]
-}
-
 r1_t_bgp4_AS65001_r2_peer = {}
 
 r1_t_bgp4_AS65000_r3_peer = {
@@ -182,6 +138,50 @@ r1_t_bgp4_AS65000_r8_peer = {
 }
 
 r1_t_bgp4_AS65000_r9_peer = {
+    "100.64.101.0/24": [
+        {
+            "asn": "AS65100",
+            "attributes": {
+                "BGP.as_path": [65100],
+                "BGP.large_community": [(65000, 4, 65414), (65000, 3, 2)],
+                "BGP.local_pref": 750,
+                "BGP.next_hop": ["100.64.0.100"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": True,
+            "bgp_type": "i",
+            "nexthops": [{"gateway": "100.64.0.100", "interface": "eth0"}],
+            "pref": 100,
+            "prefix_type": "unicast",
+            "protocol": "bgp4_AS65100_e1",
+            "type": ["BGP", "univ"],
+        }
+    ]
+}
+
+r1_t_bgp4_AS65009_r10_peer = {
+    "100.64.101.0/24": [
+        {
+            "asn": "AS65100",
+            "attributes": {
+                "BGP.as_path": [65100],
+                "BGP.large_community": [(65000, 4, 65414), (65000, 3, 2)],
+                "BGP.local_pref": 750,
+                "BGP.next_hop": ["100.64.0.100"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": True,
+            "bgp_type": "i",
+            "nexthops": [{"gateway": "100.64.0.100", "interface": "eth0"}],
+            "pref": 100,
+            "prefix_type": "unicast",
+            "protocol": "bgp4_AS65100_e1",
+            "type": ["BGP", "univ"],
+        }
+    ]
+}
+
+r1_t_bgp4_AS65100_e1_peer = {
     "100.64.101.0/24": [
         {
             "asn": "AS65100",
@@ -385,50 +385,6 @@ r10_t_bgp4_AS65000_r1_peer = {
     ]
 }
 
-r1_t_bgp6_AS65100_e1_peer = {
-    "fc00:101::/48": [
-        {
-            "asn": "AS65100",
-            "attributes": {
-                "BGP.as_path": [65100],
-                "BGP.large_community": [(65000, 4, 65414), (65000, 3, 2)],
-                "BGP.local_pref": 750,
-                "BGP.next_hop": ["fc00:100::100"],
-                "BGP.origin": "IGP",
-            },
-            "bestpath": True,
-            "bgp_type": "i",
-            "nexthops": [{"gateway": "fc00:100::100", "interface": "eth0"}],
-            "pref": 100,
-            "prefix_type": "unicast",
-            "protocol": "bgp6_AS65100_e1",
-            "type": ["BGP", "univ"],
-        }
-    ]
-}
-
-r1_t_bgp6_AS65009_r10_peer = {
-    "fc00:101::/48": [
-        {
-            "asn": "AS65100",
-            "attributes": {
-                "BGP.as_path": [65100],
-                "BGP.large_community": [(65000, 4, 65414), (65000, 3, 2)],
-                "BGP.local_pref": 750,
-                "BGP.next_hop": ["fc00:100::100"],
-                "BGP.origin": "IGP",
-            },
-            "bestpath": True,
-            "bgp_type": "i",
-            "nexthops": [{"gateway": "fc00:100::100", "interface": "eth0"}],
-            "pref": 100,
-            "prefix_type": "unicast",
-            "protocol": "bgp6_AS65100_e1",
-            "type": ["BGP", "univ"],
-        }
-    ]
-}
-
 r1_t_bgp6_AS65001_r2_peer = {}
 
 r1_t_bgp6_AS65000_r3_peer = {
@@ -564,6 +520,50 @@ r1_t_bgp6_AS65000_r8_peer = {
 }
 
 r1_t_bgp6_AS65000_r9_peer = {
+    "fc00:101::/48": [
+        {
+            "asn": "AS65100",
+            "attributes": {
+                "BGP.as_path": [65100],
+                "BGP.large_community": [(65000, 4, 65414), (65000, 3, 2)],
+                "BGP.local_pref": 750,
+                "BGP.next_hop": ["fc00:100::100"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": True,
+            "bgp_type": "i",
+            "nexthops": [{"gateway": "fc00:100::100", "interface": "eth0"}],
+            "pref": 100,
+            "prefix_type": "unicast",
+            "protocol": "bgp6_AS65100_e1",
+            "type": ["BGP", "univ"],
+        }
+    ]
+}
+
+r1_t_bgp6_AS65009_r10_peer = {
+    "fc00:101::/48": [
+        {
+            "asn": "AS65100",
+            "attributes": {
+                "BGP.as_path": [65100],
+                "BGP.large_community": [(65000, 4, 65414), (65000, 3, 2)],
+                "BGP.local_pref": 750,
+                "BGP.next_hop": ["fc00:100::100"],
+                "BGP.origin": "IGP",
+            },
+            "bestpath": True,
+            "bgp_type": "i",
+            "nexthops": [{"gateway": "fc00:100::100", "interface": "eth0"}],
+            "pref": 100,
+            "prefix_type": "unicast",
+            "protocol": "bgp6_AS65100_e1",
+            "type": ["BGP", "univ"],
+        }
+    ]
+}
+
+r1_t_bgp6_AS65100_e1_peer = {
     "fc00:101::/48": [
         {
             "asn": "AS65100",

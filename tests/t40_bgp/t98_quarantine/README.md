@@ -1,28 +1,26 @@
 # BGP quarantine tests
 
-Router r2 should receive routes from r1.
+Router r2 should be receiving routes from r1.
 
-For the inbound test the routes received should be filtered automatically.
+For the inbound test the routes should have local_pref set to 0 automatically.
 
-For the outbound test no routes should be advertised.
-
-
-## Inbound tests
-
-In terms of test "test_quarantine_inbound_cmdline":
-- Route r2 is setup from the commandline to quarantine just r1.
-
-In terms of test "test_quarantine_inbound_configfile":
-- Route r2 is setup from the config file to quarantine just r1.
+For the outbound test the routes should include the quarantine community.
 
 
-## Outbound tests
+## Test Sets
 
-In terms of test "test_quarantine_outbound_cmdline":
-- Router r1 is setup from the commandline to quarantine r2 and should not advertise any routes.
+In terms of test set "t10_inbound_configfile":
+- Route r2 is setup from the config file to quarantine peers globally and explicitly.
 
-In terms of test "test_quarantine_outbound_configfile":
-- Router r1 is setup from the config file to quarantine r2 and should not advertise any routes.
+In terms of test set "t20_outbound_configfile":
+- Route r1 is setup from the config file to quarantine peers globally and explicitly.
+
+In terms of test set "t30_inbound_cmdline":
+- Route r2 is setup from the commandline to quarantine peers with a pattern and explicitly.
+
+In terms of test set "t40_outbound_cmdline":
+- Route r1 is setup from the config file to quarantine peers with a pattern and explicitly.
+
 
 
 ## Diagram

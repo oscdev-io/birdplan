@@ -3,6 +3,24 @@
 
 """Expected test result data."""
 
+r1_t_bgp4_AS65001_r2_peer = {}
+
+r1_t_bgp4_AS65000_r3_peer = {}
+
+r1_t_bgp4_AS65003_r4_peer = {}
+
+r1_t_bgp4_AS65004_r5_peer = {}
+
+r1_t_bgp4_AS65005_r6_peer = {}
+
+r1_t_bgp4_AS65000_r7_peer = {}
+
+r1_t_bgp4_AS65000_r8_peer = {}
+
+r1_t_bgp4_AS65000_r9_peer = {}
+
+r1_t_bgp4_AS65009_r10_peer = {}
+
 r1_t_bgp4_AS65100_e1_peer = {
     "100.64.101.0/24": [
         {
@@ -65,24 +83,6 @@ r1_t_bgp4_AS65100_e1_peer = {
     ],
 }
 
-r1_t_bgp4_AS65009_r10_peer = {}
-
-r1_t_bgp4_AS65001_r2_peer = {}
-
-r1_t_bgp4_AS65000_r3_peer = {}
-
-r1_t_bgp4_AS65003_r4_peer = {}
-
-r1_t_bgp4_AS65004_r5_peer = {}
-
-r1_t_bgp4_AS65005_r6_peer = {}
-
-r1_t_bgp4_AS65000_r7_peer = {}
-
-r1_t_bgp4_AS65000_r8_peer = {}
-
-r1_t_bgp4_AS65000_r9_peer = {}
-
 r2_t_bgp4_AS65000_r1_peer = {}
 
 r3_t_bgp4_AS65000_r1_peer = {}
@@ -100,6 +100,24 @@ r8_t_bgp4_AS65000_r1_peer = {}
 r9_t_bgp4_AS65000_r1_peer = {}
 
 r10_t_bgp4_AS65000_r1_peer = {}
+
+r1_t_bgp6_AS65001_r2_peer = {}
+
+r1_t_bgp6_AS65000_r3_peer = {}
+
+r1_t_bgp6_AS65003_r4_peer = {}
+
+r1_t_bgp6_AS65004_r5_peer = {}
+
+r1_t_bgp6_AS65005_r6_peer = {}
+
+r1_t_bgp6_AS65000_r7_peer = {}
+
+r1_t_bgp6_AS65000_r8_peer = {}
+
+r1_t_bgp6_AS65000_r9_peer = {}
+
+r1_t_bgp6_AS65009_r10_peer = {}
 
 r1_t_bgp6_AS65100_e1_peer = {
     "fc00:101::/48": [
@@ -162,24 +180,6 @@ r1_t_bgp6_AS65100_e1_peer = {
         }
     ],
 }
-
-r1_t_bgp6_AS65009_r10_peer = {}
-
-r1_t_bgp6_AS65001_r2_peer = {}
-
-r1_t_bgp6_AS65000_r3_peer = {}
-
-r1_t_bgp6_AS65003_r4_peer = {}
-
-r1_t_bgp6_AS65004_r5_peer = {}
-
-r1_t_bgp6_AS65005_r6_peer = {}
-
-r1_t_bgp6_AS65000_r7_peer = {}
-
-r1_t_bgp6_AS65000_r8_peer = {}
-
-r1_t_bgp6_AS65000_r9_peer = {}
 
 r2_t_bgp6_AS65000_r1_peer = {}
 

@@ -27,13 +27,14 @@ from ...protocols.pipe import ProtocolPipe, ProtocolPipeFilterType
 class TableMaster(SectionBase):
     """BIRD master table configuration."""
 
-    _section = "Master Table"
-
     _master_attributes: MasterTableAttributes
 
     def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize the object."""
         super().__init__(birdconfig_globals)
+
+        # Set section header
+        self._section = "Master Table"
 
         self._master_attributes = MasterTableAttributes()
 

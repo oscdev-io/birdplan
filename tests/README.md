@@ -36,6 +36,10 @@
 
 [Redistribute Default](t30_ospf/t60_redistribute_default/README.md)
 
+[Interface Cost](t30_ospf/t70_interface_cost/README.md)
+
+[Interface ECMP Weight](t30_ospf/t72_interface_ecmp_weight/README.md)
+
 
 # BGP
 
@@ -64,6 +68,8 @@
 [Redistribute BGP](t40_bgp/t38_redistribute_bgp/README.md)
 
 [Prefix Limit](t40_bgp/t40_prefix_limit/README.md)
+
+[AS-SETs (IRR)](t40_bgp/t41_as_sets/README.md)
 
 [Peer Cost](t40_bgp/t42_peer_cost/README.md)
 

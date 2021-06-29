@@ -29,6 +29,8 @@ class PeerTypeConfig:
 
     r2_peer_type = "customer"
     r2_peer_config = """
+      prefix_limit4: 100
+      prefix_limit6: 100
       filter:
         origin_asns: [65000]
 """

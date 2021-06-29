@@ -42,18 +42,15 @@ BGPOriginatedRoutes = Dict[str, str]
 class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-methods
     """BIRD BGP protocol configuration."""
 
-    _section = "BGP Protocol"
-
     # BGP protocol attributes
     _bgp_attributes: BGPAttributes
     # BGP functions
     _bgp_functions: BGPFunctions
 
-    # List of our peers after configuration
+    # BGP peers
     _peers: BGPPeers
 
     # Internal config before configuration happens
-    _peers_config: BGPPeersConfig
     _originated_routes: BGPOriginatedRoutes
 
     def __init__(
@@ -62,9 +59,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         """Initialize the object."""
         super().__init__(birdconfig_globals, constants, functions, tables)
 
-        # BGP
+        # Set section name
+        self._section = "BGP Protocol"
+
+        # BGP peers
         self._peers = {}
-        self._peers_config = {}
+
         # Routes originated from BGP
         self._originated_routes = {}
 
@@ -76,6 +76,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     def configure(self) -> None:
         """Configure the BGP protocol."""
         super().configure()
+
+        # Blank the BGP peer state
+        if "bgp" not in self.birdconfig_globals.state:
+            self.birdconfig_globals.state["bgp"] = {}
+        self.birdconfig_globals.state["bgp"]["peers"] = {}
 
         self._configure_constants_bgp()
         self.functions.conf.append(self.bgp_functions, deferred=True)
@@ -133,20 +138,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             self.conf.add(bgp_direct_pipe)
 
         # Loop with BGP peers and configure them
-        for peer_name, peer_config in sorted(self.peers_config.items()):
-            peer = ProtocolBGPPeer(
-                self.birdconfig_globals,
-                self.constants,
-                self.functions,
-                self.tables,
-                self.bgp_attributes,
-                self.bgp_functions,
-                peer_name,
-                peer_config,
-            )
+        self.conf.add("")
+        for _, peer in self.peers.items():
             self.conf.add(peer)
-            # Add to our list of peer objects
-            self.peers[peer_name] = peer
 
     def add_originated_route(self, route: str) -> None:
         """Add originated route."""
@@ -155,11 +149,29 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
     def add_peer(self, peer_name: str, peer_config: BGPPeerConfig) -> None:
         """Add peer to BGP."""
-        if peer_name not in self.peers_config:
-            self.peers_config[peer_name] = peer_config
+
+        if peer_name in self.peers:
+            raise BirdPlanError(f"BGP peer '{peer_name}' already exists")
+
+        # Create BGP peer object
+        peer = ProtocolBGPPeer(
+            self.birdconfig_globals,
+            self.constants,
+            self.functions,
+            self.tables,
+            self.bgp_attributes,
+            self.bgp_functions,
+            peer_name,
+            peer_config,
+        )
+
+        # Add peer to our configured peer list
+        self.peers[peer_name] = peer
 
     def peer(self, name: str) -> ProtocolBGPPeer:
         """Return a BGP peer configuration object."""
+        if name not in self.peers:
+            raise BirdPlanError(f"Peer '{name}' not found")
         return self.peers[name]
 
     def constraints(self, peer_type: str) -> BGPPeertypeConstraints:
@@ -553,6 +565,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.bgp_attributes.graceful_shutdown = graceful_shutdown
 
     @property
+    def quarantine(self) -> bool:
+        """Global BGP peer quarantine state."""
+        return self.bgp_attributes.quarantine
+
+    @quarantine.setter
+    def quarantine(self, quarantine: bool) -> None:
+        """Global BGP peer quarantine state."""
+        self.bgp_attributes.quarantine = quarantine
+
+    @property
     def rr_cluster_id(self) -> Optional[str]:
         """Return route reflector cluster ID."""
         return self.bgp_attributes.rr_cluster_id
@@ -574,13 +596,8 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
     @property
     def peers(self) -> BGPPeers:
-        """Return BGP peers."""
+        """BGP peers."""
         return self._peers
-
-    @property
-    def peers_config(self) -> BGPPeersConfig:
-        """Return BGP peers configuration."""
-        return self._peers_config
 
     @property
     def originated_routes(self) -> BGPOriginatedRoutes:

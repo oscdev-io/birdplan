@@ -69,6 +69,10 @@ Under the area ID is `interfaces`, which is a dictionary of interface matches, c
 
 Supported interface options are listed below...
 
+* `cost` - Set OSPF cost for this interface.
+
+* `ecmp_weight` - Set ECMP weight for this interface.
+
 * `hello` - Interval in seconds between sending of Hello messages, all routers on the same network must have the same value.
 
 * `stub` - When set to `True` will not communicate OSPF over this interface, but will add it to the automatically generated interface

@@ -29,3 +29,7 @@ class PeerTypeConfig:
 
     r1_peer_asn = 4200000000
     r1_peer_type = "peer"
+    r1_peer_config = """
+      prefix_limit4: 100
+      prefix_limit6: 100
+"""

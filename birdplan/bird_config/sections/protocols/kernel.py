@@ -24,11 +24,12 @@ from .base import SectionProtocolBase
 class ProtocolKernel(SectionProtocolBase):
     """BIRD kernel protocol configuration."""
 
-    _section = "Kernel Protocol"
-
     def configure(self) -> None:
         """Configure the kernel protocol."""
         super().configure()
+
+        # Set section header
+        self._section = "Kernel Protocol"
 
         # Configure the kernel protocol
         self._configure_protocol_kernel("4")

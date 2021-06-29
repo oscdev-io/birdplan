@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2020, AllWorldIT
+# Copyright (c) 2019-2021, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,13 +18,15 @@
 
 """Entry point into Birdplan from the commandline."""
 
-from typing import Any, List, Optional
+from typing import Any, List, NoReturn, Optional
 import argparse
+import json
 import logging
 import logging.handlers
 import sys
-from birdplan import __VERSION__, BirdPlan
-from birdplan.exceptions import BirdPlanError
+from . import __VERSION__, BirdPlan
+from .exceptions import BirdPlanError, BirdPlanErrorUsage
+from .plugin import PluginCollection
 
 
 # Defaults
@@ -33,18 +35,34 @@ BIRD_CONFIG_FILE = "/etc/bird.conf"
 BIRDPLAN_STATE_FILE = "/var/lib/birdplan/birdplan.state"
 
 
+class BirdPlanArgumentParser(argparse.ArgumentParser):
+    """ArgumentParser override class to output errors slightly better."""
+
+    def error(self, message: str) -> NoReturn:
+        """
+        Slightly better error message handler for ArgumentParser.
+
+        Argument
+        --------
+        message : str
+            Error message.
+
+        """
+        raise BirdPlanErrorUsage(message, self)
+
+
 class BirdPlanCommandLine:
     """BirdPlan commandline handling class."""
 
     _args: argparse.Namespace
-    _argparser: argparse.ArgumentParser
+    _argparser: BirdPlanArgumentParser
     _birdplan: BirdPlan
 
     def __init__(self, test_mode: bool = False) -> None:
         """Instantiate object."""
 
         self._args = argparse.Namespace()
-        self._argparser = argparse.ArgumentParser(add_help=False)
+        self._argparser = BirdPlanArgumentParser(add_help=False)
         self._birdplan = BirdPlan(test_mode=test_mode)
 
     def run(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
@@ -52,423 +70,11 @@ class BirdPlanCommandLine:
     ) -> Any:
         """Run BirdPlan from command line."""
 
-        # Add main commandline arguments
-        self._add_main_arguments()
-
-        # Add subparsers
-        subparsers = self.argparser.add_subparsers()
-
-        # CMD: configure
-        parser_configure = subparsers.add_parser("configure", help="Create BIRD configuration")
-        parser_configure.add_argument(
-            "--action",
-            action="store_const",
-            const="configure",
-            default="configure",
-            help=argparse.SUPPRESS,
-        )
-        self._add_configure_arguments(parser_configure)
-
-        # CMD: bgp
-        parser_bgp = subparsers.add_parser("bgp", help="BGP commands")
-        parser_bgp.add_argument(
-            "--action",
-            action="store_const",
-            const="bgp",
-            default="bgp",
-            help=argparse.SUPPRESS,
-        )
-        bgp_subparsers = parser_bgp.add_subparsers()
-
-        # CMD: bgp graceful_shutdown
-        parser_bgp_graceful_shutdown = bgp_subparsers.add_parser("graceful_shutdown", help="BGP graceful shutdown commands")
-        parser_bgp_graceful_shutdown.add_argument(
-            "--action",
-            action="store_const",
-            const="bgp_graceful_shutdown",
-            default="bgp_graceful_shutdown",
-            help=argparse.SUPPRESS,
-        )
-        bgp_graceful_shutdown_subparsers = parser_bgp_graceful_shutdown.add_subparsers()
-
-        # CMD: bgp graceful_shutdown add
-        parser_bgp_graceful_shutdown_add = bgp_graceful_shutdown_subparsers.add_parser(
-            "add", help="Add peer(s) to BGP graceful shutdown list"
-        )
-        parser_bgp_graceful_shutdown_add.add_argument(
-            "--action",
-            action="store_const",
-            const="bgp_graceful_shutdown_add",
-            default="bgp_graceful_shutdown_add",
-            help=argparse.SUPPRESS,
-        )
-        self._add_bgp_graceful_shutdown_peers_argument(parser_bgp_graceful_shutdown_add)
-
-        # CMD: bgp graceful_shutdown remove
-        parser_bgp_graceful_shutdown_remove = bgp_graceful_shutdown_subparsers.add_parser(
-            "remove", help="Remove peer(s) from BGP graceful shutdown list"
-        )
-        parser_bgp_graceful_shutdown_remove.add_argument(
-            "--action",
-            action="store_const",
-            const="bgp_graceful_shutdown_remove",
-            default="bgp_graceful_shutdown_remove",
-            help=argparse.SUPPRESS,
-        )
-        self._add_bgp_graceful_shutdown_peers_argument(parser_bgp_graceful_shutdown_remove)
-
-        # CMD: bgp graceful_shutdown list
-        parser_bgp_graceful_shutdown_list = bgp_graceful_shutdown_subparsers.add_parser(
-            "list", help="List BGP graceful shutdown peers"
-        )
-        parser_bgp_graceful_shutdown_list.add_argument(
-            "--action",
-            action="store_const",
-            const="bgp_graceful_shutdown_list",
-            default="bgp_graceful_shutdown_list",
-            help=argparse.SUPPRESS,
-        )
-
-        # CMD: bgp quarantine
-        parser_bgp_quarantine = bgp_subparsers.add_parser("quarantine", help="BGP quarantine commands")
-        parser_bgp_quarantine.add_argument(
-            "--action",
-            action="store_const",
-            const="bgp_quarantine",
-            default="bgp_quarantine",
-            help=argparse.SUPPRESS,
-        )
-        bgp_quarantine_subparsers = parser_bgp_quarantine.add_subparsers()
-
-        # CMD: bgp quarantine add
-        parser_bgp_quarantine_add = bgp_quarantine_subparsers.add_parser("add", help="Add peer(s) to BGP quarantine list")
-        parser_bgp_quarantine_add.add_argument(
-            "--action",
-            action="store_const",
-            const="bgp_quarantine_add",
-            default="bgp_quarantine_add",
-            help=argparse.SUPPRESS,
-        )
-        self._add_bgp_quarantine_peers_argument(parser_bgp_quarantine_add)
-
-        # CMD: bgp quarantine remove
-        parser_bgp_quarantine_remove = bgp_quarantine_subparsers.add_parser(
-            "remove", help="Remove peer(s) from BGP quarantine list"
-        )
-        parser_bgp_quarantine_remove.add_argument(
-            "--action",
-            action="store_const",
-            const="bgp_quarantine_remove",
-            default="bgp_quarantine_remove",
-            help=argparse.SUPPRESS,
-        )
-        self._add_bgp_quarantine_peers_argument(parser_bgp_quarantine_remove)
-
-        # CMD: bgp quarantine list
-        parser_bgp_quarantine_list = bgp_quarantine_subparsers.add_parser("list", help="List BGP qurantined peers")
-        parser_bgp_quarantine_list.add_argument(
-            "--action",
-            action="store_const",
-            const="bgp_quarantine_list",
-            default="bgp_quarantine_list",
-            help=argparse.SUPPRESS,
-        )
-
-        # Parse args
-        self._args = self.argparser.parse_args(raw_args)
-
-        # Setup logging
-        if __name__ == "__main__":
-            self._setup_logging()
-
-        # Make sure we have an action
-        if "action" not in self.args:
-            if __name__ == "__main__":
-                print("ERROR: No action specified!", file=sys.stderr)
-                self.argparser.print_help(file=sys.stderr)
-                sys.exit(1)
-            else:
-                raise BirdPlanError("No action specified")
-
-        if self.args.action == "configure":
-            return self.configure()
-
-        if self.args.action == "bgp":
-            if __name__ == "__main__":
-                parser_bgp.print_help(file=sys.stderr)
-                sys.exit(1)
-            else:
-                raise BirdPlanError("No options specified to 'bgp' action")
-
-        # Graceful shutdown
-        elif self.args.action == "bgp_graceful_shutdown":
-            if __name__ == "__main__":
-                parser_bgp_graceful_shutdown.print_help(file=sys.stderr)
-                sys.exit(1)
-            else:
-                raise BirdPlanError("No options specified to 'bgp graceful_shutdown' action")
-        elif self.args.action == "bgp_graceful_shutdown_add":
-            self.bgp_graceful_shutdown_add(parser_bgp_graceful_shutdown_add)
-        elif self.args.action == "bgp_graceful_shutdown_remove":
-            self.bgp_graceful_shutdown_remove(parser_bgp_graceful_shutdown_remove)
-        elif self.args.action == "bgp_graceful_shutdown_list":
-            return self.bgp_graceful_shutdown_list()
-
-        # Quarantine
-        elif self.args.action == "bgp_quarantine":
-            if __name__ == "__main__":
-                parser_bgp_quarantine.print_help(file=sys.stderr)
-                sys.exit(1)
-            else:
-                raise BirdPlanError("No options specified to 'bgp quarantine' action")
-        elif self.args.action == "bgp_quarantine_add":
-            self.bgp_quarantine_add(parser_bgp_quarantine_add)
-        elif self.args.action == "bgp_quarantine_remove":
-            self.bgp_quarantine_remove(parser_bgp_quarantine_remove)
-        elif self.args.action == "bgp_quarantine_list":
-            return self.bgp_quarantine_list()
-
-        return None
-
-    def configure(self) -> bool:
-        """Configure BIRD."""
-        # Load BirdPlan configuration
-        self._birdplan_load_config()
-        # Generate BIRD configuration
-        self._birdplan_configure()
-        # Commit BirdPlan state
-        self._birdplan_commit_state()
-
-        return True
-
-    def bgp_graceful_shutdown_list(self) -> List[str]:
-        """Gracefully shutdown peers."""
-
-        # Load BirdPlan configuration
-        self._birdplan_load_config()
-
-        # Grab peer list
-        peer_list = self.birdplan.bgp_graceful_shutdown_peer_list()
-
-        if __name__ == "__main__":
-            print("Peers in graceful shutdown:")
-            for peer in peer_list:
-                print(f"  {peer}")
-            if not peer_list:
-                print("--none--")
-            print(f"Total: {len(peer_list)}")
-
-        return peer_list
-
-    def bgp_graceful_shutdown_add(self, arg_group: argparse.ArgumentParser) -> None:
-        """Add peer(s) to the BirdPlan BGP graceful shutdown list."""
-
-        # Make sure we have peers specified
-        if not self.args.peers:
-            if __name__ == "__main__":
-                print("ERROR: No BGP peer(s) specified to add for graceful shutdown", file=sys.stderr)
-                arg_group.print_help(file=sys.stderr)
-                sys.exit(1)
-            else:
-                raise BirdPlanError("No BGP peer(s) specified to add for graceful shutdown")
-
-        # Load BirdPlan configuration
-        self._birdplan_load_config()
-
-        peer_list = self.birdplan.bgp_graceful_shutdown_peer_list()
-        for peer in self.args.peers:
-            # Check if the peer is in the list
-            if peer in peer_list:
-                print(f"NOTICE: BGP peer '{peer}' already added to graceful shutdown list", file=sys.stderr)
-                continue
-            # Try add peer
-            if __name__ == "__main__":
-                try:
-                    self.birdplan.bgp_graceful_shutdown_add_peer(peer)
-                except BirdPlanError as err:
-                    print(f"ERROR: {err}")
-                    sys.exit(1)
-            else:
-                self.birdplan.bgp_graceful_shutdown_add_peer(peer)
-            print(f"BGP peer '{peer}' added to graceful shutdown list")
-
-        # Commit BirdPlan our state
-        self._birdplan_commit_state()
-
-    def bgp_graceful_shutdown_remove(self, arg_group: argparse.ArgumentParser) -> None:
-        """Remove peer(s) from the BirdPlan BGP graceful shutdown list."""
-
-        # Make sure we have peers specified
-        if not self.args.peers:
-            if __name__ == "__main__":
-                print("ERROR: No BGP peer(s) specified to add", file=sys.stderr)
-                arg_group.print_help(file=sys.stderr)
-                sys.exit(1)
-            else:
-                raise BirdPlanError("No BGP peer(s) specified to add")
-
-        # Load BirdPlan configuration
-        self._birdplan_load_config()
-
-        peer_list = self.birdplan.bgp_graceful_shutdown_peer_list()
-        for peer in self.args.peers:
-            # Check if the peer is not in the list
-            if peer not in peer_list:
-                print(f"NOTICE: BGP peer '{peer}' not in graceful shutdown list", file=sys.stderr)
-                continue
-            # Try add peer
-            if __name__ == "__main__":
-                try:
-                    self.birdplan.bgp_graceful_shutdown_remove_peer(peer)
-                except BirdPlanError as err:
-                    print(f"ERROR: {err}", file=sys.stderr)
-                    sys.exit(1)
-            else:
-                self.birdplan.bgp_graceful_shutdown_remove_peer(peer)
-            print(f"BGP peer '{peer}' removed from graceful shutdown list")
-
-        # Commit BirdPlan our state
-        self._birdplan_commit_state()
-
-    def bgp_quarantine_list(self) -> List[str]:
-        """Gracefully shutdown peers."""
-
-        # Load BirdPlan configuration
-        self._birdplan_load_config()
-
-        # Grab peer list
-        peer_list = self.birdplan.bgp_quarantine_peer_list()
-
-        if __name__ == "__main__":
-            print("BGP peers in quarantine:")
-            for peer in peer_list:
-                print(f"  {peer}")
-            if not peer_list:
-                print("--none--")
-            print(f"Total: {len(peer_list)}")
-
-        return peer_list
-
-    def bgp_quarantine_add(self, arg_group: argparse.ArgumentParser) -> None:
-        """Add peer(s) to the BirdPlan BGP quarantine list."""
-
-        # Make sure we have peers specified
-        if not self.args.peers:
-            if __name__ == "__main__":
-                print("ERROR: No BGP peer(s) specified to add to quarantine", file=sys.stderr)
-                arg_group.print_help(file=sys.stderr)
-                sys.exit(1)
-            else:
-                raise BirdPlanError("No BGP peer(s) specified to add to quarantine")
-
-        # Load BirdPlan configuration
-        self._birdplan_load_config()
-
-        peer_list = self.birdplan.bgp_quarantine_peer_list()
-        for peer in self.args.peers:
-            # Check if the peer is in the list
-            if peer in peer_list:
-                print(f"NOTICE: BGP peer '{peer}' already added to qurantine list", file=sys.stderr)
-                continue
-            # Try add peer
-            if __name__ == "__main__":
-                try:
-                    self.birdplan.bgp_quarantine_add_peer(peer)
-                except BirdPlanError as err:
-                    print(f"ERROR: {err}", file=sys.stderr)
-                    sys.exit(1)
-            else:
-                self.birdplan.bgp_quarantine_add_peer(peer)
-            print(f"BGP peer '{peer}' added to quarantine list")
-
-        # Commit BirdPlan our state
-        self._birdplan_commit_state()
-
-    def bgp_quarantine_remove(self, arg_group: argparse.ArgumentParser) -> None:
-        """Remove peer(s) from the BirdPlan BGP quarantine list."""
-
-        # Make sure we have peers specified
-        if not self.args.peers:
-            if __name__ == "__main__":
-                print("ERROR: No BGP peer(s) specified to remove from quarantine", file=sys.stderr)
-                arg_group.print_help(file=sys.stderr)
-                sys.exit(1)
-            else:
-                raise BirdPlanError("No BGP peer(s) specified to remove from quarantine")
-
-        # Load BirdPlan configuration
-        self._birdplan_load_config()
-
-        peer_list = self.birdplan.bgp_quarantine_peer_list()
-        for peer in self.args.peers:
-            # Check if the peer is not in the list
-            if peer not in peer_list:
-                print(f"NOTICE: BGP peer '{peer}' not in quarantine list", file=sys.stderr)
-                continue
-            # Try add peer
-            if __name__ == "__main__":
-                try:
-                    self.birdplan.bgp_quarantine_remove_peer(peer)
-                except BirdPlanError as err:
-                    print(f"ERROR: {err}", file=sys.stderr)
-                    sys.exit(1)
-            else:
-                self.birdplan.bgp_quarantine_remove_peer(peer)
-            print(f"BGP peer '{peer}' removed from quarantine list")
-
-        # Commit BirdPlan our state
-        self._birdplan_commit_state()
-
-    def _birdplan_load_config(self) -> None:
-        """Load BirdPlan configuration."""
-        # Try load configuration
-        if __name__ == "__main__":
-            try:
-                self.birdplan.load(plan_file=self.args.birdplan_file[0], state_file=self.args.birdplan_state_file[0])
-            except BirdPlanError as err:
-                print(f"ERROR: Failed to load BirdPlan configuration: {err}", file=sys.stderr)
-                sys.exit(1)
-        else:
-            self.birdplan.load(plan_file=self.args.birdplan_file[0], state_file=self.args.birdplan_state_file[0])
-
-    def _birdplan_configure(self) -> None:
-        """Configure BirdPlan."""
-        # Try load configuration
-        if __name__ == "__main__":
-            try:
-                self.birdplan.configure(self.args.bird_config_file[0])
-            except BirdPlanError as err:
-                print(f"ERROR: Failed to generate BirdPlan configuration: {err}", file=sys.stderr)
-                sys.exit(1)
-        else:
-            self.birdplan.configure(self.args.bird_config_file[0])
-
-    def _birdplan_commit_state(self) -> None:
-        """Commit BirdPlan state."""
-
-        # Try commit our state if we were called from the commandline
-        if __name__ == "__main__":
-            # If we didn't get a state file specified, then just display a notice we're not going to write it out
-            if not self.args.birdplan_state_file[0]:
-                print("NOTICE: State file not written!", file=sys.stderr)
-                return
-            # Try commit state
-            try:
-                self.birdplan.commit_state()
-            except BirdPlanError as err:
-                print(f"ERROR: Failed to commit BirdPlan state: {err}")
-                sys.exit(1)
-        else:
-            self.birdplan.commit_state()
-
-    def _add_configure_arguments(self, arg_group: argparse.ArgumentParser) -> None:
-        """Add configure arguments."""
-
-    def _add_main_arguments(self) -> None:
-        """Add main commandline arguments."""
-
-        if __name__ == "__main__":
+        # Don't output copyright when we output in JSON format
+        if self.is_console and not self.is_json:
             print(f"BirdPlan v{__VERSION__} - Copyright © 2019-2021, AllWorldIT.\n", file=sys.stderr)
+
+        # Add main commandline arguments
 
         optional_group = self.argparser.add_argument_group("Optional arguments")
         optional_group.add_argument("-h", "--help", action="help", help="Show this help message and exit")
@@ -484,14 +90,6 @@ class BirdPlanCommandLine:
             help=f"BirdPlan file to process (default: {BIRDPLAN_FILE})",
         )
         optional_group.add_argument(
-            "-o",
-            "--bird-config-file",
-            nargs=1,
-            metavar="BIRD_CONFIG_FILE",
-            default=[BIRD_CONFIG_FILE],
-            help=f"BIRD config file, using '-' will output to stdout (default: {BIRD_CONFIG_FILE})",
-        )
-        optional_group.add_argument(
             "-s",
             "--birdplan-state-file",
             nargs=1,
@@ -499,24 +97,97 @@ class BirdPlanCommandLine:
             default=[None],
             help=f"BirdPlan state file to use (default: {BIRDPLAN_STATE_FILE})",
         )
-
-    def _add_bgp_graceful_shutdown_peers_argument(self, arg_group: argparse.ArgumentParser) -> None:  # pylint: disable=no-self-use
-        """Add BGP graceful shutdown arguments for a command that takes peers."""
-        arg_group.add_argument(
-            "peers",
-            nargs="+",
-            metavar="PEER",
-            help="Peer name (* = all)",
+        optional_group.add_argument(
+            "-n",
+            "--no-write-state",
+            action="store_true",
+            default=False,
+            help="Disable writing state file",
+        )
+        optional_group.add_argument(
+            "-j",
+            "--json",
+            action="store_true",
+            default=False,
+            help="Output in JSON",
         )
 
-    def _add_bgp_quarantine_peers_argument(self, arg_group: argparse.ArgumentParser) -> None:  # pylint: disable=no-self-use
-        """Add BGP qurantine arguments for a command that takes peers."""
-        arg_group.add_argument(
-            "peers",
-            nargs="+",
-            metavar="PEER",
-            help="Peer name",
+        # Add subparsers
+        subparsers = self.argparser.add_subparsers()
+
+        # configure
+        plugins = PluginCollection(["birdplan.plugins.cmdline"])
+
+        # Register commandline parsers
+        plugins.call_if_exists("register_parsers", {"root_parser": subparsers, "plugins": plugins})
+
+        # Parse commandline args
+        self._args = self.argparser.parse_args(raw_args)
+
+        # Setup logging
+        if __name__ == "__main__":
+            self._setup_logging()
+
+        # Make sure we have an action
+        if "action" not in self.args:
+            raise BirdPlanErrorUsage("No action specified", self.argparser)
+
+        # Generate the command line option method name
+        method_name = f"cmd_{self.args.action}"
+
+        # Grab the first plugin which has this method
+        plugin_name = plugins.get_first(method_name)
+        if not plugin_name:
+            raise BirdPlanError("Failed to find plugin to handle command line options")
+
+        # Grab the result from the command
+        result = plugins.call_plugin(plugin_name, method_name, {"cmdline": self})
+
+        # Check if we should output JSON
+        if self.is_console:
+            if self.is_json:
+                plugins.call_plugin(plugin_name, "show_output_json", result)
+            # If not, we need to output text
+            else:
+                plugins.call_plugin(plugin_name, "show_output_text", result)
+
+        return result
+
+    def birdplan_load_config(self, **kwargs: Any) -> None:
+        """
+        Load BirdPlan configuration.
+
+        Parameters
+        ----------
+        ignore_irr_changes : bool
+            Optional parameter to ignore IRR lookups during configuration load.
+
+        ignore_peeringdb_changes : bool
+            Optional parameter to ignore peering DB lookups during configuraiton load.
+
+        use_cached : bool
+            Optional parameter to use cached values from state during configuration load.
+
+        """
+
+        # Try load configuration
+        self.birdplan.load(
+            plan_file=self.args.birdplan_file[0],
+            state_file=self.args.birdplan_state_file[0],
+            **kwargs,
         )
+
+    def birdplan_commit_state(self) -> None:
+        """Commit BirdPlan state."""
+
+        # If we didn't get a state file specified, then just display a notice we're not going to write it out
+        if not self.args.birdplan_state_file[0]:
+            return
+        # Check if we need to skip writing the state
+        if self.args.no_write_state:
+            return
+
+        self.birdplan.commit_state()
 
     def _setup_logging(self) -> None:
         """Set up logging."""
@@ -548,6 +219,33 @@ class BirdPlanCommandLine:
         """Return our BirdPlan instance."""
         return self._birdplan
 
+    @property
+    def is_console(self) -> bool:
+        """
+        Property indicating True or False if we're being called from the commandline.
+
+        Returns
+        -------
+        bool indicating if we were called from the commandline.
+
+        """
+        return __name__ == "__main__"
+
+    @property
+    def is_json(self) -> bool:
+        """
+        Property indicating that we should output in JSON on the commandline.
+
+        Returns
+        -------
+        bool : indicating if we should output in JSON from the commandline.
+
+        """
+
+        if ("--json" in sys.argv) or ("-j" in sys.argv):
+            return True
+        return False
+
 
 if __name__ == "__main__":
     birdplan_cmdline = BirdPlanCommandLine()
@@ -555,4 +253,15 @@ if __name__ == "__main__":
     try:
         birdplan_cmdline.run()
     except BirdPlanError as exception:
-        print(f"ERROR: {exception}", file=sys.stderr)
+        if birdplan_cmdline.is_json:
+            print(json.dumps({"status": "error", "message": str(exception)}))
+        else:
+            print(f"ERROR: {exception}", file=sys.stderr)
+            sys.exit(1)
+
+    except BirdPlanErrorUsage as exception:
+        if birdplan_cmdline.is_json:
+            print(json.dumps({"status": "error", "message": exception.message}))
+        else:
+            print(f"ERROR: {exception}", file=sys.stderr)
+            sys.exit(2)

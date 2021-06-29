@@ -265,6 +265,22 @@ class BirdPlanBaseTestCase:
     def _get_bird_table_data(self, expected_module, router: str, table_name: str, sim) -> Tuple[Any, Any]:
         """Get the bird table received data and expected data."""
 
+        def nexthop_count(table: Dict[str, Any]) -> Optional[int]:
+            """Count nexthops in a table."""
+            count = 0
+            # Loop with prefixes
+            for prefixes in table.values():
+                # Loop with each route per prefix
+                for route in prefixes:
+                    # Add nexthop count
+                    if "nexthops" in route:
+                        count += len(route["nexthops"])
+                    # Or 1 if there are no nexthops
+                    else:
+                        count += 1
+            # Return None if we don't have a count
+            return count if count else None
+
         # Work out variable names
         table_variable_name = f"{router}_{table_name}"
         expect_content_variable_name = f"{table_variable_name}_expect_content"
@@ -281,7 +297,7 @@ class BirdPlanBaseTestCase:
         # setting it to None
         expect_count = None
         if isinstance(expected_data, dict):
-            expect_count = sum(len(v) for v in expected_data.values()) or None
+            expect_count = nexthop_count(expected_data)
 
         # Save the start time
         time_start = time.time()
@@ -293,7 +309,8 @@ class BirdPlanBaseTestCase:
 
             # Grab the routers table from BIRD
             result = self._bird_route_table(sim, router, table_name)
-            result_len = sum(len(v) for v in result.values())
+            # Change None back into 0
+            result_len = nexthop_count(result) or 0
 
             count_matches = False
             content_matches = False
@@ -304,8 +321,8 @@ class BirdPlanBaseTestCase:
             # If expect_count is 0, we need to wait until its 0
             elif expect_count == 0 and result_len == expect_count:
                 count_matches = True
-            # If we are expecting a count, check to see if we have at least the number we need
-            elif result_len >= expect_count > 0:
+            # If we are expecting a count, check to see if we have have it
+            elif result_len == expect_count:
                 count_matches = True
 
             # If we don't have a content match, we match
@@ -451,8 +468,15 @@ class BirdPlanBaseTestCase:
         configured_routers = []
         for router in self.routers:
             # If we get a positive result, add the router to the list of configured routers
-            if self._birdplan_run(sim, tmpdir, router, ["configure"]):
-                configured_routers.append(router)
+            bird_config = self._birdplan_run(sim, tmpdir, router, ["configure"])
+            # If we have None it is expected
+            if bird_config is None:
+                continue
+            # If its however blank, raise exception
+            if not bird_config:
+                raise RuntimeError(f"BirdPlan failed to configure router '{router}'")
+            # Add router to list of configured routers
+            configured_routers.append(router)
 
         return configured_routers
 
@@ -616,6 +640,9 @@ class BirdPlanBaseTestCase:
         with open(birdplan_file, "w") as file:
             file.write(raw_config)
 
+        # Add YAML file early incase we need to check it when configuration fails
+        sim.add_conffile(f"birdplan.yaml.{router}", birdplan_file)
+
         # Invoke by simulating the commandline...
         birdplan_cmdline = BirdPlanCommandLine(test_mode=True)
         # Disable logging for filelog
@@ -625,12 +652,14 @@ class BirdPlanBaseTestCase:
         cmdline_args = [
             "--birdplan-file",
             birdplan_file,
-            "--bird-config-file",
-            bird_conffile,
             "--birdplan-state-file",
             bird_statefile,
             *args,
         ]
+
+        # If this is the configure command, we need to output the configuration file
+        if args[0] == "configure":
+            cmdline_args.extend(["--output-file", bird_conffile])
 
         # Check if we should get an exception or not
         if router in self.routers_config_exception:
@@ -644,12 +673,11 @@ class BirdPlanBaseTestCase:
         result = birdplan_cmdline.run(cmdline_args)
 
         # Add test report sections
-        sim.add_conffile(f"birdplan.yaml.{router}", birdplan_file)
-        sim.add_conffile(f"bird.conf.{router}", bird_conffile)
         sim.add_logfile(f"bird.log.{router}", bird_logfile)
 
         # Add the birdplan configuration object to the simulation
         if args[0] == "configure":
+            sim.add_conffile(f"bird.conf.{router}", bird_conffile)
             sim.add_config(router, birdplan_cmdline.birdplan)
 
         return result

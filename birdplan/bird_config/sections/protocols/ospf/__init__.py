@@ -18,9 +18,10 @@
 
 """BIRD OSPF protocol configuration."""
 
-from typing import Any, Dict, List
+from typing import Dict, List
 from .ospf_attributes import OSPFAttributes, OSPFRoutePolicyAccept, OSPFRoutePolicyRedistribute
 from .ospf_functions import OSPFFunctions
+from .area import ProtocolOSPFArea
 from ..direct import ProtocolDirect
 from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from ..base import SectionProtocolBase
@@ -31,19 +32,13 @@ from ....globals import BirdConfigGlobals
 from .....exceptions import BirdPlanError
 
 OSPFAreaConfig = Dict[str, str]
-OSPFAreas = Dict[str, OSPFAreaConfig]
-
-OSPFInterfaceConfig = Dict[str, Any]
-OSPFInterfaces = Dict[str, OSPFInterfaceConfig]
+OSPFAreas = Dict[str, ProtocolOSPFArea]
 
 
 class ProtocolOSPF(SectionProtocolBase):
     """BIRD OSPF protocol configuration."""
 
-    _section = "OSPF Protocol"
-
     _areas: OSPFAreas
-    _interfaces: OSPFInterfaces
 
     _ospf_attributes: OSPFAttributes
     # OSPF functions
@@ -55,9 +50,11 @@ class ProtocolOSPF(SectionProtocolBase):
         """Initialize the object."""
         super().__init__(birdconfig_globals, constants, functions, tables)
 
-        # Areas and interfaces
+        # Set section name
+        self._section = "OSPF Protocol"
+
+        # OSPF areas
         self._areas = {}
-        self._interfaces = {}
 
         self._ospf_attributes = OSPFAttributes()
         # Setup OSPF functions
@@ -124,60 +121,28 @@ class ProtocolOSPF(SectionProtocolBase):
             )
             self.conf.add(ospf_direct_pipe)
 
-    def add_area(self, area_name: str, area_config: OSPFAreaConfig) -> None:
+    def add_area(self, area_name: str, area_config: OSPFAreaConfig) -> ProtocolOSPFArea:
         """Add area to OSPF."""
-        # Make sure the area exists
-        if area_name not in self.areas:
-            self._areas[area_name] = area_config
 
-    def add_interface(self, area_name: str, interface_name: str, interface_config: OSPFInterfaceConfig) -> None:
-        """Add interface to OSPF."""
-        # Make sure the area exists
-        if area_name not in self.interfaces:
-            self._interfaces[area_name] = {}
-        # Make sure the interface exists
-        if interface_name not in self.interfaces[area_name]:
-            self._interfaces[area_name][interface_name] = []
-        # Grab the config so its easier to work with below
-        config = self.interfaces[area_name][interface_name]
-        # Work through supported configuration
-        for key, value in interface_config.items():
-            if key in ("hello", "wait"):
-                config.append({key: value})
-            elif key == "stub":
-                if not value:
-                    BirdPlanError(f"The OSPF default config for interface '{interface_name}' item 'stub' is 'false'")
-                config.append({key: value})
-            else:
-                raise BirdPlanError(f"The OSPF config for interface '{interface_name}' item '{key}' hasnt been added to Salt yet")
+        # Make sure area doesn't exist
+        if area_name in self.areas:
+            raise BirdPlanError(f"OSPF area '{area_name}' already exists")
 
-    def _area_config(self) -> List[str]:
-        """Generate area configuration."""
+        # Create OSPF area object
+        area = ProtocolOSPFArea(
+            self.birdconfig_globals,
+            self.constants,
+            self.functions,
+            self.tables,
+            self.ospf_attributes,
+            area_name,
+            area_config,
+        )
 
-        area_lines = []
-        for area_name in self.interfaces:
-            area_lines.append(f"  area {area_name} {{")
-            # Loop with area config items
-            # NK: NOT USED ATM
-            #            for key, value in self.areas[area_name].items():
-            #                area_lines.append(f"    {key} {value};")
-            # Loop with interfaces
-            for interface_name in sorted(self.interfaces[area_name].keys()):
-                interface = self.interfaces[area_name][interface_name]
-                area_lines.append(f'    interface "{interface_name}" {{')
-                # Loop with config items
-                for config_item in interface:
-                    # Loop with key-value pairs
-                    for key, value in config_item.items():
-                        if (key == "stub") and value:
-                            area_lines.append(f"      {key};")
-                        else:
-                            area_lines.append(f"      {key} {value};")
-                area_lines.append("    };")
-            # End off area
-            area_lines.append("  };")
+        # Add area to OSPF
+        self.areas[area.name] = area  # Use the sanitized area name from the area object
 
-        return area_lines
+        return area
 
     def _setup_protocol(self, ipv: str) -> None:
         self.conf.add(f"protocol ospf v3 ospf{ipv} {{")
@@ -191,7 +156,10 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("")
         self.conf.add("  };")
         self.conf.add("")
-        self.conf.add(self._area_config())
+        # Add areas
+        for _, area in sorted(self.areas.items()):
+            self.conf.add(area)
+        # Close off block
         self.conf.add("};")
         self.conf.add("")
 
@@ -309,15 +277,16 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add("};")
         self.conf.add("")
 
+    def area(self, name: str) -> ProtocolOSPFArea:
+        """Return a OSPF area configuration object."""
+        if name not in self.areas:
+            raise BirdPlanError(f"Area '{name}' not found")
+        return self.areas[name]
+
     @property
     def areas(self) -> OSPFAreas:
         """Return OSPF areas."""
         return self._areas
-
-    @property
-    def interfaces(self) -> OSPFInterfaces:
-        """Return OSPF interfaces."""
-        return self._interfaces
 
     @property
     def ospf_attributes(self) -> OSPFAttributes:

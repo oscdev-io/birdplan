@@ -31,6 +31,11 @@ from .exceptions import BirdPlanError
 
 __VERSION__ = "0.0.1"
 
+# Some types we need
+BirdPlanBGPPeerGracefulShutdownStatus = Dict[str, Dict[str, bool]]
+BirdPlanBGPPeerQuarantineStatus = Dict[str, Dict[str, bool]]
+BirdPlanOSPFInterfaceStatus = Dict[str, Dict[str, Dict[str, Any]]]
+
 
 class BirdPlan:
     """Main BirdPlan class."""
@@ -46,7 +51,7 @@ class BirdPlan:
         self._config = {}
         self._state_file = None
 
-    def load(self, plan_file: str, state_file: Optional[str] = None) -> None:
+    def load(self, **kwargs: Any) -> None:  # noqa: C901
         """
         Initialize object.
 
@@ -54,10 +59,31 @@ class BirdPlan:
         ----------
         plan_file : str
             Source plan file to generate configuration from.
+
         state_file : Optional[str]
-            Optional state file, used for commands like BGP graceful shutdown
+            Optional state file, used for commands like BGP graceful shutdown.
+
+        ignore_irr_changes : bool
+            Optional parameter to ignore IRR lookups during configuration load.
+
+        ignore_peeringdb_changes : bool
+            Optional parameter to ignore peering DB lookups during configuraiton load.
+
+        use_cached : bool
+            Optional parameter to use cached values from state during configuration load.
 
         """
+
+        # Grab parameters
+        plan_file: Optional[str] = kwargs.get("plan_file")
+        state_file: Optional[str] = kwargs.get("state_file")
+        ignore_irr_changes: bool = kwargs.get("ignore_irr_changes", False)
+        ignore_peeringdb_changes: bool = kwargs.get("ignore_peeringdb_changes", False)
+        use_cached: bool = kwargs.get("use_cached", False)
+
+        # Make sure we have the parameters we need
+        if not plan_file:
+            raise BirdPlanError("Required parameter 'plan_file' not found")
 
         # Create search paths for Jinja2
         search_paths = [os.path.dirname(plan_file)]
@@ -100,19 +126,8 @@ class BirdPlan:
                 try:
                     self.state = yaml.safe_load(raw_state)
                 except ImportError as err:  # pragma: no cover
+                    # We use the state_file here because the size of raw_state may be larger than 100MiB
                     raise BirdPlanError(f" Failed to load BirdPlan state '{state_file}': {err}") from None
-
-    def configure(self, output_filename: Optional[str] = None) -> str:
-        """
-        Create configuration for BIRD.
-
-        Parameters
-        ----------
-        output_filename : Optional[str]
-            Optional filename to write the configuration to. If this is not specified we'll just return the
-            configuration.
-
-        """
 
         # Make sure we have configuration...
         if not self.config:
@@ -123,6 +138,11 @@ class BirdPlan:
             if config_item not in ("router_id", "log_file", "debug", "static", "export_kernel", "bgp", "rip", "ospf"):
                 raise BirdPlanError(f"The config item '{config_item}' is not supported")
 
+        # Setup globals we need
+        self.birdconf.birdconfig_globals.ignore_irr_changes = ignore_irr_changes
+        self.birdconf.birdconfig_globals.ignore_peeringdb_changes = ignore_peeringdb_changes
+        self.birdconf.birdconfig_globals.use_cached = use_cached
+
         # Configure sections
         self._config_global()
         self._config_static()
@@ -131,21 +151,16 @@ class BirdPlan:
         self._config_ospf()
         self._config_bgp()
 
-        # Generate the configuration
-        config_str = "\n".join(self.birdconf.get_config())
+    def configure(self) -> str:
+        """
+        Create BIRD configuration.
 
-        # If we have a filename, write out
-        if output_filename:
-            if output_filename == "-":
-                print(config_str)
-            else:
-                try:
-                    with open(output_filename, "w") as config_file:
-                        config_file.write(config_str)
-                except OSError as err:  # pragma: no cover
-                    raise BirdPlanError(f"Failed to open '{output_filename}' for writing: {err}") from None
+        Returns
+        -------
+            str : Bird configuration as a string.
 
-        return config_str
+        """
+        return "\n".join(self.birdconf.get_config())
 
     def commit_state(self) -> None:
         """Commit our current state."""
@@ -155,158 +170,515 @@ class BirdPlan:
             raise BirdPlanError("Commit of BirdPlan state requires a state file, none loaded")
 
         # Dump the state in pretty YAML
-        raw_state = yaml.dump(self.state, default_flow_style=False)
+        yaml_output = yaml.dump(self.state, default_flow_style=False)
 
         # Write out state file
         try:
             with open(self.state_file, "w") as file:
-                file.write(raw_state)
+                file.write(yaml_output)
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.state_file}' for writing: {err}") from None
 
-    def bgp_graceful_shutdown_add_peer(self, peer: str) -> None:
+    def state_bgp_peer_graceful_shutdown_set(self, peer: str, value: bool) -> None:
         """
-        Add a peer to the BGP graceful shutdown list.
+        Set the BGP graceful shutdown override state for a peer.
 
         Parameters
         ----------
         peer : str
-            Peer name to add to BGP graceful shutdown list.
+            Peer name to set to BGP graceful shutdown state for.
+            Pattern matches can be specified with '*'.
+
+        value : bool
+            State of the graceful shutdown option for this peer.
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP graceful shutdown requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP graceful shutdown override requires a state file, none loaded")
 
         # Prepare the state structure if its not got what we need
         if "bgp" not in self.state:
             self.state["bgp"] = {}
-        if "graceful_shutdown" not in self.state["bgp"]:
-            self.state["bgp"]["graceful_shutdown"] = []
 
-        # If the peer is not in the list, then add it
-        if peer not in self.state["bgp"]["graceful_shutdown"]:
-            self.state["bgp"]["graceful_shutdown"].append(peer)
-        else:
-            raise BirdPlanError("BGP peer already in graceful_shutdown list")
+        # Make sure we have the global setting
+        if "+graceful_shutdown" not in self.state["bgp"]:
+            self.state["bgp"]["+graceful_shutdown"] = {}
+        # Set the global setting for this pattern
+        self.state["bgp"]["+graceful_shutdown"][peer] = value
 
-    def bgp_graceful_shutdown_remove_peer(self, peer: str) -> None:
+    def state_bgp_peer_graceful_shutdown_remove(self, peer: str) -> None:
         """
-        Remove a peer from the BGP graceful shutdown list.
+        Remove a BGP graceful shutdown override flag from a peer or pattern.
 
         Parameters
         ----------
         peer : str
-            Peer name to remove from BGP graceful shutdown list.
+            Peer name or pattern to remove the BGP graceful shutdown override flag from.
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP graceful shutdown requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP graceful shutdown override requires a state file, none loaded")
 
         # Prepare the state structure if its not got what we need
-        if (
-            "bgp" not in self.state
-            or "graceful_shutdown" not in self.state["bgp"]
-            or peer not in self.state["bgp"]["graceful_shutdown"]
-        ):
-            raise BirdPlanError("BGP peer not in graceful_shutdown list")
+        if "bgp" not in self.state:
+            return
 
-        # Remove peer from graceful_shutdown list
-        self.state["bgp"]["graceful_shutdown"].remove(peer)
+        # Remove from the global settings
+        if "+graceful_shutdown" in self.state["bgp"]:
+            # Check it exists first, if not raise an exception
+            if peer not in self.state["bgp"]["+graceful_shutdown"]:
+                raise BirdPlanError(f"BGP peer '{peer}' graceful shutdown override not found")
+            # Remove peer from graceful shutdown list
+            del self.state["bgp"]["+graceful_shutdown"][peer]
+            # If the result is an empty dict, just delete it too
+            if not self.state["bgp"]["+graceful_shutdown"]:
+                del self.state["bgp"]["+graceful_shutdown"]
 
-    def bgp_graceful_shutdown_peer_list(self) -> List[str]:
+    def state_bgp_peer_graceful_shutdown_status(self) -> BirdPlanBGPPeerGracefulShutdownStatus:
         """
-        Return the list of peers that are currently set for graceful shutdown.
+        Return the status of BGP peer graceful shutdown.
 
         Returns
         -------
-        List[str]
-            List of BGP peers set for graceful shutdown.
+        BirdPlanBGPPeerGracefulShutdownStatus
+            Dictionary containing the status of overrides and peers.
+
+            eg.
+            {
+                'overrides': {
+                    'p*': True,
+                    'peer1': False,
+                }
+                'current': {
+                    'peer1': False,
+                }
+                'pending': {
+                    'peer1': False,
+                }
+            }
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP graceful shutdown requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP graceful shutdown override requires a state file, none loaded")
 
-        # Prepare the state structure if its not got what we need
-        if "bgp" not in self.state or "graceful_shutdown" not in self.state["bgp"]:
-            return []
+        # Initialize our return structure
+        ret: BirdPlanBGPPeerGracefulShutdownStatus = {
+            "overrides": {},
+            "current": {},
+            "pending": {},
+        }
 
-        return [f"{x}" for x in self.state["bgp"]["graceful_shutdown"]]
+        # Return if we don't have any BGP state
+        if "bgp" not in self.state:
+            return ret
 
-    def bgp_quarantine_add_peer(self, peer: str) -> None:
+        # Pull in any overrides we may have
+        if "+graceful_shutdown" in self.state["bgp"]:
+            ret["overrides"] = self.state["bgp"]["+graceful_shutdown"]
+
+        # Check if we have any peers in our state
+        if "peers" in self.state["bgp"]:
+            # If we do loop with them
+            for peer, peer_state in self.state["bgp"]["peers"].items():
+                # And check if they have a graceful shutdown state or not
+                if "graceful_shutdown" in peer_state:
+                    ret["current"][peer] = peer_state["graceful_shutdown"]
+                else:
+                    ret["current"][peer] = False
+
+        # Generate the override status as if we were doing a configure
+        for peer in self.birdconf.protocols.bgp.peers:
+            ret["pending"][peer] = self.birdconf.protocols.bgp.peer(peer).graceful_shutdown
+
+        return ret
+
+    def state_bgp_peer_quarantine_set(self, peer: str, value: bool) -> None:
         """
-        Add a peer to the BGP quarantine list.
+        Set the BGP quarantine override state for a peer.
 
         Parameters
         ----------
         peer : str
-            Peer name to add to BGP quarantine list.
+            Peer name to set to BGP quarantine state for.
+            Pattern matches can be specified with '*'.
+
+        value : bool
+            State of the quarantine option for this peer.
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP quarantine requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP quarantine override requires a state file, none loaded")
 
         # Prepare the state structure if its not got what we need
         if "bgp" not in self.state:
             self.state["bgp"] = {}
-        if "quarantine" not in self.state["bgp"]:
-            self.state["bgp"]["quarantine"] = []
 
-        # If the peer is not in the list, then add it
-        if peer not in self.state["bgp"]["quarantine"]:
-            self.state["bgp"]["quarantine"].append(peer)
-        else:
-            raise BirdPlanError("BGP peer already in quarantine list")
+        # Make sure we have the global setting
+        if "+quarantine" not in self.state["bgp"]:
+            self.state["bgp"]["+quarantine"] = {}
+        # Set the global setting for this pattern
+        self.state["bgp"]["+quarantine"][peer] = value
 
-    def bgp_quarantine_remove_peer(self, peer: str) -> None:
+    def state_bgp_peer_quarantine_remove(self, peer: str) -> None:
         """
-        Remove a peer from the BGP quarantine list.
+        Remove a BGP quarantine override flag from a peer or pattern.
 
         Parameters
         ----------
         peer : str
-            Peer name to remove from BGP quarantine list.
+            Peer name or pattern to remove the BGP quarantine override flag from.
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP quarantine requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP quarantine override requires a state file, none loaded")
 
         # Prepare the state structure if its not got what we need
-        if "bgp" not in self.state or "quarantine" not in self.state["bgp"] or peer not in self.state["bgp"]["quarantine"]:
-            raise BirdPlanError("BGP peer not in quarantine list")
+        if "bgp" not in self.state:
+            return
+
+        # Remove from the global settings
+        if ("+quarantine" not in self.state["bgp"]) or (peer not in self.state["bgp"]["+quarantine"]):
+            raise BirdPlanError(f"BGP peer '{peer}' quarantine override not found")
 
         # Remove peer from quarantine list
-        self.state["bgp"]["quarantine"].remove(peer)
+        del self.state["bgp"]["+quarantine"][peer]
+        # If the result is an empty dict, just delete it too
+        if not self.state["bgp"]["+quarantine"]:
+            del self.state["bgp"]["+quarantine"]
 
-    def bgp_quarantine_peer_list(self) -> List[str]:
+    def state_bgp_peer_quarantine_status(self) -> BirdPlanBGPPeerQuarantineStatus:
         """
-        Return the list of peers that are currently set for quarantine.
+        Return the status of BGP peer quarantine.
 
         Returns
         -------
-        List[str]
-            List of BGP peers set for quarantine.
+        BirdPlanBGPPeerQuarantineStatus
+            Dictionary containing the status of overrides and peers.
+
+            eg.
+            {
+                'overrides': {
+                    'p*': True,
+                    'peer1': False,
+                }
+                'current': {
+                    'peer1': False,
+                }
+                'pending': {
+                    'peer1': False,
+                }
+            }
 
         """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("Using of BGP quarantine requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP quarantine override requires a state file, none loaded")
+
+        # Initialize our return structure
+        ret: BirdPlanBGPPeerQuarantineStatus = {
+            "overrides": {},
+            "current": {},
+            "pending": {},
+        }
+
+        # Return if we don't have any BGP state
+        if "bgp" not in self.state:
+            return ret
+
+        # Pull in any overrides we may have
+        if "+quarantine" in self.state["bgp"]:
+            ret["overrides"] = self.state["bgp"]["+quarantine"]
+
+        # Check if we have any peers in our state
+        if "peers" in self.state["bgp"]:
+            # If we do loop with them
+            for peer, peer_state in self.state["bgp"]["peers"].items():
+                # And check if they have a quarantine state or not
+                if "quarantine" in peer_state:
+                    ret["current"][peer] = peer_state["quarantine"]
+                else:
+                    ret["current"][peer] = False
+
+        # Generate the override status as if we were doing a configure
+        for peer in self.birdconf.protocols.bgp.peers:
+            ret["pending"][peer] = self.birdconf.protocols.bgp.peer(peer).quarantine
+
+        return ret
+
+    def state_ospf_set_interface_cost(self, area: str, interface: str, cost: int) -> None:
+        """
+        Set an OSPF interface cost override.
+
+        Parameters
+        ----------
+        area : str
+            Interface to set the OSPF cost for.
+
+        interface : str
+            Interface to set the OSPF cost for.
+
+        cost : int
+            OSPF interface cost.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF interface cost override requires a state file, none loaded")
 
         # Prepare the state structure if its not got what we need
-        if "bgp" not in self.state or "quarantine" not in self.state["bgp"]:
-            return []
+        if "ospf" not in self.state:
+            self.state["ospf"] = {}
+        if "areas" not in self.state["ospf"]:
+            self.state["ospf"]["areas"] = {}
+        if area not in self.state["ospf"]["areas"]:
+            self.state["ospf"]["areas"][area] = {}
+        if "+interfaces" not in self.state["ospf"]["areas"][area]:
+            self.state["ospf"]["areas"][area]["+interfaces"] = {}
+        if interface not in self.state["ospf"]["areas"][area]["+interfaces"]:
+            self.state["ospf"]["areas"][area]["+interfaces"][interface] = {}
 
-        return [f"{x}" for x in self.state["bgp"]["quarantine"]]
+        # Set the interface cost value
+        self.state["ospf"]["areas"][area]["+interfaces"][interface]["cost"] = cost
+
+    def state_ospf_remove_interface_cost(self, area: str, interface: str) -> None:
+        """
+        Remove an OSPF interface cost override.
+
+        Parameters
+        ----------
+        area : str
+            OSPF area which contains the interface.
+
+        interface : str
+            Interface to remove the OSPF cost for.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF interface cost override requires a state file, none loaded")
+
+        # Check if this cost override exists
+        if (  # pylint: disable=too-many-boolean-expressions
+            "ospf" not in self.state
+            or "areas" not in self.state["ospf"]
+            or area not in self.state["ospf"]["areas"]
+            or "+interfaces" not in self.state["ospf"]["areas"][area]
+            or interface not in self.state["ospf"]["areas"][area]["+interfaces"]
+            or "cost" not in self.state["ospf"]["areas"][area]["+interfaces"][interface]
+        ):
+            raise BirdPlanError(f"OSPF area '{area}' interface '{interface}' cost override not found")
+
+        # Remove OSPF interface cost from state
+        del self.state["ospf"]["areas"][area]["+interfaces"][interface]["cost"]
+        # Remove hanging data structure endpoint
+        if not self.state["ospf"]["areas"][area]["+interfaces"][interface]:
+            del self.state["ospf"]["areas"][area]["+interfaces"][interface]
+        if not self.state["ospf"]["areas"][area]["+interfaces"]:
+            del self.state["ospf"]["areas"][area]["+interfaces"]
+
+    def state_ospf_set_interface_ecmp_weight(self, area: str, interface: str, ecmp_weight: int) -> None:
+        """
+        Set an OSPF interface ECMP weight override.
+
+        Parameters
+        ----------
+        area : str
+            OSPF area which contains the interface.
+
+        interface : str
+            Interface to set the OSPF ECMP weight for.
+
+        ecmp_weight : int
+            OSPF interface ECMP weight.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF interface ECMP weight override requires a state file, none loaded")
+
+        # Prepare the state structure if its not got what we need
+        if "ospf" not in self.state:
+            self.state["ospf"] = {}
+        if "areas" not in self.state["ospf"]:
+            self.state["ospf"]["areas"] = {}
+        if area not in self.state["ospf"]["areas"]:
+            self.state["ospf"]["areas"][area] = {}
+        if "+interfaces" not in self.state["ospf"]["areas"][area]:
+            self.state["ospf"]["areas"][area]["+interfaces"] = {}
+        if interface not in self.state["ospf"]["areas"][area]["+interfaces"]:
+            self.state["ospf"]["areas"][area]["+interfaces"][interface] = {}
+
+        # Set the interface ecmp_weight value
+        self.state["ospf"]["areas"][area]["+interfaces"][interface]["ecmp_weight"] = ecmp_weight
+
+    def state_ospf_remove_interface_ecmp_weight(self, area: str, interface: str) -> None:
+        """
+        Remove an OSPF interface ECMP weight override.
+
+        Parameters
+        ----------
+        area : str
+            OSPF area which contains the interface.
+
+        interface : str
+            Interface to remove the OSPF ECMP weight for.
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF interface ECMP weight override requires a state file, none loaded")
+
+        # Check if this ECMP weight override exists
+        if (  # pylint: disable=too-many-boolean-expressions
+            "ospf" not in self.state
+            or "areas" not in self.state["ospf"]
+            or area not in self.state["ospf"]["areas"]
+            or "+interfaces" not in self.state["ospf"]["areas"][area]
+            or interface not in self.state["ospf"]["areas"][area]["+interfaces"]
+            or "ecmp_weight" not in self.state["ospf"]["areas"][area]["+interfaces"][interface]
+        ):
+            raise BirdPlanError(f"OSPF area '{area}' interface '{interface}' ECMP weight override not found")
+
+        # Remove OSPF interface ECMP weight from state
+        del self.state["ospf"]["areas"][area]["+interfaces"][interface]["ecmp_weight"]
+        # Remove hanging data structure endpoint
+        if not self.state["ospf"]["areas"][area]["+interfaces"][interface]:
+            del self.state["ospf"]["areas"][area]["+interfaces"][interface]
+        if not self.state["ospf"]["areas"][area]["+interfaces"]:
+            del self.state["ospf"]["areas"][area]["+interfaces"]
+
+    def state_ospf_interface_status(self) -> BirdPlanOSPFInterfaceStatus:
+        """
+        Return the status of OSPF interfaces.
+
+        Returns
+        -------
+        BirdPlanOSPFInterfaceStatus
+            Dictionary containing the status of overrides and peers.
+
+            eg.
+            {
+                'overrides': {
+                    'areas': {
+                        '0': {
+                            'interfaces': {
+                                'eth0': {
+                                    'cost': 10,
+                                    'ecmp_weight': 100,
+                                }
+                            }
+                        }
+                    }
+                },
+                'current': {
+                    'areas': {
+                        '0': {
+                            'interfaces': {
+                                'eth0': {
+                                    'cost': 10,
+                                    'ecmp_weight': 100,
+                                }
+                            }
+                        }
+                    }
+                },
+                'pending': {
+                    'areas': {
+                        '0': {
+                            'interfaces': {
+                                'eth0': {
+                                    'cost': 10,
+                                    'ecmp_weight': 100,
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        """
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF interface override requires a state file, none loaded")
+
+        # Initialize our return structure
+        ret: BirdPlanOSPFInterfaceStatus = {
+            "overrides": {},
+            "current": {},
+            "pending": {},
+        }
+
+        # Return if we don't have any OSPF state
+        if "ospf" not in self.state or "areas" not in self.state["ospf"]:
+            return ret
+
+        # Process overrides
+        for area_name, area in self.state["ospf"]["areas"].items():
+            # Make sure we have interfaces in the area
+            if "+interfaces" not in area:
+                continue
+            # Loop with interfaces
+            for interface_name, interface in area["+interfaces"].items():
+                # Check our structure is setup
+                if "areas" not in ret["overrides"]:
+                    ret["overrides"]["areas"] = {}
+                if area_name not in ret["overrides"]["areas"]:
+                    ret["overrides"]["areas"][area_name] = {}
+                if "interfaces" not in ret["overrides"]["areas"][area_name]:
+                    ret["overrides"]["areas"][area_name]["interfaces"] = {}
+                # Link interface
+                ret["overrides"]["areas"][area_name]["interfaces"][interface_name] = interface
+
+        # Process current state
+        for area_name, area in self.state["ospf"]["areas"].items():
+            # Make sure we have interfaces in the area
+            if "interfaces" not in area:
+                continue
+            # Loop with interfaces
+            for interface_name, interface in area["interfaces"].items():
+                # Check our structure is setup
+                if "areas" not in ret["current"]:
+                    ret["current"]["areas"] = {}
+                if area_name not in ret["current"]["areas"]:
+                    ret["current"]["areas"][area_name] = {}
+                if "interfaces" not in ret["current"]["areas"][area_name]:
+                    ret["current"]["areas"][area_name]["interfaces"] = {}
+                # Link interface
+                ret["current"]["areas"][area_name]["interfaces"][interface_name] = interface
+
+        # Generate the override status as if we were doing a configure
+        for area_name, area in self.birdconf.protocols.ospf.areas.items():
+            for interface_name, interface in area.interfaces.items():
+                # Check our structure is setup
+                if "areas" not in ret["pending"]:
+                    ret["pending"]["areas"] = {}
+                if area_name not in ret["pending"]["areas"]:
+                    ret["pending"]["areas"][area_name] = {}
+                if "interfaces" not in ret["pending"]["areas"][area_name]:
+                    ret["pending"]["areas"][area_name]["interfaces"] = {}
+                if interface_name not in ret["pending"]["areas"][area_name]["interfaces"]:
+                    ret["pending"]["areas"][area_name]["interfaces"][interface_name] = {}
+                # Add attributes we need
+                ret["pending"]["areas"][area_name]["interfaces"][interface_name]["cost"] = interface.cost
+                ret["pending"]["areas"][area_name]["interfaces"][interface_name]["ecmp_weight"] = interface.ecmp_weight
+
+        return ret
 
     def _config_global(self) -> None:
         """Configure global options."""
@@ -386,7 +758,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in RIP accept")
 
-    def _config_rip_redistribute(self) -> None:
+    def _config_rip_redistribute(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
         """Configure rip:redistribute section."""
 
         # If we don't have a redistribute section just return
@@ -491,7 +863,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in ospf:accept")
 
-    def _config_ospf_redistribute(self) -> None:
+    def _config_ospf_redistribute(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
         """Configure ospf:redistribute section."""
 
         # If we don't have a redistribute section just return
@@ -542,7 +914,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")
 
-    def _config_ospf_areas(self) -> None:
+    def _config_ospf_areas(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
         """Configure ospf:interfaces section."""
 
         # If we don't have areas in our ospf section, just return
@@ -550,34 +922,52 @@ class BirdPlan:
             return
 
         # Loop with each area and its config
-        for area_name, area in self.config["ospf"]["areas"].items():
+        for area_name, raw_area_config in self.config["ospf"]["areas"].items():
             # Make sure we have an interface for the area
-            if "interfaces" not in area:
+            if "interfaces" not in raw_area_config:
                 raise BirdPlanError(f"OSPF area '{area_name}' must contain 'interfaces'")
             # Loop with each config item
-            for config_item, config_value in area.items():
-                # Make sure this item is supported
-                if config_item not in ("config", "interfaces"):
-                    raise BirdPlanError(
-                        f"Configuration item '{config_item}' with value '{config_value}' not understood in ospf:areas"
-                    )
-            # See if we have area config
             area_config = {}
-            if "config" in area:
-                # Loop with each config item in the peer
-                for config_item, config_value in area["config"].items():
-                    # No items supported atm
-                    if config_item in ("xxxxx", "yyyy"):
-                        area_config[config_item] = config_value
-                    # If we don't understand this 'redistribute' entry, throw an error
-                    else:
-                        raise BirdPlanError("Configuration item '{config_item}' not understood in OSPF area")
+            for config_item, raw_config in raw_area_config.items():
+                # Make sure this item is supported
+                if config_item not in ("xxxxxxx", "interfaces"):
+                    raise BirdPlanError(
+                        f"Configuration item '{config_item}' with value '{raw_config}' not understood in ospf:areas"
+                    )
+                # Skip over interfaces
+                if config_item == "interfaces":
+                    continue
+                # Check for supported config options
+                if config_item in ("xxxxx", "yyyy"):
+                    area_config[config_item] = raw_config
+                # If we don't understand this 'redistribute' entry, throw an error
+                else:
+                    raise BirdPlanError(f"Configuration item '{config_item}' not understood in ospf:areas")
+
             # Add area
-            self.birdconf.protocols.ospf.add_area(area_name, area_config)
+            area = self.birdconf.protocols.ospf.add_area(area_name, area_config)
+
             # Loop with interfaces in area
-            for interface_name, interface_config in area["interfaces"].items():
+            for interface_name, raw_config in raw_area_config["interfaces"].items():
+                # Start with no special interface configuration
+                interface_config: Dict[str, Any] = {}
+                # Check what kind of config we've got...
+                if isinstance(raw_config, bool):
+                    pass
+                # Else if its a dict, we need to treat it a bit differently
+                elif isinstance(raw_config, dict):
+                    for raw_item, raw_value in raw_config.items():
+                        if raw_item in ("cost", "ecmp_weight", "hello", "stub", "wait"):
+                            interface_config[raw_item] = raw_value
+                        else:
+                            raise BirdPlanError(
+                                f"Configuration item '{raw_item}' not understood in OSPF interface '{interface_name}'"
+                            )
+                else:
+                    raise BirdPlanError(f"Configurion for OSPF interface name '{interface_name}' has an unsupported value")
+
                 # Add interface to area
-                self.birdconf.protocols.ospf.add_interface(area_name, interface_name, interface_config)
+                area.add_interface(interface_name, interface_config)
 
     def _config_bgp(self) -> None:
         """Configure bgp section."""
@@ -595,14 +985,15 @@ class BirdPlan:
         for config_item in self.config["bgp"]:
             if config_item not in (
                 # Globals
+                "accept",
                 "asn",
                 "graceful_shutdown",
-                "peertype_constraints",
-                "originate",  # Origination
-                "accept",
                 "import",
-                "rr_cluster_id",
+                "originate",  # Origination
                 "peers",
+                "peertype_constraints",
+                "quarantine",
+                "rr_cluster_id",
             ):
                 raise BirdPlanError(f"The 'bgp' config item '{config_item}' is not supported")
 
@@ -644,11 +1035,15 @@ class BirdPlan:
         if "graceful_shutdown" in self.config["bgp"]:
             self.birdconf.protocols.bgp.graceful_shutdown = self.config["bgp"]["graceful_shutdown"]
 
+        # Setup graceful shutdown if specified
+        if "quarantine" in self.config["bgp"]:
+            self.birdconf.protocols.bgp.quarantine = self.config["bgp"]["quarantine"]
+
         # Set our route reflector cluster id
         if "rr_cluster_id" in self.config["bgp"]:
             self.birdconf.protocols.bgp.rr_cluster_id = self.config["bgp"]["rr_cluster_id"]
 
-    def _config_bgp_peertype_constraints(self) -> None:
+    def _config_bgp_peertype_constraints(self) -> None:  # noqa: C901
         """Configure bgp:peertype_constraints section."""
 
         # If we don't have a peertype_constraints section, just return
@@ -762,7 +1157,7 @@ class BirdPlan:
         for route in self.config["bgp"]["originate"]:
             self.birdconf.protocols.bgp.add_originated_route(route)
 
-    def _config_bgp_import(self) -> None:
+    def _config_bgp_import(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
         """Configure bgp:import section."""
 
         # If we don't have the option then just return
@@ -831,9 +1226,9 @@ class BirdPlan:
             # Configure peer
             self._config_bgp_peers_peer(peer_name, peer_config)
 
-    def _config_bgp_peers_peer(
+    def _config_bgp_peers_peer(  # noqa: C901, pylint: disable=too-many-branches,too-many-locals,too-many-statements
         self, peer_name: str, peer_config: Dict[str, Any]
-    ) -> None:  # pylint: disable=too-many-branches # noqa: C901
+    ) -> None:
         """Configure bgp:peers single peer."""
 
         # Start with no peer config
@@ -1051,18 +1446,6 @@ class BirdPlan:
 
             else:
                 raise BirdPlanError(f"Configuration item '{config_item}' not understood in bgp:peers:{peer_name}")
-
-        # Check if we have a graceful shutdown state
-        if "bgp" in self.state and "graceful_shutdown" in self.state["bgp"]:
-            # If we do, then check if this peer is in it
-            if peer_name in self.state["bgp"]["graceful_shutdown"] or "*" in self.state["bgp"]["graceful_shutdown"]:
-                peer["graceful_shutdown"] = self.state["bgp"]["graceful_shutdown"]
-
-        # Check if we have a quarantine state
-        if "bgp" in self.state and "quarantine" in self.state["bgp"]:
-            # If we do, then check if this peer is in it
-            if peer_name in self.state["bgp"]["quarantine"]:
-                peer["quarantine"] = self.state["bgp"]["quarantine"]
 
         # Check items we need
         for required_item in ["asn", "description", "type"]:

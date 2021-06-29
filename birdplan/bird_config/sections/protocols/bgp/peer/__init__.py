@@ -21,6 +21,7 @@
 # pylint: disable=too-many-lines
 
 from typing import Any, Dict, List, Optional, Union
+import fnmatch
 import re
 
 from .peer_attributes import (
@@ -58,6 +59,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     _bgp_functions: BGPFunctions
     _peer_attributes: BGPPeerAttributes
     _state: Dict[str, Any]
+    _prev_state: Optional[Dict[str, Any]]
 
     def __init__(
         self,
@@ -81,6 +83,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Save our name and configuration
         self.name = peer_name
+
+        # Check if we have a previous state for this peer
+        self._prev_state = None
+        if (
+            "bgp" in self.birdconfig_globals.state
+            and "peers" in self.birdconfig_globals.state["bgp"]
+            and self.name in self.birdconfig_globals.state["bgp"]["peers"]
+        ):
+            # If we do set our attribute for it
+            self._prev_state = self.birdconfig_globals.state["bgp"]["peers"][self.name]
 
         # Check if we have a peer description
         if "description" not in peer_config:
@@ -201,12 +213,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             if self.peer_type not in ("customer", "peer", "routeserver", "transit"):
                 raise BirdPlanError(f"Having 'cost' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
             self.cost = peer_config["cost"]
-
-        # Check if we're in graceful_shutdown mode
-        if self.bgp_attributes.graceful_shutdown:
-            self.graceful_shutdown = True
-        if "graceful_shutdown" in peer_config:
-            self.graceful_shutdown = peer_config["graceful_shutdown"]
 
         # Check if we are adding a large community to outgoing routes
         if "incoming_large_communities" in peer_config:
@@ -814,10 +820,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.prepend.static_blackhole.own_asn = prepend_option
                 self.prepend.static_default.own_asn = prepend_option
 
-        # Check if we're quarantined
-        if "quarantine" in peer_config and peer_config["quarantine"]:
-            self.quarantined = True
-
         # Check if we have a blackhole community
         if "blackhole_community" in peer_config:
             if self.peer_type not in ("routeserver", "routecollector", "transit"):
@@ -883,8 +885,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     "large_community_import_maxlen",
                 ):
                     raise BirdPlanError(
-                        f"BGP peer 'constraints' configuration '{constraint_name}' for peer '{self.name}' with type "
-                        f"'{self.peer_type}' is invalid"
+                        f"BGP peer 'constraints' configuration '{constraint_name}' for peer '{self.name}' "
+                        f"with type '{self.peer_type}' is invalid"
                     )
                 # Make sure this peer supports blackhole imports
                 if constraint_name.startswith("blackhole_import_"):
@@ -896,8 +898,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         "rrserver-rrserver",
                     ):
                         raise BirdPlanError(
-                            f"Having '{constraint_name}' specified for peer '{self.name}' with type '{self.peer_type}' "
-                            "makes no sense"
+                            f"Having '{constraint_name}' specified for peer '{self.name}' "
+                            f"with type '{self.peer_type}' makes no sense"
                         )
                 # Make sure this peer accepts blackhole exports
                 if constraint_name.startswith("blackhole_export_"):
@@ -911,8 +913,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         "transit",
                     ):
                         raise BirdPlanError(
-                            f"Having '{constraint_name}' specified for peer '{self.name}' with type '{self.peer_type}' "
-                            "makes no sense"
+                            f"Having '{constraint_name}' specified for peer '{self.name}' "
+                            f"with type '{self.peer_type}' makes no sense"
                         )
                 # Make sure this peer supports imports
                 if "import" in constraint_name:
@@ -927,48 +929,101 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         "transit",
                     ):
                         raise BirdPlanError(
-                            f"Having '{constraint_name}' specified for peer '{self.name}' with type '{self.peer_type}' "
-                            "makes no sense"
+                            f"Having '{constraint_name}' specified for peer '{self.name}' "
+                            f"with type '{self.peer_type}' makes no sense"
                         )
                 # Set constraint
                 setattr(self.constraints, constraint_name, constraint_value)
 
+        # Check if we're in graceful_shutdown mode
+        if self.bgp_attributes.graceful_shutdown:
+            self.graceful_shutdown = True
+        if "graceful_shutdown" in peer_config:
+            self.graceful_shutdown = peer_config["graceful_shutdown"]
+
+        # Check if we're quarantined
+        if self.bgp_attributes.quarantine:
+            self.quarantine = True
+        if "quarantine" in peer_config:
+            self.quarantine = peer_config["quarantine"]
+
         #
-        # NETWORK RELATED QUERIES
+        # NETWORK AND STATE (CACHE) RELATED QUERIES
         #
-        prev_state = {}
-        if (
-            "bgp" in self.birdconfig_globals.state
-            and "peers" in self.birdconfig_globals.state["bgp"]
-            and self.name in self.birdconfig_globals.state["bgp"]["peers"]
-        ):
-            prev_state = self.birdconfig_globals.state["bgp"]["peers"][self.name]
 
         # Work out the prefix limits...
         if self.prefix_limit4 == "peeringdb" or self.prefix_limit6 == "peeringdb":
-            # Grab PeeringDB entries
-            peeringdb = PeeringDB()
-            peeringdb_info = peeringdb.get_prefix_limits(self.asn)
+            # Setup our peeringdb info
+            peeringdb_info: Dict[str, Any] = {}
+
+            # Check if we're using cached values or not
+            if self.birdconfig_globals.use_cached:
+                # Check if we're pulling the IPv4 limits out our cache
+                if self.prefix_limit4 == "peeringdb":
+                    if not (
+                        self.prev_state
+                        and "prefix_limit" in self.prev_state
+                        and "peeringdb" in self.prev_state["prefix_limit"]
+                        and "ipv4" in self.prev_state["prefix_limit"]["peeringdb"]
+                    ):
+                        raise BirdPlanError(
+                            f"No PeeringDB information in cache for peer '{self.name}' "
+                            f"with type '{self.peer_type}' for IPv4 prefix limit"
+                        )
+                    # Pull entry from cache
+                    peeringdb_info["info_prefixes4"] = self.prev_state["prefix_limit"]["peeringdb"]["ipv4"]
+                # Check if we're pulling the IPv6 limits out our cache
+                if self.prefix_limit6 == "peeringdb":
+                    if not (
+                        self.prev_state
+                        and "prefix_limit" in self.prev_state
+                        and "peeringdb" in self.prev_state["prefix_limit"]
+                        and "ipv6" in self.prev_state["prefix_limit"]["peeringdb"]
+                    ):
+                        raise BirdPlanError(
+                            f"No PeeringDB information in cache for peer '{self.name}' "
+                            f"with type '{self.peer_type}' for IPv6 prefix limit"
+                        )
+                    # Pull entry from cache
+                    peeringdb_info["info_prefixes6"] = self.prev_state["prefix_limit"]["peeringdb"]["ipv6"]
+            else:
+                # Grab PeeringDB entries
+                peeringdb = PeeringDB()
+                peeringdb_info = peeringdb.get_prefix_limits(self.asn)
+
+                # Make sure we got IPv4 limits back from PeeringDB
+                if not peeringdb_info["info_prefixes4"]:
+                    raise BirdPlanError(f"No IPv4 PeeringDB information found for peer '{self.name}' with type '{self.peer_type}'")
+
+                # Make sure we got IPv6 limits back from PeeringDB
+                if not peeringdb_info["info_prefixes6"]:
+                    raise BirdPlanError(f"No IPv6 PeeringDB information found for peer '{self.name}' with type '{self.peer_type}'")
 
             # Check if we're setting our IPv4 prefix limit from peeringdb
             if self.prefix_limit4 == "peeringdb":
                 # Sanity checks
                 if (
-                    "prefix_limit" in prev_state
-                    and "peeringdb" in prev_state["prefix_limit"]
-                    and "ipv4" in prev_state["prefix_limit"]["peeringdb"]
+                    not self.birdconfig_globals.ignore_peeringdb_changes
+                    and self.prev_state
+                    and "prefix_limit" in self.prev_state
+                    and "peeringdb" in self.prev_state["prefix_limit"]
+                    and "ipv4" in self.prev_state["prefix_limit"]["peeringdb"]
                 ):
                     # Check if there was a substantial reduction in number of prefixes allowed
-                    if peeringdb_info["info_prefixes4"] * 2 < prev_state["prefix_limit"]["peeringdb"]["ipv4"]:
+                    if peeringdb_info["info_prefixes4"] * 2 < self.prev_state["prefix_limit"]["peeringdb"]["ipv4"]:
                         raise BirdPlanError(
-                            f"PeeringDB IPv4 prefix limit for peer '{self.name}' decreased substantially from previous run: "
-                            "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv4"], peeringdb_info["info_prefixes4"])
+                            f"PeeringDB IPv4 prefix limit for peer '{self.name}' with type '{self.peer_type}' "
+                            "decreased substantially from previous run: "
+                            "last=%s, now=%s"
+                            % (self.prev_state["prefix_limit"]["peeringdb"]["ipv4"], peeringdb_info["info_prefixes4"])
                         )
                     # Check if there was a substantial increase in number of prefixes allowed
-                    if peeringdb_info["info_prefixes4"] / 2 > prev_state["prefix_limit"]["peeringdb"]["ipv4"]:
+                    if peeringdb_info["info_prefixes4"] / 2 > self.prev_state["prefix_limit"]["peeringdb"]["ipv4"]:
                         raise BirdPlanError(
-                            f"PeeringDB IPv4 prefix limit for peer '{self.name}' increased substantially from previous run: "
-                            "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv4"], peeringdb_info["info_prefixes4"])
+                            f"PeeringDB IPv4 prefix limit for peer '{self.name}' with type '{self.peer_type}' "
+                            "increased substantially from previous run: "
+                            "last=%s, now=%s"
+                            % (self.prev_state["prefix_limit"]["peeringdb"]["ipv4"], peeringdb_info["info_prefixes4"])
                         )
                 # Set the limits
                 self.prefix_limit4 = None
@@ -978,21 +1033,27 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             if self.prefix_limit6 == "peeringdb":
                 # Sanity checks
                 if (
-                    "prefix_limit" in prev_state
-                    and "peeringdb" in prev_state["prefix_limit"]
-                    and "ipv6" in prev_state["prefix_limit"]["peeringdb"]
+                    not self.birdconfig_globals.ignore_peeringdb_changes
+                    and self.prev_state
+                    and "prefix_limit" in self.prev_state
+                    and "peeringdb" in self.prev_state["prefix_limit"]
+                    and "ipv6" in self.prev_state["prefix_limit"]["peeringdb"]
                 ):
                     # Check if there was a substantial reduction in number of prefixes allowed
-                    if peeringdb_info["info_prefixes6"] * 2 < prev_state["prefix_limit"]["peeringdb"]["ipv6"]:
+                    if peeringdb_info["info_prefixes6"] * 2 < self.prev_state["prefix_limit"]["peeringdb"]["ipv6"]:
                         raise BirdPlanError(
-                            f"PeeringDB IPv6 prefix limit for peer '{self.name}' decreased substantially from previous run: "
-                            "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv6"], peeringdb_info["info_prefixes6"])
+                            f"PeeringDB IPv6 prefix limit for peer '{self.name}' with type '{self.peer_type}' "
+                            "decreased substantially from previous run: "
+                            "last=%s, now=%s"
+                            % (self.prev_state["prefix_limit"]["peeringdb"]["ipv6"], peeringdb_info["info_prefixes6"])
                         )
                     # Check if there was a substantial increase in number of prefixes allowed
-                    if peeringdb_info["info_prefixes6"] / 2 > prev_state["prefix_limit"]["peeringdb"]["ipv6"]:
+                    if peeringdb_info["info_prefixes6"] / 2 > self.prev_state["prefix_limit"]["peeringdb"]["ipv6"]:
                         raise BirdPlanError(
-                            f"PeeringDB IPv6 prefix limit for peer '{self.name}' increased substantially from previous run: "
-                            "last=%s, now=%s" % (prev_state["prefix_limit"]["peeringdb"]["ipv6"], peeringdb_info["info_prefixes6"])
+                            f"PeeringDB IPv6 prefix limit for peer '{self.name}' with type '{self.peer_type}' "
+                            "increased substantially from previous run: "
+                            "last=%s, now=%s"
+                            % (self.prev_state["prefix_limit"]["peeringdb"]["ipv6"], peeringdb_info["info_prefixes6"])
                         )
                 # Set the limits
                 self.prefix_limit6 = None
@@ -1000,67 +1061,163 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Check if we're going to be pulling in AS-SET information
         if self.filter_policy.as_sets:
-            # Grab BGPQ3 object to use below
-            bgpq3 = BGPQ3()
+            # Setup our IRR info
+            irr_asns: List[str] = []
+            irr_prefixes: Dict[str, Any] = {"ipv4": [], "ipv6": []}
 
-            # Grab ASNs from IRR
-            irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
-            # If we have results populate our IRR origin ASN list
-            if irr_asns:
-                self.filter_policy.origin_asns_irr.extend(irr_asns)
+            # Check if we're using cached values or not
+            if self.birdconfig_globals.use_cached:
+                # Grab IRR ASNs from previous state
+                if not (
+                    self.prev_state
+                    and "filter" in self.prev_state
+                    and "origin_asns" in self.prev_state["filter"]
+                    and "irr" in self.prev_state["filter"]["origin_asns"]
+                ):
+                    raise BirdPlanError(
+                        f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR origin ASNs"
+                    )
+                # Populate irr_asns
+                irr_asns = self.prev_state["filter"]["origin_asns"]["irr"]
 
-            # Grab IRR prefixes
-            irr_prefixes = bgpq3.get_prefixes(self.filter_policy.as_sets)
+                # Grab IRR prefixes for IPv4 from previous state
+                if not (
+                    self.prev_state
+                    and "filter" in self.prev_state
+                    and "prefixes" in self.prev_state["filter"]
+                    and "irr" in self.prev_state["filter"]["prefixes"]
+                    and "ipv4" in self.prev_state["filter"]["prefixes"]["irr"]
+                ):
+                    raise BirdPlanError(
+                        f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR IPv4 prefixes"
+                    )
+                # Populate IRR IPv4 prefixes
+                irr_prefixes["ipv4"] = self.prev_state["filter"]["prefixes"]["irr"]["ipv4"]
+
+                # Grab IRR prefixes for IPv6 from previous state
+                if not (
+                    self.prev_state
+                    and "filter" in self.prev_state
+                    and "prefixes" in self.prev_state["filter"]
+                    and "irr" in self.prev_state["filter"]["prefixes"]
+                    and "ipv6" in self.prev_state["filter"]["prefixes"]["irr"]
+                ):
+                    raise BirdPlanError(
+                        f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR IPv6 prefixes"
+                    )
+                # Populate IRR IPv6 prefixes
+                irr_prefixes["ipv6"] = self.prev_state["filter"]["prefixes"]["irr"]["ipv6"]
+
+            else:
+                # Grab BGPQ3 object to use below
+                bgpq3 = BGPQ3()
+
+                # Grab ASNs from IRR
+                irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
+                # Make sure we got IRR ASNs back from BGPQ3
+                if not irr_asns:
+                    raise BirdPlanError(f"No IRR ASNs found for peer '{self.name}' with type '{self.peer_type}'")
+
+                # Grab IRR prefixes
+                irr_prefixes = bgpq3.get_prefixes(self.filter_policy.as_sets)
+                # Make sure we got IRR prefixes back from BGPQ3
+                if ("ipv4" not in irr_prefixes or not irr_prefixes["ipv4"]) and (
+                    "ipv6" not in irr_prefixes or not irr_prefixes["ipv6"]
+                ):
+                    raise BirdPlanError(f"No IRR prefixes found for peer '{self.name}' with type '{self.peer_type}'")
+
+            # Add our ASN's onto the filter policy origin ASNs list
+            self.filter_policy.origin_asns_irr.extend(irr_asns)
+
             # Lets work out what to do with the IPv4 prefixes
             if irr_prefixes["ipv4"]:
                 # Sanity checks for IPv4 network count
                 if (
-                    "filter" in prev_state
-                    and "prefixes" in prev_state["filter"]
-                    and "irr" in prev_state["filter"]["prefixes"]
-                    and "ipv4" in prev_state["filter"]["prefixes"]["irr"]
+                    not self.birdconfig_globals.ignore_irr_changes
+                    and self.prev_state
+                    and "filter" in self.prev_state
+                    and "prefixes" in self.prev_state["filter"]
+                    and "irr" in self.prev_state["filter"]["prefixes"]
+                    and "ipv4" in self.prev_state["filter"]["prefixes"]["irr"]
                 ):
                     # Check if there was a substantial reduction in number of prefixes allowed
                     new_network_count = util.network_count(irr_prefixes["ipv4"])
-                    old_network_count = util.network_count(prev_state["filter"]["prefixes"]["irr"]["ipv4"])
+                    old_network_count = util.network_count(self.prev_state["filter"]["prefixes"]["irr"]["ipv4"])
                     if new_network_count * 2 < old_network_count:
                         raise BirdPlanError(
-                            f"IRR IPv4 network count for peer '{self.name}' decreased substantially from previous run: "
+                            f"IRR IPv4 network count for peer '{self.name}' with type '{self.peer_type}' "
+                            "decreased substantially from previous run: "
                             "last=%s, now=%s" % (old_network_count, new_network_count)
                         )
                     # Check if there was a substantial increase in number of prefixes allowed
                     if new_network_count / 2 > old_network_count:
                         raise BirdPlanError(
-                            f"IRR IPv4 network count for peer '{self.name}' increased substantially from previous run: "
+                            f"IRR IPv4 network count for peer '{self.name}' with type '{self.peer_type}' "
+                            "increased substantially from previous run: "
                             "last=%s, now=%s" % (old_network_count, new_network_count)
                         )
+
                 # All looks good, add them
                 self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv4"])
             # Lets work out what to do with the IPv6 prefixes
             if irr_prefixes["ipv6"]:
                 # Sanity checks for IPv6 network count
                 if (
-                    "filter" in prev_state
-                    and "prefixes" in prev_state["filter"]
-                    and "irr" in prev_state["filter"]["prefixes"]
-                    and "ipv6" in prev_state["filter"]["prefixes"]["irr"]
+                    not self.birdconfig_globals.ignore_irr_changes
+                    and self.prev_state
+                    and "filter" in self.prev_state
+                    and "prefixes" in self.prev_state["filter"]
+                    and "irr" in self.prev_state["filter"]["prefixes"]
+                    and "ipv6" in self.prev_state["filter"]["prefixes"]["irr"]
                 ):
                     # Check if there was a substantial reduction in number of prefixes allowed
                     new_network_count = util.network_count(irr_prefixes["ipv6"])
-                    old_network_count = util.network_count(prev_state["filter"]["prefixes"]["irr"]["ipv6"])
+                    old_network_count = util.network_count(self.prev_state["filter"]["prefixes"]["irr"]["ipv6"])
                     if new_network_count * 2 < old_network_count:
                         raise BirdPlanError(
-                            f"IRR IPv6 network count for peer '{self.name}' decreased substantially from previous run: "
+                            f"IRR IPv6 network count for peer '{self.name}' with type '{self.peer_type}' "
+                            "decreased substantially from previous run: "
                             "last=%s, now=%s" % (old_network_count, new_network_count)
                         )
                     # Check if there was a substantial increase in number of prefixes allowed
                     if new_network_count / 2 > old_network_count:
                         raise BirdPlanError(
-                            f"IRR IPv6 network count for peer '{self.name}' increased substantially from previous run: "
+                            f"IRR IPv6 network count for peer '{self.name}' with type '{self.peer_type}' "
+                            "increased substantially from previous run: "
                             "last=%s, now=%s" % (old_network_count, new_network_count)
                         )
                 # All looks good, add them
                 self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv6"])
+
+        # Check if we have a graceful shutdown override
+        if ("bgp" in self.birdconfig_globals.state) and ("+graceful_shutdown" in self.birdconfig_globals.state["bgp"]):
+            # Then check if we have an explicit setting
+            if self.name in self.birdconfig_globals.state["bgp"]["+graceful_shutdown"]:
+                self.graceful_shutdown = self.birdconfig_globals.state["bgp"]["+graceful_shutdown"][self.name]
+            # If not we process the patterns
+            else:
+                for item in sorted(self.birdconfig_globals.state["bgp"]["+graceful_shutdown"]):
+                    # Skip non patterns
+                    if "*" not in item:
+                        continue
+                    # If pattern matches peer name, set the value for graceful shutdown
+                    if fnmatch.fnmatch(self.name, item):
+                        self.graceful_shutdown = self.birdconfig_globals.state["bgp"]["+graceful_shutdown"][item]
+
+        # Check if we have a quarantine override
+        if ("bgp" in self.birdconfig_globals.state) and ("+quarantine" in self.birdconfig_globals.state["bgp"]):
+            # Then check if we have an explicit setting
+            if self.name in self.birdconfig_globals.state["bgp"]["+quarantine"]:
+                self.quarantine = self.birdconfig_globals.state["bgp"]["+quarantine"][self.name]
+            # If not we process the patterns
+            else:
+                for item in sorted(self.birdconfig_globals.state["bgp"]["+quarantine"]):
+                    # Skip non patterns
+                    if "*" not in item:
+                        continue
+                    # If pattern matches peer name, set the value for quarantine
+                    if fnmatch.fnmatch(self.name, item):
+                        self.quarantine = self.birdconfig_globals.state["bgp"]["+quarantine"][item]
 
     def configure(self) -> None:
         """Configure BGP peer."""
@@ -1101,6 +1258,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     self.state["prefix_limit"]["static"] = {}
                 # Add our static IPv6 limit
                 self.state["prefix_limit"]["static"]["ipv6"] = self.prefix_limit6
+
+        # Make sure we keep our graceful shutdown state
+        self.state["graceful_shutdown"] = self.graceful_shutdown
+
+        # Make sure we keep our quarantine state
+        self.state["quarantine"] = self.quarantine
 
         self.conf.add("")
         self.conf.add(f"# Peer type: {self.peer_type}")
@@ -1893,7 +2056,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("# Export filter TO the BGP peer from the peer BGP table")
         self.conf.add(f"filter {filter_name} {{")
         # Check if we're quarantined, if we are reject routes to the peer
-        if self.quarantined:
+        if self.quarantine:
             self.conf.add("  # Peer is quarantined so reject exporting of routes")
             self.conf.add("  if DEBUG then")
             self.conf.add(
@@ -2108,7 +2271,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Quarantine mode...
         # NK: We don't quarantine route collectors as they are automagically filtered
-        if self.quarantined and self.peer_type != "routecollector":
+        if self.quarantine and self.peer_type != "routecollector":
             # Quarantine prefixes
             self.conf.add("  # Quarantine all prefixes received")
             self.conf.add(f"  {self.bgp_functions.peer_quarantine()};")
@@ -2305,6 +2468,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.state = state
 
     @property
+    def prev_state(self) -> Optional[Dict[str, Any]]:
+        """Previous state info."""
+        return self._prev_state
+
+    @prev_state.setter
+    def prev_state(self, prev_state: Dict[str, Any]) -> None:
+        """Set previous state info."""
+        self.prev_state = prev_state
+
+    @property
     def name(self) -> str:
         """Return our name."""
         return self.peer_attributes.name
@@ -2451,12 +2624,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
     @property
     def graceful_shutdown(self) -> bool:
-        """Return the value of graceful_shutdown."""
+        """Peer graceful_shutdown property."""
         return self.peer_attributes.graceful_shutdown
 
     @graceful_shutdown.setter
     def graceful_shutdown(self, graceful_shutdown: bool) -> None:
-        """Set the value of graceful_shutdown."""
+        """Set the graceful_shutdown state of the peer."""
         self.peer_attributes.graceful_shutdown = graceful_shutdown
 
     @property
@@ -2533,6 +2706,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def prefix_limit6_peeringdb(self, prefix_limit6: Optional[str]) -> None:
         """Set our IPv6 prefix limit from PeeringDB."""
         self.peer_attributes.prefix_limit6_peeringdb = prefix_limit6
+
+    @property
+    def quarantine(self) -> bool:
+        """Peer quarantine property."""
+        return self.peer_attributes.quarantine
+
+    @quarantine.setter
+    def quarantine(self, quarantine: bool) -> None:
+        """Set the quarantine state of the peer."""
+        self.peer_attributes.quarantine = quarantine
 
     @property
     def replace_aspath(self) -> bool:
@@ -2845,20 +3028,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
     @property
     def has_ipv6(self) -> bool:
-        """Return if we have IPv6."""
+        """Peer is configured with IPv6."""
         return self.neighbor6 is not None
 
     @property
     def has_prefix_filter(self) -> BGPPeerFilterItem:
-        """Return if we filter on prefixes."""
+        """Peer has a prefix filter."""
         return self.filter_policy.prefixes or self.filter_policy.as_sets
-
-    @property
-    def quarantined(self) -> bool:
-        """Return if we're quarantined."""
-        return self.peer_attributes.quarantined
-
-    @quarantined.setter
-    def quarantined(self, quarantined: bool) -> None:
-        """Set quarantined status."""
-        self.peer_attributes.quarantined = quarantined
