@@ -34,7 +34,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes
     _configs: Dict[str, BirdPlan]
     _report: Dict[str, str]
     # All the variables we're testing and their values from the simulation
-    _variables: List[str]
+    _variables: Dict[str, str]
     # Test directory
     _test_dir: str
     # The file containing our expected results
@@ -52,7 +52,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes
         """Prepare for simulation of a new topology."""
         self._configs = {}
         self._report = {}
-        self._variables = []
+        self._variables = {}
         self._test_dir = ""
         self._expected_path = ""
         self._conffiles = {}
@@ -127,7 +127,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes
 
     def add_variable(self, name: str, content: str):  # pylint: disable=unused-argument
         """Add a variable to our expected content list."""
-        self._variables.append(content)
+        self._variables[name] = content
 
     def report(self) -> List[Tuple[str, str]]:
         """Build a report for the current test."""
@@ -196,8 +196,8 @@ class Simulation:  # pylint: disable=too-many-instance-attributes
         """Build the variable list that we should of gotten."""
 
         result = ""
-        for var in self._variables:
-            result += f"{var}\n\n"
+        for name, content in self._variables.items():
+            result += f"{name} = {content}\n\n"
 
         return result
 
