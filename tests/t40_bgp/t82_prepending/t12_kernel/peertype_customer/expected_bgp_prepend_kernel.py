@@ -339,6 +339,7 @@ r1_t_bgp4_AS65001_r2_peer = {
         },
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": False,
             "nexthops": [{"gateway": "100.201.0.4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -353,6 +354,7 @@ r1_t_bgp4_AS65001_r2_peer = {
                 "Kernel.metric": 0,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": False,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -361,6 +363,7 @@ r1_t_bgp4_AS65001_r2_peer = {
         },
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -371,6 +374,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     "100.101.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -381,6 +385,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     "100.111.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -391,6 +396,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     "100.112.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -401,6 +407,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     "100.113.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
+            "bestpath": True,
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate4",
@@ -416,6 +423,7 @@ r1_t_bgp4_AS65001_r2_peer = {
                 "Kernel.metric": 0,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -433,6 +441,7 @@ r1_t_bgp4_AS65001_r2_peer = {
                 "Kernel.scope": "link",
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -443,6 +452,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     "100.131.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -453,6 +463,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     "100.132.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1157,6 +1168,7 @@ r1_t_bgp6_AS65001_r2_peer = {
         },
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": False,
             "nexthops": [{"gateway": "fc00:201::4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1171,6 +1183,7 @@ r1_t_bgp6_AS65001_r2_peer = {
                 "Kernel.metric": 1024,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": False,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -1179,6 +1192,7 @@ r1_t_bgp6_AS65001_r2_peer = {
         },
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1279,6 +1293,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     "fc00:111::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1289,6 +1304,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     "fc00:112::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1305,6 +1321,7 @@ r1_t_bgp6_AS65001_r2_peer = {
                 "Kernel.metric": 1024,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -1321,6 +1338,7 @@ r1_t_bgp6_AS65001_r2_peer = {
                 "Kernel.metric": 1024,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -1331,6 +1349,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     "fc00:131::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1341,6 +1360,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     "fc00:132::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1618,6 +1638,7 @@ r1_t_bgp4 = {
         },
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": False,
             "nexthops": [{"gateway": "100.201.0.4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1631,6 +1652,7 @@ r1_t_bgp4 = {
                 "Kernel.metric": 0,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": False,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -1639,6 +1661,7 @@ r1_t_bgp4 = {
         },
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1649,6 +1672,7 @@ r1_t_bgp4 = {
     "100.101.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -1659,6 +1683,7 @@ r1_t_bgp4 = {
     "100.111.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1669,6 +1694,7 @@ r1_t_bgp4 = {
     "100.112.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1679,6 +1705,7 @@ r1_t_bgp4 = {
     "100.113.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
+            "bestpath": True,
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate4",
@@ -1693,6 +1720,7 @@ r1_t_bgp4 = {
                 "Kernel.metric": 0,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -1709,6 +1737,7 @@ r1_t_bgp4 = {
                 "Kernel.scope": "link",
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -1725,6 +1754,7 @@ r1_t_bgp4 = {
                 "Kernel.metric": 0,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": True,
             "pref": 10,
             "prefix_type": "blackhole",
             "protocol": "kernel4",
@@ -1734,6 +1764,7 @@ r1_t_bgp4 = {
     "100.131.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1744,6 +1775,7 @@ r1_t_bgp4 = {
     "100.132.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -1758,6 +1790,7 @@ r1_t_bgp4 = {
                 "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 940,
             },
+            "bestpath": True,
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "static4",
@@ -2181,6 +2214,7 @@ r1_t_bgp6 = {
         },
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": False,
             "nexthops": [{"gateway": "fc00:201::4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -2194,6 +2228,7 @@ r1_t_bgp6 = {
                 "Kernel.metric": 1024,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": False,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -2202,6 +2237,7 @@ r1_t_bgp6 = {
         },
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -2212,6 +2248,7 @@ r1_t_bgp6 = {
     "fc00:101::/64": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -2350,6 +2387,7 @@ r1_t_bgp6 = {
     "fc00:111::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -2360,6 +2398,7 @@ r1_t_bgp6 = {
     "fc00:112::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -2370,6 +2409,7 @@ r1_t_bgp6 = {
     "fc00:113::/64": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
+            "bestpath": True,
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate6",
@@ -2384,6 +2424,7 @@ r1_t_bgp6 = {
                 "Kernel.metric": 1024,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -2399,6 +2440,7 @@ r1_t_bgp6 = {
                 "Kernel.metric": 1024,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -2415,6 +2457,7 @@ r1_t_bgp6 = {
                 "Kernel.metric": 1024,
                 "Kernel.source": "RTS_DEVICE",
             },
+            "bestpath": True,
             "pref": 10,
             "prefix_type": "blackhole",
             "protocol": "kernel6",
@@ -2424,6 +2467,7 @@ r1_t_bgp6 = {
     "fc00:131::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -2434,6 +2478,7 @@ r1_t_bgp6 = {
     "fc00:132::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -2448,6 +2493,7 @@ r1_t_bgp6 = {
                 "BGP.large_community": [(65000, 3, 1)],
                 "BGP.local_pref": 940,
             },
+            "bestpath": True,
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "static6",
@@ -2705,6 +2751,7 @@ r1_master4 = {
         },
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": False,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -2712,6 +2759,7 @@ r1_master4 = {
             "type": ["inherit", "univ"],
         },
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -2721,6 +2769,7 @@ r1_master4 = {
     ],
     "100.101.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -2731,6 +2780,7 @@ r1_master4 = {
     "100.111.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -2741,6 +2791,7 @@ r1_master4 = {
     "100.112.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -2751,6 +2802,7 @@ r1_master4 = {
     "100.113.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
+            "bestpath": True,
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate4",
@@ -2760,6 +2812,7 @@ r1_master4 = {
     "100.121.0.0/24": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -2770,6 +2823,7 @@ r1_master4 = {
     "100.122.0.0/24": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.scope": "link", "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -2780,6 +2834,7 @@ r1_master4 = {
     "100.123.0.0/31": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "pref": 10,
             "prefix_type": "blackhole",
             "protocol": "kernel4",
@@ -2788,6 +2843,7 @@ r1_master4 = {
     ],
     "100.131.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -2797,6 +2853,7 @@ r1_master4 = {
     ],
     "100.132.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -2804,9 +2861,12 @@ r1_master4 = {
             "type": ["static", "univ"],
         }
     ],
-    "100.133.0.0/24": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
+    "100.133.0.0/24": [
+        {"bestpath": True, "pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}
+    ],
     "100.201.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -2816,6 +2876,7 @@ r1_master4 = {
     ],
     "100.64.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -3108,6 +3169,7 @@ r2_master4 = {
     ],
     "100.64.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -3249,6 +3311,7 @@ r1_master6 = {
         },
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": False,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -3256,6 +3319,7 @@ r1_master6 = {
             "type": ["inherit", "univ"],
         },
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -3265,6 +3329,7 @@ r1_master6 = {
     ],
     "fc00:100::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -3274,6 +3339,7 @@ r1_master6 = {
     ],
     "fc00:101::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -3412,6 +3478,7 @@ r1_master6 = {
     "fc00:111::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -3422,6 +3489,7 @@ r1_master6 = {
     "fc00:112::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -3432,6 +3500,7 @@ r1_master6 = {
     "fc00:113::/64": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
+            "bestpath": True,
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate6",
@@ -3441,6 +3510,7 @@ r1_master6 = {
     "fc00:121::/48": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -3451,6 +3521,7 @@ r1_master6 = {
     "fc00:122::/48": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -3461,6 +3532,7 @@ r1_master6 = {
     "fc00:123::/127": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "pref": 10,
             "prefix_type": "blackhole",
             "protocol": "kernel6",
@@ -3469,6 +3541,7 @@ r1_master6 = {
     ],
     "fc00:131::/48": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -3478,6 +3551,7 @@ r1_master6 = {
     ],
     "fc00:132::/48": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -3485,9 +3559,12 @@ r1_master6 = {
             "type": ["static", "univ"],
         }
     ],
-    "fc00:133::/64": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
+    "fc00:133::/64": [
+        {"bestpath": True, "pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}
+    ],
     "fc00:201::/48": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -3500,6 +3577,7 @@ r1_master6 = {
 r2_master6 = {
     "fc00:100::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -3755,6 +3833,7 @@ r1_t_kernel4 = {
         },
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": False,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -3762,6 +3841,7 @@ r1_t_kernel4 = {
             "type": ["inherit", "univ"],
         },
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -3772,6 +3852,7 @@ r1_t_kernel4 = {
     "100.111.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -3782,6 +3863,7 @@ r1_t_kernel4 = {
     "100.112.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -3792,6 +3874,7 @@ r1_t_kernel4 = {
     "100.113.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
+            "bestpath": True,
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate4",
@@ -3801,6 +3884,7 @@ r1_t_kernel4 = {
     "100.121.0.0/24": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -3811,6 +3895,7 @@ r1_t_kernel4 = {
     "100.122.0.0/24": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.scope": "link", "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -3821,6 +3906,7 @@ r1_t_kernel4 = {
     "100.123.0.0/31": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "pref": 10,
             "prefix_type": "blackhole",
             "protocol": "kernel4",
@@ -3829,6 +3915,7 @@ r1_t_kernel4 = {
     ],
     "100.131.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -3838,6 +3925,7 @@ r1_t_kernel4 = {
     ],
     "100.132.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -3845,7 +3933,9 @@ r1_t_kernel4 = {
             "type": ["static", "univ"],
         }
     ],
-    "100.133.0.0/24": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
+    "100.133.0.0/24": [
+        {"bestpath": True, "pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}
+    ],
     "100.64.103.0/24": [
         {
             "attributes": {
@@ -4263,6 +4353,7 @@ r1_t_kernel6 = {
         },
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": False,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -4270,6 +4361,7 @@ r1_t_kernel6 = {
             "type": ["inherit", "univ"],
         },
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -4408,6 +4500,7 @@ r1_t_kernel6 = {
     "fc00:111::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::4", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -4418,6 +4511,7 @@ r1_t_kernel6 = {
     "fc00:112::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 930},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -4428,6 +4522,7 @@ r1_t_kernel6 = {
     "fc00:113::/64": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1), (65000, 1200, 2)], "BGP.local_pref": 930},
+            "bestpath": True,
             "pref": 200,
             "prefix_type": "blackhole",
             "protocol": "bgp_originate6",
@@ -4437,6 +4532,7 @@ r1_t_kernel6 = {
     "fc00:121::/48": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -4447,6 +4543,7 @@ r1_t_kernel6 = {
     "fc00:122::/48": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -4457,6 +4554,7 @@ r1_t_kernel6 = {
     "fc00:123::/127": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "pref": 10,
             "prefix_type": "blackhole",
             "protocol": "kernel6",
@@ -4465,6 +4563,7 @@ r1_t_kernel6 = {
     ],
     "fc00:131::/48": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -4474,6 +4573,7 @@ r1_t_kernel6 = {
     ],
     "fc00:132::/48": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -4481,7 +4581,9 @@ r1_t_kernel6 = {
             "type": ["static", "univ"],
         }
     ],
-    "fc00:133::/64": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
+    "fc00:133::/64": [
+        {"bestpath": True, "pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}
+    ],
 }
 
 r2_t_kernel6 = {

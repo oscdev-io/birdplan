@@ -7,6 +7,7 @@ r1_t_bgp4_AS65001_r2_peer = {
     "100.101.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -43,6 +44,7 @@ r1_t_bgp6_AS65001_r2_peer = {
     "fc00:101::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -79,6 +81,7 @@ r1_t_bgp4 = {
     "100.101.0.0/24": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -115,6 +118,7 @@ r1_t_bgp6 = {
     "fc00:101::/48": [
         {
             "attributes": {"BGP.large_community": [(65000, 3, 1)], "BGP.local_pref": 940},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -150,6 +154,7 @@ r2_t_bgp6 = {
 r1_master4 = {
     "100.101.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -159,6 +164,7 @@ r1_master4 = {
     ],
     "100.64.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -168,6 +174,7 @@ r1_master4 = {
     ],
     "192.168.1.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -200,6 +207,7 @@ r2_master4 = {
     ],
     "100.64.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -209,6 +217,7 @@ r2_master4 = {
     ],
     "192.168.2.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -221,6 +230,7 @@ r2_master4 = {
 r1_master6 = {
     "fc00:100::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -230,6 +240,7 @@ r1_master6 = {
     ],
     "fc00:101::/48": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -239,6 +250,7 @@ r1_master6 = {
     ],
     "fc01::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -251,6 +263,7 @@ r1_master6 = {
 r2_master6 = {
     "fc00:100::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -280,6 +293,7 @@ r2_master6 = {
     ],
     "fc02::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -292,6 +306,7 @@ r2_master6 = {
 r1_t_kernel4 = {
     "100.101.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "192.168.1.2", "interface": "eth1"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -327,6 +342,7 @@ r2_t_kernel4 = {
 r1_t_kernel6 = {
     "fc00:101::/48": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "fc01::2", "interface": "eth1"}],
             "pref": 200,
             "prefix_type": "unicast",

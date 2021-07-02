@@ -6,6 +6,7 @@
 r1_t_rip4 = {
     "100.101.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -15,6 +16,7 @@ r1_t_rip4 = {
     ],
     "100.211.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth10"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -28,6 +30,7 @@ r2_t_rip4 = {
     "100.101.0.0/24": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
             "pref": 120,
@@ -39,6 +42,7 @@ r2_t_rip4 = {
     "100.211.0.0/24": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
             "pref": 120,
@@ -52,6 +56,7 @@ r2_t_rip4 = {
 r1_t_rip6 = {
     "fc00:101::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -61,6 +66,7 @@ r1_t_rip6 = {
     ],
     "fc00:211::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth10"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -74,6 +80,7 @@ r2_t_rip6 = {
     "fc00:101::/64": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
             "pref": 120,
@@ -85,6 +92,7 @@ r2_t_rip6 = {
     "fc00:211::/64": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
             "pref": 120,
@@ -99,6 +107,7 @@ r1_master4 = {
     "0.0.0.0/0": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": False,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -106,6 +115,7 @@ r1_master4 = {
             "type": ["inherit", "univ"],
         },
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -115,6 +125,7 @@ r1_master4 = {
     ],
     "100.101.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -125,6 +136,7 @@ r1_master4 = {
     "100.121.0.0/24": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -135,6 +147,7 @@ r1_master4 = {
     "100.122.0.0/24": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.scope": "link", "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -145,6 +158,7 @@ r1_master4 = {
     "100.123.0.0/31": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "pref": 10,
             "prefix_type": "blackhole",
             "protocol": "kernel4",
@@ -153,6 +167,7 @@ r1_master4 = {
     ],
     "100.131.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -162,6 +177,7 @@ r1_master4 = {
     ],
     "100.132.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -169,9 +185,12 @@ r1_master4 = {
             "type": ["static", "univ"],
         }
     ],
-    "100.133.0.0/24": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
+    "100.133.0.0/24": [
+        {"bestpath": True, "pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}
+    ],
     "100.201.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -181,6 +200,7 @@ r1_master4 = {
     ],
     "100.211.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth10"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -190,6 +210,7 @@ r1_master4 = {
     ],
     "100.64.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -203,6 +224,7 @@ r2_master4 = {
     "100.101.0.0/24": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
             "pref": 120,
@@ -214,6 +236,7 @@ r2_master4 = {
     "100.211.0.0/24": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
             "pref": 120,
@@ -224,6 +247,7 @@ r2_master4 = {
     ],
     "100.64.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -237,6 +261,7 @@ r1_master6 = {
     "::/0": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": False,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -244,6 +269,7 @@ r1_master6 = {
             "type": ["inherit", "univ"],
         },
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -253,6 +279,7 @@ r1_master6 = {
     ],
     "fc00:100::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -262,6 +289,7 @@ r1_master6 = {
     ],
     "fc00:101::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -272,6 +300,7 @@ r1_master6 = {
     "fc00:121::/48": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -282,6 +311,7 @@ r1_master6 = {
     "fc00:122::/48": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -292,6 +322,7 @@ r1_master6 = {
     "fc00:123::/127": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "pref": 10,
             "prefix_type": "blackhole",
             "protocol": "kernel6",
@@ -300,6 +331,7 @@ r1_master6 = {
     ],
     "fc00:131::/48": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -309,6 +341,7 @@ r1_master6 = {
     ],
     "fc00:132::/48": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -316,9 +349,12 @@ r1_master6 = {
             "type": ["static", "univ"],
         }
     ],
-    "fc00:133::/64": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
+    "fc00:133::/64": [
+        {"bestpath": True, "pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}
+    ],
     "fc00:201::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -328,6 +364,7 @@ r1_master6 = {
     ],
     "fc00:211::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth10"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -340,6 +377,7 @@ r1_master6 = {
 r2_master6 = {
     "fc00:100::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -350,6 +388,7 @@ r2_master6 = {
     "fc00:101::/64": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
             "pref": 120,
@@ -361,6 +400,7 @@ r2_master6 = {
     "fc00:211::/64": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
             "pref": 120,
@@ -374,6 +414,7 @@ r2_master6 = {
 r1_t_direct4_rip = {
     "100.101.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -383,6 +424,7 @@ r1_t_direct4_rip = {
     ],
     "100.211.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth10"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -395,6 +437,7 @@ r1_t_direct4_rip = {
 r1_t_direct6_rip = {
     "fc00:101::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth1"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -404,6 +447,7 @@ r1_t_direct6_rip = {
     ],
     "fc00:211::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth10"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -417,6 +461,7 @@ r1_t_kernel4 = {
     "0.0.0.0/0": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": False,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -424,6 +469,7 @@ r1_t_kernel4 = {
             "type": ["inherit", "univ"],
         },
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -434,6 +480,7 @@ r1_t_kernel4 = {
     "100.121.0.0/24": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -444,6 +491,7 @@ r1_t_kernel4 = {
     "100.122.0.0/24": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.scope": "link", "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -454,6 +502,7 @@ r1_t_kernel4 = {
     "100.123.0.0/31": [
         {
             "attributes": {"Kernel.metric": 0, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "pref": 10,
             "prefix_type": "blackhole",
             "protocol": "kernel4",
@@ -462,6 +511,7 @@ r1_t_kernel4 = {
     ],
     "100.131.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "100.201.0.2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -471,6 +521,7 @@ r1_t_kernel4 = {
     ],
     "100.132.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -478,13 +529,16 @@ r1_t_kernel4 = {
             "type": ["static", "univ"],
         }
     ],
-    "100.133.0.0/24": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}],
+    "100.133.0.0/24": [
+        {"bestpath": True, "pref": 200, "prefix_type": "blackhole", "protocol": "static4", "type": ["static", "univ"]}
+    ],
 }
 
 r2_t_kernel4 = {
     "100.101.0.0/24": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
             "pref": 120,
@@ -496,6 +550,7 @@ r2_t_kernel4 = {
     "100.211.0.0/24": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
             "pref": 120,
@@ -510,6 +565,7 @@ r1_t_kernel6 = {
     "::/0": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": False,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -517,6 +573,7 @@ r1_t_kernel6 = {
             "type": ["inherit", "univ"],
         },
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -527,6 +584,7 @@ r1_t_kernel6 = {
     "fc00:121::/48": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::3", "interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -537,6 +595,7 @@ r1_t_kernel6 = {
     "fc00:122::/48": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 10,
             "prefix_type": "unicast",
@@ -547,6 +606,7 @@ r1_t_kernel6 = {
     "fc00:123::/127": [
         {
             "attributes": {"Kernel.metric": 1024, "Kernel.source": "RTS_DEVICE"},
+            "bestpath": True,
             "pref": 10,
             "prefix_type": "blackhole",
             "protocol": "kernel6",
@@ -555,6 +615,7 @@ r1_t_kernel6 = {
     ],
     "fc00:131::/48": [
         {
+            "bestpath": True,
             "nexthops": [{"gateway": "fc00:201::2", "interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -564,6 +625,7 @@ r1_t_kernel6 = {
     ],
     "fc00:132::/48": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth2"}],
             "pref": 200,
             "prefix_type": "unicast",
@@ -571,13 +633,16 @@ r1_t_kernel6 = {
             "type": ["static", "univ"],
         }
     ],
-    "fc00:133::/64": [{"pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}],
+    "fc00:133::/64": [
+        {"bestpath": True, "pref": 200, "prefix_type": "blackhole", "protocol": "static6", "type": ["static", "univ"]}
+    ],
 }
 
 r2_t_kernel6 = {
     "fc00:101::/64": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
             "pref": 120,
@@ -589,6 +654,7 @@ r2_t_kernel6 = {
     "fc00:211::/64": [
         {
             "attributes": {"RIP.metric": 3, "RIP.tag": "0000"},
+            "bestpath": True,
             "metric1": 3,
             "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
             "pref": 120,

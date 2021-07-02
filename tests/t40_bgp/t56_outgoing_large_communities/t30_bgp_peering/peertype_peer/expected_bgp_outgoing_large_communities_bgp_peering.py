@@ -14,6 +14,7 @@ r2_t_bgp6 = {}
 r2_master4 = {
     "100.64.0.0/24": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
@@ -26,6 +27,7 @@ r2_master4 = {
 r2_master6 = {
     "fc00:100::/64": [
         {
+            "bestpath": True,
             "nexthops": [{"interface": "eth0"}],
             "pref": 240,
             "prefix_type": "unicast",
