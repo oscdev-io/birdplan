@@ -20,12 +20,13 @@
 
 """Test case simulation class."""
 
-from typing import Any, Dict, List, Tuple
 import os
 import pprint
+from typing import Any, Dict, List, Tuple
+
+from birdplan import BirdPlan  # pylint: disable=import-error
 from nsnetsim.generic_node import GenericNode
 from nsnetsim.topology import Topology
-from birdplan import BirdPlan  # pylint: disable=import-error
 
 
 class Simulation:  # pylint: disable=too-many-instance-attributes
