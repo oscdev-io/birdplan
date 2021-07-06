@@ -347,8 +347,8 @@ class BirdPlanBaseTestCase:
             nexthops.sort(key=lambda item: item["protocol"])
 
         # Add report
-        report = f"{table_variable_name} = " + pprint.pformat(result)
-        sim.add_report_obj(f"BIRD_TABLE({router})[{table_name}]", report)
+        report = pprint.pformat(result, width=132, compact=True)
+        sim.add_report_obj(f"BIRD_TABLE({router})[{table_name}]", f"{table_variable_name} = {report}")
         # Add variable so we can keep track of its expected content for later
         sim.add_variable(table_variable_name, report)
 
@@ -406,8 +406,8 @@ class BirdPlanBaseTestCase:
                 time.sleep(0.5)
 
             # Add report
-            report = f"{table_variable_name} = " + pprint.pformat(result, width=132, compact=True)
-            sim.add_report_obj(f"OS_RIB({router})[{table_name}]", report)
+            report = pprint.pformat(result, width=132, compact=True)
+            sim.add_report_obj(f"OS_RIB({router})[{table_name}]", f"{table_variable_name} = {report}")
             # Add variable so we can keep track of its expected content for later
             sim.add_variable(table_variable_name, report)
 
