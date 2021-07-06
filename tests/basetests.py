@@ -326,10 +326,10 @@ class BirdPlanBaseTestCase:
                 count_matches = True
 
             # If we don't have a content match, we match
-            if not expect_content:
+            if expect_content is None:
                 content_matches = True
             # Else check that the result contains the content we're looking for
-            elif expect_content in f"{result}":
+            elif expect_content == result:
                 content_matches = True
 
             # Check if have what we expected
