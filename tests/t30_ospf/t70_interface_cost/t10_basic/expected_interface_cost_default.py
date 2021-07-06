@@ -93,6 +93,284 @@ r2_t_ospf4 = {
     ],
 }
 
+r3_t_ospf4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
+r4_t_ospf4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
+r5_t_ospf4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
+r6_t_ospf4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
+r7_t_ospf4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
+r8_t_ospf4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 20, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 20,
+            "metric2": 10000,
+            "nexthops": [
+                {"gateway": "100.102.0.2", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.3", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.4", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.5", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.6", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.7", "interface": "eth0", "weight": 1},
+            ],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 20},
+            "bestpath": True,
+            "metric1": 20,
+            "nexthops": [
+                {"gateway": "100.102.0.2", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.3", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.4", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.5", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.6", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.7", "interface": "eth0", "weight": 1},
+            ],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
 r1_t_ospf6 = {
     "fc00:100::/64": [
         {
@@ -173,6 +451,284 @@ r2_t_ospf6 = {
             "metric1": 10,
             "metric2": 10000,
             "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r3_t_ospf6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r4_t_ospf6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r5_t_ospf6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r6_t_ospf6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r7_t_ospf6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r8_t_ospf6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 20},
+            "bestpath": True,
+            "metric1": 20,
+            "nexthops": [
+                {"gateway": "fe80::2:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::3:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::4:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::5:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::6:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::7:ff:fe00:2", "interface": "eth0", "weight": 1},
+            ],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 20, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 20,
+            "metric2": 10000,
+            "nexthops": [
+                {"gateway": "fe80::2:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::3:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::4:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::5:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::6:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::7:ff:fe00:2", "interface": "eth0", "weight": 1},
+            ],
             "ospf_type": "E2",
             "pref": 150,
             "prefix_type": "unicast",
@@ -307,6 +863,372 @@ r2_master4 = {
     ],
 }
 
+r3_master4 = {
+    "100.102.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+}
+
+r4_master4 = {
+    "100.102.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+}
+
+r5_master4 = {
+    "100.102.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+}
+
+r6_master4 = {
+    "100.102.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+}
+
+r7_master4 = {
+    "100.102.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+}
+
+r8_master4 = {
+    "100.102.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 20, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 20,
+            "metric2": 10000,
+            "nexthops": [
+                {"gateway": "100.102.0.2", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.3", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.4", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.5", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.6", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.7", "interface": "eth0", "weight": 1},
+            ],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 20},
+            "bestpath": True,
+            "metric1": 20,
+            "nexthops": [
+                {"gateway": "100.102.0.2", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.3", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.4", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.5", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.6", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.7", "interface": "eth0", "weight": 1},
+            ],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
 r1_master6 = {
     "fc00:100::/64": [
         {
@@ -421,6 +1343,372 @@ r2_master6 = {
             "metric1": 10,
             "metric2": 10000,
             "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r3_master6 = {
+    "fc00:100::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "fc00:102::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r4_master6 = {
+    "fc00:100::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "fc00:102::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r5_master6 = {
+    "fc00:100::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "fc00:102::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r6_master6 = {
+    "fc00:100::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "fc00:102::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r7_master6 = {
+    "fc00:100::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "fc00:102::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth1"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r8_master6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 20},
+            "bestpath": True,
+            "metric1": 20,
+            "nexthops": [
+                {"gateway": "fe80::2:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::3:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::4:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::5:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::6:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::7:ff:fe00:2", "interface": "eth0", "weight": 1},
+            ],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        },
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": False,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        },
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 20, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 20,
+            "metric2": 10000,
+            "nexthops": [
+                {"gateway": "fe80::2:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::3:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::4:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::5:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::6:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::7:ff:fe00:2", "interface": "eth0", "weight": 1},
+            ],
             "ospf_type": "E2",
             "pref": 150,
             "prefix_type": "unicast",
@@ -547,6 +1835,284 @@ r2_t_kernel4 = {
     ],
 }
 
+r3_t_kernel4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
+r4_t_kernel4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
+r5_t_kernel4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
+r6_t_kernel4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
+r7_t_kernel4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "100.64.0.1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
+r8_t_kernel4 = {
+    "100.102.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "100.131.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 20, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 20,
+            "metric2": 10000,
+            "nexthops": [
+                {"gateway": "100.102.0.2", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.3", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.4", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.5", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.6", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.7", "interface": "eth0", "weight": 1},
+            ],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+    "100.64.0.0/24": [
+        {
+            "attributes": {"OSPF.metric1": 20},
+            "bestpath": True,
+            "metric1": 20,
+            "nexthops": [
+                {"gateway": "100.102.0.2", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.3", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.4", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.5", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.6", "interface": "eth0", "weight": 1},
+                {"gateway": "100.102.0.7", "interface": "eth0", "weight": 1},
+            ],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf4",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+}
+
 r1_t_kernel6 = {
     "fc00:100::/64": [
         {
@@ -627,6 +2193,284 @@ r2_t_kernel6 = {
             "metric1": 10,
             "metric2": 10000,
             "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r3_t_kernel6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r4_t_kernel6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r5_t_kernel6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r6_t_kernel6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r7_t_kernel6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth1"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 10, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 10,
+            "metric2": 10000,
+            "nexthops": [{"gateway": "fe80::1:ff:fe00:1", "interface": "eth0"}],
+            "ospf_type": "E2",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "router_id": "0.0.0.1",
+            "type": ["OSPF-E2", "univ"],
+        }
+    ],
+}
+
+r8_t_kernel6 = {
+    "fc00:100::/64": [
+        {
+            "attributes": {"OSPF.metric1": 20},
+            "bestpath": True,
+            "metric1": 20,
+            "nexthops": [
+                {"gateway": "fe80::2:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::3:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::4:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::5:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::6:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::7:ff:fe00:2", "interface": "eth0", "weight": 1},
+            ],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:102::/64": [
+        {
+            "attributes": {"OSPF.metric1": 10},
+            "bestpath": True,
+            "metric1": 10,
+            "nexthops": [{"interface": "eth0"}],
+            "ospf_type": "I",
+            "pref": 150,
+            "prefix_type": "unicast",
+            "protocol": "ospf6",
+            "type": ["OSPF", "univ"],
+        }
+    ],
+    "fc00:131::/48": [
+        {
+            "attributes": {"OSPF.metric1": 20, "OSPF.metric2": 10000, "OSPF.router_id": "0.0.0.1", "OSPF.tag": "0x00000000"},
+            "bestpath": True,
+            "metric1": 20,
+            "metric2": 10000,
+            "nexthops": [
+                {"gateway": "fe80::2:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::3:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::4:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::5:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::6:ff:fe00:2", "interface": "eth0", "weight": 1},
+                {"gateway": "fe80::7:ff:fe00:2", "interface": "eth0", "weight": 1},
+            ],
             "ospf_type": "E2",
             "pref": 150,
             "prefix_type": "unicast",

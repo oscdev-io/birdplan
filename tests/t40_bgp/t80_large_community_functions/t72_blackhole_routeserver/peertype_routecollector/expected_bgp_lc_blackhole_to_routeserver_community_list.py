@@ -163,6 +163,38 @@ r1_t_bgp4 = {}
 
 r2_t_bgp4 = {}
 
+r3_t_bgp4 = {}
+
+r4_t_bgp4 = {}
+
+r5_t_bgp4 = {}
+
+r6_t_bgp4 = {}
+
+r7_t_bgp4 = {}
+
+r8_t_bgp4 = {}
+
+r9_t_bgp4 = {}
+
+r10_t_bgp4 = {}
+
 r1_t_bgp6 = {}
 
 r2_t_bgp6 = {}
+
+r3_t_bgp6 = {}
+
+r4_t_bgp6 = {}
+
+r5_t_bgp6 = {}
+
+r6_t_bgp6 = {}
+
+r7_t_bgp6 = {}
+
+r8_t_bgp6 = {}
+
+r9_t_bgp6 = {}
+
+r10_t_bgp6 = {}

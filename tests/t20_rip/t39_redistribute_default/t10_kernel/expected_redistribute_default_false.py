@@ -79,9 +79,13 @@ r1_t_rip4 = {}
 
 r2_t_rip4 = {}
 
+r3_t_rip4 = {}
+
 r1_t_rip6 = {}
 
 r2_t_rip6 = {}
+
+r3_t_rip6 = {}
 
 r1_master4 = {
     "0.0.0.0/0": [
@@ -201,6 +205,19 @@ r2_master4 = {
             "type": ["device", "univ"],
         }
     ],
+}
+
+r3_master4 = {
+    "100.102.0.0/24": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct4",
+            "type": ["device", "univ"],
+        }
+    ]
 }
 
 r1_master6 = {
@@ -323,6 +340,19 @@ r2_master6 = {
     ],
 }
 
+r3_master6 = {
+    "fc00:102::/64": [
+        {
+            "bestpath": True,
+            "nexthops": [{"interface": "eth0"}],
+            "pref": 240,
+            "prefix_type": "unicast",
+            "protocol": "direct6",
+            "type": ["device", "univ"],
+        }
+    ]
+}
+
 r1_t_kernel4 = {
     "0.0.0.0/0": [
         {
@@ -402,6 +432,8 @@ r1_t_kernel4 = {
 
 r2_t_kernel4 = {}
 
+r3_t_kernel4 = {}
+
 r1_t_kernel6 = {
     "::/0": [
         {
@@ -480,6 +512,8 @@ r1_t_kernel6 = {
 }
 
 r2_t_kernel6 = {}
+
+r3_t_kernel6 = {}
 
 r1_inet = [
     {"dev": "eth2", "dst": "default", "flags": [], "gateway": "100.201.0.3"},
