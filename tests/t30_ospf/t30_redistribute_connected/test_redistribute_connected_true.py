@@ -31,5 +31,3 @@ class Test(Template):
   redistribute:
     connected: True
 """
-
-    r1_t_ospf4_expect_content = "'OSPF.metric1'"
