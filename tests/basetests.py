@@ -347,10 +347,14 @@ class BirdPlanBaseTestCase:
             nexthops.sort(key=lambda item: item["protocol"])
 
         # Add report
-        report = pprint.pformat(result, width=132, compact=True)
-        sim.add_report_obj(f"BIRD_TABLE({router})[{table_name}]", f"{table_variable_name} = {report}")
+        report_result = pprint.pformat(result, width=132, compact=True)
+        sim.add_report_obj(f"BIRD_TABLE({router})[{table_name}]", f"{table_variable_name} = {report_result}")
         # Add variable so we can keep track of its expected content for later
-        sim.add_variable(table_variable_name, report)
+        sim.add_variable(table_variable_name, report_result)
+        # If we didn't match add the incorrect result to the report too
+        if expect_content != result:
+            report_expected = pprint.pformat(expect_content, width=132, compact=True)
+            sim.add_report_obj(f"EXPECTED_BIRD_TABLE({router})[{table_name}]", f"{table_variable_name} = {report_expected}")
 
         # Return the two chunks of data for later assertion
         return (result, expected_data)
