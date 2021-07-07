@@ -30,3 +30,5 @@ class Test(Template):
     def _test_interface_attributes(self, sim, tmpdir):
         """OSPF interface cost test to customize template."""
         # This is a configuration file test
+
+        # Check if we're delaying testing (for convergeance)
