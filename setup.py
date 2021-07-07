@@ -47,7 +47,7 @@ setup(
         "Topic:: System:: Networking",
     ],
     python_requires=">=3.8",
-    install_requires=["birdclient", "nsnetsim", "pyyaml"],
+    install_requires=["birdclient", "nsnetsim", "pyyaml", "colorama"],
     packages=find_packages(),
     entry_points={"console_scripts": ["birdplan=birdplan.cmdline:run_birdplan"]},
 )

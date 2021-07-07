@@ -265,39 +265,11 @@ class BirdPlanBaseTestCase:
     def _get_bird_table_data(self, expected_module, router: str, table_name: str, sim) -> Tuple[Any, Any]:
         """Get the bird table received data and expected data."""
 
-        def nexthop_count(table: Dict[str, Any]) -> Optional[int]:
-            """Count nexthops in a table."""
-            count = 0
-            # Loop with prefixes
-            for prefixes in table.values():
-                # Loop with each route per prefix
-                for route in prefixes:
-                    # Add nexthop count
-                    if "nexthops" in route:
-                        count += len(route["nexthops"])
-                    # Or 1 if there are no nexthops
-                    else:
-                        count += 1
-            # Return None if we don't have a count
-            return count if count else None
-
         # Work out variable names
         table_variable_name = f"{router}_{table_name}"
-        expect_content_variable_name = f"{table_variable_name}_expect_content"
 
         # Grab table data
-        expected_data = self._get_expected_data_item(expected_module, table_variable_name)
-        expect_content = self._get_expected_data_item(expected_module, expect_content_variable_name)
-
-        # If we didn't find expect_content in the expected results file, check our test case...
-        if not expect_content and hasattr(self, expect_content_variable_name):
-            expect_content = getattr(self, expect_content_variable_name)
-
-        # If we have entries in our routing table, we set expect_count to that number, else we don't use expect_count by
-        # setting it to None
-        expect_count = None
-        if isinstance(expected_data, dict):
-            expect_count = nexthop_count(expected_data)
+        result_expected = self._get_expected_data_item(expected_module, table_variable_name)
 
         # Save the start time
         time_start = time.time()
@@ -306,34 +278,20 @@ class BirdPlanBaseTestCase:
         expect_timeout = 10
         result = []
         while True:
+            content_matches = False
 
             # Grab the routers table from BIRD
             result = self._bird_route_table(sim, router, table_name)
-            # Change None back into 0
-            result_len = nexthop_count(result) or 0
 
-            count_matches = False
-            content_matches = False
-
-            # If we're not expecting a count of table entries, we match
-            if expect_count is None:
-                count_matches = True
-            # If expect_count is 0, we need to wait until its 0
-            elif expect_count == 0 and result_len == expect_count:
-                count_matches = True
-            # If we are expecting a count, check to see if we have have it
-            elif result_len == expect_count:
-                count_matches = True
-
-            # If we don't have a content match, we match
-            if not expect_content:
+            # If we don't have a content match, we match as we have a sleep() after bird status
+            if result_expected is None:
                 content_matches = True
             # Else check that the result contains the content we're looking for
-            elif expect_content in f"{result}":
+            elif result_expected == result:
                 content_matches = True
 
             # Check if have what we expected
-            if count_matches and content_matches:
+            if content_matches:
                 break
 
             # If not, check to see if we've exceeded our timeout
@@ -347,16 +305,24 @@ class BirdPlanBaseTestCase:
             nexthops.sort(key=lambda item: item["protocol"])
 
         # Add report
-        report = pprint.pformat(result, width=132, compact=True)
-        sim.add_report_obj(f"BIRD_TABLE({router})[{table_name}]", f"{table_variable_name} = {report}")
+        report_result = pprint.pformat(result, width=132, compact=True)
+        sim.add_report_obj(f"BIRD_TABLE({router})[{table_name}]", f"{table_variable_name} = {report_result}")
         # Add variable so we can keep track of its expected content for later
-        sim.add_variable(table_variable_name, report)
+        sim.add_variable(table_variable_name, report_result)
+        # If we didn't match add the incorrect result to the report too
+        if result_expected != result:
+            report_expected = pprint.pformat(result_expected, width=132, compact=True)
+            sim.add_report_obj(f"EXPECTED_BIRD_TABLE({router})[{table_name}]", f"{table_variable_name} = {report_expected}")
 
         # Return the two chunks of data for later assertion
-        return (result, expected_data)
+        return (result, result_expected)
 
-    def _test_os_rib(self, table_name: str, sim):
+    def _test_os_rib(self, table_name: str, sim, routers: Optional[List[str]] = None):
         """Test OS routing table."""
+
+        # Check if we didn't get a router list override, if we didn't, then use all routers
+        if not routers:
+            routers = self.routers
 
         # Grab the the expected data module
         expected_module = self._get_expected_module(sim)
@@ -364,62 +330,71 @@ class BirdPlanBaseTestCase:
         # Assertion data
         assert_data = {}
 
-        # Loop with our BIRD routers
-        for router in self.routers:
+        # Loop with our BIRD routers and grab the data for assertion below
+        for router in routers:
             # Skip over routers not configured
             if not sim.node(router):
                 continue
+            # Grab assert data
+            assert_data[router] = self._get_os_rib_data(expected_module, router, table_name, sim)
 
-            # Work out variable names
-            table_variable_name = f"{router}_{table_name}"
-
-            # Grab table data
-            expected_data = self._get_expected_data_item(expected_module, table_variable_name)
-
-            # Save the start time
-            time_start = time.time()
-
-            # Grab expected count and start with blank result
-            expect_count = None
-            if isinstance(expected_data, dict):
-                expect_count = len(expected_data) or None
-            expect_timeout = 10
-            result = []
-            while True:
-                # Grab the RIB table from the OS
-                result = sim.node(router).run_ip(["--family", table_name, "route", "list"])
-
-                # If we're not expecting a count of table entries, we match
-                if expect_count is None:
-                    break
-                # If expect_count is 0, we need to wait until its 0
-                if expect_count == 0 and len(result) == expect_count:
-                    break
-                # If we are expecting a count, check to see if we have at least the number we need
-                if len(result) >= expect_count > 0:
-                    break
-
-                # If not, check to see if we've exceeded our timeout
-                if time.time() - time_start > expect_timeout:
-                    break
-
-                time.sleep(0.5)
-
-            # Add report
-            report = pprint.pformat(result, width=132, compact=True)
-            sim.add_report_obj(f"OS_RIB({router})[{table_name}]", f"{table_variable_name} = {report}")
-            # Add variable so we can keep track of its expected content for later
-            sim.add_variable(table_variable_name, report)
-
-            # Save both tables for the assert test below
-            assert_data[router] = (result, expected_data)
-
-        # Loop with the results and assert
+        # Run asserts on the data received
         for router, data in assert_data.items():
             # Name variables nicely so they look good in our test output
             received_data, expected_data = data
             # Make sure table matches
             assert received_data == expected_data, f"BIRD router '{router}' RIB '{table_name}' does not match what it should be"
+
+    def _get_os_rib_data(self, expected_module, router: str, table_name: str, sim) -> Tuple[Any, Any]:
+        """Get the OS RIB received data and expected data."""
+
+        # Work out variable names
+        table_variable_name = f"{router}_{table_name}"
+
+        # Grab table data
+        result_expected = self._get_expected_data_item(expected_module, table_variable_name)
+
+        # Save the start time
+        time_start = time.time()
+
+        # Start with a blank result
+        expect_timeout = 10
+        result = []
+        while True:
+            result_matches = False
+
+            # Grab the routers table from BIRD
+            result = sim.node(router).run_ip(["--family", table_name, "route", "list"])
+
+            # If we don't have a content match, we match as we have a sleep() after bird status
+            if result_expected is None:
+                result_matches = True
+            # Else check that the result contains the content we're looking for
+            elif result_expected == result:
+                result_matches = True
+
+            # Check if have what we expected
+            if result_matches:
+                break
+
+            # If not, check to see if we've exceeded our timeout
+            if time.time() - time_start > expect_timeout:
+                break
+
+            time.sleep(0.5)
+
+        # Add report
+        report_result = pprint.pformat(result, width=132, compact=True)
+        sim.add_report_obj(f"OS_RIB({router})[{table_name}]", f"{table_variable_name} = {report_result}")
+        # Add variable so we can keep track of its expected content for later
+        sim.add_variable(table_variable_name, report_result)
+        # If we didn't match add the incorrect result to the report too
+        if result_expected != result:
+            report_expected = pprint.pformat(result_expected, width=132, compact=True)
+            sim.add_report_obj(f"EXPECTED_OS_RIB({router})[{table_name}]", f"{table_variable_name} = {report_expected}")
+
+        # Return the two chunks of data for later assertion
+        return (result, result_expected)
 
     def _get_expected_module(self, sim):
         """Grab the expected data module."""
