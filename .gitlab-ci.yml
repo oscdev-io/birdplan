@@ -41,6 +41,13 @@ test_job:
   - pip install git+https://oscdev.io/software/nsnetsim.git
   # Run tests
   - if [ -n "$EXTRA_TEST_OPTS" ]; then echo "EXTRA_TEST_OPTS => $EXTRA_TEST_OPTS"; python setup.py test --addopt "$EXTRA_TEST_OPTS"; else python setup.py test; fi
+  # Save HTML coverage report
+  - mkdir public
+  - coverage html -d public/coverage
+  # Save coverage report
+  artifacts:
+    paths:
+    - public
 
 prepare_release:
   stage: prepare_release
@@ -55,7 +62,7 @@ prepare_release:
   - if [ -n "$LAST_TAG" ]; then COMMIT_RANGE="$LAST_TAG..$CI_COMMIT_TAG"; else COMMIT_RANGE=""; fi
   # Output description file
   - echo "Automatic release based on tag $CI_COMMIT_TAG" > build/description.txt
-  - git log --oneline --decorate --no-merges $COMMIT_RANGE >> build/description.txt
+  - git log --oneline --decorate --no-merges "$COMMIT_RANGE" >> build/description.txt
   artifacts:
     expire_in: 1 day
     paths:
