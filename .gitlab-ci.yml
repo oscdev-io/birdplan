@@ -37,8 +37,8 @@ test_job:
       bgpq3
   # Create Python environment
   - pacman -S --noconfirm python-pip git
-  - pip install git+https://oscdev.io/software/birdclient.git
-  - pip install git+https://oscdev.io/software/nsnetsim.git
+  - pip install git+https://gitlab.oscdev.io/software/birdclient.git
+  - pip install git+https://gitlab.oscdev.io/software/nsnetsim.git
   # Run tests
   - if [ -n "$EXTRA_TEST_OPTS" ]; then echo "EXTRA_TEST_OPTS => $EXTRA_TEST_OPTS"; python setup.py test --addopt "$EXTRA_TEST_OPTS"; else python setup.py test; fi
   # Save HTML coverage report
