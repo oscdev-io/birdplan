@@ -123,7 +123,7 @@ class BirdPlanBaseTestCase:
         # Configure our simulator with the BIRD routers
         configured_routers = self._configure_bird_routers(sim, tmpdir)
         for router in configured_routers:
-            sim.add_node(BirdRouterNode(name=router, configfile=f"{tmpdir}/bird.conf.{router}"))
+            sim.add_node(BirdRouterNode(name=router, configfile=f"{tmpdir}/bird.conf.{router}", debug=True))
 
         # Loop with our ExaBGP's and create the nodes
         self._configure_exabgps(sim, tmpdir)
