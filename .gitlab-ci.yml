@@ -29,8 +29,8 @@ test_job:
   - pacman -S --noconfirm
       python-colorama
       python-jinja
-      python-yaml python-yaml-stubs
-      python-requests python-requests-stubs
+      python-yaml python-types-yaml
+      python-requests python-types-requests
       iproute2
       bird
       exabgp
