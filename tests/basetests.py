@@ -277,9 +277,8 @@ class BirdPlanBaseTestCase:
         # Start with a blank result
         expect_timeout = 10
         result = []
+        content_matches = False
         while True:
-            content_matches = False
-
             # Grab the routers table from BIRD
             result = self._bird_route_table(sim, router, table_name)
 
@@ -310,7 +309,7 @@ class BirdPlanBaseTestCase:
         # Add variable so we can keep track of its expected content for later
         sim.add_variable(table_variable_name, report_result)
         # If we didn't match add the incorrect result to the report too
-        if result_expected != result:
+        if not content_matches:
             report_expected = pprint.pformat(result_expected, width=132, compact=True)
             sim.add_report_obj(f"EXPECTED_BIRD_TABLE({router})[{table_name}]", f"{table_variable_name} = {report_expected}")
 
