@@ -275,7 +275,7 @@ class BirdPlanBaseTestCase:
         time_start = time.time()
 
         # Start with a blank result
-        expect_timeout = 10
+        expect_timeout = 120
         result = []
         content_matches = False
         while True:
