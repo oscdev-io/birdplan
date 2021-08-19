@@ -633,7 +633,7 @@ class BirdPlanBaseTestCase:
                     if "attributes" in dest and "OSPF.router_id" in dest["attributes"]:
                         del dest["attributes"]["OSPF.router_id"]
             # Sort route table so its consistent
-            route_table[route].sort(key=repr)
+            routes.sort(key=repr)
 
         # Return route table
         return route_table
