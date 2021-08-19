@@ -178,7 +178,7 @@ def fixture_sim(request):
 
     # Check if we're delaying checking of results
     if request.config.getoption("--write-expected"):
-        simulation.delay = 10
+        simulation.delay = 20
 
     # Yield the simulation to the test
     yield simulation
