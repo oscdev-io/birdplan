@@ -25,13 +25,14 @@ import pprint
 from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
-from birdplan import BirdPlan  # pylint: disable=import-error
 from nsnetsim.generic_node import GenericNode
 from nsnetsim.topology import Topology
+from birdplan import BirdPlan  # pylint: disable=import-error
 
 
 class YAMLSafeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
     """Safe YAML loader wtih some specific datatypes."""
+
     def construct_python_tuple(self, node):
         """Tuple constructor."""
         return tuple(self.construct_sequence(node))
