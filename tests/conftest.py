@@ -185,33 +185,8 @@ def fixture_sim(request):
 
     # Check if we're supposed to be writing out the expected results
     if request.config.getoption("--write-expected"):
-        # Make sure we do infact have an expected results path set
-        if not simulation.expected_path:
-            raise RuntimeError("No expected_path set and '--write-expected' given on commandline")
-
-        # Write out expected file contents
-        with open(simulation.expected_path, "w") as expected_file:
-            expected_file.write("# type: ignore\n")
-            expected_file.write("# pylint: disable=too-many-lines\n\n")
-            expected_file.write('"""Expected test result data."""\n\n')
-            expected_file.write(simulation.variables)
-
-        # Grab the expected configuration file
-        expected_conffile_base = simulation.expected_path.replace(".py", "")
-        for conffile_name, sim_conffile_path in simulation.conffiles.items():
-            expected_conffile = f"{expected_conffile_base}_{conffile_name}"
-            # If this is a birdplan config file, write it out
-            if "birdplan" in conffile_name:
-                # Cleanup filename
-                expected_conffile = expected_conffile.replace("_birdplan.yaml.", ".birdplan.") + ".conf"
-                # We need to replace some options that are variable so files don't change between runs
-                with open(sim_conffile_path, "r") as config_file:
-                    conf_lines = config_file.readlines()
-                with open(expected_conffile, "w") as config_file:
-                    for line in conf_lines:
-                        if "log_file:" in line:
-                            line = "log_file: /var/log/birdplan.log\n"
-                        config_file.write(line)
+        # Write out simulation data
+        simulation.write_data()
 
     # Destroy simulation
     simulation.destroy()

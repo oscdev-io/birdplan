@@ -22,13 +22,11 @@
 """Base test classes for our tests."""
 
 from typing import Any, Dict, List, Optional, Tuple
-import importlib
 import inspect
 import logging
 import os
 import re
 import time
-import pathlib
 import pprint
 import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
@@ -49,8 +47,6 @@ BirdConfigMacros = Optional[Dict[str, Dict[str, str]]]
 @pytest.mark.incremental
 class BirdPlanBaseTestCase:
     """Base test case for our tests."""
-
-    sim: Simulation
 
     # List of ExaBGP nodes to create, eg. ["e1"]
     exabgps = []
@@ -111,14 +107,8 @@ class BirdPlanBaseTestCase:
     def _test_setup(self, sim, testpath, tmpdir):  # pylint: disable=too-many-locals
         """Set up a BIRD test scenario using our attributes."""
 
-        # Grab the directory the test is running in
-        sim.test_dir = os.path.dirname(testpath)
-
-        # Grab the filename of the test
-        test_filename = os.path.basename(testpath)
-
-        # Work out the expected file path
-        sim.expected_path = f"{sim.test_dir}/expected{test_filename[4:]}"
+        # Set test we're currently running
+        sim.set_test(testpath)
 
         # Configure our simulator with the BIRD routers
         configured_routers = self._configure_bird_routers(sim, tmpdir)
@@ -169,10 +159,13 @@ class BirdPlanBaseTestCase:
                     switch = getattr(self, switch_attr)
                     sim.node(switch).add_interface(sim.node(exabgp).interface(interface))
 
+        # Load data we may have
+        sim.load_data()
+
         # Simulate our topology
         sim.run()
 
-    def _test_bird_status(self, sim):
+    def _test_bird_status(self, sim: Simulation):
         """Test all bird instances are up and responding."""
 
         # Loop with BIRD routers
@@ -196,15 +189,12 @@ class BirdPlanBaseTestCase:
         if sim.delay:
             time.sleep(sim.delay)
 
-    def _test_bird_routers_table_bgp_peers(self, ipv: int, sim, routers: Optional[List[str]] = None):
+    def _test_bird_routers_table_bgp_peers(self, sim: Simulation, ipv: int, routers: Optional[List[str]] = None):
         """Test BIRD BGP peer routing table."""
 
         # Check if we didn't get a router list override, if we didn't, then use all routers
         if not routers:
             routers = self.routers
-
-        # Grab the the expected data module
-        expected_module = self._get_expected_module(sim)
 
         # Assertion data
         assert_data = {}
@@ -222,7 +212,7 @@ class BirdPlanBaseTestCase:
                 if router not in assert_data:
                     assert_data[router] = {}
                 # Grab data for assertion below
-                assert_data[router][table_name] = self._get_bird_table_data(expected_module, router, table_name, sim)
+                assert_data[router][table_name] = self._get_bird_table_data(sim, router, table_name)
 
         # Run asserts on the data received
         for router in assert_data:
@@ -234,15 +224,12 @@ class BirdPlanBaseTestCase:
                     received_data == expected_data
                 ), f"BIRD router '{router}' peer table '{table_name}' does not match what it should be"
 
-    def _test_bird_routers_table(self, table_name: str, sim, routers: Optional[List[str]] = None):
+    def _test_bird_routers_table(self, sim: Simulation, table_name: str, routers: Optional[List[str]] = None):
         """Test BIRD routing table for all routers, or those specified."""
 
         # Check if we didn't get a router list override, if we didn't, then use all routers
         if not routers:
             routers = self.routers
-
-        # Grab the the expected data module
-        expected_module = self._get_expected_module(sim)
 
         # Assertion data
         assert_data = {}
@@ -253,7 +240,7 @@ class BirdPlanBaseTestCase:
             if not sim.node(router):
                 continue
             # Grab assert data
-            assert_data[router] = self._get_bird_table_data(expected_module, router, table_name, sim)
+            assert_data[router] = self._get_bird_table_data(sim, router, table_name)
 
         # Run asserts on the data received
         for router, data in assert_data.items():
@@ -262,14 +249,14 @@ class BirdPlanBaseTestCase:
             # Make sure table matches
             assert received_data == expected_data, f"BIRD router '{router}' table '{table_name}' does not match what it should be"
 
-    def _get_bird_table_data(self, expected_module, router: str, table_name: str, sim) -> Tuple[Any, Any]:
+    def _get_bird_table_data(self, sim: Simulation, router: str, table_name: str) -> Tuple[Any, Any]:
         """Get the bird table received data and expected data."""
 
         # Work out variable names
-        table_variable_name = f"{router}_{table_name}"
+        data_name = f"{router}_{table_name}"
 
         # Grab table data
-        result_expected = self._get_expected_data_item(expected_module, table_variable_name)
+        result_expected = sim.get_data(data_name)
 
         # Save the start time
         time_start = time.time()
@@ -283,7 +270,9 @@ class BirdPlanBaseTestCase:
             result = self._bird_route_table(sim, router, table_name)
 
             # If we don't have a content match, we match as we have a sleep() after bird status
-            if result_expected is None:
+            # The first case is when there is no expected data
+            # The second case is when this item is missing from the expected data
+            if result_expected is None or isinstance(result_expected, ValueError):
                 content_matches = True
             # Else check that the result contains the content we're looking for
             elif result_expected == result:
@@ -305,26 +294,23 @@ class BirdPlanBaseTestCase:
 
         # Add report
         report_result = pprint.pformat(result, width=132, compact=True)
-        sim.add_report_obj(f"BIRD_TABLE({router})[{table_name}]", f"{table_variable_name} = {report_result}")
+        sim.add_report_obj(f"BIRD_TABLE({router})[{table_name}]", f"{data_name} = {report_result}")
         # Add variable so we can keep track of its expected content for later
-        sim.add_variable(table_variable_name, report_result)
+        sim.add_variable(data_name, result)
         # If we didn't match add the incorrect result to the report too
         if not content_matches:
             report_expected = pprint.pformat(result_expected, width=132, compact=True)
-            sim.add_report_obj(f"EXPECTED_BIRD_TABLE({router})[{table_name}]", f"{table_variable_name} = {report_expected}")
+            sim.add_report_obj(f"EXPECTED_BIRD_TABLE({router})[{table_name}]", f"{data_name} = {report_expected}")
 
         # Return the two chunks of data for later assertion
         return (result, result_expected)
 
-    def _test_os_rib(self, table_name: str, sim, routers: Optional[List[str]] = None):
+    def _test_os_rib(self, sim: Simulation, table_name: str, routers: Optional[List[str]] = None):
         """Test OS routing table."""
 
         # Check if we didn't get a router list override, if we didn't, then use all routers
         if not routers:
             routers = self.routers
-
-        # Grab the the expected data module
-        expected_module = self._get_expected_module(sim)
 
         # Assertion data
         assert_data = {}
@@ -335,7 +321,7 @@ class BirdPlanBaseTestCase:
             if not sim.node(router):
                 continue
             # Grab assert data
-            assert_data[router] = self._get_os_rib_data(expected_module, router, table_name, sim)
+            assert_data[router] = self._get_os_rib_data(sim, router, table_name)
 
         # Run asserts on the data received
         for router, data in assert_data.items():
@@ -344,24 +330,23 @@ class BirdPlanBaseTestCase:
             # Make sure table matches
             assert received_data == expected_data, f"BIRD router '{router}' RIB '{table_name}' does not match what it should be"
 
-    def _get_os_rib_data(self, expected_module, router: str, table_name: str, sim) -> Tuple[Any, Any]:
+    def _get_os_rib_data(self, sim: Simulation, router: str, table_name: str) -> Tuple[Any, Any]:
         """Get the OS RIB received data and expected data."""
 
         # Work out variable names
-        table_variable_name = f"{router}_{table_name}"
+        data_name = f"{router}_{table_name}"
 
         # Grab table data
-        result_expected = self._get_expected_data_item(expected_module, table_variable_name)
+        result_expected = sim.get_data(data_name)
 
         # Save the start time
         time_start = time.time()
 
         # Start with a blank result
-        expect_timeout = 10
+        expect_timeout = 120
         result = []
+        result_matches = False
         while True:
-            result_matches = False
-
             # Grab the routers table from BIRD
             result = sim.node(router).run_ip(["--family", table_name, "route", "list"])
 
@@ -384,57 +369,16 @@ class BirdPlanBaseTestCase:
 
         # Add report
         report_result = pprint.pformat(result, width=132, compact=True)
-        sim.add_report_obj(f"OS_RIB({router})[{table_name}]", f"{table_variable_name} = {report_result}")
+        sim.add_report_obj(f"OS_RIB({router})[{table_name}]", f"{data_name} = {report_result}")
         # Add variable so we can keep track of its expected content for later
-        sim.add_variable(table_variable_name, report_result)
+        sim.add_variable(data_name, result)
         # If we didn't match add the incorrect result to the report too
-        if result_expected != result:
+        if not result_matches:
             report_expected = pprint.pformat(result_expected, width=132, compact=True)
-            sim.add_report_obj(f"EXPECTED_OS_RIB({router})[{table_name}]", f"{table_variable_name} = {report_expected}")
+            sim.add_report_obj(f"EXPECTED_OS_RIB({router})[{table_name}]", f"{data_name} = {report_expected}")
 
         # Return the two chunks of data for later assertion
         return (result, result_expected)
-
-    def _get_expected_module(self, sim):
-        """Grab the expected data module."""
-
-        # Grab relative path of our expected results file
-        relpath = pathlib.Path(sim.expected_path).relative_to(os.path.dirname(__file__))
-
-        # Grab the expected results filename
-        module_filename = os.path.basename(relpath)
-
-        # Work out the directory name of the expected results file
-        module_dirname = f"tests/{os.path.dirname(relpath)}"
-
-        # Grab the expected results module package name, which is the directory name with / replaced with .
-        module_pkgname = module_dirname.replace("/", ".")
-
-        # Remove the .py from the data module
-        module_name = f".{module_filename[:-3]}"
-
-        # Import data module, remove .py from the data_module_filename
-        try:
-            expected_module = importlib.import_module(module_name, module_pkgname)
-        except ModuleNotFoundError:
-            expected_module = None
-
-        return expected_module
-
-    def _get_expected_data_item(self, expected_data, symbol_name: str) -> Any:
-        """Get an item from our data module."""
-
-        data = None
-        # But if we have a variable set for this router and table, use it instead
-        if hasattr(expected_data, symbol_name):
-            symbol = getattr(expected_data, symbol_name)
-            # If the symbol is a callable, then call it with self
-            if callable(symbol):
-                data = symbol(self)
-            else:
-                data = symbol
-
-        return data
 
     def _configure_bird_routers(self, sim: Simulation, tmpdir: str) -> List[str]:
         """Create our configuration files."""
@@ -689,6 +633,8 @@ class BirdPlanBaseTestCase:
                     # Check if we have attributes and if the router_id is there
                     if "attributes" in dest and "OSPF.router_id" in dest["attributes"]:
                         del dest["attributes"]["OSPF.router_id"]
+            # Sort route table so its consistent
+            route_table[route].sort(key=repr)
 
         # Return route table
         return route_table
