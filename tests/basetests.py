@@ -263,11 +263,14 @@ class BirdPlanBaseTestCase:
 
         # Start with a blank result
         expect_timeout = 120
-        result = []
+        result = None
         content_matches = False
         while True:
             # Grab the routers table from BIRD
             result = self._bird_route_table(sim, router, table_name)
+            # Sort nexthops by protocol
+            for nexthops in result.values():
+                nexthops.sort(key=lambda item: item["protocol"])
 
             # If we don't have a content match, we match as we have a sleep() after bird status
             # The first case is when there is no expected data
@@ -287,10 +290,6 @@ class BirdPlanBaseTestCase:
                 break
 
             time.sleep(0.5)
-
-        # Sort nexthops by protocol
-        for nexthops in result.values():
-            nexthops.sort(key=lambda item: item["protocol"])
 
         # Add report
         report_result = pprint.pformat(result, width=132, compact=True)
