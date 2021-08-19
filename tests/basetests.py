@@ -617,9 +617,9 @@ class BirdPlanBaseTestCase:
         route_table = sim.node(router).birdc_show_route_table(route_table_name, **kwargs)
 
         # Loop with routes in the table
-        for route in route_table:
+        for routes in route_table.values():
             # Loop with each destination
-            for dest in route_table[route]:
+            for dest in routes:
                 # Remove since field
                 del dest["since"]
                 # If this is OSPF type I, we need to remove the router_id to prevent a race condition depending which router
