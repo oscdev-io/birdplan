@@ -218,11 +218,6 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
 
         data = self._expected_data.get(data_name, ValueError("No Data"))
 
-        # If we have a dict, try order they key values (route list)
-        if isinstance(data, dict):
-            for _, routes in data.items():
-                routes.sort(key=repr)
-
         return data
 
     def load_data(self) -> None:

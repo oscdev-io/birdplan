@@ -632,8 +632,6 @@ class BirdPlanBaseTestCase:
                     # Check if we have attributes and if the router_id is there
                     if "attributes" in dest and "OSPF.router_id" in dest["attributes"]:
                         del dest["attributes"]["OSPF.router_id"]
-            # Sort route table so its consistent
-            routes.sort(key=repr)
 
         # Return route table
         return route_table
