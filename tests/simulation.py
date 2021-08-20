@@ -22,11 +22,23 @@
 
 import os
 import pprint
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
+import yaml
 from nsnetsim.generic_node import GenericNode
 from nsnetsim.topology import Topology
 from birdplan import BirdPlan  # pylint: disable=import-error
+
+
+class YAMLSafeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
+    """Safe YAML loader wtih some specific datatypes."""
+
+    def construct_python_tuple(self, node):
+        """Tuple constructor."""
+        return tuple(self.construct_sequence(node))
+
+
+YAMLSafeLoader.add_constructor("tag:yaml.org,2002:python/tuple", YAMLSafeLoader.construct_python_tuple)
 
 
 class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-public-methods
@@ -36,10 +48,14 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
     _report: Dict[str, str]
     # All the variables we're testing and their values from the simulation
     _variables: Dict[str, str]
+
     # Test directory
-    _test_dir: str
-    # The file containing our expected results
-    _expected_path: str
+    _test_dir: Optional[str]
+    # Current test being run
+    _test_file: Optional[str]
+
+    _expected_data: Optional[Dict[str, Any]]
+
     _conffiles: Dict[str, str]
     _logfiles: Dict[str, str]
     _topology: Topology
@@ -54,8 +70,12 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
         self._configs = {}
         self._report = {}
         self._variables = {}
-        self._test_dir = ""
-        self._expected_path = ""
+
+        self._test_dir = None
+        self._test_file = None
+
+        self._expected_data = None
+
         self._conffiles = {}
         self._logfiles = {}
         self._topology = Topology()
@@ -165,7 +185,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
         items = []
 
         # Loop with configuration files to add
-        for name, filename in self._conffiles.items():
+        for name, filename in self.conffiles.items():
             # If the file does not exist, just output a message
             if not os.path.exists(filename):
                 items.append((name, "-- NOT CREATED --"))
@@ -182,6 +202,68 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
 
         return items
 
+    def set_test(self, testpath: str) -> None:
+        """Set test we're busy running."""
+
+        # Grab the filename of the test
+        self._test_file = os.path.basename(testpath)
+        # Grab the directory the test is running in
+        self._test_dir = os.path.dirname(testpath)
+
+    def get_data(self, data_name: str) -> Any:
+        """Return simulation data that we loaded."""
+
+        if self._expected_data is None:
+            return None
+
+        data = self._expected_data.get(data_name, ValueError("No Data"))
+
+        return data
+
+    def load_data(self) -> None:
+        """Read in simulation data."""
+
+        # If our expected data doesn't exist, then abort loading it
+        if not os.path.exists(self.expected_data_filepath):
+            return
+
+        # Write out our data
+        with open(self.expected_data_filepath, "r") as expected_data_file:
+            self._expected_data = yaml.load(expected_data_file, Loader=YAMLSafeLoader)
+
+    def write_data(self) -> None:
+        """Write out simulation data."""
+
+        # Write out our data
+        with open(self.expected_data_filepath, "w") as expected_data_file:
+            yaml.dump(self._variables, expected_data_file, default_flow_style=False)
+
+        # Grab the expected configuration file
+        expected_conf_filename_base = self.test_file.replace(".py", "")
+        expected_conf_filepath_base = f"{self.test_dir}/{expected_conf_filename_base}"
+        for conffile_name, sim_conffile_path in self.conffiles.items():
+            # Work out expected config filepath
+            expected_conf_filepath = f"{expected_conf_filepath_base}_{conffile_name}"
+            expected_conf_filepath = expected_conf_filepath.replace("_birdplan.yaml.", ".birdplan.") + ".conf"
+            # If this is a birdplan config file, write it out
+            if "birdplan" in conffile_name:
+                # We need to replace some options that are variable so files don't change between runs
+                with open(sim_conffile_path, "r") as config_file:
+                    conf_lines = config_file.readlines()
+                with open(expected_conf_filepath, "w") as config_file:
+                    for line in conf_lines:
+                        if "log_file:" in line:
+                            line = "log_file: /var/log/birdplan.log\n"
+                        config_file.write(line)
+
+    @property
+    def expected_data_filepath(self) -> str:
+        """Return our expected data filepath."""
+
+        # Work out our data file name and path
+        expected_data_filename = self.test_file.replace(".py", ".yaml")
+        return f"{self.test_dir}/{expected_data_filename}"
+
     @property
     def conffiles(self) -> Dict[str, str]:
         """Return our configuration files."""
@@ -193,11 +275,12 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
         return self._logfiles
 
     @property
-    def variables(self) -> str:
+    def variables_py(self) -> str:
         """Build the variable list that we should of gotten."""
 
         result = ""
-        for name, content in self._variables.items():
+        for name, data in self._variables.items():
+            content = pprint.pformat(data, width=132, compact=True)
             result += f"{name} = {content}\n\n"
 
         return result
@@ -207,25 +290,10 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
         """Return our test directory."""
         return self._test_dir
 
-    @test_dir.setter
-    def test_dir(self, test_dir: str):
-        """Set our test directory."""
-        self._test_dir = test_dir
-
     @property
-    def expected_path(self) -> str:
-        """
-        Return our expected path.
-
-        This is the file we get our expected results from.
-
-        """
-        return self._expected_path
-
-    @expected_path.setter
-    def expected_path(self, expected_path: str):
-        """Set our expected path."""
-        self._expected_path = expected_path
+    def test_file(self) -> str:
+        """Return our test file."""
+        return self._test_file
 
     @property
     def delay(self) -> int:
