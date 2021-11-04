@@ -99,7 +99,7 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
         # Grab peer list
         return cmdline.birdplan.state_ospf_interface_status()
 
-    def show_output_text(  # pylint: disable=no-self-use,too-many-locals,too-many-branches,too-many-statements
+    def show_output_text(  # noqa: C901 # pylint: disable=no-self-use,too-many-locals,too-many-branches,too-many-statements
         self, data: Any
     ) -> None:
         """

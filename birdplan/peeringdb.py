@@ -48,7 +48,7 @@ PEERINGDB_32BIT_LOWER = 4200000000
 PEERINGDB_32BIT_UPPER = 4294967294
 
 
-class PeeringDB:
+class PeeringDB:  # pylint: disable=too-few-public-methods
     """PeeringDB support class."""
 
     def __init__(self) -> None:
@@ -84,7 +84,7 @@ class PeeringDB:
         # Lastly return it
         return peeringdb_info
 
-    def _cache(self, obj: str, value: Optional[PeeringDBInfo] = None) -> Optional[Any]:
+    def _cache(self, obj: str, value: Optional[PeeringDBInfo] = None) -> Optional[Any]:  # pylint: disable=no-self-use
         """Retrieve or store value in cache."""
 
         if "objects" not in peeringdb_cache:

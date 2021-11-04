@@ -27,7 +27,7 @@ def sanitize_community(community: str) -> str:
     # Split on :
     community_components = community.split(":")
     # Re-join using , and add brackets
-    community_str = "(%s)" % ",".join(community_components)
+    community_str = f'({",".join(community_components)})'
     return community_str
 
 

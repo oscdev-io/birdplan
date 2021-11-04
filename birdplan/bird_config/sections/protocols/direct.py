@@ -32,7 +32,7 @@ class ProtocolDirect(SectionProtocolBase):
     _name_suffix: str
     _interfaces: List[str]
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         constants: SectionConstants,
@@ -86,9 +86,9 @@ class ProtocolDirect(SectionProtocolBase):
         protocol_name = f"direct{ipv}{self.name_suffix}"
 
         self.conf.add(f"protocol direct {protocol_name} {{")
-        self.conf.add('  description "Direct protocol for IPv%s";' % ipv)
+        self.conf.add(f'  description "Direct protocol for IPv{ipv}";')
         self.conf.add("")
-        self.conf.add("  ipv%s {" % ipv)
+        self.conf.add(f"  ipv{ipv} {{")
         self.conf.add(f"    table t_{protocol_name};")
         self.conf.add("")
         self.conf.add("    export none;")

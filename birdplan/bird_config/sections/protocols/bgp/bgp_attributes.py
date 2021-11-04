@@ -102,7 +102,7 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
         self.static_default = False
 
 
-class BGPPeertypeConstraints:  # pylint: disable=too-few-public-methods
+class BGPPeertypeConstraints:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """
     BGP constraints for a specific peer type.
 

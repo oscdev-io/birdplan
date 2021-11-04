@@ -72,7 +72,7 @@ class bird_function:  # pylint: disable=invalid-name,too-few-public-methods
         # Lets keep track of our BIRD function name
         self.bird_func_name = bird_func_name
 
-    def __call__(self, func: Callable[..., str]) -> Callable[..., str]:
+    def __call__(self, func: Callable[..., str]) -> Callable[..., str]:  # noqa: C901
         """Return the wrapper."""
 
         def wrapped_function(*args: Any, **kwargs: Any) -> str:

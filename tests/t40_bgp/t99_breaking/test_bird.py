@@ -43,7 +43,7 @@ class Test:
 
     num_bird_routers = 2500
 
-    def test_setup(self, sim, testpath, tmpdir, enable_performance_test):
+    def test_setup(self, sim, testpath, tmpdir, enable_performance_test):  # pylint: disable=too-many-locals
         """Set up our test."""
 
         # Make sure --enable-performance-test was specified
@@ -150,7 +150,7 @@ class Test:
             exabgpconfig_filename = f"{tmpdir}/exabgp.conf.{exabgp['name']}"
 
             # Write out our birdplan config files
-            with open(exabgpconfig_filename, "w") as exabgpconfig_file:
+            with open(exabgpconfig_filename, "w", encoding="UTF-8") as exabgpconfig_file:
                 exabgpconfig_file.write(exabgp["config"])
 
             sim.add_node(ExaBGPRouterNode(name=exabgp["name"], configfile=exabgpconfig_filename))
@@ -168,7 +168,7 @@ class Test:
             bpstate_filename = f"{tmpdir}/birdplan.state.{router['name']}"
 
             # Write out our birdplan config files
-            with open(bpconfig_filename, "w") as bpconfig_file:
+            with open(bpconfig_filename, "w", encoding="UTF-8") as bpconfig_file:
                 bpconfig_file.write(router["config"])
 
             # Invoke by simulating the commandline...
@@ -202,7 +202,9 @@ class Test:
 
         assert "a" == "b", "OH NO"
 
-    def _configure_bird(self, router_id: str, asn: str, source4: str, source6: str, peers: List[Dict[str, str]]):
+    def _configure_bird(  # pylint: disable=too-many-arguments
+        self, router_id: str, asn: str, source4: str, source6: str, peers: List[Dict[str, str]]
+    ):
         """Configure a BIRD router."""
 
         # Generate the top global section of the birdplan configuration
@@ -241,7 +243,9 @@ bgp:
         # Return BIRD config
         return birdplan_config
 
-    def _configure_exabgp(self, sim: Simulation, router_id: str, asn: str, source4: str, source6: str, peer: Dict[str, str]):
+    def _configure_exabgp(  # pylint: disable=too-many-arguments
+        self, sim: Simulation, router_id: str, asn: str, source4: str, source6: str, peer: Dict[str, str]
+    ):
         """Configure an ExaBGP."""
 
         exabgp_config = f"""
