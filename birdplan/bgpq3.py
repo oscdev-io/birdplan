@@ -91,7 +91,7 @@ class BGPQ3:
 
         return asns_bgpq3["asns"]
 
-    def get_prefixes(self, as_sets: Union[str, List[str]]) -> Dict[str, List[str]]:
+    def get_prefixes(self, as_sets: Union[str, List[str]]) -> Dict[str, List[str]]:  # noqa: C901
         """Get prefixes."""
 
         # Build an object list depending on the type of "objects" above
@@ -141,8 +141,8 @@ class BGPQ3:
                         greater_equal = prefix["greater-equal"]
                     else:
                         greater_equal = ipaddress.ip_network(prefix["prefix"]).prefixlen
-                    # Add prefix
-                    prefixes[family].append("%s{%s,%s}" % (prefix["prefix"], greater_equal, prefix["less-equal"]))
+                    # Add prefix, format is %s{%s,%s}
+                    prefixes[family].append(f'{prefix["prefix"]}{{{greater_equal},{prefix["less-equal"]}}}')
 
         return prefixes
 

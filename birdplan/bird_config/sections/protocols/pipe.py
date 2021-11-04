@@ -58,7 +58,7 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
     # IP versions we're creating a pipe for
     _ipversions: List[str]
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         table_from: PipeTableNameType,

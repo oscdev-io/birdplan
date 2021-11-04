@@ -61,7 +61,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     _state: Dict[str, Any]
     _prev_state: Optional[Dict[str, Any]]
 
-    def __init__(
+    def __init__(  # noqa: C901 # pylint: disable=too-many-branches,too-many-statements,too-many-arguments,too-many-locals
         self,
         birdconfig_globals: BirdConfigGlobals,
         constants: SectionConstants,
@@ -71,7 +71,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         bgp_functions: BGPFunctions,
         peer_name: str,
         peer_config: BGPPeerConfig,
-    ):  # pylint: disable=too-many-branches,too-many-statements,too-many-arguments
+    ):
         """Initialize the object."""
         super().__init__(birdconfig_globals, constants, functions, tables)
 
@@ -1133,7 +1133,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             if irr_prefixes["ipv4"]:
                 # Sanity checks for IPv4 network count
                 if (
-                    not self.birdconfig_globals.ignore_irr_changes
+                    not self.birdconfig_globals.ignore_irr_changes  # pylint: disable=too-many-boolean-expressions
                     and self.prev_state
                     and "filter" in self.prev_state
                     and "prefixes" in self.prev_state["filter"]
@@ -1163,7 +1163,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             if irr_prefixes["ipv6"]:
                 # Sanity checks for IPv6 network count
                 if (
-                    not self.birdconfig_globals.ignore_irr_changes
+                    not self.birdconfig_globals.ignore_irr_changes  # pylint: disable=too-many-boolean-expressions
                     and self.prev_state
                     and "filter" in self.prev_state
                     and "prefixes" in self.prev_state["filter"]
@@ -1219,7 +1219,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     if fnmatch.fnmatch(self.name, item):
                         self.quarantine = self.birdconfig_globals.state["bgp"]["+quarantine"][item]
 
-    def configure(self) -> None:
+    def configure(self) -> None:  # noqa: C901 # pylint: disable=too-many-branches
         """Configure BGP peer."""
         super().configure()
 
@@ -1372,7 +1372,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Store our BGP table names
         self.state["tables"] = state_tables
 
-    def _setup_aspath_asns(self) -> None:
+    def _setup_aspath_asns(self) -> None:  # noqa: C901 # pylint: disable=too-many-branches
         """AS-PATH ASN list setup."""
 
         # Short circuit and exit if we have none
@@ -1449,7 +1449,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.state["filter"] = {}
         self.state["filter"]["aspath_asns"] = state
 
-    def _setup_origin_asns(self) -> None:
+    def _setup_origin_asns(self) -> None:  # noqa: disable=C901
         """Origin ASN list setup."""
 
         # Short circuit and exit if we have none
@@ -1534,7 +1534,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.state["filter"] = {}
         self.state["filter"]["peer_asns"] = state
 
-    def _setup_peer_prefixes(self) -> None:
+    def _setup_peer_prefixes(self) -> None:  # noqa: C901 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         """Prefix list setup."""
 
         # Short circuit and exit if we have none
@@ -1575,7 +1575,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 for prefix in prefix_list:
                     prefixes.append(prefix)
                     # Add blackhole
-                    blackhole = "%s+" % re.split(r"[{+]", prefix, 1)[0]
+                    blackhole = re.split(r"[{+]", prefix, 1)[0] + "+"
                     blackholes.append(blackhole)
             # Sort and unique our results
             prefixes = sorted(set(prefixes))
@@ -1600,7 +1600,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     if prefix not in prefixes:
                         prefixes_irr.append(prefix)
                     # Add blackhole, and make sure we're not duplicating here either
-                    blackhole = "%s+" % prefix.split("{", 1)[0]
+                    blackhole = prefix.split("{", 1)[0] + "+"
                     if blackhole not in blackholes:
                         blackholes_irr.append(blackhole)
 
@@ -1663,7 +1663,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _peer_to_bgp_import_filter(self) -> None:  # pylint: disable=too-many-branches,too-many-statements
+    def _peer_to_bgp_import_filter(  # noqa: C901 # pylint: disable=too-many-branches,too-many-statements,too-many-locals
+        self,
+    ) -> None:
         """Import filter FROM the main BGP table to the BGP peer table."""
 
         # Set our filter name
@@ -2070,7 +2072,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _peer_import_filter(self) -> None:  # pylint: disable=too-many-branches,too-many-statements
+    def _peer_import_filter(self) -> None:  # noqa: C901 # pylint: disable=too-many-branches,too-many-statements
         """Peer import filter setup from peer to peer table."""
 
         # Set our filter name
@@ -2316,7 +2318,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _setup_peer_protocol(self, ipv: str) -> None:
+    def _setup_peer_protocol(self, ipv: str) -> None:  # noqa: C901
         """Peer protocol setup for a single protocol."""
 
         protocol_state = {}

@@ -173,7 +173,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
                 items.append((name, "-- NOT CREATED --"))
                 continue
             # If it does exist add its contents to our items
-            with open(filename, "r") as logfile:
+            with open(filename, "r", encoding="UTF-8") as logfile:
                 contents = logfile.read()
             items.append((name, contents))
 
@@ -192,7 +192,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
                 continue
             # If it does exist loop with each line, number it and add
             contents = ""
-            with open(filename, "r") as conffile:
+            with open(filename, "r", encoding="UTF-8") as conffile:
                 lineno = 1
                 for line in conffile.readlines():
                     contents += f"{lineno}: {line}"
@@ -228,14 +228,15 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
             return
 
         # Write out our data
-        with open(self.expected_data_filepath, "r") as expected_data_file:
-            self._expected_data = yaml.load(expected_data_file, Loader=YAMLSafeLoader)
+        with open(self.expected_data_filepath, "r", encoding="UTF-8") as expected_data_file:
+            # We inherit the safe loader above, so this shouldn't be exploitable
+            self._expected_data = yaml.load(expected_data_file, Loader=YAMLSafeLoader)  # nosec
 
     def write_data(self) -> None:
         """Write out simulation data."""
 
         # Write out our data
-        with open(self.expected_data_filepath, "w") as expected_data_file:
+        with open(self.expected_data_filepath, "w", encoding="UTF-8") as expected_data_file:
             yaml.dump(self._variables, expected_data_file, default_flow_style=False)
 
         # Grab the expected configuration file
@@ -248,9 +249,9 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
             # If this is a birdplan config file, write it out
             if "birdplan" in conffile_name:
                 # We need to replace some options that are variable so files don't change between runs
-                with open(sim_conffile_path, "r") as config_file:
+                with open(sim_conffile_path, "r", encoding="UTF-8") as config_file:
                     conf_lines = config_file.readlines()
-                with open(expected_conf_filepath, "w") as config_file:
+                with open(expected_conf_filepath, "w", encoding="UTF-8") as config_file:
                     for line in conf_lines:
                         if "log_file:" in line:
                             line = "log_file: /var/log/birdplan.log\n"

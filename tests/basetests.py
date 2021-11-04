@@ -215,8 +215,8 @@ class BirdPlanBaseTestCase:
                 assert_data[router][table_name] = self._get_bird_table_data(sim, router, table_name)
 
         # Run asserts on the data received
-        for router in assert_data:
-            for table_name, data in assert_data[router].items():
+        for router, results in assert_data.items():
+            for table_name, data in results.items():
                 # Name variables nicely so they look good in our test output
                 received_data, expected_data = data
                 # Make sure table matches
@@ -397,7 +397,9 @@ class BirdPlanBaseTestCase:
 
         return configured_routers
 
-    def _configure_exabgps(self, sim: Simulation, tmpdir: str) -> List[str]:
+    def _configure_exabgps(  # noqa: C901 # pylint: disable=too-many-locals,too-many-branches
+        self, sim: Simulation, tmpdir: str
+    ) -> List[str]:
         """Create our configuration files."""
 
         # Loop with each ExaBGP
@@ -460,7 +462,7 @@ class BirdPlanBaseTestCase:
                 raise RuntimeError(f"No ExaBGP configuration file found for ExaBGP '{exabgp}' with ASN '{exabgp_asn}'")
 
             # Read in configuration file
-            with open(exabgp_config_file, "r") as file:
+            with open(exabgp_config_file, "r", encoding="UTF-8") as file:
                 raw_config = file.read()
             # Check if we're replacing macros in our configuration file
             for macro, value in internal_macros.items():
@@ -468,13 +470,13 @@ class BirdPlanBaseTestCase:
                     value = f"{value}"
                 raw_config = raw_config.replace(macro, value)
             # Write out new BirdPlan file with macros replaced
-            with open(exabgp_conffile, "w") as file:
+            with open(exabgp_conffile, "w", encoding="UTF-8") as file:
                 file.write(raw_config)
 
             # Add config file to our simulation so we get a report for it
             sim.add_conffile(f"exabgp.conf.{exabgp}", exabgp_conffile)
 
-    def _birdplan_run(  # pylint: disable=too-many-arguments,too-many-locals
+    def _birdplan_run(  # noqa: C901 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements
         self, sim: Simulation, tmpdir: str, router: str, args: List[str]
     ) -> Any:
         """Run BirdPlan for a given router."""
@@ -543,7 +545,7 @@ class BirdPlanBaseTestCase:
             raise RuntimeError("No router configuration file found")
 
         # Read in configuration file
-        with open(router_config_file, "r") as file:
+        with open(router_config_file, "r", encoding="UTF-8") as file:
             raw_config = file.read()
         # Check if we're replacing macros in our configuration file
         for macro, value in macros.items():
@@ -554,7 +556,7 @@ class BirdPlanBaseTestCase:
                 raise RuntimeError(f"Macro '{macro}' for router '{router}' has value None")
             raw_config = raw_config.replace(macro, value)
         # Write out new BirdPlan file with macros replaced
-        with open(birdplan_file, "w") as file:
+        with open(birdplan_file, "w", encoding="UTF-8") as file:
             file.write(raw_config)
 
         # Add YAML file early incase we need to check it when configuration fails
@@ -654,7 +656,7 @@ class BirdPlanBaseTestCase:
             if tries > 10:
                 return False
             # Open log file and read in the log
-            with open(sim.logfiles[logname], "r") as logfile:
+            with open(sim.logfiles[logname], "r", encoding="UTF-8") as logfile:
                 log_str = logfile.read()
             # Check if the log contains what we're looking for
             if re.search(matches, log_str):

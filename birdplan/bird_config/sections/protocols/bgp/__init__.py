@@ -387,9 +387,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         for prefix in sorted(self.originated_routes.keys()):
             info = self.originated_routes[prefix]
             if "." in prefix:
-                routes["4"].append("%s %s" % (prefix, info))
+                routes["4"].append(f"{prefix} {info}")
             elif ":" in prefix:
-                routes["6"].append("%s %s" % (prefix, info))
+                routes["6"].append(f"{prefix} {info}")
             else:
                 raise BirdPlanError(f"The BGP originate route '{prefix}' is odd")
 

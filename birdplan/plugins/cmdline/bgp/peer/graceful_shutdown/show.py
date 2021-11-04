@@ -87,7 +87,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
         # Grab peer list
         return cmdline.birdplan.state_bgp_peer_graceful_shutdown_status()
 
-    def show_output_text(self, data: Any) -> None:  # pylint: disable=no-self-use, too-many-branches
+    def show_output_text(self, data: Any) -> None:  # noqa: C901 # pylint: disable=no-self-use, too-many-branches
         """
         Show command output in text.
 

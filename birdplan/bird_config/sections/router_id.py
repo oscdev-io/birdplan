@@ -34,7 +34,7 @@ class SectionRouterID(SectionBase):
         # Set section header
         self._section = "Router ID"
 
-        self._router_id = "0.0.0.0"
+        self._router_id = "0.0.0.0"  # nosec
 
     def configure(self) -> None:
         """Configure routing id."""

@@ -50,7 +50,7 @@ class ProtocolOSPFArea(SectionProtocolBase):  # pylint: disable=too-many-public-
     # OSPF interfaces belonging to this area
     _interfaces: OSPFAreaInterfaces
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         constants: SectionConstants,

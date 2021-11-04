@@ -118,7 +118,7 @@ class BirdPlan:
             if os.path.isfile(self.state_file):
                 # Read in state file
                 try:
-                    with open(self.state_file, "r") as file:
+                    with open(self.state_file, "r", encoding="UTF-8") as file:
                         raw_state = file.read()
                 except OSError as err:
                     raise BirdPlanError(f"Failed to read BirdPlan state file '{state_file}': {err}") from None
@@ -174,7 +174,7 @@ class BirdPlan:
 
         # Write out state file
         try:
-            with open(self.state_file, "w") as file:
+            with open(self.state_file, "w", encoding="UTF-8") as file:
                 file.write(yaml_output)
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.state_file}' for writing: {err}") from None
@@ -562,7 +562,7 @@ class BirdPlan:
         if not self.state["ospf"]["areas"][area]["+interfaces"]:
             del self.state["ospf"]["areas"][area]["+interfaces"]
 
-    def state_ospf_interface_status(self) -> BirdPlanOSPFInterfaceStatus:
+    def state_ospf_interface_status(self) -> BirdPlanOSPFInterfaceStatus:  # noqa: C901 # pylint: disable=too-many-branches
         """
         Return the status of OSPF interfaces.
 
