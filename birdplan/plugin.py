@@ -316,7 +316,7 @@ class PluginCollection:
                 logging.debug("Plugin loaded '%s' [class=%s]", plugin_name, class_name)
 
         # Look for modules in sub packages
-        all_current_paths = []
+        all_current_paths: List[str] = []
 
         if isinstance(imported_package.__path__, str):
             all_current_paths.append(imported_package.__path__)
