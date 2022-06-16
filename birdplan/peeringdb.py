@@ -84,7 +84,7 @@ class PeeringDB:  # pylint: disable=too-few-public-methods
         # Lastly return it
         return peeringdb_info
 
-    def _cache(self, obj: str, value: Optional[PeeringDBInfo] = None) -> Optional[Any]:  # pylint: disable=no-self-use
+    def _cache(self, obj: str, value: Optional[PeeringDBInfo] = None) -> Optional[Any]:
         """Retrieve or store value in cache."""
 
         if "objects" not in peeringdb_cache:

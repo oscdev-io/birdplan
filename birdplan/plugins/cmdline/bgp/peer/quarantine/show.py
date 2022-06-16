@@ -88,7 +88,7 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
         # Grab peer list
         return cmdline.birdplan.state_bgp_peer_quarantine_status()
 
-    def show_output_text(self, data: BirdPlanBGPPeerQuarantineStatus) -> None:  # noqa: C901 # pylint: disable=no-self-use
+    def show_output_text(self, data: BirdPlanBGPPeerQuarantineStatus) -> None:  # noqa: C901
         """
         Show command output in text.
 

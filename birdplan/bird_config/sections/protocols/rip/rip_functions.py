@@ -34,7 +34,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         self._section = "RIP Functions"
 
     @bird_function("rip_accept_connected")
-    def accept_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def accept_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD rip_accept_connected function."""
 
         return f"""\
@@ -48,7 +48,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             }}"""
 
     @bird_function("rip_accept_rip_default")
-    def accept_rip_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def accept_rip_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD rip_accept_rip_default function."""
 
         return f"""\
@@ -62,7 +62,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             }}"""
 
     @bird_function("rip_accept_rip")
-    def accept_rip(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def accept_rip(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD rip_accept_rip function."""
 
         return f"""\
@@ -75,7 +75,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             }}"""
 
     @bird_function("rip_redistribute_connected")
-    def redistribute_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def redistribute_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD rip_redistribute_connected function."""
 
         return f"""\
@@ -89,7 +89,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             }}"""
 
     @bird_function("rip_redistribute_rip_default")
-    def redistribute_rip_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def redistribute_rip_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD rip_redistribute_rip_default function."""
 
         return f"""\
@@ -103,7 +103,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             }}"""
 
     @bird_function("rip_redistribute_rip")
-    def redistribute_rip(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def redistribute_rip(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD rip_redistribute_rip function."""
 
         return f"""\

@@ -42,7 +42,7 @@ class bird_function:  # pylint: disable=invalid-name,too-few-public-methods
     An example of a decorated function is below...
     ```
         @bird_function("bgp_some_function")
-        def bgp_func(self) -> str:  # pylint: disable=no-self-use
+        def bgp_func(self) -> str:
             """Test function."""
 
             return """\
@@ -149,7 +149,7 @@ class SectionFunctions(SectionBase):
             self.conf.add("")
 
     @bird_function("prefix_is_longer")
-    def prefix_is_longer(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def prefix_is_longer(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD prefix_is_longer function."""
 
         return """\
@@ -165,7 +165,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @bird_function("prefix_is_shorter")
-    def prefix_is_shorter(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def prefix_is_shorter(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD prefix_is_shorter function."""
 
         return """\
@@ -180,7 +180,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @bird_function("accept_kernel")
-    def accept_kernel(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def accept_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD accept_kernel function."""
 
         return f"""\
@@ -193,7 +193,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @bird_function("accept_kernel_default")
-    def accept_kernel_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def accept_kernel_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD accept_kernel_default function."""
 
         return f"""\
@@ -206,7 +206,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @bird_function("accept_static")
-    def accept_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def accept_static(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD accept_static function."""
 
         return f"""\
@@ -219,7 +219,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @bird_function("accept_static_default")
-    def accept_static_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def accept_static_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD accept_static_default function."""
 
         return f"""\
@@ -232,7 +232,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @bird_function("is_bgp")
-    def is_bgp(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def is_bgp(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD is_bgp function."""
 
         return """\
@@ -243,7 +243,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @bird_function("is_bogon")
-    def is_bogon(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def is_bogon(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD is_bogon function."""
 
         return f"""\
@@ -258,7 +258,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @bird_function("is_connected")
-    def is_connected(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def is_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD is_connected function."""
 
         return """\
@@ -269,7 +269,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @bird_function("is_default")
-    def is_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def is_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD is_default function."""
 
         return """\
@@ -281,7 +281,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @bird_function("is_kernel")
-    def is_kernel(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def is_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD is_kernel function."""
 
         return """\
@@ -292,7 +292,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @bird_function("is_static")
-    def is_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def is_static(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD is_static function."""
 
         return """\
@@ -303,7 +303,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @bird_function("redistribute_kernel")
-    def redistribute_kernel(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def redistribute_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD redistribute_kernel function."""
 
         return f"""\
@@ -316,7 +316,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @bird_function("redistribute_kernel_default")
-    def redistribute_kernel_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def redistribute_kernel_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD redistribute_kernel_default function."""
 
         return f"""\
@@ -329,7 +329,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @bird_function("redistribute_static")
-    def redistribute_static(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def redistribute_static(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD redistribute_static function."""
 
         return f"""\
@@ -342,7 +342,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @bird_function("redistribute_static_default")
-    def redistribute_static_default(self, *args: Any) -> str:  # pylint: disable=no-self-use,unused-argument
+    def redistribute_static_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD redistribute_static_default function."""
 
         return f"""\
@@ -354,7 +354,7 @@ class SectionFunctions(SectionBase):
                 accept;
             }}"""
 
-    def route_info(self) -> str:  # pylint: disable=no-self-use,unused-argument
+    def route_info(self) -> str:  # pylint: disable=unused-argument
         """BIRD route_info function."""
 
         return """net, " from ", proto"""
