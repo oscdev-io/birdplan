@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # type: ignore
-# pylint: disable=import-error,too-few-public-methods,no-self-use
+# pylint: disable=import-error,too-few-public-methods
 
 """BGP configuration for basic setup between e1 and r1 with no filter."""
 

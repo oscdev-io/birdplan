@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # type: ignore
-# pylint: disable=import-error,too-few-public-methods,no-self-use
+# pylint: disable=import-error,too-few-public-methods
 
 """BGP non-private ASN when using replace_aspath test case template."""
 
