@@ -19,11 +19,12 @@
 """BirdPlan commandline options for "birdplan configure"."""
 
 
-from typing import Any, Dict, Optional
 import argparse
-from .cmdline_plugin import BirdPlanCmdlinePluginBase
+from typing import Any, Dict, Optional
+
 from ...cmdline import BIRD_CONFIG_FILE
 from ...exceptions import BirdPlanError
+from .cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
 class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):

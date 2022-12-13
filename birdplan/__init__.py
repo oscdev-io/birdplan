@@ -20,14 +20,15 @@
 
 # pylint: disable=too-many-lines
 
-from typing import Any, Dict, List, Optional, Union
 import os
 import re
+from typing import Any, Dict, List, Optional, Union
+
 import jinja2
 import yaml
+
 from .bird_config import BirdConfig
 from .exceptions import BirdPlanError
-
 
 __VERSION__ = "0.0.1"
 

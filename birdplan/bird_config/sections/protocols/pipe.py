@@ -20,9 +20,9 @@
 
 from enum import Enum
 from typing import Callable, List, Union
-from ..base import SectionBase
-from ...globals import BirdConfigGlobals
 
+from ...globals import BirdConfigGlobals
+from ..base import SectionBase
 
 PipeTableNameType = Union[str, Callable[[str], str]]
 

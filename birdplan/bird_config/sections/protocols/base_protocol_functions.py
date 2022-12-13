@@ -18,12 +18,13 @@
 
 """BIRD protocol specific functions base class."""
 
-from collections import OrderedDict
 import textwrap
+from collections import OrderedDict
 from typing import Dict
+
+from ....bird_config.globals import BirdConfigGlobals
 from ..base import SectionBase
 from ..functions import SectionFunctions
-from ....bird_config.globals import BirdConfigGlobals
 
 
 class ProtocolFunctionsBase(SectionBase):  # pylint: disable=too-many-public-methods

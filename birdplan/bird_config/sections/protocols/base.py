@@ -18,11 +18,11 @@
 
 """BIRD protocol base class."""
 
+from ...globals import BirdConfigGlobals
 from ..base import SectionBase
 from ..constants import SectionConstants
 from ..functions import SectionFunctions
 from ..tables import SectionTables
-from ...globals import BirdConfigGlobals
 
 
 class SectionProtocolBase(SectionBase):

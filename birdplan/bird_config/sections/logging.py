@@ -19,6 +19,7 @@
 """BIRD logging configuration."""
 
 from birdplan.bird_config.globals import BirdConfigGlobals
+
 from .base import SectionBase
 
 

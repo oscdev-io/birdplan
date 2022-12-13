@@ -19,11 +19,12 @@
 """BIRD direct protocol configuration."""
 
 from typing import List, Optional
-from .base import SectionProtocolBase
+
+from ...globals import BirdConfigGlobals
 from ..constants import SectionConstants
 from ..functions import SectionFunctions
 from ..tables import SectionTables
-from ...globals import BirdConfigGlobals
+from .base import SectionProtocolBase
 
 
 class ProtocolDirect(SectionProtocolBase):

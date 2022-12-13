@@ -20,36 +20,35 @@
 
 # pylint: disable=too-many-lines
 
-from typing import Any, Dict, List, Optional, Union
 import fnmatch
 import re
+from typing import Any, Dict, List, Optional, Union
 
+from ......bgpq3 import BGPQ3
+from ......exceptions import BirdPlanError
+from ......peeringdb import PeeringDB
+from ..... import util
+from .....globals import BirdConfigGlobals
+from ....constants import SectionConstants
+from ....functions import BirdVariable, SectionFunctions
+from ....tables import SectionTables
+from ...base import SectionProtocolBase
+from ...pipe import ProtocolPipe, ProtocolPipeFilterType
+from ..bgp_attributes import BGPAttributes, BGPPeertypeConstraints
+from ..bgp_functions import BGPFunctions
+from ..typing import BGPPeerConfig
 from .peer_attributes import (
     BGPPeerAttributes,
-    BGPPeerFilterPolicy,
+    BGPPeerConstraints,
     BGPPeerFilterItem,
+    BGPPeerFilterPolicy,
     BGPPeerLargeCommunities,
     BGPPeerLocation,
     BGPPeerPrefixLimit,
     BGPPeerPrepend,
     BGPPeerRoutePolicyAccept,
     BGPPeerRoutePolicyRedistribute,
-    BGPPeerConstraints,
 )
-
-from ..bgp_attributes import BGPAttributes, BGPPeertypeConstraints
-from ..bgp_functions import BGPFunctions
-from ..typing import BGPPeerConfig
-from ...pipe import ProtocolPipe, ProtocolPipeFilterType
-from ...base import SectionProtocolBase
-from ....constants import SectionConstants
-from ....functions import BirdVariable, SectionFunctions
-from ....tables import SectionTables
-from ..... import util
-from .....globals import BirdConfigGlobals
-from ......bgpq3 import BGPQ3
-from ......exceptions import BirdPlanError
-from ......peeringdb import PeeringDB
 
 
 class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance-attributes,too-many-public-methods

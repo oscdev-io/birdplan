@@ -19,9 +19,10 @@
 """RIP protocol specific functions class."""
 
 from typing import Any
-from ..base_protocol_functions import ProtocolFunctionsBase
-from ...functions import bird_function, SectionFunctions
+
 from ....globals import BirdConfigGlobals
+from ...functions import SectionFunctions, bird_function
+from ..base_protocol_functions import ProtocolFunctionsBase
 
 
 class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods

@@ -18,8 +18,8 @@
 
 """BIRD functions configuration."""
 
-from collections import OrderedDict
 import textwrap
+from collections import OrderedDict
 from typing import Any, Callable, Dict, List
 
 from ...bird_config.globals import BirdConfigGlobals

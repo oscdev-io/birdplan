@@ -18,14 +18,13 @@
 
 """BGPQ3 support class."""
 
-from typing import Any, Dict, List, Optional, Union
 import ipaddress
 import json
 import subprocess  # nosec
 import time
+from typing import Any, Dict, List, Optional, Union
 
 from .exceptions import BirdPlanError
-
 
 # Keep a cache for results returned while loaded into memory
 #

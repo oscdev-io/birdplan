@@ -18,8 +18,8 @@
 
 """BirdPlan exceptions."""
 
-from typing import Any
 import argparse
+from typing import Any
 
 
 class BirdPlanError(RuntimeError):

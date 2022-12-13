@@ -18,16 +18,16 @@
 
 """Entry point into Birdplan from the commandline."""
 
-from typing import Any, List, NoReturn, Optional
 import argparse
 import json
 import logging
 import logging.handlers
 import sys
+from typing import Any, List, NoReturn, Optional
+
 from . import __VERSION__, BirdPlan
 from .exceptions import BirdPlanError, BirdPlanErrorUsage
 from .plugin import PluginCollection
-
 
 # Defaults
 BIRDPLAN_FILE = "/etc/birdplan/birdplan.yaml"

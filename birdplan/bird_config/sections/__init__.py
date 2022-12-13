@@ -18,7 +18,7 @@
 
 """BIRD configuration sections."""
 
-from birdplan.bird_config.globals import BirdConfigGlobals
+from ..globals import BirdConfigGlobals
 from .base import SectionBase
 from .constants import SectionConstants
 from .functions import SectionFunctions

@@ -19,9 +19,10 @@
 """BIRD master table configuration."""
 
 from birdplan.bird_config.globals import BirdConfigGlobals
-from .master_attributes import MasterTableAttributes, MasterTableRoutePolicyExport
+
 from ...base import SectionBase
 from ...protocols.pipe import ProtocolPipe, ProtocolPipeFilterType
+from .master_attributes import MasterTableAttributes, MasterTableRoutePolicyExport
 
 
 class TableMaster(SectionBase):

@@ -18,10 +18,11 @@
 
 """BirdPlan commandline options for OSPF interface show."""
 
-from typing import Any, Dict, List
 import argparse
-from ...cmdline_plugin import BirdPlanCmdlinePluginBase
+from typing import Any, Dict, List
+
 from .....console.colors import colored
+from ...cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
 class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):

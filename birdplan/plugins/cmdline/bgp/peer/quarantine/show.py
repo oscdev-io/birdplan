@@ -18,11 +18,12 @@
 
 """BirdPlan commandline options for BGP peer quarantine show."""
 
-from typing import Any, Dict
 import argparse
-from ....cmdline_plugin import BirdPlanCmdlinePluginBase
+from typing import Any, Dict
+
 from ...... import BirdPlanBGPPeerQuarantineStatus
 from ......console.colors import colored
+from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
 class BirdplanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):

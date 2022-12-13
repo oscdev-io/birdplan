@@ -21,9 +21,10 @@
 # pylint: disable=too-many-lines
 
 from typing import Any
-from ..base_protocol_functions import ProtocolFunctionsBase
-from ...functions import BirdVariable, SectionFunctions, bird_function
+
 from ....globals import BirdConfigGlobals
+from ...functions import BirdVariable, SectionFunctions, bird_function
+from ..base_protocol_functions import ProtocolFunctionsBase
 
 
 class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods

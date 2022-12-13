@@ -21,18 +21,19 @@
 # pylint: disable=too-many-lines
 
 from typing import Dict, List, Optional
+
+from .....exceptions import BirdPlanError
+from ....globals import BirdConfigGlobals
+from ...constants import SectionConstants
+from ...functions import SectionFunctions
+from ...tables import SectionTables
+from ..base import SectionProtocolBase
+from ..direct import ProtocolDirect
+from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from .bgp_attributes import BGPAttributes, BGPPeertypeConstraints, BGPRoutePolicyAccept, BGPRoutePolicyImport
 from .bgp_functions import BGPFunctions
 from .peer import ProtocolBGPPeer
 from .typing import BGPPeerConfig
-from ..pipe import ProtocolPipe, ProtocolPipeFilterType
-from ..direct import ProtocolDirect
-from ..base import SectionProtocolBase
-from ...constants import SectionConstants
-from ...functions import SectionFunctions
-from ...tables import SectionTables
-from ....globals import BirdConfigGlobals
-from .....exceptions import BirdPlanError
 
 BGPPeersConfig = Dict[str, BGPPeerConfig]
 BGPPeers = Dict[str, ProtocolBGPPeer]

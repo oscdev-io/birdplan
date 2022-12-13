@@ -20,16 +20,17 @@
 
 # pylint: disable=too-many-lines
 
-from typing import Optional
 import fnmatch
-from .interface_attributes import OSPFAreaInterfaceAttributes
-from .typing import OSPFAreaInterfaceConfig
-from ..area_attributes import OSPFAreaAttributes
-from ....base import SectionProtocolBase
+from typing import Optional
+
+from ......globals import BirdConfigGlobals
 from .....constants import SectionConstants
 from .....functions import SectionFunctions
 from .....tables import SectionTables
-from ......globals import BirdConfigGlobals
+from ....base import SectionProtocolBase
+from ..area_attributes import OSPFAreaAttributes
+from .interface_attributes import OSPFAreaInterfaceAttributes
+from .typing import OSPFAreaInterfaceConfig
 
 
 class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-many-public-methods,too-many-instance-attributes

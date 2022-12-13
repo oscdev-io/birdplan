@@ -18,12 +18,12 @@
 
 """PeeringDB support class."""
 
-from typing import Any, Dict, Optional
 import time
+from typing import Any, Dict, Optional
+
 import requests
 
 from .exceptions import BirdPlanError
-
 
 PeeringDBInfo = Dict[str, Any]
 
