@@ -21,8 +21,8 @@
 
 """BGP large community functions test case."""
 
-from ..template_large_community_prepend_location_3x_to_transit import Template
 from ....config.peertype_rrserver_rrserver.r1_to_r10 import PeerTypeConfig
+from ..template_large_community_prepend_location_3x_to_transit import Template
 
 
 class Test(PeerTypeConfig, Template):

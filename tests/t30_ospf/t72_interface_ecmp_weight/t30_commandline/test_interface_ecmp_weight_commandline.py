@@ -22,6 +22,7 @@
 """OSPF test case for interface ECMP weight using command line settings."""
 
 import time
+
 from ..template import Template
 
 

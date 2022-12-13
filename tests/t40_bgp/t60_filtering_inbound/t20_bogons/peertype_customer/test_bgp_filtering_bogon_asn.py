@@ -21,8 +21,8 @@
 
 """BGP filtering test case."""
 
-from ..template_bogon_asn import Template
 from ....config.peertype_customer.e1r1_no_filter import PeerTypeConfig
+from ..template_bogon_asn import Template
 
 
 class Test(PeerTypeConfig, Template):

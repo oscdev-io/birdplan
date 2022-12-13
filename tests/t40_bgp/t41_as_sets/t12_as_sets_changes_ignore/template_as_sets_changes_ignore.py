@@ -21,9 +21,11 @@
 
 """BGP peer AS-SET changes test case template."""
 
-from typing import Any, List
 import time
+from typing import Any, List
+
 from birdplan import bgpq3
+
 from ....basetests import BirdPlanBaseTestCase
 from ....simulation import Simulation
 

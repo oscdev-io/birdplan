@@ -21,8 +21,8 @@
 
 """BGP large community (filtered function) stripping test case."""
 
-from ..template_stripping_large_community_filtered import Template
 from ...config.peertype_routecollector.e1r1 import PeerTypeConfig
+from ..template_stripping_large_community_filtered import Template
 
 
 class Test(PeerTypeConfig, Template):

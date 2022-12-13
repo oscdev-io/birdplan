@@ -21,8 +21,8 @@
 
 """BGP redistribution test case."""
 
-from ..template_redistribute_bgp_own_blackhole import Template
 from ....config.peertype_rrclient.rrserver.r1r2 import PeerTypeConfig
+from ..template_redistribute_bgp_own_blackhole import Template
 
 
 class Test(PeerTypeConfig, Template):

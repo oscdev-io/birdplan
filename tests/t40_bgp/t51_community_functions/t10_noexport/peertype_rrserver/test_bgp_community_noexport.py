@@ -21,8 +21,8 @@
 
 """BGP community functions test case."""
 
-from ..template_community_noexport import Template
 from ....config.peertype_rrserver.r1_to_r10 import PeerTypeConfig
+from ..template_community_noexport import Template
 
 
 class Test(PeerTypeConfig, Template):

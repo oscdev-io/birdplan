@@ -21,8 +21,8 @@
 
 """BGP filtering test case."""
 
-from ..template_first_as_not_peer_as import Template
 from ....config.peertype_peer.e1r1 import PeerTypeConfig
+from ..template_first_as_not_peer_as import Template
 
 
 class Test(PeerTypeConfig, Template):

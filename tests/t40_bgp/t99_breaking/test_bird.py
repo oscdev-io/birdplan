@@ -21,17 +21,19 @@
 
 """BIRD BGP test."""
 
-from ipaddress import IPv4Address, IPv6Address
 import logging
 import os
 import time
+from ipaddress import IPv4Address, IPv6Address
 from typing import Dict, List
-import pytest
 
+import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.exabgp_router_node import ExaBGPRouterNode
 from nsnetsim.switch_node import SwitchNode
+
 from birdplan.cmdline import BirdPlanCommandLine
+
 from ...simulation import Simulation
 
 

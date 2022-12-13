@@ -21,9 +21,10 @@
 """Testing stuff."""
 
 import re
-import pytest
-from .simulation import Simulation
 
+import pytest
+
+from .simulation import Simulation
 
 # Make sure basetests has its asserts rewritten
 pytest.register_assert_rewrite("tests.basetests")

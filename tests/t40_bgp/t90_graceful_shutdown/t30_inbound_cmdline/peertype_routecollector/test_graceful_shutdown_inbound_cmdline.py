@@ -21,8 +21,8 @@
 
 """BGP graceful shutdown test case."""
 
-from ..template_graceful_shutdown_inbound_cmdline import Template
 from ....config.peertype_routecollector.r1r2 import PeerTypeConfig
+from ..template_graceful_shutdown_inbound_cmdline import Template
 
 
 class Test(PeerTypeConfig, Template):

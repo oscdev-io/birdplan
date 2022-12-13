@@ -21,8 +21,8 @@
 
 """BGP peer cost test case."""
 
-from ..template import Template
 from ...config.peertype_rrserver_rrserver.e1r1 import PeerTypeConfig
+from ..template import Template
 
 
 class Test(PeerTypeConfig, Template):

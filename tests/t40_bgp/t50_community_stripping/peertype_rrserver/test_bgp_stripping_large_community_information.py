@@ -21,8 +21,8 @@
 
 """BGP large community (information function) stripping test case."""
 
-from ..template_stripping_large_community_information import Template
 from ...config.peertype_rrserver.e1r1 import PeerTypeConfig
+from ..template_stripping_large_community_information import Template
 
 
 class Test(PeerTypeConfig, Template):

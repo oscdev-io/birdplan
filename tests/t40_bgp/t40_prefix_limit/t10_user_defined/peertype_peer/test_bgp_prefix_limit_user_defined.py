@@ -21,8 +21,8 @@
 
 """BGP prefix limit test case."""
 
-from ..template_prefix_limit_user_defined import Template
 from ....config.peertype_peer.e1r1_no_limit import PeerTypeConfig
+from ..template_prefix_limit_user_defined import Template
 
 
 class Test(PeerTypeConfig, Template):

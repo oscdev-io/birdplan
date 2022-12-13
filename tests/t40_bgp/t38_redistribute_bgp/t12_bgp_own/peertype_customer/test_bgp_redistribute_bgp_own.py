@@ -21,8 +21,8 @@
 
 """BGP redistribution test case."""
 
-from ..template_redistribute_bgp_own import Template
 from ....config.peertype_customer.transit.r1r2 import PeerTypeConfig
+from ..template_redistribute_bgp_own import Template
 
 
 class Test(PeerTypeConfig, Template):

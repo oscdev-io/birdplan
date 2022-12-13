@@ -21,21 +21,23 @@
 
 """Base test classes for our tests."""
 
-from typing import Any, Dict, List, Optional, Tuple
 import inspect
 import logging
 import os
+import pprint
 import re
 import time
-import pprint
+from typing import Any, Dict, List, Optional, Tuple
+
 import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.exabgp_router_node import ExaBGPRouterNode
 from nsnetsim.switch_node import SwitchNode
+
 from birdplan.cmdline import BirdPlanCommandLine
 from birdplan.exceptions import BirdPlanError
-from .simulation import Simulation
 
+from .simulation import Simulation
 
 BirdConfigMacros = Optional[Dict[str, Dict[str, str]]]
 

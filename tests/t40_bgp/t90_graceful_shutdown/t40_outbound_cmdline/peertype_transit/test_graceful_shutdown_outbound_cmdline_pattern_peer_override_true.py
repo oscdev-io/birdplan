@@ -21,8 +21,8 @@
 
 """BGP graceful shutdown test case."""
 
-from ..template_graceful_shutdown_outbound_cmdline_pattern_peer_override_true import Template
 from ....config.peertype_transit.r1r2 import PeerTypeConfig
+from ..template_graceful_shutdown_outbound_cmdline_pattern_peer_override_true import Template
 
 
 class Test(PeerTypeConfig, Template):

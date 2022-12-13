@@ -21,8 +21,8 @@
 
 """BGP large community functions test case."""
 
-from ..template_large_community_localpref_minus_1 import Template
 from ....config.peertype_customer.r1_to_r10 import PeerTypeConfig
+from ..template_large_community_localpref_minus_1 import Template
 
 
 class Test(PeerTypeConfig, Template):

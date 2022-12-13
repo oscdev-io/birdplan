@@ -21,8 +21,8 @@
 
 """BGP accept blackhole route test cases, with peer accept:bgp_own_blackhole set to True."""
 
-from ..template_peer_accept_bgp_own_blackhole_true import Template
 from ...config.peertype_peer.e1r1 import PeerTypeConfig
+from ..template_peer_accept_bgp_own_blackhole_true import Template
 
 
 class Test(PeerTypeConfig, Template):

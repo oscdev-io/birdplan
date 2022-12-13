@@ -21,8 +21,8 @@
 
 """BGP accept default route test cases, with accept:bgp_own_default set to True."""
 
-from ..template_global_accept_bgp_own_default_true import Template
 from ...config.peertype_rrserver_rrserver.e1r1 import PeerTypeConfig
+from ..template_global_accept_bgp_own_default_true import Template
 
 
 class Test(PeerTypeConfig, Template):

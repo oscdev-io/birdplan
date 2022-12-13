@@ -21,8 +21,8 @@
 
 """BGP import kernel route test case."""
 
-from ..template_import_kernel import Template
 from ...config.peertype_internal.r1r2 import PeerTypeConfig
+from ..template_import_kernel import Template
 
 
 class Test(PeerTypeConfig, Template):

@@ -27,6 +27,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import yaml
 from nsnetsim.generic_node import GenericNode
 from nsnetsim.topology import Topology
+
 from birdplan import BirdPlan  # pylint: disable=import-error
 
 

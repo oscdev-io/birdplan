@@ -21,8 +21,8 @@
 
 """BGP AS-SET test case."""
 
-from ..template_as_sets_use_cached import Template
 from ....config.peertype_routeserver.e1r1 import PeerTypeConfig
+from ..template_as_sets_use_cached import Template
 
 
 class Test(PeerTypeConfig, Template):

@@ -21,8 +21,8 @@
 
 """BGP large community functions test case."""
 
-from ..template_lc_blackhole_to_transit_community_list import Template
 from ....config.peertype_internal.r1_to_r10 import PeerTypeConfig
+from ..template_lc_blackhole_to_transit_community_list import Template
 
 
 class Test(PeerTypeConfig, Template):

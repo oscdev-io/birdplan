@@ -21,8 +21,8 @@
 
 """BGP redistribute static route test cases, with redistribute:static set to False."""
 
-from ..template_redistribute_static_false import Template
 from ...config.peertype_rrserver_rrserver.r1r2 import PeerTypeConfig
+from ..template_redistribute_static_false import Template
 
 
 class Test(PeerTypeConfig, Template):

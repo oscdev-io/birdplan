@@ -21,11 +21,13 @@
 
 """BGP peer AS-SET filtered test case template."""
 
-from typing import Any, List
 import time
+from typing import Any, List
+
 from birdplan import bgpq3
-from ..template_base import TemplateBase as TemplateSetBase
+
 from ....simulation import Simulation
+from ..template_base import TemplateBase as TemplateSetBase
 
 
 class TemplateBase(TemplateSetBase):

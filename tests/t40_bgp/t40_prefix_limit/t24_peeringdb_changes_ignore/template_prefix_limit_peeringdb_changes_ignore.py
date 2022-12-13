@@ -21,9 +21,11 @@
 
 """BGP prefix limit test template."""
 
-from typing import Any, List
 import time
+from typing import Any, List
+
 from birdplan import peeringdb
+
 from ....basetests import BirdPlanBaseTestCase
 from ....simulation import Simulation
 

@@ -21,8 +21,8 @@
 
 """BGP filtering test case."""
 
-from ..template_transit_free_asn import Template
 from ....config.peertype_routeserver.e1r1 import PeerTypeConfig
+from ..template_transit_free_asn import Template
 
 
 class Test(PeerTypeConfig, Template):

@@ -21,8 +21,8 @@
 
 """BGP filtering test case."""
 
-from ..template_origin_asn_filtered_without_match import Template
 from ....config.peertype_rrserver.e1r1 import PeerTypeConfig
+from ..template_origin_asn_filtered_without_match import Template
 
 
 class Test(PeerTypeConfig, Template):

@@ -21,8 +21,8 @@
 
 """Basic BGP test case."""
 
-from ..template_bgp_ipv6 import Template
 from ...config.peertype_rrserver_rrserver.e1r1 import PeerTypeConfig
+from ..template_bgp_ipv6 import Template
 
 
 class Test(PeerTypeConfig, Template):

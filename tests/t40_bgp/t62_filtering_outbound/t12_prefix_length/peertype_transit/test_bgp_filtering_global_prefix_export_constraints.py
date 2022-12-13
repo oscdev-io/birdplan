@@ -21,8 +21,8 @@
 
 """BGP filtering test case."""
 
-from ..template_global_prefix_export_constraints import Template
 from ....config.peertype_transit.r1_to_r10 import PeerTypeConfig
+from ..template_global_prefix_export_constraints import Template
 
 
 class Test(PeerTypeConfig, Template):
