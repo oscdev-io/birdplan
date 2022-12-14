@@ -25,9 +25,10 @@ import logging.handlers
 import sys
 from typing import Any, List, NoReturn, Optional
 
-from . import __VERSION__, BirdPlan
+from . import BirdPlan
 from .exceptions import BirdPlanError, BirdPlanErrorUsage
 from .plugin import PluginCollection
+from .version import __version__
 
 # Defaults
 BIRDPLAN_FILE = "/etc/birdplan/birdplan.yaml"
@@ -72,7 +73,7 @@ class BirdPlanCommandLine:
 
         # Don't output copyright when we output in JSON format
         if self.is_console and not self.is_json:
-            print(f"BirdPlan v{__VERSION__} - Copyright © 2019-2021, AllWorldIT.\n", file=sys.stderr)
+            print(f"BirdPlan v{__version__} - Copyright © 2019-2021, AllWorldIT.\n", file=sys.stderr)
 
         # Add main commandline arguments
 

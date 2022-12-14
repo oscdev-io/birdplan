@@ -29,8 +29,13 @@ import yaml
 
 from .bird_config import BirdConfig
 from .exceptions import BirdPlanError
+from .version import __version__
 
-__VERSION__ = "0.0.1"
+
+__all__ = [
+    "BirdConfig",
+    "__version__",
+]
 
 # Some types we need
 BirdPlanBGPPeerGracefulShutdownStatus = Dict[str, Dict[str, bool]]

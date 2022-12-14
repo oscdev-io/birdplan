@@ -18,8 +18,7 @@
 
 """BIRD master table configuration."""
 
-from birdplan.bird_config.globals import BirdConfigGlobals
-
+from ....globals import BirdConfigGlobals
 from ...base import SectionBase
 from ...protocols.pipe import ProtocolPipe, ProtocolPipeFilterType
 from .master_attributes import MasterTableAttributes, MasterTableRoutePolicyExport

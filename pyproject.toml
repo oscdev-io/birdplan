@@ -1,6 +1,109 @@
 [build-system]
-requires = ["setuptools>=49", "setuptools-scm", "wheel"]
-build-backend = "setuptools.build_meta"
+#build-backend = "poetry.core.masonry.api"
+#requires = ["poetry-core", "setuptools"]
+requires = ["flit_core"]
+build-backend = "flit_core.buildapi"
+
+
+[project]
+name = "birdplan"
+description = "BirdPlan configuration file generator."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Nigel Kukard", email = "nkukard@LBSD.net" }
+]
+keywords = ["routing", "networking", "BGP", "RIP", "RIPv2", "RIPv3", "OSPF", "OSPFv3"]
+classifiers=[
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Documentation",
+]
+dynamic = ["version"]
+dependencies = [
+# NK: Add these back after development
+#    "birdclient",
+#    "nsnetsim",
+    "colorama",
+    "jinja2",
+    "pyyaml",
+    "requests",
+    "setuptools",
+]
+
+[project.scripts]
+birdplan = "birdplan:cmdline.run_birdplan"
+
+
+[project.urls]
+Homepage = "https://gitlab.oscdev.io/software/birdplan"
+"Issue Tracker" = "https://gitlab.oscdev.io/software/birdplan/-/issues"
+"Source Code" = "https://gitlab.oscdev.io/software/birdplan"
+Documentation = "https://software.pages.oscdev.io/birdplan"
+
+
+[tox]
+isolated_build = true
+
+
+[tool.poetry]
+name = "birdplan"
+#version = "x.x.x"
+description = "BirdPlan configuration file generator."
+authors = ["Nigel Kukard <nkukard@LBSD.net>"]
+packages = [
+    { include = "birdplan" }
+]
+
 
 [tool.black]
 line-length = 132
+
+
+[tool.isort]
+line_length = 120
+profile = "black"
+
+
+[tool.mypy]
+ignore_missing_imports = true
+strict = true
+
+
+[tool.pylint]
+load-plugins = [
+    "pylint.extensions.broad_try_clause",
+    "pylint.extensions.code_style",
+    "pylint.extensions.emptystring",
+    "pylint.extensions.comparetozero",
+    "pylint.extensions.comparison_placement",
+    "pylint.extensions.confusing_elif",
+    "pylint.extensions.for_any_all",
+    "pylint.extensions.bad_builtin",
+    "pylint.extensions.mccabe",
+    "pylint.extensions.docstyle",
+    "pylint.extensions.check_elif",
+    "pylint.extensions.eq_without_hash",
+    "pylint.extensions.private_import",
+    "pylint.extensions.redefined_variable_type",
+    "pylint.extensions.no_self_use",
+    "pylint.extensions.overlapping_exceptions",
+    "pylint.extensions.docparams",
+    "pylint.extensions.redefined_loop_name",
+    "pylint.extensions.set_membership",
+    "pylint.extensions.typing",
+]
+
+[tool.pylint.broad_try_clause]
+max-try-statements = 5
+
+[tool.pylint.message_control]
+max-line-length = 132
+# C0199: First line empty in method docstring (docstring-first-line-empty)
+# R0801: Similar lines in X files
+# R6103: Use '....' instead (assignment on IF line)
+disable = "C0199,R0801,R6103"
