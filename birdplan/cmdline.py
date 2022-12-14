@@ -16,10 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Entry point into Birdplan from the commandline."""
+"""Birdplan commandline interface."""
 
-import argparse
 import json
+import argparse
 import logging
 import logging.handlers
 import sys
@@ -62,8 +62,12 @@ class BirdPlanCommandLine:
     def __init__(self, test_mode: bool = False) -> None:
         """Instantiate object."""
 
+        prog: Optional[str] = None
+        if sys.argv[0].endswith("__main__.py"):
+            prog = "python -m birdplan"
+
         self._args = argparse.Namespace()
-        self._argparser = BirdPlanArgumentParser(add_help=False)
+        self._argparser = BirdPlanArgumentParser(add_help=False, prog=prog)
         self._birdplan = BirdPlan(test_mode=test_mode)
 
     def run(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
@@ -76,7 +80,6 @@ class BirdPlanCommandLine:
             print(f"BirdPlan v{__version__} - Copyright © 2019-2021, AllWorldIT.\n", file=sys.stderr)
 
         # Add main commandline arguments
-
         optional_group = self.argparser.add_argument_group("Optional arguments")
         optional_group.add_argument("-h", "--help", action="help", help="Show this help message and exit")
         optional_group.add_argument("-v", "--verbose", action="store_true", help="Display verbose logging")
@@ -248,7 +251,9 @@ class BirdPlanCommandLine:
         return False
 
 
-if __name__ == "__main__":
+# Main entry point from the commandline
+def main() -> None:
+    """Entry point function for the commandline."""
     birdplan_cmdline = BirdPlanCommandLine()
 
     try:
