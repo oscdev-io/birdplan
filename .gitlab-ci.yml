@@ -27,6 +27,7 @@ test_job:
       python-pytest-pylint
       python-pytest-mypy
       python-pytest-xdist
+      python-tox
   - pacman -S --noconfirm
       python-colorama
       python-jinja
