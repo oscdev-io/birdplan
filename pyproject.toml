@@ -26,8 +26,8 @@ classifiers=[
 dynamic = ["version"]
 dependencies = [
 # NK: Add these back after development
-#    "birdclient",
-#    "nsnetsim",
+    "birdclient @ git+https://gitlab.oscdev.io/software/birdclient.git@master",
+    "nsnetsim @ git+https://gitlab.oscdev.io/software/nsnetsim.git@master",
     "colorama",
     "jinja2",
     "pyyaml",
