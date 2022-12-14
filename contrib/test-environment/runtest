@@ -2,11 +2,11 @@
 
 cd /root/birdplan
 echo "PYTHONPATH: $PYTHONPATH"
-#echo "RUNNING: python setup.py test --addopt \"-v $*\""
 echo "RUNNING: tox -e unit-tests -- '$@'"
 
 export PYTHONPATH
 
-#nice python setup.py test --addopt "-v $*"
-nice tox -e unit-tests -- "$@"
+pacman -Q bird
+pacman -Q exabgp
 
+nice tox -e unit-tests -- "$@"
