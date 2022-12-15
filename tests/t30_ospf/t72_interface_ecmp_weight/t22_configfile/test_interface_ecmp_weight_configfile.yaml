@@ -1251,15 +1251,15 @@ r2_inet6:
   - dev: eth2
     flags: []
     gateway: fe80::5:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::6:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::7:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth1
     flags: []
     gateway: fe80::5:ff:fe00:2
@@ -2386,15 +2386,15 @@ r3_inet6:
   - dev: eth2
     flags: []
     gateway: fe80::5:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::6:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::7:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth1
     flags: []
     gateway: fe80::5:ff:fe00:2
@@ -3521,15 +3521,15 @@ r4_inet6:
   - dev: eth2
     flags: []
     gateway: fe80::5:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::6:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::7:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth1
     flags: []
     gateway: fe80::5:ff:fe00:2
@@ -4643,15 +4643,15 @@ r5_inet6:
   - dev: eth2
     flags: []
     gateway: fe80::2:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::3:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::4:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth1
     flags: []
     gateway: fe80::2:ff:fe00:2
@@ -5927,15 +5927,15 @@ r6_inet6:
   - dev: eth2
     flags: []
     gateway: fe80::2:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::3:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::4:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth1
     flags: []
     gateway: fe80::2:ff:fe00:2
@@ -7211,15 +7211,15 @@ r7_inet6:
   - dev: eth2
     flags: []
     gateway: fe80::2:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::3:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth2
     flags: []
     gateway: fe80::4:ff:fe00:3
-    weight: 1
+    weight: 2
   - dev: eth1
     flags: []
     gateway: fe80::2:ff:fe00:2
