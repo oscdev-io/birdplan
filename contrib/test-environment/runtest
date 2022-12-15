@@ -4,9 +4,11 @@ pacman -Q bird
 pacman -Q exabgp
 
 cd /root/birdplan
-#echo "PYTHONPATH: $PYTHONPATH"
-echo "RUNNING: tox -e unit-tests -- '$@'"
 
-#export PYTHONPATH
+ARGS=("$@")
+if [ ${#ARGS[@]} -eq 0 ]; then
+    ARGS=(--numprocesses=auto --dist=loadfile)
+fi
 
-nice tox -e unit-tests -- "$@"
+echo "RUNNING: tox -- ${ARGS[@]}"
+nice tox -- ${ARGS[@]}

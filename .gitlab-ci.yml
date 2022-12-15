@@ -26,7 +26,7 @@ test_job:
       exabgp
       bgpq3
   # Run tests
-  - if [ -n "$EXTRA_TEST_OPTS" ]; then echo "EXTRA_TEST_OPTS => $EXTRA_TEST_OPTS"; tox -- $EXTRA_TEST_OPTS; else tox; fi
+  - contrib/test-environment/runtest $EXTRA_TEST_OPTS
   # Save HTML coverage report
   - tox -e cov-html
   - mkdir public
