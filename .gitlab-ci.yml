@@ -28,8 +28,9 @@ test_job:
   # Run tests
   - if [ -n "$EXTRA_TEST_OPTS" ]; then echo "EXTRA_TEST_OPTS => $EXTRA_TEST_OPTS"; tox -- $EXTRA_TEST_OPTS; else tox; fi
   # Save HTML coverage report
+  - tox -e cov-html
   - mkdir public
-  - coverage html -d public/coverage
+  - mv htmlcov public/coverage
   # Save coverage report
   artifacts:
     paths:

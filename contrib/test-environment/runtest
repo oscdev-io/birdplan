@@ -1,12 +1,12 @@
 #!/bin/bash
 
-cd /root/birdplan
-echo "PYTHONPATH: $PYTHONPATH"
-echo "RUNNING: tox -e unit-tests -- '$@'"
-
-export PYTHONPATH
-
 pacman -Q bird
 pacman -Q exabgp
+
+cd /root/birdplan
+#echo "PYTHONPATH: $PYTHONPATH"
+echo "RUNNING: tox -e unit-tests -- '$@'"
+
+#export PYTHONPATH
 
 nice tox -e unit-tests -- "$@"
