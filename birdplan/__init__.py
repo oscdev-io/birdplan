@@ -31,7 +31,6 @@ from .bird_config import BirdConfig
 from .exceptions import BirdPlanError
 from .version import __version__
 
-
 __all__ = [
     "BirdConfig",
     "__version__",

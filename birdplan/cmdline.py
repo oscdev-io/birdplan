@@ -18,8 +18,8 @@
 
 """Birdplan commandline interface."""
 
-import json
 import argparse
+import json
 import logging
 import logging.handlers
 import sys
