@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2020, AllWorldIT
+# Copyright (c) 2019-2021, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,23 +16,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# type: ignore
-# pylint: disable=import-error,too-few-public-methods
-
-"""BGP redistribute kernel route test case template."""
-
-from .template_base import TemplateBase as TemplateSetBase
+"""Commandline entrypoint."""
 
 
-class TemplateBase(TemplateSetBase):
-    """BGP redistribute kernel route test case template."""
+import sys
 
-    def r1_template_peer_extra_config(self):
-        """Return extra peer config."""
+from .cmdline import main
 
-        if getattr(self, "r1_peer_type", None) in ("routecollector", "routeserver", "transit"):
-            return """
-      blackhole_community: True
-"""
+__all__: list[str] = []
 
-        return ""
+
+if __name__ == "__main__":
+    main()
+    sys.exit(0)

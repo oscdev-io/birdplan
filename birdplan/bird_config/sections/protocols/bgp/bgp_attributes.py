@@ -60,14 +60,14 @@ class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
 
 
 class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
-    """
+    r"""
     BGP route policy for importing of routes internally.
 
     Attributes
     ----------
     connected : Union[bool, List[str]]
         Import connected routes into the main BGP table. This attribute is indexed by interface name with a boolean option.
-        The interface name can be an exact interface match, or a wildcard with a *.
+        The interface name can be an exact interface match, or a wildcard with a \*.
     kernel : bool
         Import kernel routes into the main BGP table. Defaults to `False`.
     kernel_blackhole : bool

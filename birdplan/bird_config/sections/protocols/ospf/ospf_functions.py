@@ -21,7 +21,7 @@
 from typing import Any
 
 from ....globals import BirdConfigGlobals
-from ...functions import SectionFunctions, bird_function
+from ...functions import BirdFunction, SectionFunctions
 from ..base_protocol_functions import ProtocolFunctionsBase
 
 
@@ -34,7 +34,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
 
         self._section = "OSPF Functions"
 
-    @bird_function("ospf_accept_connected")
+    @BirdFunction("ospf_accept_connected")
     def accept_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD ospf_accept_connected function."""
 
@@ -48,7 +48,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
                 accept;
             }}"""
 
-    @bird_function("ospf_accept_ospf")
+    @BirdFunction("ospf_accept_ospf")
     def accept_ospf(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD ospf_accept_ospf function."""
 
@@ -62,7 +62,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
                 accept;
             }}"""
 
-    @bird_function("ospf_accept_ospf_default")
+    @BirdFunction("ospf_accept_ospf_default")
     def accept_ospf_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD ospf_accept_ospf_default function."""
 
@@ -77,7 +77,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
                 accept;
             }}"""
 
-    @bird_function("ospf_is_connected")
+    @BirdFunction("ospf_is_connected")
     def is_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD ospf_is_connected function."""
 
@@ -88,7 +88,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
                 return false;
             }"""
 
-    @bird_function("ospf_redistribute_connected")
+    @BirdFunction("ospf_redistribute_connected")
     def redistribute_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD ospf_redistribute_connected function."""
 

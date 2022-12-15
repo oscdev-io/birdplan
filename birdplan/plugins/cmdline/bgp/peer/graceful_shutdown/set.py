@@ -102,7 +102,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
         # Check value is valid
         if cmdline.args.value[0] not in ("true", "false"):
             raise BirdPlanErrorUsage("BGP peer graceful shutdown override flag value must be 'true' or 'false'", self._subparser)
-        value = bool(cmdline.args.value[0] == "true")
+        value = cmdline.args.value[0] == "true"
 
         # Load BirdPlan configuration
         cmdline.birdplan_load_config()

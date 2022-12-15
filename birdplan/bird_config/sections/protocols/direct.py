@@ -33,7 +33,7 @@ class ProtocolDirect(SectionProtocolBase):
     _name_suffix: str
     _interfaces: List[str]
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         constants: SectionConstants,

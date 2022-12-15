@@ -100,7 +100,7 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
         # Grab peer list
         return cmdline.birdplan.state_ospf_interface_status()
 
-    def show_output_text(  # noqa: C901 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+    def show_output_text(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         self, data: Any
     ) -> None:
         """
@@ -191,9 +191,9 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
                     # Make things easier below
                     current_interface = data["current"]["areas"][area_name]["interfaces"][interface]
                     # Check if we have a current cost and ECMP weight
-                    if "cost" in current_interface:
+                    if "cost" in current_interface:  # noqa: SIM908
                         current_cost = current_interface["cost"]
-                    if "ecmp_weight" in current_interface:
+                    if "ecmp_weight" in current_interface:  # noqa: SIM908
                         current_ecmp_weight = current_interface["ecmp_weight"]
 
                 # Work out the cost string

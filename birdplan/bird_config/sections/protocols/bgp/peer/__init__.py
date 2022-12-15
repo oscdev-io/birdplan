@@ -60,7 +60,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     _state: Dict[str, Any]
     _prev_state: Optional[Dict[str, Any]]
 
-    def __init__(  # noqa: C901 # pylint: disable=too-many-branches,too-many-statements,too-many-arguments,too-many-locals
+    def __init__(  # noqa: CFQ001,CFQ002 # pylint: disable=too-many-branches,too-many-statements,too-many-arguments,too-many-locals
         self,
         birdconfig_globals: BirdConfigGlobals,
         constants: SectionConstants,
@@ -151,7 +151,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.replace_aspath = True
 
         # If the peer type is of internal nature, but doesn't match our peer type, throw an exception
-        if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.asn != self.bgp_attributes.asn and not (self.peer_type == "internal" and self.replace_aspath):
                 raise BirdPlanError(
                     f"BGP peer '{self.name}' ({self.asn}) is of internal nature, "
@@ -326,7 +326,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                             f"'{self.peer_type}' is invalid"
                         )
                     # Check that we're not doing something stupid
-                    if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):
+                    if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):  # noqa: SIM102
                         if lc_type in (
                             "bgp_default",
                             "bgp_own_default",
@@ -342,7 +342,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                                 f"Having 'outgoing_large_communities:{lc_type}' specified for peer '{self.name}' "
                                 f"with type '{self.peer_type}' makes no sense"
                             )
-                    if self.peer_type not in (
+                    if self.peer_type not in (  # noqa: SIM102
                         "internal",
                         "routeserver",
                         "routecollector",
@@ -554,15 +554,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # If the peer is a customer or peer, check if we have a prefix limit, if not add it from peeringdb
         if self.peer_type in ("customer", "peer"):
             if self.has_ipv4:
-                if "prefix_limit4" not in peer_config:
-                    self.prefix_limit4 = "peeringdb"
-                else:
-                    self.prefix_limit4 = peer_config["prefix_limit4"]
+                self.prefix_limit4 = peer_config.get("prefix_limit4", "peeringdb")
             if self.has_ipv6:
-                if "prefix_limit6" not in peer_config:
-                    self.prefix_limit6 = "peeringdb"
-                else:
-                    self.prefix_limit6 = peer_config["prefix_limit6"]
+                self.prefix_limit6 = peer_config.get("prefix_limit6", "peeringdb")
         # Having a prefix limit set for anything other than the above peer types makes no sense
         else:
             if "prefix_limit4" in peer_config:
@@ -618,7 +612,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 setattr(self.route_policy_accept, accept_type, accept_config)
 
         # Check bgp:accept:bgp_customer_blackhole
-        if self.peer_type not in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if self.peer_type not in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.route_policy_accept.bgp_customer_blackhole:
                 raise BirdPlanError(
                     f"Having 'accept:bgp_customer_blackhole' set to True for peer '{self.name}' with type '{self.peer_type}' "
@@ -639,14 +633,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     "makes no sense"
                 )
         # Check bgp:accept:bgp_transit_default
-        if self.peer_type not in ("internal", "rrclient", "rrserver", "rrserver-rrserver", "transit"):
+        if self.peer_type not in ("internal", "rrclient", "rrserver", "rrserver-rrserver", "transit"):  # noqa: SIM102
             if self.route_policy_accept.bgp_transit_default:
                 raise BirdPlanError(
                     f"Having 'accept:bgp_transit_default' set to True for peer '{self.name}' with type '{self.peer_type}' "
                     "makes no sense"
                 )
         # Check if this is a customer with blackholing and without a prefix filter set
-        if self.peer_type == "customer":
+        if self.peer_type == "customer":  # noqa: SIM102
             if self.route_policy_accept.bgp_customer_blackhole and not self.has_prefix_filter:
                 raise BirdPlanError(
                     f"Having 'accept:bgp_customer_blackhole' set to True for peer '{self.name}' with type '{self.peer_type}' "
@@ -755,7 +749,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                             f"'{self.peer_type}' is invalid"
                         )
                     # Check that we're not doing something stupid
-                    if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):
+                    if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):  # noqa: SIM102
                         if prepend_type in (
                             "bgp_default",
                             "default",
@@ -771,7 +765,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                                 f"Having 'prepend:{prepend_type}' specified for peer '{self.name}' with type '{self.peer_type}' "
                                 "makes no sense"
                             )
-                    if self.peer_type not in (
+                    if self.peer_type not in (  # noqa: SIM102
                         "internal",
                         "routeserver",
                         "routecollector",
@@ -797,7 +791,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         # Grab the prepend attribute
                         prepend_attr = getattr(self.prepend, prepend_type)
                         # Set prepend count
-                        setattr(prepend_attr, "own_asn", prepend_config)
+                        setattr(prepend_attr, "own_asn", prepend_config)  # noqa: B010
             # If its just a number set the count
             else:
                 prepend_option = peer_config["prepend"]
@@ -888,7 +882,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         f"with type '{self.peer_type}' is invalid"
                     )
                 # Make sure this peer supports blackhole imports
-                if constraint_name.startswith("blackhole_import_"):
+                if constraint_name.startswith("blackhole_import_"):  # noqa: SIM102
                     if self.peer_type not in (
                         "customer",
                         "internal",
@@ -901,7 +895,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                             f"with type '{self.peer_type}' makes no sense"
                         )
                 # Make sure this peer accepts blackhole exports
-                if constraint_name.startswith("blackhole_export_"):
+                if constraint_name.startswith("blackhole_export_"):  # noqa: SIM102
                     if self.peer_type not in (
                         "internal",
                         "routeserver",
@@ -916,7 +910,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                             f"with type '{self.peer_type}' makes no sense"
                         )
                 # Make sure this peer supports imports
-                if "import" in constraint_name:
+                if "import" in constraint_name:  # noqa: SIM102
                     if self.peer_type not in (
                         "customer",
                         "internal",
@@ -1218,7 +1212,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     if fnmatch.fnmatch(self.name, item):
                         self.quarantine = self.birdconfig_globals.state["bgp"]["+quarantine"][item]
 
-    def configure(self) -> None:  # noqa: C901 # pylint: disable=too-many-branches
+    def configure(self) -> None:  # pylint: disable=too-many-branches
         """Configure BGP peer."""
         super().configure()
 
@@ -1371,7 +1365,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Store our BGP table names
         self.state["tables"] = state_tables
 
-    def _setup_aspath_asns(self) -> None:  # noqa: C901 # pylint: disable=too-many-branches
+    def _setup_aspath_asns(self) -> None:  # pylint: disable=too-many-branches
         """AS-PATH ASN list setup."""
 
         # Short circuit and exit if we have none
@@ -1448,7 +1442,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.state["filter"] = {}
         self.state["filter"]["aspath_asns"] = state
 
-    def _setup_origin_asns(self) -> None:  # noqa: disable=C901
+    def _setup_origin_asns(self) -> None:
         """Origin ASN list setup."""
 
         # Short circuit and exit if we have none
@@ -1533,7 +1527,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.state["filter"] = {}
         self.state["filter"]["peer_asns"] = state
 
-    def _setup_peer_prefixes(self) -> None:  # noqa: C901 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+    def _setup_peer_prefixes(self) -> None:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         """Prefix list setup."""
 
         # Short circuit and exit if we have none
@@ -1662,7 +1656,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _peer_to_bgp_import_filter(  # noqa: C901 # pylint: disable=too-many-branches,too-many-statements,too-many-locals
+    def _peer_to_bgp_import_filter(  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-statements,too-many-locals
         self,
     ) -> None:
         """Import filter FROM the main BGP table to the BGP peer table."""
@@ -1730,7 +1724,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  {self.bgp_functions.peer_reject_noexport_transit()};")
 
         # Rejections based on location-based large communities
-        if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
+        if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):  # noqa: SIM102
             # Check if we have a ISO-3166 country code
             if self.location.iso3166:
                 self.conf.add("  # Check if we're not exporting this route based on the ISO-3166 location")
@@ -1911,14 +1905,22 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.prepend.kernel.own_asn:
             self.conf.add(f"    {self.bgp_functions.peer_prepend_kernel(BirdVariable('BGP_ASN'), self.prepend.kernel.own_asn)};")
 
-        if self.peer_type in ("internal", "routecollector", "routeserver", "rrclient", "rrserver", "rrserver-rrserver", "transit"):
+        if self.peer_type in (  # noqa: SIM102
+            "internal",
+            "routecollector",
+            "routeserver",
+            "rrclient",
+            "rrserver",
+            "rrserver-rrserver",
+            "transit",
+        ):
             if self.prepend.kernel_blackhole.own_asn:
                 peer_prepend_kernel_blackhole = self.bgp_functions.peer_prepend_kernel_blackhole(
                     BirdVariable("BGP_ASN"), self.prepend.kernel_blackhole.own_asn
                 )
                 self.conf.add(f"    {peer_prepend_kernel_blackhole};")
 
-        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.kernel_default.own_asn:
                 peer_prepend_kernel_default = self.bgp_functions.peer_prepend_kernel_default(
                     BirdVariable("BGP_ASN"), self.prepend.kernel_default.own_asn
@@ -1930,7 +1932,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 f"    {self.bgp_functions.peer_prepend_originated(BirdVariable('BGP_ASN'), self.prepend.originated.own_asn)};"
             )
 
-        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.originated_default.own_asn:
                 peer_prepend_originated_default = self.bgp_functions.peer_prepend_originated_default(
                     BirdVariable("BGP_ASN"), self.prepend.originated_default.own_asn
@@ -1940,14 +1942,22 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.prepend.static.own_asn:
             self.conf.add(f"    {self.bgp_functions.peer_prepend_static(BirdVariable('BGP_ASN'), self.prepend.static.own_asn)};")
 
-        if self.peer_type in ("internal", "routecollector", "routeserver", "rrclient", "rrserver", "rrserver-rrserver", "transit"):
+        if self.peer_type in (  # noqa: SIM102
+            "internal",
+            "routecollector",
+            "routeserver",
+            "rrclient",
+            "rrserver",
+            "rrserver-rrserver",
+            "transit",
+        ):
             if self.prepend.static_blackhole.own_asn:
                 peer_prepend_static_blackhole = self.bgp_functions.peer_prepend_static_blackhole(
                     BirdVariable("BGP_ASN"), self.prepend.static_blackhole.own_asn
                 )
                 self.conf.add(f"    {peer_prepend_static_blackhole};")
 
-        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.static_default.own_asn:
                 peer_prepend_static_default = self.bgp_functions.peer_prepend_static_default(
                     BirdVariable("BGP_ASN"), self.prepend.static_default.own_asn
@@ -1957,14 +1967,22 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.prepend.bgp_own.own_asn:
             self.conf.add(f"    {self.bgp_functions.peer_prepend_bgp_own(BirdVariable('BGP_ASN'), self.prepend.bgp_own.own_asn)};")
 
-        if self.peer_type in ("internal", "routecollector", "routeserver", "rrclient", "rrserver", "rrserver-rrserver", "transit"):
+        if self.peer_type in (  # noqa: SIM102
+            "internal",
+            "routecollector",
+            "routeserver",
+            "rrclient",
+            "rrserver",
+            "rrserver-rrserver",
+            "transit",
+        ):
             if self.prepend.bgp_own_blackhole.own_asn:
                 peer_prepend_bgp_own_blackhole = self.bgp_functions.peer_prepend_bgp_own_blackhole(
                     BirdVariable("BGP_ASN"), self.prepend.bgp_own_blackhole.own_asn
                 )
                 self.conf.add(f"    {peer_prepend_bgp_own_blackhole};")
 
-        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.bgp_own_default.own_asn:
                 peer_prepend_bgp_own_default = self.bgp_functions.peer_prepend_bgp_own_default(
                     BirdVariable("BGP_ASN"), self.prepend.bgp_own_default.own_asn
@@ -1976,26 +1994,34 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 f"    {self.bgp_functions.peer_prepend_bgp_customer(BirdVariable('BGP_ASN'), self.prepend.bgp_customer.own_asn)};"
             )
 
-        if self.peer_type in ("internal", "routecollector", "routeserver", "rrclient", "rrserver", "rrserver-rrserver", "transit"):
+        if self.peer_type in (  # noqa: SIM102
+            "internal",
+            "routecollector",
+            "routeserver",
+            "rrclient",
+            "rrserver",
+            "rrserver-rrserver",
+            "transit",
+        ):
             if self.prepend.bgp_customer_blackhole.own_asn:
                 peer_prepend_bgp_customer_blackhole = self.bgp_functions.peer_prepend_bgp_customer_blackhole(
                     BirdVariable("BGP_ASN"), self.prepend.bgp_customer_blackhole.own_asn
                 )
                 self.conf.add(f"    {peer_prepend_bgp_customer_blackhole};")
 
-        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.bgp_peering.own_asn:
                 self.conf.add(
                     f"    {self.bgp_functions.peer_prepend_bgp_peering(BirdVariable('BGP_ASN'), self.prepend.bgp_peering.own_asn)};"
                 )
 
-        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.bgp_transit.own_asn:
                 self.conf.add(
                     f"    {self.bgp_functions.peer_prepend_bgp_transit(BirdVariable('BGP_ASN'), self.prepend.bgp_transit.own_asn)};"
                 )
 
-        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.bgp_transit_default.own_asn:
                 peer_prepend_bgp_transit_default = self.bgp_functions.peer_prepend_bgp_transit_default(
                     BirdVariable("BGP_ASN"), self.prepend.bgp_transit_default.own_asn
@@ -2071,7 +2097,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _peer_import_filter(self) -> None:  # noqa: C901 # pylint: disable=too-many-branches,too-many-statements
+    def _peer_import_filter(self) -> None:  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-statements
         """Peer import filter setup from peer to peer table."""
 
         # Set our filter name
@@ -2287,7 +2313,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.conf.add(f"  {self.bgp_functions.peer_import_location_unm49(self.location.unm49)};")
 
         # If this is a customer or internal peer type, check if we're doing replacement of the AS-PATH and add the action community
-        if self.peer_type in ("customer", "internal"):
+        if self.peer_type in ("customer", "internal"):  # noqa: SIM102
             if self.replace_aspath:
                 # Lastly add the large community to replace the ASN
                 self.conf.add(
@@ -2317,13 +2343,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _setup_peer_protocol(self, ipv: str) -> None:  # noqa: C901
+    def _setup_peer_protocol(self, ipv: str) -> None:
         """Peer protocol setup for a single protocol."""
 
-        protocol_state = {}
-
-        # Save the current protocol name
-        protocol_state["name"] = self.protocol_name(ipv)
+        protocol_state = {
+            # Save the current protocol name
+            "name": self.protocol_name(ipv)
+        }
 
         # Get our source and neighbor addresses
         source_address = getattr(self, f"source_address{ipv}")

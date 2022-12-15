@@ -100,14 +100,14 @@ class Template(BirdPlanBaseTestCase):
         """Graceful shutdown test to customize template."""
 
         # Check if we get an exception now during reconfiguration
-        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+        if getattr(self, "r1_peer_type", None) in ("customer", "peer"):
             super()._birdplan_run(sim, tmpdir, "r1", ["configure", "--use-cached"])
 
     def test_as_sets_without_use_cached(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Check if we get an exception now during reconfiguration
-        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+        if getattr(self, "r1_peer_type", None) in ("customer", "peer"):
 
             with pytest.raises(
                 BirdPlanError,

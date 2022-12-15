@@ -6,4 +6,4 @@ max-line-length=132
 
 # Disable similarity checks as the test directory is huge
 
-disable=C0330,similarities
+disable=similarities

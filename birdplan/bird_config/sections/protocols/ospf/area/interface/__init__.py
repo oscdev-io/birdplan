@@ -42,7 +42,7 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
     # OSPF area interface attributes
     _interface_attributes: OSPFAreaInterfaceAttributes
 
-    def __init__(  # noqa: C901 # pylint: disable=too-many-arguments,too-many-branches
+    def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments,too-many-branches
         self,
         birdconfig_globals: BirdConfigGlobals,
         constants: SectionConstants,

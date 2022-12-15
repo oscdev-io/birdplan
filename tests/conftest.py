@@ -79,7 +79,7 @@ class CustomPytestRegex:
         return self._regex.pattern
 
 
-@pytest.fixture
+@pytest.fixture()
 def helpers():
     """Return our helpers."""
     return Helpers
@@ -138,9 +138,9 @@ def pytest_runtest_makereport(item, call):
                     report.sections.extend(sim.report_configs())
 
             # If this is an incremental test we need to add an attribute to indicate failure
-            if "incremental" in item.keywords:
+            if "incremental" in item.keywords:  # noqa: SIM102
                 if call.excinfo is not None:
-                    setattr(item.parent, "_previousfailed", item)
+                    setattr(item.parent, "_previousfailed", item)  # noqa: B010
 
         # If the test passed, clear the report data
         else:
@@ -154,7 +154,7 @@ def pytest_runtest_setup(item):
     """Check if the previous test failed, if so xfail the rest."""
 
     # Clear reports before running test
-    if hasattr(item.parent, "fixturenames"):
+    if hasattr(item.parent, "fixturenames"):  # noqa: SIM102
         if "sim" in item.parent.fixturenames:
             sim = item.parent.funcargs["sim"]
             sim.clear_report()

@@ -56,7 +56,7 @@ class BirdPlan:
         self._config = {}
         self._state_file = None
 
-    def load(self, **kwargs: Any) -> None:  # noqa: C901
+    def load(self, **kwargs: Any) -> None:
         """
         Initialize object.
 
@@ -266,7 +266,7 @@ class BirdPlan:
                 }
             }
 
-        """
+        """  # noqa: RST201,RST203,RST301
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
@@ -292,10 +292,7 @@ class BirdPlan:
             # If we do loop with them
             for peer, peer_state in self.state["bgp"]["peers"].items():
                 # And check if they have a graceful shutdown state or not
-                if "graceful_shutdown" in peer_state:
-                    ret["current"][peer] = peer_state["graceful_shutdown"]
-                else:
-                    ret["current"][peer] = False
+                ret["current"][peer] = peer_state.get("graceful_shutdown", False)
 
         # Generate the override status as if we were doing a configure
         for peer in self.birdconf.protocols.bgp.peers:
@@ -384,7 +381,7 @@ class BirdPlan:
                 }
             }
 
-        """
+        """  # noqa: RST201,RST203,RST301
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
@@ -410,10 +407,7 @@ class BirdPlan:
             # If we do loop with them
             for peer, peer_state in self.state["bgp"]["peers"].items():
                 # And check if they have a quarantine state or not
-                if "quarantine" in peer_state:
-                    ret["current"][peer] = peer_state["quarantine"]
-                else:
-                    ret["current"][peer] = False
+                ret["current"][peer] = peer_state.get("quarantine", False)
 
         # Generate the override status as if we were doing a configure
         for peer in self.birdconf.protocols.bgp.peers:
@@ -567,7 +561,7 @@ class BirdPlan:
         if not self.state["ospf"]["areas"][area]["+interfaces"]:
             del self.state["ospf"]["areas"][area]["+interfaces"]
 
-    def state_ospf_interface_status(self) -> BirdPlanOSPFInterfaceStatus:  # noqa: C901 # pylint: disable=too-many-branches
+    def state_ospf_interface_status(self) -> BirdPlanOSPFInterfaceStatus:  # pylint: disable=too-many-branches
         """
         Return the status of OSPF interfaces.
 
@@ -616,7 +610,7 @@ class BirdPlan:
                 }
             }
 
-        """
+        """  # noqa: RST201,RST203,RST301
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
@@ -763,7 +757,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in RIP accept")
 
-    def _config_rip_redistribute(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
+    def _config_rip_redistribute(self) -> None:  # pylint: disable=too-many-branches
         """Configure rip:redistribute section."""
 
         # If we don't have a redistribute section just return
@@ -868,7 +862,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{accept}' not understood in ospf:accept")
 
-    def _config_ospf_redistribute(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
+    def _config_ospf_redistribute(self) -> None:  # pylint: disable=too-many-branches
         """Configure ospf:redistribute section."""
 
         # If we don't have a redistribute section just return
@@ -919,7 +913,7 @@ class BirdPlan:
             else:
                 raise BirdPlanError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")
 
-    def _config_ospf_areas(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
+    def _config_ospf_areas(self) -> None:  # pylint: disable=too-many-branches
         """Configure ospf:interfaces section."""
 
         # If we don't have areas in our ospf section, just return
@@ -1048,7 +1042,7 @@ class BirdPlan:
         if "rr_cluster_id" in self.config["bgp"]:
             self.birdconf.protocols.bgp.rr_cluster_id = self.config["bgp"]["rr_cluster_id"]
 
-    def _config_bgp_peertype_constraints(self) -> None:  # noqa: C901
+    def _config_bgp_peertype_constraints(self) -> None:
         """Configure bgp:peertype_constraints section."""
 
         # If we don't have a peertype_constraints section, just return
@@ -1100,7 +1094,7 @@ class BirdPlan:
                         f"The 'bgp:peertype_constraints:{peer_type}' config item '{constraint_name}' is not supported"
                     )
                 # Make sure this peer supports blackhole imports
-                if constraint_name.startswith("blackhole_import_"):
+                if constraint_name.startswith("blackhole_import_"):  # noqa: SIM102
                     if peer_type not in (
                         "customer",
                         "internal",
@@ -1113,7 +1107,7 @@ class BirdPlan:
                             "makes no sense"
                         )
                 # Make sure this peer accepts blackhole exports
-                if constraint_name.startswith("blackhole_export_"):
+                if constraint_name.startswith("blackhole_export_"):  # noqa: SIM102
                     if peer_type not in (
                         "internal",
                         "routeserver",
@@ -1128,7 +1122,7 @@ class BirdPlan:
                             "makes no sense"
                         )
                 # Make sure this peer supports imports
-                if "import" in constraint_name:
+                if "import" in constraint_name:  # noqa: SIM102
                     if peer_type not in (
                         "customer",
                         "customer.private",
@@ -1162,7 +1156,7 @@ class BirdPlan:
         for route in self.config["bgp"]["originate"]:
             self.birdconf.protocols.bgp.add_originated_route(route)
 
-    def _config_bgp_import(self) -> None:  # noqa: C901, pylint: disable=too-many-branches
+    def _config_bgp_import(self) -> None:  # pylint: disable=too-many-branches
         """Configure bgp:import section."""
 
         # If we don't have the option then just return
@@ -1231,7 +1225,7 @@ class BirdPlan:
             # Configure peer
             self._config_bgp_peers_peer(peer_name, peer_config)
 
-    def _config_bgp_peers_peer(  # noqa: C901, pylint: disable=too-many-branches,too-many-locals,too-many-statements
+    def _config_bgp_peers_peer(  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-locals,too-many-statements
         self, peer_name: str, peer_config: Dict[str, Any]
     ) -> None:
         """Configure bgp:peers single peer."""

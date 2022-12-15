@@ -181,7 +181,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             raise BirdPlanError(f"Peer type '{peer_type}' has no implemented global prefix limits")
         return self.bgp_attributes.peertype_constraints[peer_type]
 
-    def _configure_constants_bgp(self) -> None:  # pylint: disable=too-many-statements
+    def _configure_constants_bgp(self) -> None:  # noqa: CFQ001 # pylint: disable=too-many-statements
         """Configure BGP constants."""
         self.constants.conf.append_title("BGP Constants")
 

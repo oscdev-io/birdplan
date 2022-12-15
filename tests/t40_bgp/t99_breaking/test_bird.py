@@ -37,7 +37,7 @@ from birdplan.cmdline import BirdPlanCommandLine
 from ...simulation import Simulation
 
 
-@pytest.mark.incremental
+@pytest.mark.incremental()
 class Test:
     """BIRD BGP test."""
 
@@ -45,7 +45,7 @@ class Test:
 
     num_bird_routers = 2500
 
-    def test_setup(self, sim, testpath, tmpdir, enable_performance_test):  # pylint: disable=too-many-locals
+    def test_setup(self, sim, testpath, tmpdir, enable_performance_test):  # noqa: CFQ001 # pylint: disable=too-many-locals
         """Set up our test."""
 
         # Make sure --enable-performance-test was specified
@@ -202,7 +202,8 @@ class Test:
 
         time.sleep(10000)
 
-        assert "a" == "b", "OH NO"
+        # assert False, "OH NO"
+        pytest.fail("OH NO")
 
     def _configure_bird(  # pylint: disable=too-many-arguments
         self, router_id: str, asn: str, source4: str, source6: str, peers: List[Dict[str, str]]
@@ -225,7 +226,7 @@ bgp:
         # Loop with each peer
         for peer in peers:
             extra_config = ""
-            if "extra_config" in peer:
+            if peer.get("extra_config"):
                 extra_config = peer["extra_config"]
             # Generate peer configuration blocks
             peer_config = f"""
@@ -245,7 +246,7 @@ bgp:
         # Return BIRD config
         return birdplan_config
 
-    def _configure_exabgp(  # pylint: disable=too-many-arguments
+    def _configure_exabgp(  # noqa: CFQ002 # pylint: disable=too-many-arguments
         self, sim: Simulation, router_id: str, asn: str, source4: str, source6: str, peer: Dict[str, str]
     ):
         """Configure an ExaBGP."""

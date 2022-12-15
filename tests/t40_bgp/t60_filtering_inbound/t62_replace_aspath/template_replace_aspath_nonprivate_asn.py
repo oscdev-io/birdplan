@@ -36,7 +36,7 @@ class Template(TemplateBase):
 
         # Add large communities for peer types that require them
         large_communities = ""
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if getattr(self, "r1_peer_type", None) in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             large_communities = "65000:3:1"
 
         self._exabgpcli(

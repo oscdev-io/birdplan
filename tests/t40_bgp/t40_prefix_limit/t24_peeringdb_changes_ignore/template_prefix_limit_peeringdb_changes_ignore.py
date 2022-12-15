@@ -105,7 +105,7 @@ class Template(BirdPlanBaseTestCase):
         peeringdb.PEERINGDB_16BIT_LOWER = 65002
 
         # Check if we get an exception now during reconfiguration
-        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+        if getattr(self, "r1_peer_type", None) in ("customer", "peer"):
             super()._birdplan_run(sim, tmpdir, "r1", ["configure", "--ignore-peeringdb-changes"])
 
         # Restore global
@@ -130,7 +130,7 @@ class Template(BirdPlanBaseTestCase):
         peeringdb.PEERINGDB_16BIT_LOWER = 65002
 
         # Check if we get an exception now during reconfiguration
-        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+        if getattr(self, "r1_peer_type", None) in ("customer", "peer"):
             super()._birdplan_run(sim, tmpdir, "r1", ["configure", "--ignore-peeringdb-changes"])
 
         # Restore global
@@ -155,7 +155,7 @@ class Template(BirdPlanBaseTestCase):
         peeringdb.PEERINGDB_16BIT_LOWER = 65002
 
         # Check if we get an exception now during reconfiguration
-        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+        if getattr(self, "r1_peer_type", None) in ("customer", "peer"):
             super()._birdplan_run(sim, tmpdir, "r1", ["configure", "--ignore-peeringdb-changes"])
 
         # Restore global
@@ -180,7 +180,7 @@ class Template(BirdPlanBaseTestCase):
         peeringdb.PEERINGDB_16BIT_LOWER = 65002
 
         # Check if we get an exception now during reconfiguration
-        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+        if getattr(self, "r1_peer_type", None) in ("customer", "peer"):
             super()._birdplan_run(sim, tmpdir, "r1", ["configure", "--ignore-peeringdb-changes"])
 
         # Restore global

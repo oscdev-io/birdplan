@@ -29,7 +29,7 @@ class Template(TemplateBase):
 
     def r1_template_peer_config(self):
         """Return custom peer config depending on the per type."""
-        if getattr(self, "r1_peer_type") == "customer":
+        if getattr(self, "r1_peer_type", None) == "customer":
             return """
       filter:
         prefixes: ["192.168.0.0/24", "fec0::/48"]
@@ -41,7 +41,7 @@ class Template(TemplateBase):
 
         # Add large communities for peer types that require them
         relation_large_communities = ""
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if getattr(self, "r1_peer_type", None) in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             relation_large_communities = "65000:3:1"
 
         self._exabgpcli(

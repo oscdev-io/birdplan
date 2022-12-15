@@ -46,7 +46,7 @@ BirdConfigMacros = Optional[Dict[str, Dict[str, str]]]
 #
 
 
-@pytest.mark.incremental
+@pytest.mark.incremental()
 class BirdPlanBaseTestCase:
     """Base test case for our tests."""
 
@@ -277,7 +277,7 @@ class BirdPlanBaseTestCase:
             # If we don't have a content match, we match as we have a sleep() after bird status
             # The first case is when there is no expected data
             # The second case is when this item is missing from the expected data
-            if result_expected is None or isinstance(result_expected, ValueError):
+            if result_expected is None or isinstance(result_expected, ValueError):  # noqa: SIM114
                 content_matches = True
             # Else check that the result contains the content we're looking for
             elif result_expected == result:
@@ -352,7 +352,7 @@ class BirdPlanBaseTestCase:
             result = sim.node(router).run_ip(["--family", table_name, "route", "list"])
 
             # If we don't have a content match, we match as we have a sleep() after bird status
-            if result_expected is None:
+            if result_expected is None:  # noqa: SIM114
                 result_matches = True
             # Else check that the result contains the content we're looking for
             elif result_expected == result:
@@ -399,9 +399,7 @@ class BirdPlanBaseTestCase:
 
         return configured_routers
 
-    def _configure_exabgps(  # noqa: C901 # pylint: disable=too-many-locals,too-many-branches
-        self, sim: Simulation, tmpdir: str
-    ) -> List[str]:
+    def _configure_exabgps(self, sim: Simulation, tmpdir: str) -> List[str]:  # pylint: disable=too-many-locals,too-many-branches
         """Create our configuration files."""
 
         # Loop with each ExaBGP
@@ -478,7 +476,7 @@ class BirdPlanBaseTestCase:
             # Add config file to our simulation so we get a report for it
             sim.add_conffile(f"exabgp.conf.{exabgp}", exabgp_conffile)
 
-    def _birdplan_run(  # noqa: C901 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements
+    def _birdplan_run(  # noqa: CFQ001 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements
         self, sim: Simulation, tmpdir: str, router: str, args: List[str]
     ) -> Any:
         """Run BirdPlan for a given router."""
@@ -506,7 +504,7 @@ class BirdPlanBaseTestCase:
             "template_peer_extra_config",
             "template_allpeer_config",
         ]
-        extra_attr_list = getattr(self, "template_macros")
+        extra_attr_list = getattr(self, "template_macros", None)
         if extra_attr_list:
             attr_list.extend(extra_attr_list)
 

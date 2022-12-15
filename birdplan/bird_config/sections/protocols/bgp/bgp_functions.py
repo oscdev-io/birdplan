@@ -23,7 +23,7 @@
 from typing import Any
 
 from ....globals import BirdConfigGlobals
-from ...functions import BirdVariable, SectionFunctions, bird_function
+from ...functions import BirdFunction, BirdVariable, SectionFunctions
 from ..base_protocol_functions import ProtocolFunctionsBase
 
 
@@ -36,7 +36,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         self._section = "BGP Functions"
 
-    @bird_function("bgp_accept_bgp")
+    @BirdFunction("bgp_accept_bgp")
     def accept_bgp(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_accept_bgp function."""
 
@@ -54,7 +54,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_accept_customer_blackhole")
+    @BirdFunction("bgp_accept_customer_blackhole")
     def accept_customer_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_accept_customer_blackhole function."""
 
@@ -72,7 +72,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_accept_own_blackhole")
+    @BirdFunction("bgp_accept_own_blackhole")
     def accept_own_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_accept_own_blackhole function."""
 
@@ -90,7 +90,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_accept_bgp_own_default")
+    @BirdFunction("bgp_accept_bgp_own_default")
     def accept_bgp_own_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_accept_bgp_own_default function."""
 
@@ -108,7 +108,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_accept_bgp_transit_default")
+    @BirdFunction("bgp_accept_bgp_transit_default")
     def accept_bgp_transit_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_accept_bgp_transit_default function."""
 
@@ -126,7 +126,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_accept_originated")
+    @BirdFunction("bgp_accept_originated")
     def accept_originated(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_accept_originated function."""
 
@@ -139,7 +139,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_accept_originated_default")
+    @BirdFunction("bgp_accept_originated_default")
     def accept_originated_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_accept_originated_default function."""
 
@@ -152,7 +152,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_is_connected")
+    @BirdFunction("bgp_is_connected")
     def is_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_is_connected function."""
 
@@ -163,7 +163,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return false;
             }"""
 
-    @bird_function("bgp_is_originated")
+    @BirdFunction("bgp_is_originated")
     def is_originated(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_is_originated function."""
 
@@ -174,7 +174,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return false;
             }"""
 
-    @bird_function("bgp_is_bgp_customer")
+    @BirdFunction("bgp_is_bgp_customer")
     def is_bgp_customer(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_is_bgp_customer function."""
 
@@ -185,7 +185,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return false;
             }"""
 
-    @bird_function("bgp_is_bgp_own")
+    @BirdFunction("bgp_is_bgp_own")
     def is_bgp_own(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_is_bgp_own function."""
 
@@ -196,7 +196,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return false;
             }}"""
 
-    @bird_function("bgp_is_bgp_peer")
+    @BirdFunction("bgp_is_bgp_peer")
     def is_bgp_peer(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_is_bgp_peer function."""
 
@@ -207,7 +207,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return false;
             }"""
 
-    @bird_function("bgp_is_bgp_peering")
+    @BirdFunction("bgp_is_bgp_peering")
     def is_bgp_peering(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_is_bgp_peering function."""
 
@@ -218,7 +218,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return false;
             }}"""
 
-    @bird_function("bgp_is_bgp_routeserver")
+    @BirdFunction("bgp_is_bgp_routeserver")
     def is_bgp_routeserver(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_is_bgp_routeserver function."""
 
@@ -229,7 +229,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return false;
             }"""
 
-    @bird_function("bgp_is_bgp_transit")
+    @BirdFunction("bgp_is_bgp_transit")
     def is_bgp_transit(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_is_bgp_transit function."""
 
@@ -240,7 +240,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return false;
             }"""
 
-    @bird_function("bgp_is_blackhole")
+    @BirdFunction("bgp_is_blackhole")
     def is_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_is_blackhole function."""
 
@@ -251,7 +251,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return false;
             }"""
 
-    @bird_function("bgp_import_kernel")
+    @BirdFunction("bgp_import_kernel")
     def import_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_import_kernel function."""
 
@@ -265,7 +265,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_import_kernel_blackhole")
+    @BirdFunction("bgp_import_kernel_blackhole")
     def import_kernel_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_import_kernel_blackhole function."""
 
@@ -281,7 +281,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_import_kernel_default")
+    @BirdFunction("bgp_import_kernel_default")
     def import_kernel_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_import_kernel_default function."""
 
@@ -295,7 +295,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_import_own")
+    @BirdFunction("bgp_import_own")
     def import_own(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_import_own function."""
 
@@ -317,7 +317,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_local_pref = BGP_PREF_OWN - local_pref_cost;
             }}"""
 
-    @bird_function("bgp_import_static")
+    @BirdFunction("bgp_import_static")
     def import_static(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_import_static function."""
 
@@ -331,7 +331,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_import_static_blackhole")
+    @BirdFunction("bgp_import_static_blackhole")
     def import_static_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_import_static_blackhole function."""
 
@@ -347,7 +347,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_import_static_default")
+    @BirdFunction("bgp_import_static_default")
     def import_static_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_import_static_default function."""
 
@@ -361,7 +361,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_peer_reject_non_targetted_blackhole")
+    @BirdFunction("bgp_peer_reject_non_targetted_blackhole")
     def peer_reject_non_targetted_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_non_targetted_blackhole function."""
 
@@ -408,7 +408,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_accept")
+    @BirdFunction("bgp_peer_accept")
     def peer_accept(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_accept function."""
 
@@ -420,7 +420,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_peer_accept_blackhole")
+    @BirdFunction("bgp_peer_accept_blackhole")
     def peer_accept_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_accept_blackhole function."""
 
@@ -436,7 +436,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if (BGP_COMMUNITY_NOEXPORT !~ bgp_community) then bgp_community.add(BGP_COMMUNITY_NOEXPORT);
             }}"""
 
-    @bird_function("bgp_peer_accept_blackhole_originated")
+    @BirdFunction("bgp_peer_accept_blackhole_originated")
     def peer_accept_blackhole_originated(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_accept_blackhole_originated function."""
 
@@ -451,7 +451,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 dest = RTD_BLACKHOLE;
             }}"""
 
-    @bird_function("bgp_peer_community_add_blackhole")
+    @BirdFunction("bgp_peer_community_add_blackhole")
     def peer_community_add_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_community_add_blackhole function."""
 
@@ -464,7 +464,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_community.add(community);
         }}"""
 
-    @bird_function("bgp_peer_communities_strip_all")
+    @BirdFunction("bgp_peer_communities_strip_all")
     def peer_communities_strip_all(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_communities_strip_all function."""
 
@@ -520,7 +520,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 }}
             }}"""
 
-    @bird_function("bgp_peer_communities_strip_internal")
+    @BirdFunction("bgp_peer_communities_strip_internal")
     def peer_communities_strip_internal(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_communities_strip_internal function."""
 
@@ -577,7 +577,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 }}
             }}"""
 
-    @bird_function("bgp_peer_filter_asn_bogons")
+    @BirdFunction("bgp_peer_filter_asn_bogons")
     def peer_filter_asn_bogons(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_asn_bogons function."""
 
@@ -590,7 +590,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_BOGON_ASN);
             }}"""
 
-    @bird_function("bgp_peer_filter_asn_invalid")
+    @BirdFunction("bgp_peer_filter_asn_invalid")
     def peer_filter_asn_invalid(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_asn_invalid function."""
 
@@ -604,7 +604,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_FIRST_AS_NOT_PEER_AS);
             }}"""
 
-    @bird_function("bgp_peer_filter_aspath_allow")
+    @BirdFunction("bgp_peer_filter_aspath_allow")
     def peer_filter_aspath_allow(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_aspath_allow function."""
 
@@ -618,7 +618,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_ASPATH_NOT_ALLOWED);
             }}"""
 
-    @bird_function("bgp_peer_filter_aspath_deny")
+    @BirdFunction("bgp_peer_filter_aspath_deny")
     def peer_filter_aspath_deny(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_aspath_deny function."""
 
@@ -632,7 +632,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_ASPATH_NOT_ALLOWED);
             }}"""
 
-    @bird_function("bgp_peer_filter_asn_private")
+    @BirdFunction("bgp_peer_filter_asn_private")
     def peer_filter_asn_private(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_asn_private function."""
 
@@ -646,7 +646,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_ASPATH_NOT_ALLOWED);
             }}"""
 
-    @bird_function("bgp_peer_filter_asn_transit")
+    @BirdFunction("bgp_peer_filter_asn_transit")
     def peer_filter_asn_transit(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_asn_transit function."""
 
@@ -660,7 +660,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_TRANSIT_FREE_ASN);
             }}"""
 
-    @bird_function("bgp_peer_filter_asns_allow")
+    @BirdFunction("bgp_peer_filter_asns_allow")
     def peer_filter_asns_allow(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_asns_allow function."""
 
@@ -673,7 +673,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_PEER_AS);
             }}"""
 
-    @bird_function("bgp_peer_filter_asns_deny")
+    @BirdFunction("bgp_peer_filter_asns_deny")
     def peer_filter_asns_deny(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_asns_deny function."""
 
@@ -686,7 +686,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_PEER_AS);
             }}"""
 
-    @bird_function("bgp_peer_filter_aspath_length")
+    @BirdFunction("bgp_peer_filter_aspath_length")
     def peer_filter_aspath_length(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_aspath_length function."""
 
@@ -707,7 +707,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 }}
             }}"""
 
-    @bird_function("bgp_peer_filter_blackhole")
+    @BirdFunction("bgp_peer_filter_blackhole")
     def peer_filter_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_blackhole function."""
 
@@ -721,7 +721,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED);
             }}"""
 
-    @bird_function("bgp_peer_filter_blackhole_size")
+    @BirdFunction("bgp_peer_filter_blackhole_size")
     def peer_filter_blackhole_size(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_blackhole_size function."""
 
@@ -762,7 +762,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 }}
             }}"""
 
-    @bird_function("bgp_peer_filter_bogons")
+    @BirdFunction("bgp_peer_filter_bogons")
     def peer_filter_bogons(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_bogons function."""
 
@@ -775,7 +775,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_BOGON);
             }}"""
 
-    @bird_function("bgp_peer_filter_community_lengths")
+    @BirdFunction("bgp_peer_filter_community_lengths")
     def peer_filter_community_lengths(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_community_lengths function."""
 
@@ -810,7 +810,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 }}
             }}"""
 
-    @bird_function("bgp_peer_filter_customer_blackhole")
+    @BirdFunction("bgp_peer_filter_customer_blackhole")
     def peer_filter_customer_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_customer_blackhole function."""
 
@@ -825,7 +825,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_peer_filter_default")
+    @BirdFunction("bgp_peer_filter_default")
     def peer_filter_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_default function."""
 
@@ -839,7 +839,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_peer_filter_invalid_blackhole")
+    @BirdFunction("bgp_peer_filter_invalid_blackhole")
     def peer_filter_invalid_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_invalid_blackhole function."""
 
@@ -854,7 +854,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_peer_filter_invalid_default")
+    @BirdFunction("bgp_peer_filter_invalid_default")
     def peer_filter_invalid_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_invalid_default function."""
 
@@ -869,7 +869,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_peer_filter_lc_no_relation")
+    @BirdFunction("bgp_peer_filter_lc_no_relation")
     def peer_filter_lc_no_relation(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_lc_no_relation function."""
 
@@ -882,7 +882,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_NO_RELATION_LC);
             }}"""
 
-    @bird_function("bgp_peer_filter_nexthop_not_peerip")
+    @BirdFunction("bgp_peer_filter_nexthop_not_peerip")
     def peer_filter_nexthop_not_peerip(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_nexthop_not_peerip function."""
 
@@ -896,7 +896,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_NEXT_HOP_NOT_PEER_IP);
             }}"""
 
-    @bird_function("bgp_peer_filter_origin_asns_allow")
+    @BirdFunction("bgp_peer_filter_origin_asns_allow")
     def peer_filter_origin_asns_allow(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_origin_asns_allow function."""
 
@@ -909,7 +909,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_ORIGIN_AS);
             }}"""
 
-    @bird_function("bgp_peer_filter_origin_asns_deny")
+    @BirdFunction("bgp_peer_filter_origin_asns_deny")
     def peer_filter_origin_asns_deny(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_origin_asns_deny function."""
 
@@ -922,7 +922,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_ORIGIN_AS);
             }}"""
 
-    @bird_function("bgp_peer_filter_own_blackhole")
+    @BirdFunction("bgp_peer_filter_own_blackhole")
     def peer_filter_own_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_own_blackhole function."""
 
@@ -937,7 +937,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_peer_filter_own_default")
+    @BirdFunction("bgp_peer_filter_own_default")
     def peer_filter_own_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_own_default function."""
 
@@ -951,7 +951,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_peer_filter_prefix_size")
+    @BirdFunction("bgp_peer_filter_prefix_size")
     def peer_filter_prefix_size(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_prefix_size function."""
 
@@ -992,7 +992,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 }}
             }}"""
 
-    @bird_function("bgp_peer_filter_prefixes_allow")
+    @BirdFunction("bgp_peer_filter_prefixes_allow")
     def peer_filter_prefixes_allow(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_prefixes_allow function."""
 
@@ -1010,7 +1010,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_PREFIX_FILTERED);
             }}"""
 
-    @bird_function("bgp_peer_filter_prefixes_deny")
+    @BirdFunction("bgp_peer_filter_prefixes_deny")
     def peer_filter_prefixes_deny(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_prefixes_deny function."""
 
@@ -1028,7 +1028,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_PREFIX_FILTERED);
             }}"""
 
-    @bird_function("bgp_peer_filter_prefixes_blackhole_allow")
+    @BirdFunction("bgp_peer_filter_prefixes_blackhole_allow")
     def peer_filter_prefixes_blackhole_allow(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_prefixes_blackhole_allow function."""
 
@@ -1049,7 +1049,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED);
             }}"""
 
-    @bird_function("bgp_peer_filter_prefixes_blackhole_deny")
+    @BirdFunction("bgp_peer_filter_prefixes_blackhole_deny")
     def peer_filter_prefixes_blackhole_deny(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_prefixes_blackhole_deny function."""
 
@@ -1070,7 +1070,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED);
             }}"""
 
-    @bird_function("bgp_peer_filter_routecollector_all")
+    @BirdFunction("bgp_peer_filter_routecollector_all")
     def peer_filter_routecollector_all(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_routecollector_all function."""
 
@@ -1082,7 +1082,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_ROUTECOLLECTOR);
             }}"""
 
-    @bird_function("bgp_peer_filter_transit_default")
+    @BirdFunction("bgp_peer_filter_transit_default")
     def peer_filter_transit_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_filter_transit_default function."""
 
@@ -1097,7 +1097,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 accept;
             }}"""
 
-    @bird_function("bgp_peer_graceful_shutdown")
+    @BirdFunction("bgp_peer_graceful_shutdown")
     def peer_graceful_shutdown(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_graceful_shutdown function."""
 
@@ -1109,7 +1109,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_community.add(BGP_COMMUNITY_GRACEFUL_SHUTDOWN);
             }}"""
 
-    @bird_function("bgp_peer_import_customer")
+    @BirdFunction("bgp_peer_import_customer")
     def peer_import_customer(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_import_customer function."""
 
@@ -1125,7 +1125,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_local_pref = BGP_PREF_CUSTOMER - local_pref_cost;
             }}"""
 
-    @bird_function("bgp_peer_import_graceful_shutdown")
+    @BirdFunction("bgp_peer_import_graceful_shutdown")
     def peer_import_graceful_shutdown(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_import_graceful_shutdown function."""
 
@@ -1137,7 +1137,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_local_pref = 0;
             }}"""
 
-    @bird_function("bgp_peer_import_location_iso3166")
+    @BirdFunction("bgp_peer_import_location_iso3166")
     def peer_import_location_iso3166(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_import_location_iso3166 function."""
 
@@ -1150,7 +1150,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add((BGP_ASN, BGP_LC_FUNCTION_LOCATION_ISO3166, location));
             }}"""
 
-    @bird_function("bgp_peer_import_location_unm49")
+    @BirdFunction("bgp_peer_import_location_unm49")
     def peer_import_location_unm49(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_import_location_unm49 function."""
 
@@ -1164,7 +1164,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             }}"""
 
     # Local pref manipulation
-    @bird_function("bgp_peer_import_localpref")
+    @BirdFunction("bgp_peer_import_localpref")
     def peer_import_localpref(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_import_localpref function."""
 
@@ -1189,7 +1189,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 }}
             }}"""
 
-    @bird_function("bgp_peer_import_peer")
+    @BirdFunction("bgp_peer_import_peer")
     def peer_import_peer(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_import_peer function."""
 
@@ -1205,7 +1205,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_local_pref = BGP_PREF_PEER - local_pref_cost;
             }}"""
 
-    @bird_function("bgp_peer_import_routeserver")
+    @BirdFunction("bgp_peer_import_routeserver")
     def peer_import_routeserver(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_import_routeserver function."""
 
@@ -1221,7 +1221,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_local_pref = BGP_PREF_ROUTESERVER - local_pref_cost;
             }}"""
 
-    @bird_function("bgp_peer_import_transit")
+    @BirdFunction("bgp_peer_import_transit")
     def peer_import_transit(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_import_transit function."""
 
@@ -1237,7 +1237,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_local_pref = BGP_PREF_TRANSIT - local_pref_cost;
             }}"""
 
-    @bird_function("bgp_peer_lc_add_connected")
+    @BirdFunction("bgp_peer_lc_add_connected")
     def peer_lc_add_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_connected function."""
 
@@ -1250,7 +1250,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_kernel")
+    @BirdFunction("bgp_peer_lc_add_kernel")
     def peer_lc_add_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_kernel function."""
 
@@ -1267,7 +1267,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_kernel_blackhole")
+    @BirdFunction("bgp_peer_lc_add_kernel_blackhole")
     def peer_lc_add_kernel_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_kernel_blackhole function."""
 
@@ -1284,7 +1284,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_kernel_default")
+    @BirdFunction("bgp_peer_lc_add_kernel_default")
     def peer_lc_add_kernel_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_kernel_default function."""
 
@@ -1301,7 +1301,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_originated")
+    @BirdFunction("bgp_peer_lc_add_originated")
     def peer_lc_add_originated(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_originated function."""
 
@@ -1315,7 +1315,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_originated_blackhole")
+    @BirdFunction("bgp_peer_lc_add_originated_blackhole")
     def peer_lc_add_originated_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_originated_blackhole function."""
 
@@ -1332,7 +1332,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_originated_default")
+    @BirdFunction("bgp_peer_lc_add_originated_default")
     def peer_lc_add_originated_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_originated_default function."""
 
@@ -1349,7 +1349,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_static")
+    @BirdFunction("bgp_peer_lc_add_static")
     def peer_lc_add_static(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_static function."""
 
@@ -1366,7 +1366,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_static_blackhole")
+    @BirdFunction("bgp_peer_lc_add_static_blackhole")
     def peer_lc_add_static_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_static_blackhole function."""
 
@@ -1383,7 +1383,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_static_default")
+    @BirdFunction("bgp_peer_lc_add_static_default")
     def peer_lc_add_static_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_static_default function."""
 
@@ -1400,7 +1400,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_bgp_own")
+    @BirdFunction("bgp_peer_lc_add_bgp_own")
     def peer_lc_add_bgp_own(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_bgp_own function."""
 
@@ -1418,7 +1418,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_bgp_own_blackhole")
+    @BirdFunction("bgp_peer_lc_add_bgp_own_blackhole")
     def peer_lc_add_bgp_own_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_bgp_own_blackhole function."""
 
@@ -1435,7 +1435,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_bgp_own_default")
+    @BirdFunction("bgp_peer_lc_add_bgp_own_default")
     def peer_lc_add_bgp_own_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_bgp_own_default function."""
 
@@ -1452,7 +1452,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_bgp_customer")
+    @BirdFunction("bgp_peer_lc_add_bgp_customer")
     def peer_lc_add_bgp_customer(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_bgp_customer function."""
 
@@ -1470,7 +1470,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_bgp_customer_blackhole")
+    @BirdFunction("bgp_peer_lc_add_bgp_customer_blackhole")
     def peer_lc_add_bgp_customer_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_bgp_customer_blackhole function."""
 
@@ -1487,7 +1487,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_bgp_peering")
+    @BirdFunction("bgp_peer_lc_add_bgp_peering")
     def peer_lc_add_bgp_peering(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_bgp_peering function."""
 
@@ -1501,7 +1501,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_bgp_transit")
+    @BirdFunction("bgp_peer_lc_add_bgp_transit")
     def peer_lc_add_bgp_transit(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_bgp_transit function."""
 
@@ -1519,7 +1519,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_bgp_transit_default")
+    @BirdFunction("bgp_peer_lc_add_bgp_transit_default")
     def peer_lc_add_bgp_transit_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_bgp_transit_default function."""
 
@@ -1536,7 +1536,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_lc_add_blackhole")
+    @BirdFunction("bgp_peer_lc_add_blackhole")
     def peer_lc_add_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_lc_add_blackhole function."""
 
@@ -1550,7 +1550,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @bird_function("bgp_peer_peer_prepend")
+    @BirdFunction("bgp_peer_peer_prepend")
     def peer_prepend(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_peer_prepend function."""
 
@@ -1569,7 +1569,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if (prepend_count > 9) then bgp_path.prepend(peer_asn);
             }"""
 
-    @bird_function("bgp_peer_peer_prepend_default")
+    @BirdFunction("bgp_peer_peer_prepend_default")
     def peer_prepend_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_peer_prepend_default function."""
 
@@ -1582,7 +1582,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_connected")
+    @BirdFunction("bgp_peer_prepend_connected")
     def peer_prepend_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_connected function."""
 
@@ -1596,7 +1596,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_kernel")
+    @BirdFunction("bgp_peer_prepend_kernel")
     def peer_prepend_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_kernel function."""
 
@@ -1613,7 +1613,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_kernel_blackhole")
+    @BirdFunction("bgp_peer_prepend_kernel_blackhole")
     def peer_prepend_kernel_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_kernel_blackhole function."""
 
@@ -1630,7 +1630,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_kernel_default")
+    @BirdFunction("bgp_peer_prepend_kernel_default")
     def peer_prepend_kernel_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_kernel_default function."""
 
@@ -1647,7 +1647,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_originated")
+    @BirdFunction("bgp_peer_prepend_originated")
     def peer_prepend_originated(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_originated function."""
 
@@ -1663,7 +1663,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_originated_default")
+    @BirdFunction("bgp_peer_prepend_originated_default")
     def peer_prepend_originated_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_originated_default function."""
 
@@ -1679,7 +1679,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_static")
+    @BirdFunction("bgp_peer_prepend_static")
     def peer_prepend_static(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_static function."""
 
@@ -1696,7 +1696,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_static_blackhole")
+    @BirdFunction("bgp_peer_prepend_static_blackhole")
     def peer_prepend_static_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_static_blackhole function."""
 
@@ -1713,7 +1713,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_static_default")
+    @BirdFunction("bgp_peer_prepend_static_default")
     def peer_prepend_static_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_static_default function."""
 
@@ -1730,7 +1730,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_bgp_own")
+    @BirdFunction("bgp_peer_prepend_bgp_own")
     def peer_prepend_bgp_own(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_bgp_own function."""
 
@@ -1747,7 +1747,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_bgp_own_blackhole")
+    @BirdFunction("bgp_peer_prepend_bgp_own_blackhole")
     def peer_prepend_bgp_own_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_bgp_own_blackhole function."""
 
@@ -1764,7 +1764,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_bgp_own_default")
+    @BirdFunction("bgp_peer_prepend_bgp_own_default")
     def peer_prepend_bgp_own_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_bgp_own_default function."""
 
@@ -1781,7 +1781,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_bgp_customer")
+    @BirdFunction("bgp_peer_prepend_bgp_customer")
     def peer_prepend_bgp_customer(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_bgp_customer function."""
 
@@ -1798,7 +1798,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_bgp_customer_blackhole")
+    @BirdFunction("bgp_peer_prepend_bgp_customer_blackhole")
     def peer_prepend_bgp_customer_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_bgp_customer_blackhole function."""
 
@@ -1815,7 +1815,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_bgp_peering")
+    @BirdFunction("bgp_peer_prepend_bgp_peering")
     def peer_prepend_bgp_peering(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_bgp_peering function."""
 
@@ -1828,7 +1828,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_bgp_transit")
+    @BirdFunction("bgp_peer_prepend_bgp_transit")
     def peer_prepend_bgp_transit(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_bgp_transit function."""
 
@@ -1845,7 +1845,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_bgp_transit_default")
+    @BirdFunction("bgp_peer_prepend_bgp_transit_default")
     def peer_prepend_bgp_transit_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_bgp_transit_default function."""
 
@@ -1862,7 +1862,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("peer_asn"), BirdVariable("prepend_count"))};
             }}"""
 
-    @bird_function("bgp_peer_prepend_lc")
+    @BirdFunction("bgp_peer_prepend_lc")
     def peer_prepend_lc(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_lc function."""
 
@@ -1899,7 +1899,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 }}
             }}"""
 
-    @bird_function("bgp_peer_prepend_lc_location")
+    @BirdFunction("bgp_peer_prepend_lc_location")
     def peer_prepend_lc_location(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_prepend_location function."""
 
@@ -1940,7 +1940,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 }}
             }}"""
 
-    @bird_function("bgp_peer_quarantine")
+    @BirdFunction("bgp_peer_quarantine")
     def peer_quarantine(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_quarantine function."""
 
@@ -1952,7 +1952,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_QUARANTINED);
             }}"""
 
-    @bird_function("bgp_peer_redistribute_bgp_customer")
+    @BirdFunction("bgp_peer_redistribute_bgp_customer")
     def peer_redistribute_bgp_customer(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_bgp_customer function."""
 
@@ -1973,7 +1973,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_bgp_customer_blackhole")
+    @BirdFunction("bgp_peer_redistribute_bgp_customer_blackhole")
     def peer_redistribute_bgp_customer_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_bgp_customer_blackhole function."""
 
@@ -1994,7 +1994,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_bgp_own")
+    @BirdFunction("bgp_peer_redistribute_bgp_own")
     def peer_redistribute_bgp_own(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_bgp_own function."""
 
@@ -2015,7 +2015,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_bgp_own_blackhole")
+    @BirdFunction("bgp_peer_redistribute_bgp_own_blackhole")
     def peer_redistribute_bgp_own_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_bgp_own_blackhole function."""
 
@@ -2036,7 +2036,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_bgp_own_default")
+    @BirdFunction("bgp_peer_redistribute_bgp_own_default")
     def peer_redistribute_bgp_own_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_bgp_own_default function."""
 
@@ -2057,7 +2057,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_bgp_peering")
+    @BirdFunction("bgp_peer_redistribute_bgp_peering")
     def peer_redistribute_bgp_peering(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_bgp_peering function."""
 
@@ -2094,7 +2094,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return false;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_bgp_transit")
+    @BirdFunction("bgp_peer_redistribute_bgp_transit")
     def peer_redistribute_bgp_transit(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_bgp_transit function."""
 
@@ -2115,7 +2115,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_bgp_transit_default")
+    @BirdFunction("bgp_peer_redistribute_bgp_transit_default")
     def peer_redistribute_bgp_transit_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_bgp_transit_default function."""
 
@@ -2136,7 +2136,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_connected")
+    @BirdFunction("bgp_peer_redistribute_connected")
     def peer_redistribute_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_connected function."""
 
@@ -2157,7 +2157,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_kernel")
+    @BirdFunction("bgp_peer_redistribute_kernel")
     def peer_redistribute_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_kernel function."""
 
@@ -2177,7 +2177,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_kernel_blackhole")
+    @BirdFunction("bgp_peer_redistribute_kernel_blackhole")
     def peer_redistribute_kernel_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_kernel_blackhole function."""
 
@@ -2197,7 +2197,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_kernel_default")
+    @BirdFunction("bgp_peer_redistribute_kernel_default")
     def peer_redistribute_kernel_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_kernel_default function."""
 
@@ -2218,7 +2218,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_originated")
+    @BirdFunction("bgp_peer_redistribute_originated")
     def peer_redistribute_originated(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_originated function."""
 
@@ -2239,7 +2239,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_originated_default")
+    @BirdFunction("bgp_peer_redistribute_originated_default")
     def peer_redistribute_originated_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_originated_default function."""
 
@@ -2259,7 +2259,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_static")
+    @BirdFunction("bgp_peer_redistribute_static")
     def peer_redistribute_static(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_static function."""
 
@@ -2279,7 +2279,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_static_blackhole")
+    @BirdFunction("bgp_peer_redistribute_static_blackhole")
     def peer_redistribute_static_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_static_blackhole function."""
 
@@ -2299,7 +2299,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_redistribute_static_default")
+    @BirdFunction("bgp_peer_redistribute_static_default")
     def peer_redistribute_static_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_redistribute_static_default function."""
 
@@ -2320,7 +2320,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_reject_blackholes")
+    @BirdFunction("bgp_peer_reject_blackholes")
     def peer_reject_blackholes(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_blackholes function."""
 
@@ -2334,7 +2334,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_reject_bogons")
+    @BirdFunction("bgp_peer_reject_bogons")
     def peer_reject_bogons(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_bogons function."""
 
@@ -2347,7 +2347,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_reject_filtered")
+    @BirdFunction("bgp_peer_reject_filtered")
     def peer_reject_filtered(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_filtered function."""
 
@@ -2360,7 +2360,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_reject_noadvertise")
+    @BirdFunction("bgp_peer_reject_noadvertise")
     def peer_reject_noadvertise(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_noadvertise function."""
 
@@ -2375,7 +2375,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_reject_noexport")
+    @BirdFunction("bgp_peer_reject_noexport")
     def peer_reject_noexport(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_noexport function."""
 
@@ -2389,7 +2389,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_reject_noexport_asn")
+    @BirdFunction("bgp_peer_reject_noexport_asn")
     def peer_reject_noexport_asn(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_noexport_asn function."""
 
@@ -2404,7 +2404,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_reject_noexport_customer")
+    @BirdFunction("bgp_peer_reject_noexport_customer")
     def peer_reject_noexport_customer(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_noexport_customer function."""
 
@@ -2419,7 +2419,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_reject_noexport_peer")
+    @BirdFunction("bgp_peer_reject_noexport_peer")
     def peer_reject_noexport_peer(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_noexport_peer function."""
 
@@ -2434,7 +2434,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_reject_noexport_transit")
+    @BirdFunction("bgp_peer_reject_noexport_transit")
     def peer_reject_noexport_transit(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_noexport_transit function."""
 
@@ -2449,7 +2449,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_reject_noexport_location")
+    @BirdFunction("bgp_peer_reject_noexport_location")
     def peer_reject_noexport_location(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_noexport_location function."""
 
@@ -2464,7 +2464,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 reject;
             }}"""
 
-    @bird_function("bgp_peer_reject_non_exportable")
+    @BirdFunction("bgp_peer_reject_non_exportable")
     def peer_reject_non_exportable(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_non_exportable function."""
 
@@ -2504,7 +2504,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return true;
             }}"""
 
-    @bird_function("bgp_peer_reject_non_exportable_blackhole")
+    @BirdFunction("bgp_peer_reject_non_exportable_blackhole")
     def peer_reject_non_exportable_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_reject_non_exportable_blackhole function."""
 
@@ -2544,7 +2544,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 return true;
             }}"""
 
-    @bird_function("bgp_peer_replace_aspath")
+    @BirdFunction("bgp_peer_replace_aspath")
     def peer_replace_aspath(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_replace_aspath function."""
 
@@ -2567,7 +2567,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 {self.peer_prepend(BirdVariable("BGP_ASN"), BirdVariable("path_len"))};
             }}"""
 
-    @bird_function("bgp_peer_remove_lc_private")
+    @BirdFunction("bgp_peer_remove_lc_private")
     def peer_remove_lc_private(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_remove_lc_private function."""
 

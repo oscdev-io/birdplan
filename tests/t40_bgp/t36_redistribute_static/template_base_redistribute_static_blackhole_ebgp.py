@@ -30,7 +30,7 @@ class TemplateBase(TemplateSetBase):
     def r1_template_peer_extra_config(self):
         """Return extra peer config."""
 
-        if getattr(self, "r1_peer_type") in ("routecollector", "routeserver", "transit"):
+        if getattr(self, "r1_peer_type", None) in ("routecollector", "routeserver", "transit"):
             return """
       blackhole_community: True
 """

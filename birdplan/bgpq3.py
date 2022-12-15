@@ -90,7 +90,7 @@ class BGPQ3:
 
         return asns_bgpq3["asns"]
 
-    def get_prefixes(self, as_sets: Union[str, List[str]]) -> Dict[str, List[str]]:  # noqa: C901
+    def get_prefixes(self, as_sets: Union[str, List[str]]) -> Dict[str, List[str]]:
         """Get prefixes."""
 
         # Build an object list depending on the type of "objects" above
@@ -136,7 +136,7 @@ class BGPQ3:
                     prefixes[family].append(prefix["prefix"])
                 else:
                     # Work out greater_equal component
-                    if "greater-equal" in prefix:
+                    if "greater-equal" in prefix:  # noqa: SIM401
                         greater_equal = prefix["greater-equal"]
                     else:
                         greater_equal = ipaddress.ip_network(prefix["prefix"]).prefixlen
@@ -159,7 +159,7 @@ class BGPQ3:
         # Return the decoded json output
         return json.loads(result)
 
-    def _cache(self, obj: str, value: Optional[Any] = None) -> Optional[Any]:
+    def _cache(self, obj: str, value: Optional[Any] = None) -> Optional[Any]:  # noqa: CFQ004
         """Retrieve or store value in cache."""
 
         if self.server not in bgpq3_cache:
