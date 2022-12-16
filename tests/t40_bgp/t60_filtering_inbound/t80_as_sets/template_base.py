@@ -21,11 +21,13 @@
 
 """BGP peer AS-SET filtered test case template."""
 
-from typing import Any, List
 import time
+from typing import Any, List
+
 from birdplan import bgpq3
-from ..template_base import TemplateBase as TemplateSetBase
+
 from ....simulation import Simulation
+from ..template_base import TemplateBase as TemplateSetBase
 
 
 class TemplateBase(TemplateSetBase):
@@ -70,7 +72,7 @@ class TemplateBase(TemplateSetBase):
 
         # Add large communities for peer types that require them
         large_communities = ""
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if getattr(self, "r1_peer_type", None) in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             large_communities = "65000:3:1"
 
         # Advertise an allowed prefix from an allowed origin AS

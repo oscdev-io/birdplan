@@ -21,8 +21,8 @@
 
 """BGP filtering test case."""
 
-from ..template_prefix_filtered_internal import Template
 from ....config.peertype_rrserver.e1r1 import PeerTypeConfig
+from ..template_prefix_filtered_internal import Template
 
 
 class Test(PeerTypeConfig, Template):

@@ -22,6 +22,7 @@
 """BGP quarantine test case template."""
 
 import time
+
 from ..template_base import TemplateBase
 
 

@@ -21,8 +21,8 @@
 
 """BGP outgoing large communities test case."""
 
-from ..template_outgoing_large_communities_originated import Template
 from ....config.peertype_transit.customer.r1r2 import PeerTypeConfig
+from ..template_outgoing_large_communities_originated import Template
 
 
 class Test(PeerTypeConfig, Template):

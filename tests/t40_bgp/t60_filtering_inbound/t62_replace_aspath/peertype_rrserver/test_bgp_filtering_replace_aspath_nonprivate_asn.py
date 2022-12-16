@@ -21,8 +21,8 @@
 
 """BGP filtering test case."""
 
-from ..template_replace_aspath_nonprivate_asn import Template
 from ....config.peertype_rrserver.e1r1 import PeerTypeConfig
+from ..template_replace_aspath_nonprivate_asn import Template
 
 
 class Test(PeerTypeConfig, Template):

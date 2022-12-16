@@ -21,18 +21,19 @@
 # pylint: disable=too-many-lines
 
 from typing import Dict, List, Optional
+
+from .....exceptions import BirdPlanError
+from ....globals import BirdConfigGlobals
+from ...constants import SectionConstants
+from ...functions import SectionFunctions
+from ...tables import SectionTables
+from ..base import SectionProtocolBase
+from ..direct import ProtocolDirect
+from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from .bgp_attributes import BGPAttributes, BGPPeertypeConstraints, BGPRoutePolicyAccept, BGPRoutePolicyImport
 from .bgp_functions import BGPFunctions
 from .peer import ProtocolBGPPeer
 from .typing import BGPPeerConfig
-from ..pipe import ProtocolPipe, ProtocolPipeFilterType
-from ..direct import ProtocolDirect
-from ..base import SectionProtocolBase
-from ...constants import SectionConstants
-from ...functions import SectionFunctions
-from ...tables import SectionTables
-from ....globals import BirdConfigGlobals
-from .....exceptions import BirdPlanError
 
 BGPPeersConfig = Dict[str, BGPPeerConfig]
 BGPPeers = Dict[str, ProtocolBGPPeer]
@@ -180,7 +181,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             raise BirdPlanError(f"Peer type '{peer_type}' has no implemented global prefix limits")
         return self.bgp_attributes.peertype_constraints[peer_type]
 
-    def _configure_constants_bgp(self) -> None:  # pylint: disable=too-many-statements
+    def _configure_constants_bgp(self) -> None:  # noqa: CFQ001 # pylint: disable=too-many-statements
         """Configure BGP constants."""
         self.constants.conf.append_title("BGP Constants")
 

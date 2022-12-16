@@ -21,8 +21,8 @@
 
 """BGP import static route test case."""
 
-from ..template_import_static_false import Template
 from ...config.peertype_transit.r1r2 import PeerTypeConfig
+from ..template_import_static_false import Template
 
 
 class Test(PeerTypeConfig, Template):

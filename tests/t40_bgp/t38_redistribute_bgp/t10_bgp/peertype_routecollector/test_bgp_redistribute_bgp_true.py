@@ -21,8 +21,8 @@
 
 """BGP redistribution test case."""
 
-from ..template_redistribute_bgp_true import Template
 from ....config.peertype_routecollector.peer.r1r2 import PeerTypeConfig
+from ..template_redistribute_bgp_true import Template
 
 
 class Test(PeerTypeConfig, Template):

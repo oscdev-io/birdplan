@@ -21,8 +21,8 @@
 
 """BGP redistribute static route test case."""
 
-from ..template_redistribute_static import Template
 from ...config.peertype_rrserver_rrserver.r1r2 import PeerTypeConfig
+from ..template_redistribute_static import Template
 
 
 class Test(PeerTypeConfig, Template):

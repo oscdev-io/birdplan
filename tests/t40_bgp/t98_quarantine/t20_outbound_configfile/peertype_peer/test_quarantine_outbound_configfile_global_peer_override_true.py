@@ -21,8 +21,8 @@
 
 """BGP quarantine test case."""
 
-from ..template_quarantine_outbound_configfile_global_peer_override_true import Template
 from ....config.peertype_peer.r1r2 import PeerTypeConfig
+from ..template_quarantine_outbound_configfile_global_peer_override_true import Template
 
 
 class Test(PeerTypeConfig, Template):

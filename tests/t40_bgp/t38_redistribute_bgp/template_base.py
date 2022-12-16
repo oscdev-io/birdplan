@@ -45,7 +45,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Dynamic configuration."""
 
         config = []
-        r1_peer_type = getattr(self, "r1_peer_type")
+        r1_peer_type = getattr(self, "r1_peer_type", None)
 
         # Mark blackhole capable eBGP peers
         if r1_peer_type in ("routecollector", "routeserver", "transit"):
@@ -79,7 +79,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
         sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
 
-    def test_announce_routes(self, sim):
+    def test_announce_routes(self, sim):  # noqa: CFQ001
         """Hook to add in routes if we need to."""
 
         # Own route

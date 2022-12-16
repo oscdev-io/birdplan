@@ -88,7 +88,7 @@ class TemplateBase(BirdPlanBaseTestCase):
     def r1_template_peer_config(self):
         """Return custom config based on the peer type."""
         # Grab the peer type
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
         # If its a customer, return the prefixes
         if peer_type == "customer":
             return """

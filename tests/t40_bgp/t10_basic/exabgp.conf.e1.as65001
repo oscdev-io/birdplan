@@ -3,6 +3,9 @@ neighbor 100.64.0.1 {
     local-as 65001;
     peer-as 65000;
     local-address 100.64.0.2;
+	family {
+		ipv4 unicast;
+	}
 }
 
 neighbor fc00:100::1 {
@@ -10,4 +13,7 @@ neighbor fc00:100::1 {
     local-as 65001;
     peer-as 65000;
     local-address fc00:100::2;
+	family {
+		ipv6 unicast;
+	}
 }

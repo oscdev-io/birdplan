@@ -21,8 +21,8 @@
 
 """BGP redistribute static route test case."""
 
-from ..template_redistribute_static_blackhole import Template
 from ...config.peertype_rrclient.r1r2 import PeerTypeConfig
+from ..template_redistribute_static_blackhole import Template
 
 
 class Test(PeerTypeConfig, Template):

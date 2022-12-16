@@ -18,33 +18,19 @@ test_job:
   - pacman -Syu --noconfirm
   - pacman -S --noconfirm grep python
   - pacman -S --noconfirm
-      python-pytest-runner
-      python-pytest-cov
-      python-pytest-black
-      python-pytest-flake8
-      python-pytest-pycodestyle
-      python-pytest-pydocstyle
-      python-pytest-pylint
-      python-pytest-mypy
-      python-pytest-xdist
+      git
+      python-tox
   - pacman -S --noconfirm
-      python-colorama
-      python-jinja
-      python-yaml python-types-yaml
-      python-requests python-types-requests
       iproute2
       bird
       exabgp
       bgpq3
-  # Create Python environment
-  - pacman -S --noconfirm python-pip git
-  - pip install git+https://gitlab.oscdev.io/software/birdclient.git
-  - pip install git+https://gitlab.oscdev.io/software/nsnetsim.git
   # Run tests
-  - if [ -n "$EXTRA_TEST_OPTS" ]; then echo "EXTRA_TEST_OPTS => $EXTRA_TEST_OPTS"; python setup.py test --addopt "$EXTRA_TEST_OPTS"; else python setup.py test; fi
+  - contrib/test-environment/runtest $EXTRA_TEST_OPTS
   # Save HTML coverage report
+  - tox -e cov-html
   - mkdir public
-  - coverage html -d public/coverage
+  - mv htmlcov public/coverage
   # Save coverage report
   artifacts:
     paths:

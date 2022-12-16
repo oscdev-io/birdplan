@@ -18,10 +18,11 @@
 
 """BirdPlan commandline options for BGP peer graceful shutdown show."""
 
-from typing import Any, Dict
 import argparse
-from ....cmdline_plugin import BirdPlanCmdlinePluginBase
+from typing import Any, Dict
+
 from ......console.colors import colored
+from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
 class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
@@ -87,7 +88,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
         # Grab peer list
         return cmdline.birdplan.state_bgp_peer_graceful_shutdown_status()
 
-    def show_output_text(self, data: Any) -> None:  # noqa: C901 # pylint: disable= too-many-branches
+    def show_output_text(self, data: Any) -> None:  # pylint: disable= too-many-branches
         """
         Show command output in text.
 
@@ -124,12 +125,12 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
 
             # Grab pending status
             pending_status = None
-            if peer in data["pending"]:
+            if peer in data["pending"]:  # noqa: SIM908
                 pending_status = data["pending"][peer]
 
             # Grab current status
             current_status = None
-            if peer in data["current"]:
+            if peer in data["current"]:  # noqa: SIM908
                 current_status = data["current"][peer]
 
             # Work out our status string

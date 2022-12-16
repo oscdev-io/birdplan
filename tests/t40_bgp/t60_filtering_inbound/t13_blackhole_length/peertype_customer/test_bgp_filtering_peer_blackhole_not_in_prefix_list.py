@@ -21,8 +21,8 @@
 
 """BGP filtering test case."""
 
-from ..template_peer_blackhole_not_in_prefix_list import Template
 from ....config.peertype_customer.e1r1 import PeerTypeConfig
+from ..template_peer_blackhole_not_in_prefix_list import Template
 
 
 class Test(PeerTypeConfig, Template):

@@ -21,8 +21,8 @@
 
 """BGP filtering test case."""
 
-from ..template_global_large_community_length_import_constraints import Template
 from ....config.peertype_rrserver_rrserver.e1r1 import PeerTypeConfig
+from ..template_global_large_community_length_import_constraints import Template
 
 
 class Test(PeerTypeConfig, Template):

@@ -27,6 +27,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import yaml
 from nsnetsim.generic_node import GenericNode
 from nsnetsim.topology import Topology
+
 from birdplan import BirdPlan  # pylint: disable=import-error
 
 
@@ -193,10 +194,8 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
             # If it does exist loop with each line, number it and add
             contents = ""
             with open(filename, "r", encoding="UTF-8") as conffile:
-                lineno = 1
-                for line in conffile.readlines():
+                for lineno, line in enumerate(conffile.readlines()):
                     contents += f"{lineno}: {line}"
-                    lineno += 1
             # Add report
             items.append((name, contents))
 

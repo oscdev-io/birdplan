@@ -40,14 +40,14 @@ class OSPFRoutePolicyAccept:  # pylint: disable=too-few-public-methods
 
 
 class OSPFRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
-    """
+    r"""
     OSPF route policy for redistributing of routes.
 
     Attributes
     ----------
     connected : Union[bool, List[str]]
         Redistribute connected routes to the main OSPF table. This attribute is indexed by interface name with a boolean option.
-        The interface name can be an exact interface match, or a wildcard with a *.
+        The interface name can be an exact interface match, or a wildcard with a \*.
     kernel : bool
         Redistribute kernel routes to the main OSPF table. Defaults to `False`.
     kernel_default : bool

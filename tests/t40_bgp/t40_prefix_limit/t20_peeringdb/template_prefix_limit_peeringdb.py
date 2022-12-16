@@ -21,9 +21,11 @@
 
 """BGP prefix limit test template."""
 
-from typing import Any, List
 import time
+from typing import Any, List
+
 from birdplan import peeringdb
+
 from ....basetests import BirdPlanBaseTestCase
 from ....simulation import Simulation
 
@@ -72,7 +74,7 @@ class Template(BirdPlanBaseTestCase):
 
         # Add large communities for peer types that require them
         large_communities = ""
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if getattr(self, "r1_peer_type", None) in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             large_communities = "65000:3:1"
 
         self._exabgpcli(
@@ -104,7 +106,7 @@ class Template(BirdPlanBaseTestCase):
             return
 
         # We're only interested in testing out customer and peer peer types
-        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+        if getattr(self, "r1_peer_type", None) in ("customer", "peer"):
             route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp4_AS65001_e1: Route limit exceeded, shutting down")
             assert route_limit_exceeded, "Failed to shut down IPv4 connection when route limit exceeded"
 

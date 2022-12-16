@@ -18,19 +18,19 @@
 
 """BIRD protocols section."""
 
-from .device import ProtocolDevice
-from .direct import ProtocolDirect
-from .kernel import ProtocolKernel
-from .pipe import ProtocolPipe
-from .static import ProtocolStatic
-from .rip import ProtocolRIP
-from .ospf import ProtocolOSPF
-from .bgp import ProtocolBGP
+from ...globals import BirdConfigGlobals
 from ..base import SectionBase
 from ..constants import SectionConstants
 from ..functions import SectionFunctions
 from ..tables import SectionTables
-from ...globals import BirdConfigGlobals
+from .bgp import ProtocolBGP
+from .device import ProtocolDevice
+from .direct import ProtocolDirect
+from .kernel import ProtocolKernel
+from .ospf import ProtocolOSPF
+from .pipe import ProtocolPipe
+from .rip import ProtocolRIP
+from .static import ProtocolStatic
 
 
 class SectionProtocols(SectionBase):

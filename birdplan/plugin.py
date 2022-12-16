@@ -277,7 +277,7 @@ class PluginCollection:
         for plugin_package in self._plugin_packages:
             self._find_plugins(plugin_package)
 
-    def _find_plugins(self, package_name: str) -> None:  # noqa: C901, pylint: disable=too-many-branches
+    def _find_plugins(self, package_name: str) -> None:  # pylint: disable=too-many-branches
         """
         Recursively search the plugin_package and retrieve all plugins.
 

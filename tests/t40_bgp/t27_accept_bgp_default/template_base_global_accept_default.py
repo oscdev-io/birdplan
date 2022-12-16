@@ -30,7 +30,7 @@ class TemplateBase(TemplateSetBase):
     def r1_template_peer_config(self):
         """Return custom config depending on peer type."""
 
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
 
         # For the global test, we only accept own default if this is our own peer
         if peer_type in ("internal", "rrclient", "rrserver", "rrserver_rrserver"):

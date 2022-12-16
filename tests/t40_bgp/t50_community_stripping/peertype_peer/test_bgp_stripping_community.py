@@ -21,8 +21,8 @@
 
 """BGP community stripping test case."""
 
-from ..template_stripping_community import Template
 from ...config.peertype_peer.e1r1 import PeerTypeConfig
+from ..template_stripping_community import Template
 
 
 class Test(PeerTypeConfig, Template):

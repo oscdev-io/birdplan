@@ -32,14 +32,14 @@ class Template(TemplateBase):
     @property
     def exabgps(self):
         """Add e2 if we're an iBGP peer."""
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if getattr(self, "r1_peer_type", None) in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             return ["e1", "e2"]
         return ["e1"]
 
     def r1_e2_config(self):
         """Output e2 configuration."""
 
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if getattr(self, "r1_peer_type", None) in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             return f"""
     e2:
       asn: {self.r1_peer_asn}
@@ -64,7 +64,7 @@ class Template(TemplateBase):
 
         # Add large communities for peer types that require them
         large_communities = ""
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if getattr(self, "r1_peer_type", None) in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             large_communities = "65000:3:1"
 
             self._exabgpcli(

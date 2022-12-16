@@ -19,6 +19,7 @@
 """BIRD OSPF area interface attributes."""
 
 from typing import Optional
+
 from .......exceptions import BirdPlanError
 
 

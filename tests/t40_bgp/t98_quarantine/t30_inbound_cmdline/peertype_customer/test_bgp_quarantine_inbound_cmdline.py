@@ -21,8 +21,8 @@
 
 """BGP quarantine test case."""
 
-from ..template_quarantine_inbound_cmdline import Template
 from ....config.peertype_customer.r1r2 import PeerTypeConfig
+from ..template_quarantine_inbound_cmdline import Template
 
 
 class Test(PeerTypeConfig, Template):

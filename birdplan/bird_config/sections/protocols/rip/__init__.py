@@ -19,16 +19,17 @@
 """BIRD RIP protocol configuration."""
 
 from typing import Dict, List, Union
-from .rip_attributes import RIPAttributes, RIPRoutePolicyAccept, RIPRoutePolicyRedistribute
-from .rip_functions import RIPFunctions
-from ..direct import ProtocolDirect
-from ..pipe import ProtocolPipe, ProtocolPipeFilterType
-from ..base import SectionProtocolBase
+
+from .....exceptions import BirdPlanError
+from ....globals import BirdConfigGlobals
 from ...constants import SectionConstants
 from ...functions import SectionFunctions
 from ...tables import SectionTables
-from ....globals import BirdConfigGlobals
-from .....exceptions import BirdPlanError
+from ..base import SectionProtocolBase
+from ..direct import ProtocolDirect
+from ..pipe import ProtocolPipe, ProtocolPipeFilterType
+from .rip_attributes import RIPAttributes, RIPRoutePolicyAccept, RIPRoutePolicyRedistribute
+from .rip_functions import RIPFunctions
 
 RIPInterfaceConfig = Union[bool, Dict[str, str]]
 RIPInterfaces = Dict[str, RIPInterfaceConfig]

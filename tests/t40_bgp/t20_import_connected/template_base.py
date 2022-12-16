@@ -21,8 +21,9 @@
 
 """BGP import connected test case template."""
 
-from birdclient.exceptions import BirdClientError
 import pytest
+from birdclient.exceptions import BirdClientError
+
 from ...basetests import BirdPlanBaseTestCase
 
 

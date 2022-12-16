@@ -21,11 +21,14 @@
 
 """BGP prefix limit test template."""
 
-from typing import Any, List
 import time
+from typing import Any, List
+
 import pytest
+
 from birdplan import peeringdb
 from birdplan.exceptions import BirdPlanError
+
 from ....basetests import BirdPlanBaseTestCase
 from ....simulation import Simulation
 
@@ -105,7 +108,7 @@ class Template(BirdPlanBaseTestCase):
         peeringdb.PEERINGDB_16BIT_LOWER = 65002
 
         # Check if we get an exception now during reconfiguration
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
         if peer_type in ("customer", "peer"):
             with pytest.raises(
                 BirdPlanError,
@@ -136,7 +139,7 @@ class Template(BirdPlanBaseTestCase):
         peeringdb.PEERINGDB_16BIT_LOWER = 65002
 
         # Check if we get an exception now during reconfiguration
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
         if peer_type in ("customer", "peer"):
             with pytest.raises(
                 BirdPlanError,
@@ -167,7 +170,7 @@ class Template(BirdPlanBaseTestCase):
         peeringdb.PEERINGDB_16BIT_LOWER = 65002
 
         # Check if we get an exception now during reconfiguration
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
         if peer_type in ("customer", "peer"):
             with pytest.raises(
                 BirdPlanError,
@@ -198,7 +201,7 @@ class Template(BirdPlanBaseTestCase):
         peeringdb.PEERINGDB_16BIT_LOWER = 65002
 
         # Check if we get an exception now during reconfiguration
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
         if peer_type in ("customer", "peer"):
             with pytest.raises(
                 BirdPlanError,

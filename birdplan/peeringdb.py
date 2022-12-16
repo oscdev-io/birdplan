@@ -18,12 +18,12 @@
 
 """PeeringDB support class."""
 
-from typing import Any, Dict, Optional
 import time
+from typing import Any, Dict, Optional
+
 import requests
 
 from .exceptions import BirdPlanError
-
 
 PeeringDBInfo = Dict[str, Any]
 
@@ -65,7 +65,7 @@ class PeeringDB:  # pylint: disable=too-few-public-methods
         # If we can't, grab the result from PeeringDB live
         if not result:
             # Request the PeeringDB info for this AS
-            response = requests.get(f"https://www.peeringdb.com/api/net?asn__in={asn}")
+            response = requests.get(f"https://www.peeringdb.com/api/net?asn__in={asn}", timeout=10)
             # Check the result is not empty
             if not response:  # pragma: no cover
                 raise BirdPlanError("PeeringDB returned and empty result")
@@ -84,7 +84,7 @@ class PeeringDB:  # pylint: disable=too-few-public-methods
         # Lastly return it
         return peeringdb_info
 
-    def _cache(self, obj: str, value: Optional[PeeringDBInfo] = None) -> Optional[Any]:
+    def _cache(self, obj: str, value: Optional[PeeringDBInfo] = None) -> Optional[Any]:  # noqa: CFQ004
         """Retrieve or store value in cache."""
 
         if "objects" not in peeringdb_cache:

@@ -23,7 +23,6 @@
 
 from ..template_base_community_tests import TemplateBase
 
-
 # This test is changed from 100,101 to 99,100 due to the fact we add large communities
 
 

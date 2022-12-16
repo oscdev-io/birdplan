@@ -22,6 +22,7 @@
 """OSPF test case for interface cost using command line settings."""
 
 import time
+
 from ..template import Template
 
 

@@ -21,8 +21,8 @@
 
 """BGP prepending test case."""
 
-from ..template_prepend_bgp_customer_blackhole import Template
 from ....config.peertype_transit.r1r2 import PeerTypeConfig
+from ..template_prepend_bgp_customer_blackhole import Template
 
 
 class Test(PeerTypeConfig, Template):

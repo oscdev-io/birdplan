@@ -18,10 +18,10 @@
 
 """BIRD routing tables section."""
 
-from birdplan.bird_config.globals import BirdConfigGlobals
+from ...globals import BirdConfigGlobals
+from ..base import SectionBase
 from .kernel import TableKernel
 from .master import TableMaster
-from ..base import SectionBase
 
 
 class SectionTables(SectionBase):

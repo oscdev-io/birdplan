@@ -19,7 +19,8 @@
 """BIRD OSPF area attributes."""
 
 from typing import Optional
-from birdplan.exceptions import BirdPlanError
+
+from ......exceptions import BirdPlanError
 
 
 class OSPFAreaAttributes:  # pylint: disable=too-few-public-methods

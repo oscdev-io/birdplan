@@ -38,7 +38,7 @@ class Template(TemplateBase):
         output = ""
 
         # Grab the peer type
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
         # If this is not a customer peer type, we need to add the filter section
         if peer_type != "customer":
             output += """

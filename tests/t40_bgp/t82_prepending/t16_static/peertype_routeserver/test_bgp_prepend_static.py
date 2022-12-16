@@ -21,8 +21,8 @@
 
 """BGP prepending test case."""
 
-from ..template_prepend_static import Template
 from ....config.peertype_routeserver.r1r2 import PeerTypeConfig
+from ..template_prepend_static import Template
 
 
 class Test(PeerTypeConfig, Template):

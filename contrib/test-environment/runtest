@@ -1,10 +1,14 @@
 #!/bin/bash
 
+pacman -Q bird
+pacman -Q exabgp
+
 cd /root/birdplan
-echo "PYTHONPATH: $PYTHONPATH"
-echo "RUNNING: python setup.py test --addopt \"-v $*\""
 
-export PYTHONPATH
+ARGS=("$@")
+if [ ${#ARGS[@]} -eq 0 ]; then
+    ARGS=(--numprocesses=auto --dist=loadfile)
+fi
 
-nice python setup.py test --addopt "-v $*"
-
+echo "RUNNING: tox -- ${ARGS[@]}"
+nice tox -- ${ARGS[@]}

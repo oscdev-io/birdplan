@@ -18,8 +18,8 @@
 
 """Bird configuration utility functions."""
 
-from typing import List
 import ipaddress
+from typing import List
 
 
 def sanitize_community(community: str) -> str:

@@ -19,17 +19,18 @@
 """BIRD OSPF protocol configuration."""
 
 from typing import Dict, List
-from .ospf_attributes import OSPFAttributes, OSPFRoutePolicyAccept, OSPFRoutePolicyRedistribute
-from .ospf_functions import OSPFFunctions
-from .area import ProtocolOSPFArea
-from ..direct import ProtocolDirect
-from ..pipe import ProtocolPipe, ProtocolPipeFilterType
-from ..base import SectionProtocolBase
+
+from .....exceptions import BirdPlanError
+from ....globals import BirdConfigGlobals
 from ...constants import SectionConstants
 from ...functions import SectionFunctions
 from ...tables import SectionTables
-from ....globals import BirdConfigGlobals
-from .....exceptions import BirdPlanError
+from ..base import SectionProtocolBase
+from ..direct import ProtocolDirect
+from ..pipe import ProtocolPipe, ProtocolPipeFilterType
+from .area import ProtocolOSPFArea
+from .ospf_attributes import OSPFAttributes, OSPFRoutePolicyAccept, OSPFRoutePolicyRedistribute
+from .ospf_functions import OSPFFunctions
 
 OSPFAreaConfig = Dict[str, str]
 OSPFAreas = Dict[str, ProtocolOSPFArea]

@@ -21,8 +21,8 @@
 
 """BGP accept originated route test cases, with accept:originated set to True."""
 
-from ..template_accept_originated_true import Template
 from ...config.peertype_routecollector.r1r2 import PeerTypeConfig
+from ..template_accept_originated_true import Template
 
 
 class Test(PeerTypeConfig, Template):

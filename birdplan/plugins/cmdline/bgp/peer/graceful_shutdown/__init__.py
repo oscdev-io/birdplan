@@ -18,10 +18,11 @@
 
 """BirdPlan commandline options for BGP peer graceful shutdown."""
 
-from typing import Any, Dict
 import argparse
-from ....cmdline_plugin import BirdPlanCmdlinePluginBase
+from typing import Any, Dict
+
 from ......exceptions import BirdPlanErrorUsage
+from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
 class BirdplanCmdlineBGPPeerGracefulShutdown(BirdPlanCmdlinePluginBase):

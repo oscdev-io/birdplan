@@ -19,13 +19,14 @@
 """BIRD static protocol configuration."""
 
 from typing import Dict
-from .pipe import ProtocolPipe
-from .base import SectionProtocolBase
+
+from ....exceptions import BirdPlanError
+from ...globals import BirdConfigGlobals
 from ..constants import SectionConstants
 from ..functions import SectionFunctions
 from ..tables import SectionTables
-from ...globals import BirdConfigGlobals
-from ....exceptions import BirdPlanError
+from .base import SectionProtocolBase
+from .pipe import ProtocolPipe
 
 StaticRoutes = Dict[str, str]
 

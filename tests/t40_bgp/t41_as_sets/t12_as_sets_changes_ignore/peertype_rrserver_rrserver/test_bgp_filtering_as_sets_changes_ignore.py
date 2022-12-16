@@ -21,8 +21,8 @@
 
 """BGP AS-SET test case."""
 
-from ..template_as_sets_changes_ignore import Template
 from ....config.peertype_rrserver_rrserver.e1r1 import PeerTypeConfig
+from ..template_as_sets_changes_ignore import Template
 
 
 class Test(PeerTypeConfig, Template):

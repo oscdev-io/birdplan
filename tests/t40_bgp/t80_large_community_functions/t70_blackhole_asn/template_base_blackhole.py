@@ -30,7 +30,7 @@ class TemplateSetBase(TemplateBase):
     def r1_template_peer_config(self):
         """Return custom config based on the peer type."""
         # Grab the peer type
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
         # If its a customer, return the prefixes
         if peer_type == "customer":
             return """
@@ -46,7 +46,7 @@ class TemplateSetBase(TemplateBase):
         """Return additional large communities we should be using."""
         # Add large communities for peer types that require them
         large_communities = ""
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if getattr(self, "r1_peer_type", None) in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             large_communities = "65000:3:1"
 
         return large_communities

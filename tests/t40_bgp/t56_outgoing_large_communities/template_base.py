@@ -46,7 +46,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         config = []
 
         # Redistribute default routes for all but these peer types...
-        r1_peer_type = getattr(self, "r1_peer_type")
+        r1_peer_type = getattr(self, "r1_peer_type", None)
         if r1_peer_type not in ("peer", "routecollector", "routeserver", "transit"):
             config.append("        kernel_default: True")
             config.append("        originated_default: True")
@@ -69,7 +69,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
-    def test_announce_routes(self, sim):
+    def test_announce_routes(self, sim):  # noqa: CFQ001
         """Hook to add in routes if we need to."""
 
         # Own route
@@ -190,7 +190,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         )
 
         # Don't continue if we have exceptions that will be raised
-        if getattr(self, "routers_config_exception"):
+        if getattr(self, "routers_config_exception", None):
             return
 
         # Add gateway'd kernel routes

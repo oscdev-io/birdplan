@@ -21,8 +21,8 @@
 
 """BGP incoming large community test case."""
 
-from ..template import Template
 from ...config.peertype_routeserver.r1r2 import PeerTypeConfig
+from ..template import Template
 
 
 class Test(PeerTypeConfig, Template):

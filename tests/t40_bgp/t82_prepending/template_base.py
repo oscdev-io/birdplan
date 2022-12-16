@@ -48,7 +48,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         config = []
 
         # Redistribute default routes for all but these peer types...
-        r1_peer_type = getattr(self, "r1_peer_type")
+        r1_peer_type = getattr(self, "r1_peer_type", None)
         if r1_peer_type not in ("peer", "routecollector", "routeserver", "transit"):
             config.append("        kernel_default: True")
             config.append("        originated_default: True")
@@ -91,7 +91,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
         sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
 
-    def test_announce_routes(self, sim):
+    def test_announce_routes(self, sim):  # noqa: CFQ001
         """Hook to add in routes if we need to."""
 
         #

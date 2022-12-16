@@ -22,17 +22,16 @@
 
 from typing import Any, Dict
 
-from .interface import ProtocolOSPFAreaInterface
-from .area_attributes import OSPFAreaAttributes
-from .typing import OSPFAreaConfig
-from ..ospf_attributes import OSPFAttributes
-from ...base import SectionProtocolBase
+from ......exceptions import BirdPlanError
+from .....globals import BirdConfigGlobals
 from ....constants import SectionConstants
 from ....functions import SectionFunctions
 from ....tables import SectionTables
-from .....globals import BirdConfigGlobals
-from ......exceptions import BirdPlanError
-
+from ...base import SectionProtocolBase
+from ..ospf_attributes import OSPFAttributes
+from .area_attributes import OSPFAreaAttributes
+from .interface import ProtocolOSPFAreaInterface
+from .typing import OSPFAreaConfig
 
 OSPFAreaInterfaceConfig = Dict[str, Any]
 OSPFAreaInterfaces = Dict[str, ProtocolOSPFAreaInterface]
@@ -50,7 +49,7 @@ class ProtocolOSPFArea(SectionProtocolBase):  # pylint: disable=too-many-public-
     # OSPF interfaces belonging to this area
     _interfaces: OSPFAreaInterfaces
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         constants: SectionConstants,

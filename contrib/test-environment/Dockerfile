@@ -3,25 +3,16 @@ FROM idmslinux/rolling
 RUN set -ex; \
     echo "Updating and installing..."; \
     pacman -Syu --noconfirm \
+        git \
+        python-tox \
         bgpq3 \
-        python-colorama \
-        python-jinja \
-        python-pytest-runner \
-        python-pytest-cov \
-        python-pytest-black \
-        python-pytest-flake8 \
-        python-pytest-pycodestyle \
-        python-pytest-pydocstyle \
-        python-pytest-pylint \
-        python-pytest-mypy \
-        python-pytest-xdist \
-        python-requests \
-        python-yaml \
-        iproute2 \
         bird \
-        exabgp; \
+        exabgp \
+        iproute2; \
     echo "Cleaning up..."; \
-    rm -f /var/cache/pacman/pkg/* /var/lib/pacman/sync/*
+    rm -f /var/cache/pacman/pkg/*
+    # We don't remove sync for now as it interferes with our -Q query in runtest
+    # /var/lib/pacman/sync/*
 
 # Copy in our script
 COPY runtest /root/

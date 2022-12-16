@@ -22,6 +22,7 @@
 """BGP graceful shutdown test case template."""
 
 import time
+
 from ..template_base import TemplateBase
 
 

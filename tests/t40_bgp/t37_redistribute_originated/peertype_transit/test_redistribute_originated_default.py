@@ -21,8 +21,8 @@
 
 """BGP redistribute originated route test case."""
 
-from ..template_redistribute_originated_default import Template
 from ...config.peertype_transit.r1r2 import PeerTypeConfig
+from ..template_redistribute_originated_default import Template
 
 
 class Test(PeerTypeConfig, Template):

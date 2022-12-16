@@ -21,8 +21,8 @@
 
 """BGP filtering test case."""
 
-from ..template_blackhole_length_import_constraints import Template
 from ....config.peertype_rrclient.e1r1 import PeerTypeConfig
+from ..template_blackhole_length_import_constraints import Template
 
 
 class Test(PeerTypeConfig, Template):

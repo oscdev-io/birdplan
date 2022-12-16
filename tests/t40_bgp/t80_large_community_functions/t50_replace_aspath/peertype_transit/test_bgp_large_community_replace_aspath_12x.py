@@ -21,8 +21,8 @@
 
 """BGP large community functions test case."""
 
-from ..template_large_community_replace_aspath_12x import Template
 from ....config.peertype_transit.r1_to_r10_highasn import PeerTypeConfig
+from ..template_large_community_replace_aspath_12x import Template
 
 
 class Test(PeerTypeConfig, Template):

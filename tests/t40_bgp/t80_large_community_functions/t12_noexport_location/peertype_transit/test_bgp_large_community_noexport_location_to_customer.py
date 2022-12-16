@@ -21,8 +21,8 @@
 
 """BGP large community functions test case."""
 
-from ..template_large_community_noexport_location_to_customer import Template
 from ....config.peertype_transit.r1_to_r10 import PeerTypeConfig
+from ..template_large_community_noexport_location_to_customer import Template
 
 
 class Test(PeerTypeConfig, Template):

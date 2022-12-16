@@ -19,11 +19,12 @@
 """BIRD direct protocol configuration."""
 
 from typing import List, Optional
-from .base import SectionProtocolBase
+
+from ...globals import BirdConfigGlobals
 from ..constants import SectionConstants
 from ..functions import SectionFunctions
 from ..tables import SectionTables
-from ...globals import BirdConfigGlobals
+from .base import SectionProtocolBase
 
 
 class ProtocolDirect(SectionProtocolBase):
@@ -32,7 +33,7 @@ class ProtocolDirect(SectionProtocolBase):
     _name_suffix: str
     _interfaces: List[str]
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         constants: SectionConstants,

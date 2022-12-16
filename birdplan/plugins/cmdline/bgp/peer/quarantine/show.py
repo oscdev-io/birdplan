@@ -18,11 +18,12 @@
 
 """BirdPlan commandline options for BGP peer quarantine show."""
 
-from typing import Any, Dict
 import argparse
-from ....cmdline_plugin import BirdPlanCmdlinePluginBase
+from typing import Any, Dict
+
 from ...... import BirdPlanBGPPeerQuarantineStatus
 from ......console.colors import colored
+from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
 class BirdplanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
@@ -88,7 +89,7 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
         # Grab peer list
         return cmdline.birdplan.state_bgp_peer_quarantine_status()
 
-    def show_output_text(self, data: BirdPlanBGPPeerQuarantineStatus) -> None:  # noqa: C901
+    def show_output_text(self, data: BirdPlanBGPPeerQuarantineStatus) -> None:
         """
         Show command output in text.
 
@@ -125,12 +126,12 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
 
             # Grab pending status
             pending_status = None
-            if peer in data["pending"]:
+            if peer in data["pending"]:  # noqa: SIM908
                 pending_status = data["pending"][peer]
 
             # Grab current status
             current_status = None
-            if peer in data["current"]:
+            if peer in data["current"]:  # noqa: SIM908
                 current_status = data["current"][peer]
 
             # Work out our status string

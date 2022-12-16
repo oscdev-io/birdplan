@@ -19,7 +19,8 @@
 """BIRD BGP protocol attributes."""
 
 from typing import Dict, List, Optional, Union
-from birdplan.exceptions import BirdPlanError
+
+from ......exceptions import BirdPlanError
 
 # This type is a string as we can have it set to "peeringdb"
 BGPPeerPrefixLimit = Optional[str]

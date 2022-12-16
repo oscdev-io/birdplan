@@ -21,8 +21,8 @@
 
 """BGP community functions test case."""
 
-from ..template_community_blackhole import Template
 from ....config.peertype_internal.r1_to_r10 import PeerTypeConfig
+from ..template_community_blackhole import Template
 
 
 class Test(PeerTypeConfig, Template):

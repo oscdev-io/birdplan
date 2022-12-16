@@ -21,11 +21,14 @@
 
 """BGP peer AS-SET changes test case template."""
 
-from typing import Any, List
 import time
+from typing import Any, List
+
 import pytest
+
 from birdplan import bgpq3
 from birdplan.exceptions import BirdPlanError
+
 from ....basetests import BirdPlanBaseTestCase
 from ....simulation import Simulation
 
@@ -119,7 +122,7 @@ class Template(BirdPlanBaseTestCase):
         }
 
         # Check if we get an exception now during reconfiguration
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
         if peer_type in ("customer", "peer"):
             with pytest.raises(
                 BirdPlanError,
@@ -157,7 +160,7 @@ class Template(BirdPlanBaseTestCase):
         }
 
         # Check if we get an exception now during reconfiguration
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
         if peer_type in ("customer", "peer"):
             with pytest.raises(
                 BirdPlanError,
@@ -195,7 +198,7 @@ class Template(BirdPlanBaseTestCase):
         }
 
         # Check if we get an exception now during reconfiguration
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
         if peer_type in ("customer", "peer"):
             with pytest.raises(
                 BirdPlanError,
@@ -233,7 +236,7 @@ class Template(BirdPlanBaseTestCase):
         }
 
         # Check if we get an exception now during reconfiguration
-        peer_type = getattr(self, "r1_peer_type")
+        peer_type = getattr(self, "r1_peer_type", None)
         if peer_type in ("customer", "peer"):
             with pytest.raises(
                 BirdPlanError,

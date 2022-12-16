@@ -20,9 +20,9 @@
 
 from enum import Enum
 from typing import Callable, List, Union
-from ..base import SectionBase
-from ...globals import BirdConfigGlobals
 
+from ...globals import BirdConfigGlobals
+from ..base import SectionBase
 
 PipeTableNameType = Union[str, Callable[[str], str]]
 
@@ -58,7 +58,7 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
     # IP versions we're creating a pipe for
     _ipversions: List[str]
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         table_from: PipeTableNameType,
@@ -160,7 +160,7 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
         return table_to
 
     def t_table_from(self, ipv: str) -> str:
-        """Return table_from, some tables don't have t_ prefixes."""
+        r"""Return table_from, some tables don't have t\_ prefixes."""
         table_name = self.table_from(ipv)
         # If it is not a master table, add t_
         if not table_name.startswith("master"):
@@ -168,7 +168,7 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
         return table_name
 
     def t_table_to(self, ipv: str) -> str:
-        """Return table_to, some tables don't have t_ prefixes."""
+        r"""Return table_to, some tables don't have t\_ prefixes."""
         table_name = self.table_to(ipv)
         # If it is not a master table, add t_
         if not table_name.startswith("master"):

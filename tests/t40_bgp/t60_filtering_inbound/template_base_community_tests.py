@@ -36,7 +36,7 @@ class TemplateBase(TemplateSetBase):
 
         # Add large communities for peer types that require them
         relation_large_communities = ""
-        if getattr(self, "r1_peer_type") in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+        if getattr(self, "r1_peer_type", None) in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
             relation_large_communities = "65000:3:1"
 
         # Generate community advertisements

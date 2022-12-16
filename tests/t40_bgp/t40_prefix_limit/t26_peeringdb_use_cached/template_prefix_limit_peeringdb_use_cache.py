@@ -21,11 +21,14 @@
 
 """BGP prefix limit test template."""
 
-from typing import Any, List
 import time
+from typing import Any, List
+
 import pytest
+
 from birdplan import peeringdb
 from birdplan.exceptions import BirdPlanError
+
 from ....basetests import BirdPlanBaseTestCase
 from ....simulation import Simulation
 
@@ -90,14 +93,14 @@ class Template(BirdPlanBaseTestCase):
         """Graceful shutdown test to customize template."""
 
         # Check if we get an exception now during reconfiguration
-        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+        if getattr(self, "r1_peer_type", None) in ("customer", "peer"):
             super()._birdplan_run(sim, tmpdir, "r1", ["configure", "--use-cached"])
 
     def test_peeringdb_without_use_cached(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
 
         # Check if we get an exception now during reconfiguration
-        if getattr(self, "r1_peer_type") in ("customer", "peer"):
+        if getattr(self, "r1_peer_type", None) in ("customer", "peer"):
             with pytest.raises(
                 BirdPlanError,
                 match=r"No IPv4 PeeringDB information found for peer 'e1'",

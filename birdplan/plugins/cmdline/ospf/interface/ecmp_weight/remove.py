@@ -18,8 +18,9 @@
 
 """BirdPlan commandline options for "ospf interface ecmp-weight remove"."""
 
-from typing import Any, Dict
 import argparse
+from typing import Any, Dict
+
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 

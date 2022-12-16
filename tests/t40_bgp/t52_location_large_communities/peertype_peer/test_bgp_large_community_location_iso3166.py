@@ -21,8 +21,8 @@
 
 """BGP location-based ISO-3166 large community test case."""
 
-from ..template_large_community_location_iso3166 import Template
 from ...config.peertype_peer.e1r1 import PeerTypeConfig
+from ..template_large_community_location_iso3166 import Template
 
 
 class Test(PeerTypeConfig, Template):

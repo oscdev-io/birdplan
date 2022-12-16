@@ -21,7 +21,6 @@ import re
 import sys
 import time
 
-
 route_filename = sys.argv[1]
 our_asn = sys.argv[2]
 ipv = sys.argv[3]

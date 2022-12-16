@@ -21,8 +21,8 @@
 
 """Basic BGP test case."""
 
-from ..template_bgp import Template
 from ...config.peertype_peer.e1r1 import PeerTypeConfig
+from ..template_bgp import Template
 
 
 class Test(PeerTypeConfig, Template):

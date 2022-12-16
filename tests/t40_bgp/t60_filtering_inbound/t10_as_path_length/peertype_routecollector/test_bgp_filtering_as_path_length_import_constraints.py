@@ -21,8 +21,8 @@
 
 """BGP filtering test case."""
 
-from ..template_as_path_length_import_constraints import Template
 from ....config.peertype_routecollector.e1r1 import PeerTypeConfig
+from ..template_as_path_length_import_constraints import Template
 
 
 class Test(PeerTypeConfig, Template):
