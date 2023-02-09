@@ -294,7 +294,6 @@ class PluginCollection:
 
         # Iterate through the modules
         for _, plugin_name, _ in pkgutil.iter_modules(imported_package.__path__, imported_package.__name__ + "."):
-
             # Try import
             try:
                 plugin_module = __import__(plugin_name, fromlist=["__VERSION__"])
@@ -306,7 +305,7 @@ class PluginCollection:
             object_members = inspect.getmembers(plugin_module, inspect.isclass)
 
             # Loop with class names
-            for (_, class_name) in object_members:
+            for _, class_name in object_members:
                 # Only add classes that are a sub class of Plugin
                 if not issubclass(class_name, Plugin) or (class_name is Plugin) or class_name.__name__.endswith("Base"):
                     continue

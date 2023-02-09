@@ -55,7 +55,6 @@ class TemplateBase(TemplateSetBase):
 
         # Loop with IP ranges
         for iprange in self.test_blackhole_ranges:
-
             # Loop with IPv4 blackhole lenghts
             for test_blackhole_length4 in self.test_blackhole_lengths4:
                 self._exabgpcli(

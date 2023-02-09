@@ -34,7 +34,6 @@ class TemplateBase(TemplateSetBase):
 
         # Loop with the AS-PATH counts
         for as_path_count in self.test_as_path_counts:
-
             as_path = [65001 for x in range(as_path_count)]
 
             # Add large communities for peer types that require them
