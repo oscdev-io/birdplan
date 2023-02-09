@@ -108,7 +108,6 @@ class Template(BirdPlanBaseTestCase):
 
         # Check if we get an exception now during reconfiguration
         if getattr(self, "r1_peer_type", None) in ("customer", "peer"):
-
             with pytest.raises(
                 BirdPlanError,
                 match=r"""Failed to query IRR ASNs from object '_BIRDPLAN:AS-SET'""",

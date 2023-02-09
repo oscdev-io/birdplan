@@ -160,7 +160,6 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
 
         # Loop with areas
         for area_name, interface_list in sorted(interfaces_all.items()):
-
             # Create area section
             print("  Area: " + colored(area_name, "cyan"))
 

@@ -83,7 +83,6 @@ class ProtocolDirect(SectionProtocolBase):
         self._setup_protocol("6", interface_lines)
 
     def _setup_protocol(self, ipv: str, lines: List[str]) -> None:
-
         protocol_name = f"direct{ipv}{self.name_suffix}"
 
         self.conf.add(f"protocol direct {protocol_name} {{")

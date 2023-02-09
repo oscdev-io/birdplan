@@ -123,7 +123,6 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
 
         # Loop with sorted peer list
         for peer in peers_all:
-
             # Grab pending status
             pending_status = None
             if peer in data["pending"]:  # noqa: SIM908
