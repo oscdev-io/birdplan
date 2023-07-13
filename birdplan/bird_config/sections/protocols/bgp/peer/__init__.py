@@ -1568,7 +1568,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 for prefix in prefix_list:
                     prefixes.append(prefix)
                     # Add blackhole
-                    blackhole = re.split(r"[{+]", prefix, 1)[0] + "+"
+                    blackhole = re.split(r"[{+]", prefix, maxsplit=1)[0] + "+"
                     blackholes.append(blackhole)
             # Sort and unique our results
             prefixes = sorted(set(prefixes))
