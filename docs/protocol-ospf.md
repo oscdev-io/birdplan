@@ -95,6 +95,8 @@ ospf:
 
 Tests: 2 and 3
 
+Supported in: 0.0.2
+
 OSPF protocol version to use for IPv4 routes. This defaults to "2", but "3" can be specified which will utilize IPv6 for
 OSPF communication.
 
