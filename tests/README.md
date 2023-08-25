@@ -26,6 +26,10 @@
 
 [Basic](t30_ospf/t10_basic/README.md) (including no kernel export)
 
+[Basic OSPFv2](t30_ospf/t12_basic_v4version2/README.md) (similar to [Basic](t30_ospf/t10_basic/README.md))
+
+[Basic OSPFv3](t30_ospf/t12_basic_v4version3/README.md) (similar to [Basic](t30_ospf/t10_basic/README.md))
+
 [Redistribute Connected](t30_ospf/t30_redistribute_connected/README.md)
 
 [Stub Interface](t30_ospf/t34_stub_interface/README.md)

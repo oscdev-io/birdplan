@@ -41,6 +41,8 @@ class ProtocolOSPF(SectionProtocolBase):
 
     _areas: OSPFAreas
 
+    _v4version: str
+
     _ospf_attributes: OSPFAttributes
     # OSPF functions
     _ospf_functions: OSPFFunctions
@@ -56,6 +58,9 @@ class ProtocolOSPF(SectionProtocolBase):
 
         # OSPF areas
         self._areas = {}
+
+        # OSPF version to use for IPv4
+        self._v4version = "2"
 
         self._ospf_attributes = OSPFAttributes()
         # Setup OSPF functions
@@ -146,7 +151,12 @@ class ProtocolOSPF(SectionProtocolBase):
         return area
 
     def _setup_protocol(self, ipv: str) -> None:
-        self.conf.add(f"protocol ospf v3 ospf{ipv} {{")
+        # Work out which OSPF protocol version to use
+        protocol_version = "3"
+        if ipv == "4":
+            protocol_version = self.v4version
+
+        self.conf.add(f"protocol ospf v{protocol_version} ospf{ipv} {{")
         self.conf.add(f'  description "OSPF protocol for IPv{ipv}";')
         self.conf.add("")
         self.conf.add(f"  ipv{ipv} {{")
@@ -288,6 +298,16 @@ class ProtocolOSPF(SectionProtocolBase):
     def areas(self) -> OSPFAreas:
         """Return OSPF areas."""
         return self._areas
+
+    @property
+    def v4version(self) -> str:
+        """Return OSPF IPv4 version to use."""
+        return self._v4version
+
+    @v4version.setter
+    def v4version(self, v4version: str) -> None:
+        """Set the OSPF IPv4 version to use."""
+        self._v4version = v4version
 
     @property
     def ospf_attributes(self) -> OSPFAttributes:

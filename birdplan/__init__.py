@@ -839,8 +839,19 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config["ospf"]:
-            if config_item not in ("accept", "redistribute", "areas"):
+            if config_item not in ("accept", "redistribute", "areas", "v4version"):
                 raise BirdPlanError(f"The 'ospf' config item '{config_item}' is not supported")
+
+        # Check what version of OSPF we're using for IPv4
+        if "v4version" in self.config["ospf"]:
+            if isinstance(self.config["ospf"]["v4version"], (int, str)):
+                v4version = f"{self.config['ospf']['v4version']}"
+                if v4version in ("2", "3"):
+                    self.birdconf.protocols.ospf.v4version = v4version
+                else:
+                    raise BirdPlanError("The 'ospf' config item 'v4version' has unsupported value")
+            else:
+                raise BirdPlanError("The 'ospf' config item 'v4version' has unsupported type")
 
         self._config_ospf_accept()
         self._config_ospf_redistribute()
