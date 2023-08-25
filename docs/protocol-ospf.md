@@ -90,3 +90,21 @@ ospf:
         eth1:
           stub: True
 ```
+
+## v4version
+
+Tests: 2 and 3
+
+OSPF protocol version to use for IPv4 routes. This defaults to "2", but "3" can be specified which will utilize IPv6 for
+OSPF communication.
+
+
+```yaml
+ospf:
+  v4version: 3
+  areas:
+    0:
+      interfaces:
+        eth0: True
+```
+
