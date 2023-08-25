@@ -19,7 +19,7 @@ ospf:
   areas:
     0:
       interfaces:
-        'eth0': []
+        eth0: True
 ```
 
 ## redistribute
@@ -56,7 +56,7 @@ ospf:
   areas:
     0:
       interfaces:
-        'eth0': []
+        eth0: True
 ```
 
 ## areas
@@ -86,7 +86,7 @@ ospf:
   areas:
     0:
       interfaces:
-        'eth0': []
-        'eth1':
+        eth0: True
+        eth1:
           stub: True
 ```

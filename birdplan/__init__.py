@@ -951,10 +951,12 @@ class BirdPlan:
                 # Start with no special interface configuration
                 interface_config: Dict[str, Any] = {}
                 # Check what kind of config we've got...
+                add_ospf_interface = False
                 if isinstance(raw_config, bool):
-                    pass
+                    add_ospf_interface = raw_config
                 # Else if its a dict, we need to treat it a bit differently
                 elif isinstance(raw_config, dict):
+                    add_ospf_interface = True
                     for raw_item, raw_value in raw_config.items():
                         if raw_item in ("cost", "ecmp_weight", "hello", "stub", "wait"):
                             interface_config[raw_item] = raw_value
@@ -963,10 +965,13 @@ class BirdPlan:
                                 f"Configuration item '{raw_item}' not understood in OSPF interface '{interface_name}'"
                             )
                 else:
-                    raise BirdPlanError(f"Configurion for OSPF interface name '{interface_name}' has an unsupported value")
+                    raise BirdPlanError(
+                        f"Configurion for OSPF interface name '{interface_name}' has an unsupported type: '{type(interface_name)}'"
+                    )
 
                 # Add interface to area
-                area.add_interface(interface_name, interface_config)
+                if add_ospf_interface:
+                    area.add_interface(interface_name, interface_config)
 
     def _config_bgp(self) -> None:
         """Configure bgp section."""
