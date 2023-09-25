@@ -77,6 +77,8 @@
 
 [Peer Cost](t40_bgp/t42_peer_cost/README.md)
 
+[Add Paths](t40_bgp/t44_add_paths/README.md)
+
 [Community Stripping](t40_bgp/t50_community_stripping/README.md)
 
 [Community Functions](t40_bgp/t51_community_functions/README.md)

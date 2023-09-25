@@ -1275,6 +1275,23 @@ class BirdPlan:
                 "blackhole_community",
             ):
                 peer[config_item] = config_value
+            # Peer add_paths configuration
+            elif config_item == "add_paths":
+                peer["add_paths"] = None
+                if isinstance(config_value, bool):
+                    if config_value:
+                        peer["add_paths"] = "on"
+                elif isinstance(config_value, str):
+                    if config_value not in ("tx", "rx", "on"):
+                        raise BirdPlanError(
+                            f"Configuration value '{config_value}' not understood in bgp:peers:{peer_name}:add_paths, valid values"
+                            "are 'tx', 'rx', 'on'"
+                        )
+                    peer["add_paths"] = config_value
+                else:
+                    raise BirdPlanError(
+                        f"Configuration item has invalid type '{type(config_value)}' in bgp:peers:{peer_name}:add_paths"
+                    )
             # Peer location configuration
             elif config_item == "location":
                 peer["location"] = {}

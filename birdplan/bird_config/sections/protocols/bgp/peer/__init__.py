@@ -213,6 +213,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 raise BirdPlanError(f"Having 'cost' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
             self.cost = peer_config["cost"]
 
+        if "add_paths" in peer_config:
+            # Raise an exception if add paths does not make sense for a specific peer type
+            if self.peer_type not in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
+                raise BirdPlanError(
+                    f"Having 'add_paths' specified for peer '{self.name}' with type '{self.peer_type}' makes no" " sense"
+                )
+            self.add_paths = peer_config["add_paths"]
+
         # Check if we are adding a large community to outgoing routes
         if "incoming_large_communities" in peer_config:
             # Raise an exception if incoming large communities makes no sense for this peer type
@@ -2394,6 +2402,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Set the nexthop to ourselves for external peers
         if self.peer_type in ("customer", "peer", "transit", "routecollector", "routeserver"):
             self.conf.add("    next hop self;")
+        # Decide if we're adding all BGP paths
+        if self.add_paths:
+            self.conf.add(f"    add paths {self.add_paths};")
         # Setup import and export table so we can do soft reconfiguration
         self.conf.add("    import table;")
         self.conf.add("    export table;")
@@ -2648,6 +2659,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def cost(self, cost: int) -> None:
         """Set our prefix cost."""
         self.peer_attributes.cost = cost
+
+    @property
+    def add_paths(self) -> Optional[str]:
+        """Return the setting for adding all BGP paths."""
+        return self.peer_attributes.add_paths
+
+    @add_paths.setter
+    def add_paths(self, add_paths: str) -> None:
+        """Set our preference for adding all BGP paths."""
+        self.peer_attributes.add_paths = add_paths
 
     @property
     def graceful_shutdown(self) -> bool:

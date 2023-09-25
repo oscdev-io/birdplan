@@ -498,6 +498,29 @@ bgp:
 ```
 
 
+## add_paths
+
+ADD-PATH is the BGP capability described in RFC5492 which enables the sending/receiving (or both) of multiple paths for the same
+prefix.
+
+Valid values are `tx`, `rx` and `on`.
+
+This is only supported for peer types of `internal`, `rrclient`, `rrserver`, `rrserver-rrserver`.
+
+An example is however below...
+
+```yaml
+...
+
+bgp:
+  peers:
+    peer1:
+      asn: 65000
+      cost: 5
+...
+```
+
+
 ## description
 
 Description of this peer. This is mandatory.
