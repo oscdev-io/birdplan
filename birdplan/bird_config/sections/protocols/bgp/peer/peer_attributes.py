@@ -649,6 +649,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     cost: int
 
+    add_paths: Optional[str]
+
     graceful_shutdown: bool
 
     large_communities: BGPPeerLargeCommunities
@@ -699,6 +701,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.password = None
 
         self.cost = 0
+
+        self.add_paths = None
 
         self.graceful_shutdown = False
 
