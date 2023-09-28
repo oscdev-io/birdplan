@@ -150,6 +150,7 @@ class BirdPlan:
 
         # Configure sections
         self._config_global()
+        self._config_kernel()
         self._config_static()
         self._config_export_kernel()
         self._config_rip()
@@ -711,7 +712,7 @@ class BirdPlan:
         if "vrf" in self.config["kernel"]:
             self.birdconf.vrf = '"' + self.config["kernel"]["vrf"] + '"'
             # Make sure we also have a routing talbe
-            if "routing_talbe" not in self.config["kernel"]:
+            if "routing_table" not in self.config["kernel"]:
                 raise BirdPlanError("The 'kernel' config item 'vrf' requires that 'routing_table' is also specified")
 
         if "routing_table" in self.config["kernel"]:
