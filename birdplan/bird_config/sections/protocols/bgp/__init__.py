@@ -414,6 +414,8 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             self.conf.add(f"protocol static bgp_originate{ipv} {{")
             self.conf.add(f'  description "BGP route origination for IPv{ipv}";')
             self.conf.add("")
+            self.conf.add(f"  vrf {self.birdconfig_globals.vrf};")
+            self.conf.add("")
             self.conf.add(f"  ipv{ipv} {{")
             self.conf.add(f"    table t_bgp_originate{ipv};")
             self.conf.add("    export none;")

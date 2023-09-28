@@ -104,6 +104,26 @@ class BirdConfig:
         self.sections.router_id.router_id = router_id
 
     @property
+    def vrf(self) -> str:
+        """Return the vrf to use."""
+        return self.birdconfig_globals.vrf
+
+    @vrf.setter
+    def vrf(self, vrf: str) -> None:
+        """Set the vrf to use."""
+        self.birdconfig_globals.vrf = vrf
+
+    @property
+    def routing_table(self) -> int | None:
+        """Return the routing table to use."""
+        return self.birdconfig_globals.routing_table
+
+    @routing_table.setter
+    def routing_table(self, routing_table: int | None) -> None:
+        """Set the routing table to use."""
+        self.birdconfig_globals.routing_table = routing_table
+
+    @property
     def sections(self) -> Sections:
         """Return our sections."""
         return self._sections

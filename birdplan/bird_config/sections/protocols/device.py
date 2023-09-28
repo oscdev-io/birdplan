@@ -34,6 +34,8 @@ class ProtocolDevice(SectionProtocolBase):
         self.conf.add("protocol device {")
         self.conf.add('  description "Device protocol";')
         self.conf.add("")
+        self.conf.add(f"  vrf {self.birdconfig_globals.vrf};")
+        self.conf.add("")
         self.conf.add("  scan time 10;")
         self.conf.add("};")
         self.conf.add("")

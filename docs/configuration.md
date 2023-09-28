@@ -26,6 +26,24 @@ Set BIRD into debug mode.
 debug: True
 ```
 
+# kernel
+
+Supported in: 0.0.4
+
+The `kernel` key contains a dictionary of kernel configuration items.
+
+* `vrf` is the VRF to use for BIRD.
+
+* `routing_table` is the routing table ID to use for routes. This must be set if `vrf` is used.
+
+An example of this configuration can be found below...
+```yaml
+router_id: 0.0.0.2
+kernel:
+  vrf: vrf0
+  routing_table: 100
+```
+
 # export_kernel
 
 The `export_kernel` key contains a dictionary of the routes to be exported to the kernel RIB. All items default to `True`.

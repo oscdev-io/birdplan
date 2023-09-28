@@ -102,6 +102,8 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
             self.conf.add(f"protocol pipe p_{self.table_from(ipv)}_to_{self.table_to(ipv)}{self.name_suffix} {{")
             self.conf.add(f'  description "Pipe from {self.t_table_from(ipv)} to {self.t_table_to(ipv)}{self.name_suffix}";')
             self.conf.add("")
+            self.conf.add(f"  vrf {self.birdconfig_globals.vrf};")
+            self.conf.add("")
             self.conf.add(f"  table {self.t_table_from(ipv)};")
             self.conf.add(f"  peer table {self.t_table_to(ipv)}{self.name_suffix};")
             self.conf.add("")

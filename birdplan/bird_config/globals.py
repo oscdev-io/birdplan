@@ -21,7 +21,7 @@
 from typing import Any, Dict, Optional
 
 
-class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
+class BirdConfigGlobals:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """
     BirdConfig configuration globals.
 
@@ -35,7 +35,10 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
         Current configuration state, used for persistent data storage.
     test_mode : bool
         Enable test mode, this modifies some internals to allow for better and more complete testing
-
+    vrf: str
+        VRF to use for BIRD.
+    routing_table: int
+        Kernel routing table to add the routes to.
     """
 
     log_file: Optional[str]
@@ -45,6 +48,8 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
     use_cached: bool
     state: Dict[str, Any]
     test_mode: bool
+    vrf: str
+    routing_table: int | None
 
     def __init__(self, test_mode: bool = False) -> None:
         """Initialize object."""
@@ -53,6 +58,8 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods
         self.ignore_irr_changes = False
         self.ignore_peeringdb_changes = False
         self.use_cached = False
+        self.vrf = "default"
+        self.routing_table = None
 
         # Debugging
         self.debug = False

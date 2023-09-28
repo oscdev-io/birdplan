@@ -88,6 +88,8 @@ class ProtocolDirect(SectionProtocolBase):
         self.conf.add(f"protocol direct {protocol_name} {{")
         self.conf.add(f'  description "Direct protocol for IPv{ipv}";')
         self.conf.add("")
+        self.conf.add(f"  vrf {self.birdconfig_globals.vrf};")
+        self.conf.add("")
         self.conf.add(f"  ipv{ipv} {{")
         self.conf.add(f"    table t_{protocol_name};")
         self.conf.add("")
