@@ -516,7 +516,7 @@ bgp:
   peers:
     peer1:
       asn: 65000
-      cost: 5
+      add_paths: on
 ...
 ```
 
