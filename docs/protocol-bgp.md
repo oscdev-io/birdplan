@@ -500,6 +500,8 @@ bgp:
 
 ## add_paths
 
+Supported in: 0.0.3
+
 ADD-PATH is the BGP capability described in RFC5492 which enables the sending/receiving (or both) of multiple paths for the same
 prefix.
 
@@ -516,7 +518,7 @@ bgp:
   peers:
     peer1:
       asn: 65000
-      cost: 5
+      add_paths: on
 ...
 ```
 

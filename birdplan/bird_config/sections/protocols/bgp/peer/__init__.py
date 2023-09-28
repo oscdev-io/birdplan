@@ -2351,7 +2351,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _setup_peer_protocol(self, ipv: str) -> None:
+    def _setup_peer_protocol(self, ipv: str) -> None:  # pylint: disable=too-many-statements
         """Peer protocol setup for a single protocol."""
 
         protocol_state = {
@@ -2365,7 +2365,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         self.conf.add(f"protocol bgp {self.protocol_name(ipv)} {{")
         self.conf.add(f'  description "AS{self.asn} {self.name} - {self.description}";')
-
+        self.conf.add("")
+        self.conf.add(f"  vrf {self.birdconfig_globals.vrf};")
+        self.conf.add("")
         self.conf.add("  local as BGP_ASN;")
         self.conf.add(f"  source address {source_address};")
         self.conf.add("  strict bind;")

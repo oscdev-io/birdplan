@@ -140,7 +140,7 @@ class BirdPlan:
 
         # Check configuration options are supported
         for config_item in self.config:
-            if config_item not in ("router_id", "log_file", "debug", "static", "export_kernel", "bgp", "rip", "ospf"):
+            if config_item not in ("router_id", "kernel", "log_file", "debug", "static", "export_kernel", "bgp", "rip", "ospf"):
                 raise BirdPlanError(f"The config item '{config_item}' is not supported")
 
         # Setup globals we need
@@ -694,6 +694,28 @@ class BirdPlan:
         # Check if we're in debugging mode or not
         if "debug" in self.config:
             self.birdconf.debug = self.config["debug"]
+
+    def _config_kernel(self) -> None:
+        """Configure kernel section."""
+
+        # If we have no rip section, just return
+        if "kernel" not in self.config:
+            return
+
+        # Check configuration options are supported
+        for config_item in self.config["kernel"]:
+            if config_item not in ("vrf", "routing_table"):
+                raise BirdPlanError(f"The 'kernel' config item '{config_item}' is not supported")
+
+        # Check if we have a VRF to use
+        if "vrf" in self.config["kernel"]:
+            self.birdconf.vrf = '"' + self.config["kernel"]["vrf"] + '"'
+            # Make sure we also have a routing talbe
+            if "routing_talbe" not in self.config["kernel"]:
+                raise BirdPlanError("The 'kernel' config item 'vrf' requires that 'routing_table' is also specified")
+
+        if "routing_table" in self.config["kernel"]:
+            self.birdconf.routing_table = self.config["kernel"]["routing_table"]
 
     def _config_static(self) -> None:
         """Configure static section."""

@@ -40,6 +40,11 @@ class ProtocolKernel(SectionProtocolBase):
         self.conf.add(f"protocol kernel kernel{ipv} {{")
         self.conf.add(f'  description "Kernel protocol for IPv{ipv}";')
         self.conf.add("")
+        self.conf.add(f"  vrf {self.birdconfig_globals.vrf};")
+        # If we have a routing table, add it
+        if self.birdconfig_globals.routing_table:
+            self.conf.add(f"  kernel table {self.birdconfig_globals.routing_table};")
+        self.conf.add("")
         self.conf.add("  metric 600; # Set the BIRD metric to be used when creating kernel routes to fall in line with our OS")
         self.conf.add("  learn; # Learn routes from the kernel")
         self.conf.add("  persist; # Dont remove routes on BIRD shutdown")

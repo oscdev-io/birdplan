@@ -175,6 +175,8 @@ class ProtocolRIP(SectionProtocolBase):
             self.conf.add(f"protocol rip ng rip{ipv} {{")
         self.conf.add(f'  description "RIP protocol for IPv{ipv}";')
         self.conf.add("")
+        self.conf.add(f"  vrf {self.birdconfig_globals.vrf};")
+        self.conf.add("")
         self.conf.add(f"  ipv{ipv} {{")
         self.conf.add(f"    table t_rip{ipv};")
         self.conf.add("")

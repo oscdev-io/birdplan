@@ -159,6 +159,8 @@ class ProtocolOSPF(SectionProtocolBase):
         self.conf.add(f"protocol ospf v{protocol_version} ospf{ipv} {{")
         self.conf.add(f'  description "OSPF protocol for IPv{ipv}";')
         self.conf.add("")
+        self.conf.add(f"  vrf {self.birdconfig_globals.vrf};")
+        self.conf.add("")
         self.conf.add(f"  ipv{ipv} {{")
         self.conf.add(f"    table t_ospf{ipv};")
         self.conf.add("")
