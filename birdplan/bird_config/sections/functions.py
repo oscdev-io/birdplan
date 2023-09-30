@@ -287,7 +287,7 @@ class SectionFunctions(SectionBase):
         return """\
             # Match kernel route
             function is_kernel(string filter_name) {
-                if (source = RTS_INHERIT) then return true;
+                if (source = RTS_INHERIT && krt_source != 186) then return true;
                 return false;
             }"""
 
