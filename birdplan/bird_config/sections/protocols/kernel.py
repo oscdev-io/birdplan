@@ -50,6 +50,8 @@ class ProtocolKernel(SectionProtocolBase):
         self.conf.add("  persist; # Dont remove routes on BIRD shutdown")
         self.conf.add("  merge paths on; # Merge similar BGP paths into a multi-hop")
         self.conf.add("")
+        self.conf.add("  netlink rx buffer 16777216; # Ensure our netlink buffer is big enough")
+        self.conf.add("")
         self.conf.add(f"  ipv{ipv} {{")
         self.conf.add(f"    table t_kernel{ipv};")
         self.conf.add("")
