@@ -284,6 +284,7 @@ class SectionFunctions(SectionBase):
     def is_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD is_kernel function."""
 
+        # NK: Below we explicitly exclude krt_source = 186 as we seem to import IPv6 routes into Bird for some reason
         return """\
             # Match kernel route
             function is_kernel(string filter_name) {
