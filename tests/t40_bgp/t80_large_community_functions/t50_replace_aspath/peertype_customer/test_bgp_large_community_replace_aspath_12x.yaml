@@ -1769,13 +1769,12 @@ r3_t_bgp4:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - 100.64.0.100
+      - 100.64.0.1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: 100.64.0.1
     nexthops:
-    - gateway: 100.64.0.100
+    - gateway: 100.64.0.1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -1811,13 +1810,12 @@ r3_t_bgp4:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - 100.64.0.100
+      - 100.64.0.1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: 100.64.0.1
     nexthops:
-    - gateway: 100.64.0.100
+    - gateway: 100.64.0.1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -1854,13 +1852,12 @@ r3_t_bgp4_AS65000_r1_peer:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - 100.64.0.100
+      - 100.64.0.1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: 100.64.0.1
     nexthops:
-    - gateway: 100.64.0.100
+    - gateway: 100.64.0.1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -1896,13 +1893,12 @@ r3_t_bgp4_AS65000_r1_peer:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - 100.64.0.100
+      - 100.64.0.1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: 100.64.0.1
     nexthops:
-    - gateway: 100.64.0.100
+    - gateway: 100.64.0.1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -1939,13 +1935,12 @@ r3_t_bgp6:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - fc00:100::100
+      - fc00:100::1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: fc00:100::1
     nexthops:
-    - gateway: fc00:100::100
+    - gateway: fc00:100::1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -1981,13 +1976,12 @@ r3_t_bgp6:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - fc00:100::100
+      - fc00:100::1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: fc00:100::1
     nexthops:
-    - gateway: fc00:100::100
+    - gateway: fc00:100::1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -2024,13 +2018,12 @@ r3_t_bgp6_AS65000_r1_peer:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - fc00:100::100
+      - fc00:100::1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: fc00:100::1
     nexthops:
-    - gateway: fc00:100::100
+    - gateway: fc00:100::1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -2066,13 +2059,12 @@ r3_t_bgp6_AS65000_r1_peer:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - fc00:100::100
+      - fc00:100::1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: fc00:100::1
     nexthops:
-    - gateway: fc00:100::100
+    - gateway: fc00:100::1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -2896,13 +2888,12 @@ r8_t_bgp4:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - 100.64.0.100
+      - 100.64.0.1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: 100.64.0.1
     nexthops:
-    - gateway: 100.64.0.100
+    - gateway: 100.64.0.1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -2938,13 +2929,12 @@ r8_t_bgp4:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - 100.64.0.100
+      - 100.64.0.1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: 100.64.0.1
     nexthops:
-    - gateway: 100.64.0.100
+    - gateway: 100.64.0.1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -2981,13 +2971,12 @@ r8_t_bgp4_AS65000_r1_peer:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - 100.64.0.100
+      - 100.64.0.1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: 100.64.0.1
     nexthops:
-    - gateway: 100.64.0.100
+    - gateway: 100.64.0.1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -3023,13 +3012,12 @@ r8_t_bgp4_AS65000_r1_peer:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - 100.64.0.100
+      - 100.64.0.1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: 100.64.0.1
     nexthops:
-    - gateway: 100.64.0.100
+    - gateway: 100.64.0.1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -3066,13 +3054,12 @@ r8_t_bgp6:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - fc00:100::100
+      - fc00:100::1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: fc00:100::1
     nexthops:
-    - gateway: fc00:100::100
+    - gateway: fc00:100::1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -3108,13 +3095,12 @@ r8_t_bgp6:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - fc00:100::100
+      - fc00:100::1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: fc00:100::1
     nexthops:
-    - gateway: fc00:100::100
+    - gateway: fc00:100::1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -3151,13 +3137,12 @@ r8_t_bgp6_AS65000_r1_peer:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - fc00:100::100
+      - fc00:100::1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: fc00:100::1
     nexthops:
-    - gateway: fc00:100::100
+    - gateway: fc00:100::1
       interface: eth0
     pref: 100
     prefix_type: unicast
@@ -3193,13 +3178,12 @@ r8_t_bgp6_AS65000_r1_peer:
         - 1
       BGP.local_pref: 750
       BGP.next_hop:
-      - fc00:100::100
+      - fc00:100::1
       BGP.origin: IGP
     bestpath: true
     bgp_type: i
-    from: fc00:100::1
     nexthops:
-    - gateway: fc00:100::100
+    - gateway: fc00:100::1
       interface: eth0
     pref: 100
     prefix_type: unicast
