@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -ex
+
+for i in \
+	tests/{t10_basic,t20_rip,t30_ospf} \
+	$(find ../../tests/t40_bgp -maxdepth 1 -wholename "../../tests/t40_bgp/t*"  | cut -d/ -f 3- | sort) \
+; do
+	echo "======================== TESTING $i ============================="
+	docker-compose run --rm birdplan /root/runtest "$i" "$@"
+done
