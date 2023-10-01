@@ -11,4 +11,4 @@ if [ ${#ARGS[@]} -eq 0 ]; then
 fi
 
 echo "RUNNING: tox -- ${ARGS[@]}"
-nice tox -- ${ARGS[@]}
+nice -n 20 tox -- ${ARGS[@]}

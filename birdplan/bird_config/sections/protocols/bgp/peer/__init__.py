@@ -2351,7 +2351,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _setup_peer_protocol(self, ipv: str) -> None:  # pylint: disable=too-many-statements
+    def _setup_peer_protocol(self, ipv: str) -> None:  # pylint: disable=too-many-statements,too-many-branches
         """Peer protocol setup for a single protocol."""
 
         protocol_state = {
@@ -2404,6 +2404,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Set the nexthop to ourselves for external peers
         if self.peer_type in ("customer", "peer", "transit", "routecollector", "routeserver"):
             self.conf.add("    next hop self;")
+        # Now, if we're peering with a route reflector, or internal server
+        elif self.peer_type in ("rrserver", "internal"):
+            self.conf.add("    next hop self ebgp;")
         # Decide if we're adding all BGP paths
         if self.add_paths:
             self.conf.add(f"    add paths {self.add_paths};")
