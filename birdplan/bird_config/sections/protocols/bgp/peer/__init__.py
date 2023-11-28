@@ -1157,9 +1157,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                             "increased substantially from previous run: "
                             "last=%s, now=%s" % (old_network_count, new_network_count)
                         )
-
                 # All looks good, add them
                 self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv4"])
+
             # Lets work out what to do with the IPv6 prefixes
             if irr_prefixes["ipv6"]:
                 # Sanity checks for IPv6 network count
