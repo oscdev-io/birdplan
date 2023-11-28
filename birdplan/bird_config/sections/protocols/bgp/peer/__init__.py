@@ -1427,10 +1427,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         extra_aspath_asns.append(f"{asn}")
                     if asn not in calculated_aspath_asns:
                         calculated_aspath_asns.append(asn)
-                    aspath_asns.append(
-                        f"# Retrieved {len(extra_aspath_asns)} items from IRR with object '{self.filter_policy.as_sets}'"
-                    )
-                    aspath_asns.extend(extra_aspath_asns)
+                aspath_asns.append(
+                    f"# Retrieved {len(extra_aspath_asns)} items from IRR with object '{self.filter_policy.as_sets}'"
+                )
+                aspath_asns.extend(extra_aspath_asns)
 
         self.conf.add(f"define {self.aspath_asn_list_name} = [")
         # Loop with each line and add commas where needed
