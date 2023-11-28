@@ -657,7 +657,7 @@ bgp:
       asn: 65000
       description: Some peer
       filter:
-        as-set: AS-EXAMPLE
+        as_sets: AS-EXAMPLE
         origin_asns:
           - 65009
         peer_asns:
