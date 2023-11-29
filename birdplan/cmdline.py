@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2021, AllWorldIT
+# Copyright (c) 2019-2023, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,17 +55,19 @@ class BirdPlanArgumentParser(argparse.ArgumentParser):
 class BirdPlanCommandLine:
     """BirdPlan commandline handling class."""
 
+    _is_console: bool
     _args: argparse.Namespace
     _argparser: BirdPlanArgumentParser
     _birdplan: BirdPlan
 
-    def __init__(self, test_mode: bool = False) -> None:
+    def __init__(self, test_mode: bool = False, is_console: bool = False) -> None:
         """Instantiate object."""
 
         prog: Optional[str] = None
         if sys.argv[0].endswith("__main__.py"):
             prog = "python -m birdplan"
 
+        self._is_console = is_console
         self._args = argparse.Namespace()
         self._argparser = BirdPlanArgumentParser(add_help=False, prog=prog)
         self._birdplan = BirdPlan(test_mode=test_mode)
@@ -77,7 +79,7 @@ class BirdPlanCommandLine:
 
         # Don't output copyright when we output in JSON format
         if self.is_console and not self.is_json:
-            print(f"BirdPlan v{__version__} - Copyright © 2019-2021, AllWorldIT.\n", file=sys.stderr)
+            print(f"BirdPlan v{__version__} - Copyright © 2019-2023, AllWorldIT.\n", file=sys.stderr)
 
         # Add main commandline arguments
         optional_group = self.argparser.add_argument_group("Optional arguments")
@@ -233,7 +235,20 @@ class BirdPlanCommandLine:
         bool indicating if we were called from the commandline.
 
         """
-        return __name__ == "__main__"
+        return self._is_console
+
+    @is_console.setter
+    def is_console(self, is_console: bool) -> None:
+        """
+        Set property indicating we're running from a console.
+
+        Parameters
+        ----------
+        is_console : bool
+            Set to True indicating if we were called from the commandline.
+
+        """
+        self._is_console = is_console
 
     @property
     def is_json(self) -> bool:
@@ -254,7 +269,7 @@ class BirdPlanCommandLine:
 # Main entry point from the commandline
 def main() -> None:
     """Entry point function for the commandline."""
-    birdplan_cmdline = BirdPlanCommandLine()
+    birdplan_cmdline = BirdPlanCommandLine(is_console=True)
 
     try:
         birdplan_cmdline.run()

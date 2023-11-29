@@ -6,6 +6,49 @@ Remember to set the `router_id`, see [Configuration](configuration.md).
 
 
 
+## type
+
+The peer type, options are detailed below... this option is mandatory.
+
+* `customer` this is a customer peering session.
+* `internal` this is an internal peering session between routers.
+* `peer` this is a peering partner peering session.
+* `routecollector` this is a route collector session.
+* `routeserver` this is a route server session.
+* `rrclient` this is a route reflector client peering session.
+* `rrserver` this is a route reflector server peering session.
+* `rrserver-rrserver` this is a peering session between two route reflectors or route reflector mirrors.
+* `transit` this is a transit provider peering session.
+
+Below is a configuration example...
+```yaml
+...
+
+bgp:
+  asn: 65000
+  peers:
+    peer1:
+      asn: 65000
+      type: internal
+...
+```
+
+
+
+# asn
+
+Our BGP ASN. This is mandatory.
+
+One can specify the ASN as per below...
+```yaml
+router_id: 0.0.0.1
+
+bgp:
+  asn: 65000
+```
+
+
+
 # accept
 
 The `accept` key contains a dictionary of routes we will accept into the master table from our BGP table. Namely...
@@ -27,26 +70,16 @@ Below is a configuration example...
 ...
 
 bgp:
+  asn: 65000
   peers:
     peer1:
       asn: 65000
+      type: internal
       accept:
         default: True
 ...
 ```
 
-
-# asn
-
-Our BGP ASN. This is mandatory.
-
-One can specify the ASN as per below...
-```yaml
-router_id: 0.0.0.1
-
-bgp:
-  asn: 65000
-```
 
 
 # graceful_shutdown
@@ -67,12 +100,15 @@ An example is however below...
 ...
 
 bgp:
+  asn: 65000
   graceful_shutdown: True
   peers:
     peer1:
       asn: 65000
+      type: internal
 ...
 ```
+
 
 
 # import
@@ -110,6 +146,7 @@ bgp:
 ```
 
 
+
 # originate
 
 Origination of BGP prefixes, generally we set these to `blackhole` to avoid TTL loops.
@@ -125,6 +162,7 @@ bgp:
   originate:
     - '100.101.0.0/24 blackhole'
     - 'fc00:101::/48 blackhole'
+  ...
 ```
 
 Attributes can also be added to originated routes for instance...
@@ -132,7 +170,10 @@ Attributes can also be added to originated routes for instance...
 bird:
   originate:
     - '100.101.0.0/24 blackhole { bgp_large_community.add(65000, 111, 222) }'
+  ...
 ```
+
+
 
 # peertype_constraints
 
@@ -150,6 +191,7 @@ own ASN on eBGP export (ie. the `replace_aspath` is specified).
 * `rrserver`
 * `rrserver-rrserver`
 * `transit`
+
 
 ## Prefix size limits
 
@@ -197,6 +239,7 @@ and `customer.private` which defaults to `64`.
 Minimum IPv6 export prefix length, defaults to `16`
 and `customer.private` which defaults to `32`.
 
+
 ## Blackhole size limits
 
 * `blackhole_import_maxlen4`
@@ -231,12 +274,14 @@ Blackhole maximum IPv6 export prefix length, defaults to `128`.
 
 Blackhole minimum IPv6 export prefix length, defaults to `64`.
 
+
 ## AS-PATH length limits
 
 * `aspath_import_maxlen` - AS-PATH import maximum length, defaults to `100`.
 
 * `aspath_import_minlen` - AS-PATH import minimum length, defaults to `1`
 except for `internal`, `rrclient`, `rrserver`, `rrserver-rrserver` which defaults to `0`.
+
 
 ## Community length limits
 
@@ -269,8 +314,8 @@ One can specify the route reflector cluster ID as per below...
 router_id: 0.0.0.1
 
 bgp:
-...
   rr_cluster_id: 0.0.0.1
+  ...
 ```
 
 
@@ -289,11 +334,14 @@ An example is below...
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
-...
+      type: internal
+  ...
 ```
+
 
 
 ## accept
@@ -316,20 +364,18 @@ The `accept` key contains a dictionary of routes we will accept. Namely...
 * `bgp_transit_default` - Allows us to accept a default route that originated from a transit peer.
   The is `True` for peer type `rrserver-rrserver`.
 
-
-
 Below is a configuration example...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       accept:
         default: True
-...
+  ...
 ```
+
 
 ## blackhole_community
 
@@ -345,38 +391,36 @@ This value of this option can either be:
 
 Below is a configuration example using a normal community...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       blackhole_community: 65000:100
+  ...
 ...
 ```
 
 Below is a configuration example using a large community...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       blackhole_community: 65000:100:100
-...
+  ...
 ```
 
 Below is a configuration example using a boolean...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       blackhole_community: True
-...
+  ...
 ```
 
 
@@ -392,11 +436,12 @@ An example is however below...
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       connect_delay_time: 60
-...
+  ...
 ```
 
 
@@ -412,19 +457,20 @@ An example is however below...
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       connect_retry_time: 60
-...
+  ...
 ```
-
 
 
 ## constraints
 
 This configuration key can be used to override the global peer type constraints.
 All values default to the global setting for the specific peer type (above).
+
 
 ### Normal prefix size limits
 
@@ -437,6 +483,7 @@ All values default to the global setting for the specific peer type (above).
 * `export_maxlen6` - maximum IPv6 export prefix length.
 * `export_minlen6` - minimum IPv6 export prefix length.
 
+
 ### Blackhole prefix size limits
 
 * `blackhole_import_maxlen4` - blackhole maximum IPv4 import prefix length.
@@ -448,10 +495,12 @@ All values default to the global setting for the specific peer type (above).
 * `blackhole_export_maxlen6` - blackhole maximum IPv6 export prefix length.
 * `blackhole_export_minlen6` - blackhole minimum IPv6 export prefix length.
 
+
 ### AS-PATH length limits
 
 * `aspath_import_maxlen` - AS-PATH import maximum length.
 * `aspath_import_minlen` - AS-PATH import minimum length.
+
 
 ### Community length limits
 
@@ -465,15 +514,15 @@ An example of overriding a constraint can be found below...
 ..
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       constraints:
         import_maxlen4: 25
-...
+  ...
 ```
-
 
 
 ## cost
@@ -490,11 +539,12 @@ An example is however below...
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       cost: 5
-...
+  ...
 ```
 
 
@@ -515,11 +565,12 @@ An example is however below...
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       add_paths: on
-...
+  ...
 ```
 
 
@@ -532,11 +583,12 @@ You can specify the description as per below...
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
-...
+  ...
 ```
 
 ## error_wait_time
@@ -550,12 +602,13 @@ An example is however below...
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       error_wait_time: 120, 900
-...
+  ...
 ```
 
 
@@ -595,18 +648,16 @@ Currently only the above two methods of specifying IP ranges are accepted.
 
 The prefix sizes are controlled by the prefix and blackhole length constraints, so one does not need to specify the min and max sizes here.
 
-
 An example is however below...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       filter:
-        as-set: AS-EXAMPLE
+        as_sets: AS-EXAMPLE
         origin_asns:
           - 65009
         peer_asns:
@@ -614,7 +665,7 @@ bgp:
         prefixes:
           - "100.141.0.0/24"
           - "fc00:141::/64"
-...
+  ...
 ```
 
 
@@ -636,11 +687,12 @@ An example is however below...
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       graceful_shutdown: True
-...
+  ...
 ```
 
 
@@ -653,6 +705,7 @@ You can specify the large communities as a list as per below...
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
@@ -660,7 +713,7 @@ bgp:
       incoming_large_communities:
         - 65001:5000:1
         - 65001:5000:2
-...
+  ...
 ```
 
 
@@ -675,6 +728,7 @@ You can specify the peer location using the below configuration...
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
@@ -682,7 +736,7 @@ bgp:
       location:
         unm49: 999
         iso3166: 999
-...
+  ...
 ```
 
 
@@ -699,12 +753,13 @@ You can specify the neighbors address as per below...
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       multihop: 2
-...
+  ...
 ```
 
 
@@ -714,15 +769,14 @@ The peers IPv4 address. This option AND/OR the associated `neighbor6` option is 
 
 You can specify the neighbors address as per below...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       neighbor4: 192.168.0.1
-...
+  ...
 ```
 
 
@@ -732,23 +786,20 @@ The peers IPv6 address. This option AND/OR the associated `neighbor4` option is 
 
 You can specify the neighbors address as per below...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       neighbor6: fc00::1
-...
+  ...
 ```
-
 
 
 ## outgoing_large_communities
 
 This option allows us to set outgoing large communites in two methods listed below.
-
 
 **The first method we can use to specify outbound large communites is just list of communites:**
 
@@ -756,8 +807,8 @@ This will result in `65000:99:98` and `65000:99:99` being added to all outgoing 
 
 An example of this is below...
 ```yaml
-...
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
@@ -765,7 +816,7 @@ bgp:
       outgoing_large_communites:
         - 65000:99:98
         - 65000:99:99
-...
+  ...
 ```
 
 **The second method is we can use a dict to do fine grained adding of communites based on route type:**
@@ -801,8 +852,8 @@ Internal route types...
 
 An example of this is below...
 ```yaml
-...
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
@@ -812,7 +863,7 @@ bgp:
           - 65000:99:98
         bgp_customer:
           - 65000:99:99
-...
+  ...
 ```
 
 
@@ -826,12 +877,13 @@ This defaults to `True` for `customer` and `rrclient` peer types and `False` for
 ...
 
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       passive: True
-...
+  ...
 ```
 
 
@@ -841,15 +893,14 @@ BGP session password. You probably want to add quotes around any non-alphanumeri
 
 An example of using the password option is below...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       password: "test123"
-...
+  ...
 ```
 
 
@@ -859,15 +910,14 @@ IPv4 prefix limit for the peer. This is only supported for peer types `customer`
 
 An example of specifying a prefix limit is below...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       prefix_limit4: 100
-...
+  ...
 ```
 
 
@@ -877,15 +927,14 @@ IPv6 prefix limit for the peer. This is only supported for peer types `customer`
 
 An example of specifying a prefix limit is below...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       prefix_limit6: 100
-...
+  ...
 ```
 
 
@@ -901,14 +950,14 @@ This will result in our own ASN being prepended for the number of times specifie
 
 An example of this is below...
 ```yaml
-...
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       prepend: 2
-...
+  ...
 ```
 
 **The second method is we can use a dict to do fine grained prepending based on route type:**
@@ -943,8 +992,8 @@ Internal route types...
 
 An example of this is below...
 ```yaml
-...
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
@@ -952,7 +1001,7 @@ bgp:
       prepend:
         static: 2
         bgp_customer: 2
-...
+  ...
 ```
 
 
@@ -962,14 +1011,14 @@ Quarantine all the peer routes by filtering them out and blocking transversal in
 
 An example of quarantining a peer can be found below...
 ```yaml
-...
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Bad peer
       quarantine: True
-...
+  ...
 ```
 
 
@@ -1022,9 +1071,8 @@ BGP default route redistribution...
 
 An example of using redistribute can be found below...
 ```yaml
-...
-
 bgp:
+  ...
   originate:
     - '100.101.0.0/24 blackhole'
     - 'fc00:101::/48 blackhole'
@@ -1034,7 +1082,7 @@ bgp:
       description: Some peer
       redistribute:
         originated: True
-...
+  ...
 ```
 
 
@@ -1053,15 +1101,14 @@ Using this option will set the `constraints` profile to `customer.private` and a
 
 An example is below...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       replace_aspath: True
-...
+  ...
 ```
 
 
@@ -1071,15 +1118,14 @@ The source IPv4 address we'll be using to connect to this peer.
 
 You can specify the source address as per below...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       source_address4: 192.168.0.2
-...
+  ...
 ```
 
 ## source_address6
@@ -1088,28 +1134,12 @@ The source IPv6 address we'll be using to connect to this peer.
 
 You can specify the source address as per below...
 ```yaml
-...
-
 bgp:
+  ...
   peers:
     peer1:
       asn: 65000
       description: Some peer
       source_address6: fc00::2
-...
+  ...
 ```
-
-
-## type
-
-The peer type, options are detailed below...
-
-* `customer` this is a customer peering session.
-* `internal` this is an internal peering session between routers.
-* `peer` this is a peering partner peering session.
-* `routecollector` this is a route collector session.
-* `routeserver` this is a route server session.
-* `rrclient` this is a route reflector client peering session.
-* `rrserver` this is a route reflector server peering session.
-* `rrserver-rrserver` this is a peering session between two route reflectors or route reflector mirrors.
-* `transit` this is a transit provider peering session.
