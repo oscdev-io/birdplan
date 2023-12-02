@@ -856,6 +856,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                             f"Option 'blackhole_community' specified for peer '{self.name}' with type '{self.peer_type}' "
                             f"has an invalid value '{community}'"
                         )
+                    # NK: make linting happy
+                    if not isinstance(self.blackhole_community, list):
+                        pass
                     # Add to our configuration
                     self.blackhole_community.append(util.sanitize_community(community))
 
