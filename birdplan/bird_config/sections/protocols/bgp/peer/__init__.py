@@ -1397,13 +1397,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.filter_policy.aspath_asns:
             # Store static filter info in our state
             state["static"] = self.filter_policy.aspath_asns
+
+            extra_aspath_asns = []
             # Loop with ASNs specified in configuration
             for asn in self.filter_policy.aspath_asns:
-                if asn not in aspath_asns:
-                    aspath_asns.append(f"{asn}")
+                if asn not in aspath_asns and asn not in extra_aspath_asns:
+                    extra_aspath_asns.append(f"{asn}")
                 if asn not in calculated_aspath_asns:
                     calculated_aspath_asns.append(asn)
-            aspath_asns.insert(0, f"# Explicitly defined {len(aspath_asns)} items")
+            aspath_asns.insert(0, f"# Explicitly defined {len(extra_aspath_asns)} items (aspath_asns)")
+            aspath_asns.extend(extra_aspath_asns)
 
         # If we're a "customer" or "peer", pull in the origin_asns and irr_asns lists
         if self.peer_type in ("customer", "peer"):
@@ -1418,7 +1421,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     if asn not in calculated_aspath_asns:
                         calculated_aspath_asns.append(asn)
                 # If we're a "customer" or "peer", pull in the origin_asns into our aspath_asns list
-                aspath_asns.append(f"# Explicitly defined {len(extra_aspath_asns)} items")
+                aspath_asns.append(f"# Explicitly defined {len(extra_aspath_asns)} items (origin_asns)")
                 aspath_asns.extend(extra_aspath_asns)
 
             # Check if we got results, if so add the IRR ASNs to the aspath_asns list
@@ -1468,21 +1471,23 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.filter_policy.origin_asns:
             # Store filter info in our state
             state["static"] = self.filter_policy.origin_asns
-            # Loop with ASNs specified in configuration
+
             extra_origin_asns = []
+            # Loop with ASNs specified in configuration
             for asn in self.filter_policy.origin_asns:
                 # Make sure we don't add duplicates
                 if asn not in origin_asns and asn not in extra_origin_asns:
                     extra_origin_asns.append(f"{asn}")
-            origin_asns.append(f"# Explicitly defined {len(extra_origin_asns)} items")
+            origin_asns.append(f"# Explicitly defined {len(extra_origin_asns)} items (origin_asns)")
             origin_asns.extend(extra_origin_asns)
 
         # Grab IRR ASNs
         if self.filter_policy.origin_asns_irr:
             # Store filter info in our state
             state["irr"] = self.filter_policy.origin_asns_irr
-            # Loop with ASNs retrieved from IRR records
+
             extra_origin_asns = []
+            # Loop with ASNs retrieved from IRR records
             for asn in self.filter_policy.origin_asns_irr:
                 if asn not in origin_asns and asn not in extra_origin_asns:
                     extra_origin_asns.append(f"{asn}")
