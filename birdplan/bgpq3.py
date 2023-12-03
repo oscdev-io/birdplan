@@ -149,7 +149,7 @@ class BGPQ3:
         """Run bgpq3."""
 
         # Run the IP tool with JSON output
-        cmd_args = ["/usr/bin/bgpq3", "-h", self.server, "-j"]
+        cmd_args = ["bgpq3", "-h", self.server, "-j"]
         # Add our args
         cmd_args.extend(args)
 
