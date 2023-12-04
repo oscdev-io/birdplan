@@ -21,6 +21,7 @@
 import argparse
 from typing import Any, Dict
 
+from ......cmdline import BirdPlanCommandLine
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
@@ -92,7 +93,7 @@ class BirdplanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
         if not self._subparser:
             raise RuntimeError()
 
-        cmdline = args["cmdline"]
+        cmdline: BirdPlanCommandLine = args["cmdline"]
 
         # Grab peer name
         peer = cmdline.args.peer[0]
@@ -102,8 +103,8 @@ class BirdplanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
             raise BirdPlanErrorUsage("BGP peer quarantine override flag value must be 'true' or 'false'", self._subparser)
         value = cmdline.args.value[0] == "true"
 
-        # Load BirdPlan configuration
-        cmdline.birdplan_load_config()
+        # Load BirdPlan configuration using the cache
+        cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
         # Try set quarantine flag
         cmdline.birdplan.state_bgp_peer_quarantine_set(peer, value)
