@@ -7,10 +7,10 @@ cd /root/birdplan
 
 ARGS=("$@")
 if [ ${#ARGS[@]} -eq 0 ]; then
-    cpus=$(nprocs)
+    cpus=$(nproc)
     jobcount=$((cpus / 2))
-    ARGS=(--numprocesses=$jobcount --dist=loadfile)
+    ARGS=(--numprocesses="$jobcount" --dist=loadfile)
 fi
 
-echo "RUNNING: tox -- ${ARGS[@]}"
-nice -n 20 tox -- ${ARGS[@]}
+echo "RUNNING: tox -- ${ARGS[*]}"
+nice -n 20 tox -- "${ARGS[@]}"
