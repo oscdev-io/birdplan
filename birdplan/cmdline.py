@@ -176,19 +176,23 @@ class BirdPlanCommandLine:
 
         """
 
+        # Set the state file
+        state_file: Optional[str] = None
+        if self.args.birdplan_state_file[0]:
+            state_file = self.args.birdplan_state_file[0]
+        else:
+            state_file = BIRDPLAN_STATE_FILE
+
         # Try load configuration
         self.birdplan.load(
             plan_file=self.args.birdplan_file[0],
-            state_file=self.args.birdplan_state_file[0],
+            state_file=state_file,
             **kwargs,
         )
 
     def birdplan_commit_state(self) -> None:
         """Commit BirdPlan state."""
 
-        # If we didn't get a state file specified, then just display a notice we're not going to write it out
-        if not self.args.birdplan_state_file[0]:
-            return
         # Check if we need to skip writing the state
         if self.args.no_write_state:
             return
