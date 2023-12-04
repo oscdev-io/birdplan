@@ -21,6 +21,7 @@
 import argparse
 from typing import Any, Dict
 
+from ......cmdline import BirdPlanCommandLine
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
@@ -87,12 +88,12 @@ class BirdplanCmdlineBGPPeerGracefulShutdownRemove(BirdPlanCmdlinePluginBase):
         if not self._subparser:
             raise RuntimeError()
 
-        cmdline = args["cmdline"]
+        cmdline: BirdPlanCommandLine = args["cmdline"]
 
         peer = cmdline.args.peer[0]
 
-        # Load BirdPlan configuration
-        cmdline.birdplan_load_config()
+        # Load BirdPlan configuration using the cache
+        cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
         # Try remove graceful shutdown override flag
         cmdline.birdplan.state_bgp_peer_graceful_shutdown_remove(peer)

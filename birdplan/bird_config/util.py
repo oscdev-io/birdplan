@@ -53,11 +53,11 @@ def network_count(ip_networks: List[str]) -> int:
         ipnetwork = ipaddress.ip_network(prefix)
         # Check which IP version this is
         if ipnetwork.version == 4:
-            # Split on /24 for IPv4
-            prefix_count = len(list(ipnetwork.subnets(new_prefix=24)))
+            # Count how many /24's there are in the ipnetwork
+            prefix_count = ipnetwork.num_addresses >> 8
         else:
-            # Split on /48 for IPv6
-            prefix_count = len(list(ipnetwork.subnets(new_prefix=48)))
+            # Count approximate number of /48's there are in the ipnetwork
+            prefix_count = ipnetwork.num_addresses >> 80
         # Add to counter
         count += prefix_count
 

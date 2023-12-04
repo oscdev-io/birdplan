@@ -21,6 +21,7 @@
 import argparse
 from typing import Any, Dict
 
+from ......cmdline import BirdPlanCommandLine
 from ......console.colors import colored
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
@@ -80,10 +81,10 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
         if not self._subparser:
             raise RuntimeError()
 
-        cmdline = args["cmdline"]
+        cmdline: BirdPlanCommandLine = args["cmdline"]
 
-        # Load BirdPlan configuration
-        cmdline.birdplan_load_config(use_cached=True)
+        # Load BirdPlan configuration using the cache
+        cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
         # Grab peer list
         return cmdline.birdplan.state_bgp_peer_graceful_shutdown_status()
