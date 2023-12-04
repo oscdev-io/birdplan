@@ -120,10 +120,10 @@ class BirdPlan:
             self.state_file = state_file
 
             # Check if the state file exists...
-            if os.path.isfile(self.state_file):
+            if os.path.isfile(state_file):
                 # Read in state file
                 try:
-                    with open(self.state_file, "r", encoding="UTF-8") as file:
+                    with open(state_file, "r", encoding="UTF-8") as file:
                         raw_state = file.read()
                 except OSError as err:
                     raise BirdPlanError(f"Failed to read BirdPlan state file '{state_file}': {err}") from None
