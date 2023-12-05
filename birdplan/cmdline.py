@@ -19,13 +19,15 @@
 """Birdplan commandline interface."""
 
 import argparse
+import copy
 import json
 import logging
 import logging.handlers
 import sys
-from typing import Any, List, NoReturn, Optional
+from typing import Any, Callable, List, Literal, NoReturn, Optional
 
 from . import BirdPlan
+from .console.colors import colored
 from .exceptions import BirdPlanError, BirdPlanErrorUsage
 from .plugin import PluginCollection
 from .version import __version__
@@ -34,6 +36,74 @@ from .version import __version__
 BIRDPLAN_FILE = "/etc/birdplan/birdplan.yaml"
 BIRD_CONFIG_FILE = "/etc/bird.conf"
 BIRDPLAN_STATE_FILE = "/var/lib/birdplan/birdplan.state"
+
+
+TRACE_LOG_LEVEL = 5
+
+
+class ColorFormatter(logging.Formatter):
+    """
+    A custom log formatter class that.
+
+    It currently...
+    * Outputs the LOG_LEVEL with an appropriate color.
+    * If a log call includes an `extras={"color_message": ...}` it will be used for formatting the output, instead of the plain
+    text message.
+    """
+
+    level_name_colors: dict[int, Callable[[str], str]] = {
+        TRACE_LOG_LEVEL: lambda level_name: colored(str(level_name), "blue"),
+        logging.DEBUG: lambda level_name: ccolored(str(level_name), "cyan"),
+        logging.INFO: lambda level_name: colorede(str(level_name), "green"),
+        logging.WARNING: lambda level_name: colored(str(level_name), "yellow"),
+        logging.ERROR: lambda level_name: colored(str(level_name), "red"),
+        logging.CRITICAL: lambda level_name: colored(str(level_name), "bright_red"),
+    }
+
+    def __init__(
+        self,
+        fmt: str | None = None,
+        datefmt: str | None = None,
+        style: Literal["%", "{", "$"] = "%",
+        use_colors: bool | None = None,
+    ):
+        if isinstance(use_colors, bool):
+            self.use_colors = use_colors
+        else:
+            self.use_colors = sys.stdout.isatty()
+        super().__init__(fmt=fmt, datefmt=datefmt, style=style)
+
+    def color_level_name(self, level_name: str, level_no: int) -> str:
+        """Get colored level name from level_no."""
+
+        def default(level_name: str) -> str:
+            return str(level_name)  # pragma: no cover
+
+        func = self.level_name_colors.get(level_no, default)
+        return func(level_name)
+
+    def should_use_colors(self) -> bool:  # pylint: disable=R6301
+        """Return if we should use colors or not."""
+        return True  # pragma: no cover
+
+    def formatMessage(self, record: logging.LogRecord) -> str:  # noqa: N802
+        # Copy record
+        recordcopy = copy.copy(record)
+        # Grab level name
+        levelname = recordcopy.levelname
+        # Add padding before color control codes
+        seperator = " " * (8 - len(recordcopy.levelname))
+        # Check if we're using color or not
+        if self.use_colors:
+            # If we are get the levelname in color
+            levelname = self.color_level_name(levelname, recordcopy.levelno)
+            # If a color_message is present, use it instead
+            if "color_message" in recordcopy.__dict__:
+                recordcopy.msg = recordcopy.__dict__["color_message"]
+                recordcopy.__dict__["message"] = recordcopy.getMessage()
+        # Set the record levelcolor
+        recordcopy.__dict__["levelcolor"] = levelname + seperator
+        return super().formatMessage(recordcopy)
 
 
 class BirdPlanArgumentParser(argparse.ArgumentParser):
@@ -131,7 +201,7 @@ class BirdPlanCommandLine:
         self._args = self.argparser.parse_args(raw_args)
 
         # Setup logging
-        if __name__ == "__main__":
+        if self.is_console:
             self._setup_logging()
 
         # Make sure we have an action
@@ -208,10 +278,15 @@ class BirdPlanCommandLine:
             logger.setLevel(logging.DEBUG)
         else:
             logger.setLevel(logging.INFO)
+
+        # Remove all existing handlers
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
+
         # Setup console handler
         console_handler = logging.StreamHandler()
         # Use a better format for messages
-        console_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)-8s %(message)s"))
+        console_handler.setFormatter(ColorFormatter("%(asctime)s %(levelcolor)s %(message)s", "[%Y-%m-%d %H:%M:%S]"))
         logger.addHandler(console_handler)
 
     @property
