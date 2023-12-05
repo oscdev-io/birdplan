@@ -1247,6 +1247,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Save basic peer information
         self.state["asn"] = self.asn
         self.state["description"] = self.description
+        self.state["type"] = self.peer_type
 
         # Check for some config options we also need to save
         if self.prefix_limit4:
