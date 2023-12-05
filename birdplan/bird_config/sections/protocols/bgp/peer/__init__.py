@@ -2387,6 +2387,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Get our source and neighbor addresses
         source_address = getattr(self, f"source_address{ipv}")
         neighbor = getattr(self, f"neighbor{ipv}")
+        # Save IP address info
+        protocol_state["source_address"] = source_address
+        protocol_state["neighbor"] = neighbor
 
         self.conf.add(f"protocol bgp {self.protocol_name(ipv)} {{")
         self.conf.add(f'  description "AS{self.asn} {self.name} - {self.description}";')
