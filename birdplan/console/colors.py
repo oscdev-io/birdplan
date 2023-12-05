@@ -18,7 +18,7 @@
 
 """Commandline colors."""
 
-import colorama
+import click
 
 
 def colored(text: str, color: str) -> str:
@@ -35,11 +35,4 @@ def colored(text: str, color: str) -> str:
 
     """
 
-    # Check if we can grab the color control sequence
-    color_ctrl = getattr(colorama.Fore, color.upper(), None)
-    # If not throw an error
-    if not color_ctrl:
-        raise RuntimeError(f"No color exists '{color}'")
-
-    # Return the colored text with a reset
-    return f"{color_ctrl}{text}{colorama.Style.RESET_ALL}"
+    return click.style(text, fg=color)
