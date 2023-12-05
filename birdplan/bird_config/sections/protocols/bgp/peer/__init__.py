@@ -2446,6 +2446,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         prefix_limit = getattr(self, f"prefix_limit{ipv}")
         if prefix_limit:
             self.conf.add(f"    import limit {prefix_limit} action restart;")
+            protocol_state["prefix_limit"] = prefix_limit
         # Setup filters
         self.conf.add(f"    import filter {self.filter_name_import};")
         self.conf.add(f"    export filter {self.filter_name_export};")
