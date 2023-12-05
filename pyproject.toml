@@ -28,7 +28,7 @@ dependencies = [
 # NK: Add these back after development
     "birdclient @ git+https://gitlab.oscdev.io/software/birdclient.git@master",
     "nsnetsim @ git+https://gitlab.oscdev.io/software/nsnetsim.git@master",
-    "colorama",
+    "click",
     "jinja2",
     "pyyaml",
     "requests",

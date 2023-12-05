@@ -53,8 +53,8 @@ class ColorFormatter(logging.Formatter):
 
     level_name_colors: dict[int, Callable[[str], str]] = {
         TRACE_LOG_LEVEL: lambda level_name: colored(str(level_name), "blue"),
-        logging.DEBUG: lambda level_name: ccolored(str(level_name), "cyan"),
-        logging.INFO: lambda level_name: colorede(str(level_name), "green"),
+        logging.DEBUG: lambda level_name: colored(str(level_name), "cyan"),
+        logging.INFO: lambda level_name: colored(str(level_name), "green"),
         logging.WARNING: lambda level_name: colored(str(level_name), "yellow"),
         logging.ERROR: lambda level_name: colored(str(level_name), "red"),
         logging.CRITICAL: lambda level_name: colored(str(level_name), "bright_red"),
@@ -284,7 +284,7 @@ class BirdPlanCommandLine:
             logger.removeHandler(handler)
 
         # Setup console handler
-        console_handler = logging.StreamHandler()
+        console_handler = logging.StreamHandler(sys.stderr)
         # Use a better format for messages
         console_handler.setFormatter(ColorFormatter("%(asctime)s %(levelcolor)s %(message)s", "[%Y-%m-%d %H:%M:%S]"))
         logger.addHandler(console_handler)

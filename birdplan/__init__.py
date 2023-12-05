@@ -20,6 +20,7 @@
 
 # pylint: disable=too-many-lines
 
+import logging
 import os
 import re
 from typing import Any, Dict, List, Optional, Union
@@ -28,6 +29,7 @@ import jinja2
 import yaml
 
 from .bird_config import BirdConfig
+from .console.colors import colored
 from .exceptions import BirdPlanError
 from .version import __version__
 
@@ -1257,12 +1259,25 @@ class BirdPlan:
             return
 
         # Loop with peer ASN and config
+        peer_count = len(self.config["bgp"]["peers"])
+        peer_cur: int = 1
         for peer_name, peer_config in self.config["bgp"]["peers"].items():
             # Make sure peer name is valid
             if not re.match(r"^[a-z0-9]+$", peer_name):
                 raise BirdPlanError(f"The peer name '{peer_name}' specified in 'bgp:peers' is not valid, use [a-z0-9]")
+
+            # Log completion
+            if not self.birdconf.birdconfig_globals.suppress_info:
+                percentage_complete = (peer_cur / peer_count) * 100
+                logging.info(
+                    colored("Processing BGP peer %s/%s (%.2f%%): %s", "blue"), peer_cur, peer_count, percentage_complete, peer_name
+                )
+
             # Configure peer
             self._config_bgp_peers_peer(peer_name, peer_config)
+
+            # Bump current peer
+            peer_cur += 1
 
     def _config_bgp_peers_peer(  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-locals,too-many-statements
         self, peer_name: str, peer_config: Dict[str, Any]

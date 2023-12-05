@@ -26,6 +26,7 @@ import re
 from typing import Any, Dict, List, Optional, Union
 
 from ......bgpq3 import BGPQ3
+from ......console.colors import colored
 from ......exceptions import BirdPlanError
 from ......peeringdb import PeeringDB
 from ..... import util
@@ -963,7 +964,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
             # Check if we're using cached values or not
             if self.birdconfig_globals.use_cached:
-                logging.info("[bgp:peer:%s] Using cached PeeringDB information for prefix limits", self.name)
+                if not self.birdconfig_globals.suppress_info:
+                    logging.info("[bgp:peer:%s] Using cached PeeringDB information for prefix limits", self.name)
                 # Check if we're pulling the IPv4 limits out our cache
                 if self.prefix_limit4 == "peeringdb":
                     if not (
@@ -993,7 +995,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     # Pull entry from cache
                     peeringdb_info["info_prefixes6"] = self.prev_state["prefix_limit"]["peeringdb"]["ipv6"]
             else:
-                logging.info("[bgp:peer:%s] Retrieving prefix limits from PeeringDB", self.name)
+                if not self.birdconfig_globals.suppress_info:
+                    logging.info("[bgp:peer:%s] Retrieving prefix limits from PeeringDB", self.name)
 
                 # Grab PeeringDB entries
                 peeringdb = PeeringDB()
@@ -1075,7 +1078,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
             # Check if we're using cached values or not
             if self.birdconfig_globals.use_cached:
-                logging.info("[bgp:peer:%s] Using cached IRR information for AS-SETs", self.name)
+                if not self.birdconfig_globals.suppress_info:
+                    logging.info("[bgp:peer:%s] Using cached IRR information for AS-SETs", self.name)
 
                 # Grab IRR ASNs from previous state
                 if not (
@@ -1119,7 +1123,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 irr_prefixes["ipv6"] = self.prev_state["filter"]["prefixes"]["irr"]["ipv6"]
 
             else:
-                logging.info("[bgp:peer:%s] Retrieving IRR information for AS-SETs", self.name)
+                if not self.birdconfig_globals.suppress_info:
+                    logging.info("[bgp:peer:%s] Retrieving IRR information for AS-SETs", self.name)
 
                 # Grab BGPQ3 object to use below
                 bgpq3 = BGPQ3()
@@ -1234,7 +1239,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def configure(self) -> None:  # pylint: disable=too-many-branches
         """Configure BGP peer."""
 
-        logging.info("[bgp:peer:%s] Configuring peer: asn=%s, type=%s", self.name, self.asn, self.peer_type)
+        if not self.birdconfig_globals.suppress_info:
+            logging.info(colored("[bgp:peer:%s] Configuring peer: asn=%s, type=%s", "blue"), self.name, self.asn, self.peer_type)
 
         super().configure()
 

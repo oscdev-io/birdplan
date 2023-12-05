@@ -93,6 +93,9 @@ class BirdplanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
         # Grab the peer
         peer = cmdline.args.peer[0]
 
+        # Suppress info output
+        cmdline.birdplan.birdconf.birdconfig_globals.suppress_info = True
+
         # Load BirdPlan configuration using the cache
         cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 

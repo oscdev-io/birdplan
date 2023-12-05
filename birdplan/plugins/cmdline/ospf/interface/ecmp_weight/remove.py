@@ -21,6 +21,7 @@
 import argparse
 from typing import Any, Dict
 
+from ......cmdline import BirdPlanCommandLine
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 
@@ -91,14 +92,17 @@ class BirdplanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
         if not self._subparser:
             raise RuntimeError()
 
-        cmdline = args["cmdline"]
+        cmdline: BirdPlanCommandLine = args["cmdline"]
 
         # Grab args
         area = cmdline.args.area[0]
         interface = cmdline.args.interface[0]
 
-        # Load BirdPlan configuration
-        cmdline.birdplan_load_config()
+        # Suppress info output
+        cmdline.birdplan.birdconf.birdconfig_globals.suppress_info = True
+
+        # Load BirdPlan configuration using the cache
+        cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
         # Check if we're on the console
         cmdline.birdplan.state_ospf_remove_interface_ecmp_weight(area, interface)
