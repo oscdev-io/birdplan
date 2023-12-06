@@ -1248,6 +1248,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.state["asn"] = self.asn
         self.state["description"] = self.description
         self.state["type"] = self.peer_type
+        
+        self.state["filter"] = {}
+        self.state["filter"]["as_sets"] = self.filter_policy.as_sets
 
         # Check for some config options we also need to save
         if self.prefix_limit4:
