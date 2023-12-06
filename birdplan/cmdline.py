@@ -103,7 +103,7 @@ class ColorFormatter(logging.Formatter):
 
     def formatMessage(self, record: logging.LogRecord) -> str:  # noqa: N802
         """Format a message from a record."""
-        
+
         # Copy record
         recordcopy = copy.copy(record)
         # Grab level name
