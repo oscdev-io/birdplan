@@ -67,6 +67,21 @@ class ColorFormatter(logging.Formatter):
         style: Literal["%", "{", "$"] = "%",
         use_colors: bool | None = None,
     ):
+        """
+        Color log formatter class.
+
+        Arguments
+        ---------
+        fmt : str
+            Format string.
+        datefmt : str
+            Date format string.
+        style : str
+            Format style.
+        use_colors : bool
+            Use colors or not.
+        """
+
         if isinstance(use_colors, bool):
             self.use_colors = use_colors
         else:
@@ -87,6 +102,8 @@ class ColorFormatter(logging.Formatter):
         return True  # pragma: no cover
 
     def formatMessage(self, record: logging.LogRecord) -> str:  # noqa: N802
+        """Format a message from a record."""
+        
         # Copy record
         recordcopy = copy.copy(record)
         # Grab level name
