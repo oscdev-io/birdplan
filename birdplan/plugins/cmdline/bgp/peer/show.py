@@ -193,9 +193,11 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
 
             # NK - Update in peer_arg show too
             # Check how we're going to color entries based on their state and info
-            if protocol_status["state"] == "start":
-                state = colored(protocol_status["state"], "orange")
-            elif protocol_status["state"] == "up":
+            if protocol_status["state"] == "down":
+                state = colored(protocol_status["state"], "red")
+                if "last_error" in protocol_status:
+                    info += " - " + colored(protocol_status["last_error"], "red")
+            elif protocol_status["state"] == "up":  # noqa: SIM102
                 if protocol_status["info"] == "established":
                     state = colored(protocol_status["state"], "green")
                     info = colored(protocol_status["info"], "green")
@@ -215,18 +217,20 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
                 if "peeringdb" in data["prefix_limit"]:
                     if protocol in data["prefix_limit"]["peeringdb"]:
                         prefix_limit_str = " from PeeringDB"
-                elif "static" in data["prefix_limit"]:
+                elif "static" in data["prefix_limit"]:  # noqa: SIM102
                     if protocol in data["prefix_limit"]["static"]:
                         prefix_limit_str = " manual"
-
-            routes_imported = protocol_status["routes_imported"]
-            routes_exported = protocol_status["routes_exported"]
 
             print(f"    Mode..............: {protocol_data['mode']}")
             print(f"    State.............: {state} ({info}) since {protocol_status['since']}")
             print(f"    Local AS..........: {protocol_status['local_as']}")
-            print(f"    Source IP.........: {protocol_status['source_address']}")
-            print(f"    Neighbor ID.......: {protocol_status['neighbor_id']}")
+
+            # Work out our source address, depending if peer is up or not
+            source_address = protocol_status.get("source_address", protocol_data["source_address"])
+            print(f"    Source IP.........: {source_address}")
+
+            if "neighbor_id" in protocol_status:
+                print(f"    Neighbor ID.......: {protocol_status['neighbor_id']}")
             print(f"    Neighbor AS.......: {protocol_status['neighbor_as']}")
 
             # Check if we have an import limit
@@ -238,7 +242,13 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
                 print("    Import limit......: none")
 
             print(f"    Prefix filters....: {prefix_filters}")
-            print(f"    Prefixes..........: {routes_imported} imported, {routes_exported} exported")
+
+            # Check if we have route information
+            if "routes_imported" in protocol_status and "routes_exported" in protocol_status:
+                routes_imported = protocol_status["routes_imported"]
+                routes_exported = protocol_status["routes_exported"]
+                print(f"    Prefixes..........: {routes_imported} imported, {routes_exported} exported")
+
             print(f"    Quarantined.......: {quarantined}")
             print(f"    Graceful shutdown.: {graceful_shutdown}")
 

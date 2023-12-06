@@ -117,9 +117,11 @@ class BirdplanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
 
                 # NK - Update in peer_arg show too
                 # Check how we're going to color entries based on their state and info
-                if protocol_status["state"] == "start":
-                    state = colored(protocol_status["state"], "orange")
-                elif protocol_status["state"] == "up":
+                if protocol_status["state"] == "down":
+                    state = colored(protocol_status["state"], "red")
+                    if "info_extra" in protocol_status:
+                        info += " - " + colored(protocol_status["info_extra"], "red")
+                elif protocol_status["state"] == "up":  # noqa: SIM102
                     if protocol_status["info"] == "established":
                         state = colored(protocol_status["state"], "green")
                         info = colored(protocol_status["info"], "green")
