@@ -1236,7 +1236,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     if fnmatch.fnmatch(self.name, item):
                         self.quarantine = self.birdconfig_globals.state["bgp"]["+quarantine"][item]
 
-    def configure(self) -> None:  # pylint: disable=too-many-branches
+    def configure(self) -> None:  # pylint: disable=too-many-branches,too-many-statements
         """Configure BGP peer."""
 
         if not self.birdconfig_globals.suppress_info:

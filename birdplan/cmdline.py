@@ -97,7 +97,7 @@ class ColorFormatter(logging.Formatter):
         func = self.level_name_colors.get(level_no, default)
         return func(level_name)
 
-    def should_use_colors(self) -> bool:  # pylint: disable=R6301
+    def should_use_colors(self) -> bool:
         """Return if we should use colors or not."""
         return True  # pragma: no cover
 

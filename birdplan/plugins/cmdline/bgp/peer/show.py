@@ -106,7 +106,9 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
         # Try grab peer info
         return cmdline.birdplan.state_bgp_peer_show(peer)
 
-    def show_output_text(self, data: BirdPlanBGPPeerShow) -> None:
+    def show_output_text(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+        self, data: BirdPlanBGPPeerShow
+    ) -> None:
         """
         Show command output in text.
 
@@ -168,14 +170,14 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
 
             # Check for prefix filters
             prefix_filters = "none"
-            if "filter" in data:
+            if "filter" in data:  # noqa: SIM102
                 if "prefixes" in data["filter"]:
                     prefix_filter_strs = []
-                    if "irr" in data["filter"]["prefixes"]:
+                    if "irr" in data["filter"]["prefixes"]:  # noqa: SIM102
                         if protocol in data["filter"]["prefixes"]["irr"]:
                             count = len(data["filter"]["prefixes"]["irr"][protocol])
                             prefix_filter_strs.append(f"{count} from IRR")
-                    if "static" in data["filter"]["prefixes"]:
+                    if "static" in data["filter"]["prefixes"]:  # noqa: SIM102
                         if protocol in data["filter"]["prefixes"]["static"]:
                             count = len(data["filter"]["prefixes"]["static"][protocol])
                             prefix_filter_strs.append(f"{count} manual")

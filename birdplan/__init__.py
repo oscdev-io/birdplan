@@ -274,7 +274,7 @@ class BirdPlan:
                 },
             }
 
-        """
+        """  # noqa: RST201,RST203,RST301
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
