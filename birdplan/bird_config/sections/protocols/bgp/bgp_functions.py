@@ -42,7 +42,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Accept bgp routes
-            function bgp_accept_bgp(string filter_name) {{
+            function bgp_accept_bgp(string filter_name) -> bool {{
                 if (
                     !{self.functions.is_bgp()} ||
                     {self.is_blackhole()} ||
@@ -60,7 +60,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Accept customer blackhole routes
-            function bgp_accept_customer_blackhole(string filter_name) {{
+            function bgp_accept_customer_blackhole(string filter_name) -> bool {{
                 if (
                     !{self.functions.is_bgp()} ||
                     !{self.is_blackhole()} ||
@@ -78,7 +78,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Accept own blackhole routes
-            function bgp_accept_own_blackhole(string filter_name) {{
+            function bgp_accept_own_blackhole(string filter_name) -> bool {{
                 if (
                     !{self.functions.is_bgp()} ||
                     !{self.is_blackhole()} ||
@@ -96,7 +96,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Accept BGP default routes
-            function bgp_accept_bgp_own_default(string filter_name) {{
+            function bgp_accept_bgp_own_default(string filter_name) -> bool {{
                 if (
                     !{self.functions.is_bgp()} ||
                     !{self.is_bgp_own()} ||
@@ -114,7 +114,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Accept BGP default routes
-            function bgp_accept_bgp_transit_default(string filter_name) {{
+            function bgp_accept_bgp_transit_default(string filter_name) -> bool {{
                 if (
                     !{self.functions.is_bgp()} ||
                     !{self.is_bgp_transit()} ||
@@ -132,7 +132,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Accept originated routes
-            function bgp_accept_originated(string filter_name) {{
+            function bgp_accept_originated(string filter_name) -> bool {{
                 if (!{self.is_originated()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_accept_originated] Accepting originated route ", {self.functions.route_info()};
@@ -145,7 +145,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Accept originated default routes
-            function bgp_accept_originated_default(string filter_name) {{
+            function bgp_accept_originated_default(string filter_name) -> bool {{
                 if (!{self.is_originated()} || {self.is_blackhole()} || !{self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_accept_originated_default] Accepting originated default route ", {self.functions.route_info()};
@@ -158,7 +158,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return """\
             # Check if this is an connected route
-            function bgp_is_connected(string filter_name) {
+            function bgp_is_connected(string filter_name) -> bool {
                 if (proto = "direct4_bgp" || proto = "direct6_bgp") then return true;
                 return false;
             }"""
@@ -169,7 +169,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return """\
             # Check if this is an originated route
-            function bgp_is_originated(string filter_name) {
+            function bgp_is_originated(string filter_name) -> bool {
                 if (proto = "bgp_originate4" || proto = "bgp_originate6") then return true;
                 return false;
             }"""
@@ -180,7 +180,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return """\
             # Check if this is a route that originated from a customer
-            function bgp_is_bgp_customer(string filter_name) {
+            function bgp_is_bgp_customer(string filter_name) -> bool {
                 if (BGP_LC_RELATION_CUSTOMER ~ bgp_large_community) then return true;
                 return false;
             }"""
@@ -191,7 +191,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check if this is a route that originated within our federation
-            function bgp_is_bgp_own(string filter_name) {{
+            function bgp_is_bgp_own(string filter_name) -> bool {{
                 if ({self.functions.is_bgp()} && BGP_LC_RELATION_OWN ~ bgp_large_community) then return true;
                 return false;
             }}"""
@@ -202,7 +202,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return """\
             # Check if this is a route that originated from a peer
-            function bgp_is_bgp_peer(string filter_name) {
+            function bgp_is_bgp_peer(string filter_name) -> bool {
                 if (BGP_LC_RELATION_PEER ~ bgp_large_community) then return true;
                 return false;
             }"""
@@ -213,7 +213,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check if this is a route that originated from a peer or routeserver
-            function bgp_is_bgp_peering(string filter_name) {{
+            function bgp_is_bgp_peering(string filter_name) -> bool {{
                 if ({self.is_bgp_peer()} || {self.is_bgp_routeserver()}) then return true;
                 return false;
             }}"""
@@ -224,7 +224,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return """\
             # Check if this is a route that originated from a routeserver
-            function bgp_is_bgp_routeserver(string filter_name) {
+            function bgp_is_bgp_routeserver(string filter_name) -> bool {
                 if (BGP_LC_RELATION_ROUTESERVER ~ bgp_large_community) then return true;
                 return false;
             }"""
@@ -235,7 +235,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return """\
             # Check if this is a route that originated from a transit peer
-            function bgp_is_bgp_transit(string filter_name) {
+            function bgp_is_bgp_transit(string filter_name) -> bool {
                 if (BGP_LC_RELATION_TRANSIT ~ bgp_large_community) then return true;
                 return false;
             }"""
@@ -246,7 +246,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return """\
             # Check if this is a blackhole route
-            function bgp_is_blackhole(string filter_name) {
+            function bgp_is_blackhole(string filter_name) -> bool {
                 if (BGP_COMMUNITY_BLACKHOLE ~ bgp_community) then return true;
                 return false;
             }"""
@@ -257,7 +257,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Import kernel routes
-            function bgp_import_kernel(string filter_name) {{
+            function bgp_import_kernel(string filter_name) -> bool {{
                 if (!{self.functions.is_kernel()} || dest = RTD_BLACKHOLE || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_import_kernel] Importing kernel route ", {self.functions.route_info()};
@@ -271,7 +271,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Import kernel blackhole routes
-            function bgp_import_kernel_blackhole(string filter_name) {{
+            function bgp_import_kernel_blackhole(string filter_name) -> bool {{
                 if (!{self.functions.is_kernel()} || dest != RTD_BLACKHOLE || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_import_kernel_blackhole] Importing kernel blackhole route ", {self.functions.route_info()};
@@ -287,7 +287,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Import kernel default routes
-            function bgp_import_kernel_default(string filter_name) {{
+            function bgp_import_kernel_default(string filter_name) -> bool {{
                 if (!{self.functions.is_kernel()} || dest = RTD_BLACKHOLE || !{self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_import_kernel_default] Importing kernel default route ", {self.functions.route_info()};
@@ -323,7 +323,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Import static routes
-            function bgp_import_static(string filter_name) {{
+            function bgp_import_static(string filter_name) -> bool {{
                 if (!{self.functions.is_static()} || dest = RTD_BLACKHOLE || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_import_static] Importing static route ", {self.functions.route_info()};
@@ -337,7 +337,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Import static blackhole routes
-            function bgp_import_static_blackhole(string filter_name) {{
+            function bgp_import_static_blackhole(string filter_name) -> bool {{
                 if (!{self.functions.is_static()} || dest != RTD_BLACKHOLE || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_import_static_blackhole] Importing static blackhole route ", {self.functions.route_info()};
@@ -353,7 +353,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Import static default routes
-            function bgp_import_static_default(string filter_name) {{
+            function bgp_import_static_default(string filter_name) -> bool {{
                 if (!{self.functions.is_static()} || dest = RTD_BLACKHOLE || !{self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_import_static_default] Importing static default route ", {self.functions.route_info()};
@@ -374,7 +374,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bool allow_static_blackhole;
                 int peer_asn;
                 int type_asn
-            ) {{
+            ) -> bool {{
                 # If this is not a route with a blackhole community, then just return false
                 if !{self.is_blackhole()} then return false;
                 # If this is a blackhole community, check if we're going to allow it
@@ -426,7 +426,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Accept BGP blackhole
-            function bgp_peer_accept_blackhole(string filter_name) {{
+            function bgp_peer_accept_blackhole(string filter_name) -> bool {{
                 if !{self.is_blackhole()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_accept_blackhole] Enabling blackhole for ", {self.functions.route_info()};
@@ -442,7 +442,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Origination blackhole action
-            function bgp_peer_accept_blackhole_originated(string filter_name) {{
+            function bgp_peer_accept_blackhole_originated(string filter_name) -> bool {{
                 if (BGP_LC_ACTION_BLACKHOLE_ORIGINATE !~ bgp_large_community) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_accept_blackhole_originated] Enabling origination blackhole for ",
@@ -583,7 +583,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter bogon ASNs
-            function bgp_peer_filter_asn_bogons(string filter_name) {{
+            function bgp_peer_filter_asn_bogons(string filter_name) -> bool {{
                 if (bgp_path !~ BOGON_ASNS) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_asn_bogons] Adding BGP_LC_FILTERED_BOGON_ASN to ", {self.functions.route_info()};
@@ -596,7 +596,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter peer ASN != route first ASN
-            function bgp_peer_filter_asn_invalid(string filter_name; int peer_asn) {{
+            function bgp_peer_filter_asn_invalid(string filter_name; int peer_asn) -> bool {{
                 if (bgp_path.first = peer_asn) then return false;
                 if DEBUG then print filter_name,
                         " [bgp_peer_filter_asn_invalid] Adding BGP_LC_FILTERED_FIRST_AS_NOT_PEER_AS to ",
@@ -609,7 +609,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_filter_aspath_allow function."""
 
         return f"""\
-            function bgp_peer_filter_aspath_allow(string filter_name; int set asn_list) {{
+            function bgp_peer_filter_aspath_allow(string filter_name; int set asn_list) -> bool {{
                 if (bgp_path = filter(bgp_path, asn_list)) then return false;
                 if (bgp_large_community ~ [BGP_LC_FILTERED_ORIGIN_AS, BGP_LC_FILTERED_PEER_AS]) then return false;
                 if DEBUG then print filter_name,
@@ -623,7 +623,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_filter_aspath_deny function."""
 
         return f"""\
-            function bgp_peer_filter_aspath_deny(string filter_name; int set asn_list) {{
+            function bgp_peer_filter_aspath_deny(string filter_name; int set asn_list) -> bool {{
                 if (bgp_path !~ asn_list) then return false;
                 if (bgp_large_community ~ [BGP_LC_FILTERED_ORIGIN_AS, BGP_LC_FILTERED_PEER_AS]) then return false;
                 if DEBUG then print filter_name,
@@ -638,7 +638,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter private ASN's
-            function bgp_peer_filter_asn_private(string filter_name; int set allowed_asns) {{
+            function bgp_peer_filter_asn_private(string filter_name; int set allowed_asns) -> bool {{
                 if (bgp_path = filter(bgp_path, allowed_asns)) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_asn_private] Adding BGP_LC_FILTERED_ASPATH_NOT_ALLOWED to ",
@@ -652,7 +652,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter transit free ASNs
-            function bgp_peer_filter_asn_transit(string filter_name) {{
+            function bgp_peer_filter_asn_transit(string filter_name) -> bool {{
                 if (bgp_path !~ BGP_ASNS_TRANSIT) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_asn_transit] Adding BGP_LC_FILTERED_TRANSIT_FREE_ASN to ",
@@ -666,7 +666,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter peer ASNs (ALLOW list)
-            function bgp_peer_filter_asns_allow(string filter_name; int set asns) {{
+            function bgp_peer_filter_asns_allow(string filter_name; int set asns) -> bool {{
                 if (bgp_path.first ~ asns) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_asns_allow] Adding BGP_LC_FILTERED_PEER_AS to ", {self.functions.route_info()};
@@ -679,7 +679,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter peer ASNs (DENY list)
-            function bgp_peer_filter_asns_deny(string filter_name; int set asns) {{
+            function bgp_peer_filter_asns_deny(string filter_name; int set asns) -> bool {{
                 if (bgp_path.first !~ asns) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_asns_deny] Adding BGP_LC_FILTERED_PEER_AS to ", {self.functions.route_info()};
@@ -713,7 +713,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter blackhole routes
-            function bgp_peer_filter_blackhole(string filter_name) {{
+            function bgp_peer_filter_blackhole(string filter_name) -> bool {{
                 if !{self.is_blackhole()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_blackhole] Adding BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED to ",
@@ -731,7 +731,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 string filter_name;
                 int ipv4_maxlen; int ipv4_minlen;
                 int ipv6_maxlen; int ipv6_minlen
-            )
+            ) -> bool
             int prefix_maxlen;
             int prefix_minlen;
             {{
@@ -768,7 +768,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter bogons
-            function bgp_peer_filter_bogons(string filter_name) {{
+            function bgp_peer_filter_bogons(string filter_name) -> bool {{
                 if !{self.functions.is_bogon()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_bogons] Adding BGP_FILTERED_BOGON to ", {self.functions.route_info()};
@@ -816,7 +816,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter customer blackhole routes
-            function bgp_peer_filter_customer_blackhole(string filter_name) {{
+            function bgp_peer_filter_customer_blackhole(string filter_name) -> bool {{
                 if (!{self.is_blackhole()} || !{self.is_bgp_customer()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_customer_blackhole] Adding BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED to ",
@@ -831,7 +831,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter default routes
-            function bgp_peer_filter_default(string filter_name) {{
+            function bgp_peer_filter_default(string filter_name) -> bool {{
                 if !{self.functions.is_default()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_default] Adding BGP_LC_FILTERED_DEFAULT_NOT_ALLOWED to ", {self.functions.route_info()};
@@ -845,7 +845,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter invalid blackhole routes
-            function bgp_peer_filter_invalid_blackhole(string filter_name) {{
+            function bgp_peer_filter_invalid_blackhole(string filter_name) -> bool {{
                 if (!{self.is_blackhole()} || {self.is_bgp_customer()} || {self.is_bgp_own()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_invalid_blackhole] Adding BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED to ",
@@ -860,7 +860,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter invalid default routes
-            function bgp_peer_filter_invalid_default(string filter_name) {{
+            function bgp_peer_filter_invalid_default(string filter_name) -> bool {{
                 if (!{self.functions.is_default()} || {self.is_bgp_own()} || {self.is_bgp_transit()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_invalid_default] Adding BGP_LC_FILTERED_DEFAULT_NOT_ALLOWED to ",
@@ -875,7 +875,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter prefixes without a large community relation set
-            function bgp_peer_filter_lc_no_relation(string filter_name) {{
+            function bgp_peer_filter_lc_no_relation(string filter_name) -> bool {{
                 if (bgp_large_community ~ BGP_LC_RELATION) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_lc_no_relation] Adding BGP_LC_FILTERED_NO_RELATION_LC to ", {self.functions.route_info()};
@@ -888,7 +888,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter peer != next_hop
-            function bgp_peer_filter_nexthop_not_peerip(string filter_name) {{
+            function bgp_peer_filter_nexthop_not_peerip(string filter_name) -> bool {{
                 if (from = bgp_next_hop) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_nexthop_not_peerip] Adding BGP_LC_FILTERED_NEXT_HOP_NOT_PEER_IP to ",
@@ -902,7 +902,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter origin ASNs (ALLOW list)
-            function bgp_peer_filter_origin_asns_allow(string filter_name; int set asns) {{
+            function bgp_peer_filter_origin_asns_allow(string filter_name; int set asns) -> bool {{
                 if (bgp_path.last_nonaggregated ~ asns) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_origin_asns_allow] Adding BGP_LC_FILTERED_ORIGIN_AS to ", {self.functions.route_info()};
@@ -915,7 +915,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter origin ASNs (DENY list)
-            function bgp_peer_filter_origin_asns_deny(string filter_name; int set asns) {{
+            function bgp_peer_filter_origin_asns_deny(string filter_name; int set asns) -> bool {{
                 if (bgp_path.last_nonaggregated !~ asns) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_origin_asns_deny] Adding BGP_LC_FILTERED_ORIGIN_AS to ", {self.functions.route_info()};
@@ -928,7 +928,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter own blackhole routes
-            function bgp_peer_filter_own_blackhole(string filter_name) {{
+            function bgp_peer_filter_own_blackhole(string filter_name) -> bool {{
                 if (!{self.is_blackhole()} || !{self.is_bgp_own()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_own_blackhole] Adding BGP_LC_FILTERED_BLACKHOLE_NOT_ALLOWED to ",
@@ -943,7 +943,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter own default routes
-            function bgp_peer_filter_own_default(string filter_name) {{
+            function bgp_peer_filter_own_default(string filter_name) -> bool {{
                 if (!{self.functions.is_default()} || !{self.is_bgp_own()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_own_default] Adding BGP_LC_FILTERED_DEFAULT_NOT_ALLOWED to ", {self.functions.route_info()};
@@ -961,7 +961,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 string filter_name;
                 int ipv4_maxlen; int ipv4_minlen;
                 int ipv6_maxlen; int ipv6_minlen
-            )
+            ) -> bool
             int prefix_maxlen;
             int prefix_minlen;
             {{
@@ -1001,7 +1001,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             function bgp_peer_filter_prefixes_allow(
                 string filter_name;
                 prefix set prefix_list4; prefix set prefix_list6
-            ) {{
+            ) -> bool {{
                 if {self.is_blackhole()} then return false;
                 if (net.type = NET_IP4 && net ~ prefix_list4) then return false;
                 if (net.type = NET_IP6 && net ~ prefix_list6) then return false;
@@ -1019,7 +1019,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             function bgp_peer_filter_prefixes_deny(
                 string filter_name;
                 prefix set prefix_list4; prefix set prefix_list6
-            ) {{
+            ) -> bool {{
                 if {self.is_blackhole()} then return false;
                 if (net.type = NET_IP4 && net !~ prefix_list4) then return false;
                 if (net.type = NET_IP6 && net !~ prefix_list6) then return false;
@@ -1037,7 +1037,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             function bgp_peer_filter_prefixes_blackhole_allow(
                 string filter_name;
                 prefix set prefix_list4; prefix set prefix_list6
-            ) {{
+            ) -> bool {{
                 if !{self.is_blackhole()} then return false;
                 if (net.type = NET_IP4 && net ~ prefix_list4) then return false;
                 if (net.type = NET_IP6 && net ~ prefix_list6) then return false;
@@ -1058,7 +1058,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             function bgp_peer_filter_prefixes_blackhole_deny(
                 string filter_name;
                 prefix set prefix_list4; prefix set prefix_list6
-            ) {{
+            ) -> bool {{
                 if !{self.is_blackhole()} then return false;
                 if (net.type = NET_IP4 && net !~ prefix_list4) then return false;
                 if (net.type = NET_IP6 && net !~ prefix_list6) then return false;
@@ -1088,7 +1088,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Filter default route
-            function bgp_peer_filter_transit_default(string filter_name) {{
+            function bgp_peer_filter_transit_default(string filter_name) -> bool {{
                 if (!{self.functions.is_default()} || !{self.is_bgp_transit()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_filter_transit_default] Adding BGP_LC_FILTERED_DEFAULT_NOT_ALLOWED to ",
@@ -1130,7 +1130,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_import_graceful_shutdown function."""
 
         return f"""\
-            function bgp_peer_import_graceful_shutdown(string filter_name) {{
+            function bgp_peer_import_graceful_shutdown(string filter_name) -> bool {{
                 if (BGP_COMMUNITY_GRACEFUL_SHUTDOWN !~ bgp_community) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_import_graceful_shutdown] Setting LOCAL_PREF to 0 for ", {self.functions.route_info()};
@@ -1242,7 +1242,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_connected function."""
 
         return f"""\
-            function bgp_peer_lc_add_connected(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_connected(string filter_name; lc large_community) -> bool {{
                 if !{self.is_connected()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_lc_add_connected] Adding large community ", large_community, " for type CONNECTED to ",
@@ -1255,7 +1255,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_kernel function."""
 
         return f"""\
-            function bgp_peer_lc_add_kernel(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_kernel(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.functions.is_kernel()} ||
                     {self.functions.is_default()} ||
@@ -1272,7 +1272,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_kernel_blackhole function."""
 
         return f"""\
-            function bgp_peer_lc_add_kernel_blackhole(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_kernel_blackhole(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.functions.is_kernel()} ||
                     {self.functions.is_default()} ||
@@ -1289,7 +1289,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_kernel_default function."""
 
         return f"""\
-            function bgp_peer_lc_add_kernel_default(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_kernel_default(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.functions.is_kernel()} ||
                     !{self.functions.is_default()} ||
@@ -1307,7 +1307,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # BGP originated route large community adding
-            function bgp_peer_lc_add_originated(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_originated(string filter_name; lc large_community) -> bool {{
                 if (!{self.is_originated()} || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_lc_add_originate] Adding large community ", large_community,
@@ -1320,7 +1320,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_originated_blackhole function."""
 
         return f"""\
-            function bgp_peer_lc_add_originated_blackhole(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_originated_blackhole(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.is_originated()} ||
                     {self.functions.is_default()} ||
@@ -1337,7 +1337,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_originated_default function."""
 
         return f"""\
-            function bgp_peer_lc_add_originated_default(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_originated_default(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.is_originated()} ||
                     !{self.functions.is_default()} ||
@@ -1354,7 +1354,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_static function."""
 
         return f"""\
-            function bgp_peer_lc_add_static(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_static(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.functions.is_static()} ||
                     {self.functions.is_default()} ||
@@ -1371,7 +1371,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_static_blackhole function."""
 
         return f"""\
-            function bgp_peer_lc_add_static_blackhole(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_static_blackhole(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.functions.is_static()} ||
                     {self.functions.is_default()} ||
@@ -1388,7 +1388,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_static_default function."""
 
         return f"""\
-            function bgp_peer_lc_add_static_default(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_static_default(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.functions.is_static()} ||
                     !{self.functions.is_default()} ||
@@ -1406,7 +1406,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # BGP own route large community adding
-            function bgp_peer_lc_add_bgp_own(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_bgp_own(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.is_bgp_own()} ||
                     {self.functions.is_default()} ||
@@ -1423,7 +1423,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_bgp_own_blackhole function."""
 
         return f"""\
-            function bgp_peer_lc_add_bgp_own_blackhole(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_bgp_own_blackhole(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.is_bgp_own()} ||
                     {self.functions.is_default()} ||
@@ -1440,7 +1440,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_bgp_own_default function."""
 
         return f"""\
-            function bgp_peer_lc_add_bgp_own_default(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_bgp_own_default(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.is_bgp_own()} ||
                     !{self.functions.is_default()} ||
@@ -1458,7 +1458,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # BGP customer route large community adding
-            function bgp_peer_lc_add_bgp_customer(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_bgp_customer(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.is_bgp_customer()} ||
                     {self.functions.is_default()} ||
@@ -1475,7 +1475,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_bgp_customer_blackhole function."""
 
         return f"""\
-            function bgp_peer_lc_add_bgp_customer_blackhole(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_bgp_customer_blackhole(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.is_bgp_customer()} ||
                     {self.functions.is_default()} ||
@@ -1493,7 +1493,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # BGP peering route large community adding
-            function bgp_peer_lc_add_bgp_peering(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_bgp_peering(string filter_name; lc large_community) -> bool {{
                 if (!{self.is_bgp_peer()} && !{self.is_bgp_routeserver()}) then return false;
                 if DEBUG then print filter_name,
                         " [bgp_peer_lc_add_bgp_peer] Adding large community ", large_community, " for type BGP_PEER to ",
@@ -1507,7 +1507,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # BGP transit route large community adding
-            function bgp_peer_lc_add_bgp_transit(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_bgp_transit(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.is_bgp_transit()} ||
                     {self.functions.is_default()} ||
@@ -1524,7 +1524,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_lc_add_bgp_transit_default function."""
 
         return f"""\
-            function bgp_peer_lc_add_bgp_transit_default(string filter_name; lc large_community) {{
+            function bgp_peer_lc_add_bgp_transit_default(string filter_name; lc large_community) -> bool {{
                 if (
                     !{self.is_bgp_transit()} ||
                     !{self.functions.is_default()} ||
@@ -1574,7 +1574,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_peer_prepend_default function."""
 
         return f"""\
-            function bgp_peer_prepend_default(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_default(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if !{self.functions.is_default()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_prepend_default] Prepending AS-PATH for type DEFAULT ", prepend_count, "x to ",
@@ -1588,7 +1588,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # BGP connected route prepending
-            function bgp_peer_prepend_connected(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_connected(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if !{self.is_connected()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_prepend_connected] Prepending AS-PATH for type CONNECTED ", prepend_count, "x to "
@@ -1601,7 +1601,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_kernel function."""
 
         return f"""\
-            function bgp_peer_prepend_kernel(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_kernel(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.functions.is_kernel()} ||
                     {self.functions.is_default()} ||
@@ -1618,7 +1618,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_kernel_blackhole function."""
 
         return f"""\
-            function bgp_peer_prepend_kernel_blackhole(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_kernel_blackhole(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.functions.is_kernel()} ||
                     {self.functions.is_default()} ||
@@ -1635,7 +1635,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_kernel_default function."""
 
         return f"""\
-            function bgp_peer_prepend_kernel_default(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_kernel_default(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.functions.is_kernel()} ||
                     !{self.functions.is_default()} ||
@@ -1652,7 +1652,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_originated function."""
 
         return f"""\
-            function bgp_peer_prepend_originated(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_originated(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.is_originated()} ||
                     {self.functions.is_default()}
@@ -1668,7 +1668,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_originated_default function."""
 
         return f"""\
-            function bgp_peer_prepend_originated_default(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_originated_default(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.is_originated()} ||
                     !{self.functions.is_default()}
@@ -1684,7 +1684,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_static function."""
 
         return f"""\
-            function bgp_peer_prepend_static(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_static(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.functions.is_static()} ||
                     {self.functions.is_default()} ||
@@ -1701,7 +1701,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_static_blackhole function."""
 
         return f"""\
-            function bgp_peer_prepend_static_blackhole(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_static_blackhole(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.functions.is_static()} ||
                     {self.functions.is_default()} ||
@@ -1718,7 +1718,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_static_default function."""
 
         return f"""\
-            function bgp_peer_prepend_static_default(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_static_default(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.functions.is_static()} ||
                     !{self.functions.is_default()} ||
@@ -1735,7 +1735,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_bgp_own function."""
 
         return f"""\
-            function bgp_peer_prepend_bgp_own(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_bgp_own(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.is_bgp_own()} ||
                     {self.functions.is_default()} ||
@@ -1752,7 +1752,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_bgp_own_blackhole function."""
 
         return f"""\
-            function bgp_peer_prepend_bgp_own_blackhole(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_bgp_own_blackhole(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.is_bgp_own()} ||
                     {self.functions.is_default()} ||
@@ -1769,7 +1769,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_bgp_own_default function."""
 
         return f"""\
-            function bgp_peer_prepend_bgp_own_default(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_bgp_own_default(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.is_bgp_own()} ||
                     !{self.functions.is_default()} ||
@@ -1786,7 +1786,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_bgp_customer function."""
 
         return f"""\
-            function bgp_peer_prepend_bgp_customer(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_bgp_customer(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.is_bgp_customer()} ||
                     {self.functions.is_default()} ||
@@ -1803,7 +1803,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_bgp_customer_blackhole function."""
 
         return f"""\
-            function bgp_peer_prepend_bgp_customer_blackhole(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_bgp_customer_blackhole(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.is_bgp_customer()} ||
                     {self.functions.is_default()} ||
@@ -1820,7 +1820,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_bgp_peering function."""
 
         return f"""\
-            function bgp_peer_prepend_bgp_peering(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_bgp_peering(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (!{self.is_bgp_peer()} && !{self.is_bgp_routeserver()}) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_prepend_bgp_peer] Prepending AS-PATH for type BGP_PEER ", prepend_count, "x to ",
@@ -1833,7 +1833,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_bgp_transit function."""
 
         return f"""\
-            function bgp_peer_prepend_bgp_transit(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_bgp_transit(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.is_bgp_transit()} ||
                     {self.functions.is_default()} ||
@@ -1850,7 +1850,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         """BIRD bgp_peer_prepend_bgp_transit_default function."""
 
         return f"""\
-            function bgp_peer_prepend_bgp_transit_default(string filter_name; int peer_asn; int prepend_count) {{
+            function bgp_peer_prepend_bgp_transit_default(string filter_name; int peer_asn; int prepend_count) -> bool {{
                 if (
                     !{self.is_bgp_transit()} ||
                     !{self.functions.is_default()} ||
@@ -1958,7 +1958,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of customer routes for BGP
-            function bgp_peer_redistribute_bgp_customer(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_bgp_customer(string filter_name; bool redistribute) -> bool {{
                 # Check for redistribute customer routes
                 if (!{self.is_bgp_customer()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
@@ -1979,7 +1979,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of customer blackhole routes for BGP
-            function bgp_peer_redistribute_bgp_customer_blackhole(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_bgp_customer_blackhole(string filter_name; bool redistribute) -> bool {{
                 # Check for redistribute customer blackhole routes
                 if (!{self.is_bgp_customer()} || !{self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
@@ -2000,7 +2000,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of our own routes for BGP
-            function bgp_peer_redistribute_bgp_own(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_bgp_own(string filter_name; bool redistribute) -> bool {{
                 # Check for redistribute own routes
                 if (!{self.is_bgp_own()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
@@ -2021,7 +2021,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of our own blackhoole routes for BGP
-            function bgp_peer_redistribute_bgp_own_blackhole(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_bgp_own_blackhole(string filter_name; bool redistribute) -> bool {{
                 # Check for redistribute own blackhole routes
                 if (!{self.is_bgp_own()} || !{self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
@@ -2042,7 +2042,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of our own default routes for BGP
-            function bgp_peer_redistribute_bgp_own_default(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_bgp_own_default(string filter_name; bool redistribute) -> bool {{
                 # Check for redistribute own default routes
                 if (!{self.is_bgp_own()} || {self.is_blackhole()} || !{self.functions.is_default()}) then return false;
                 if (redistribute) then {{
@@ -2063,7 +2063,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of peering routes for BGP
-            function bgp_peer_redistribute_bgp_peering(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_bgp_peering(string filter_name; bool redistribute) -> bool {{
                 if (!{self.is_bgp_peering()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 # Check for redistribute peering routes
                 if {self.is_bgp_peer()} then {{
@@ -2100,7 +2100,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of transit routes for BGP
-            function bgp_peer_redistribute_bgp_transit(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_bgp_transit(string filter_name; bool redistribute) -> bool {{
                 # Check for redistribute transit routes
                 if (!{self.is_bgp_transit()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
@@ -2121,7 +2121,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of transit routes for BGP
-            function bgp_peer_redistribute_bgp_transit_default(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_bgp_transit_default(string filter_name; bool redistribute) -> bool {{
                 # Check for redistribute transit routes
                 if (!{self.is_bgp_transit()} || {self.is_blackhole()} || !{self.functions.is_default()}) then return false;
                 if (redistribute) then {{
@@ -2142,7 +2142,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of connected routes for BGP
-            function bgp_peer_redistribute_connected(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_connected(string filter_name; bool redistribute) -> bool {{
                 # Check for connected routes
                 if !{self.is_connected()} then return false;
                 if (redistribute) then {{
@@ -2163,7 +2163,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of kernel routes for BGP
-            function bgp_peer_redistribute_kernel(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_kernel(string filter_name; bool redistribute) -> bool {{
                 if (!{self.functions.is_kernel()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
                     if DEBUG then print filter_name,
@@ -2183,7 +2183,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of kernel blackhole routes for BGP
-            function bgp_peer_redistribute_kernel_blackhole(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_kernel_blackhole(string filter_name; bool redistribute) -> bool {{
                 if (!{self.functions.is_kernel()} || !{self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
                     if DEBUG then print filter_name,
@@ -2203,7 +2203,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of kernel default routes for BGP
-            function bgp_peer_redistribute_kernel_default(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_kernel_default(string filter_name; bool redistribute) -> bool {{
                 if (!{self.functions.is_kernel()} || {self.is_blackhole()} || !{self.functions.is_default()}) then
                     return false;
                 if (redistribute) then {{
@@ -2224,7 +2224,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of originated routes for BGP
-            function bgp_peer_redistribute_originated(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_originated(string filter_name; bool redistribute) -> bool {{
                 if (!{self.is_originated()} || {self.is_blackhole()} || {self.functions.is_default()}) then
                     return false;
                 if (redistribute) then {{
@@ -2245,7 +2245,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of originated default routes for BGP
-            function bgp_peer_redistribute_originated_default(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_originated_default(string filter_name; bool redistribute) -> bool {{
                 if (!{self.is_originated()} || {self.is_blackhole()} || !{self.functions.is_default()}) then return false;
                 if (redistribute) then {{
                     if DEBUG then print filter_name,
@@ -2265,7 +2265,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of static routes for BGP
-            function bgp_peer_redistribute_static(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_static(string filter_name; bool redistribute) -> bool {{
                 if (!{self.functions.is_static()} || {self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
                     if DEBUG then print filter_name,
@@ -2285,7 +2285,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of static blackhole routes for BGP
-            function bgp_peer_redistribute_static_blackhole(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_static_blackhole(string filter_name; bool redistribute) -> bool {{
                 if (!{self.functions.is_static()} || !{self.is_blackhole()} || {self.functions.is_default()}) then return false;
                 if (redistribute) then {{
                     if DEBUG then print filter_name,
@@ -2305,7 +2305,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check for redistribution of static default routes for BGP
-            function bgp_peer_redistribute_static_default(string filter_name; bool redistribute) {{
+            function bgp_peer_redistribute_static_default(string filter_name; bool redistribute) -> bool {{
                 if (!{self.functions.is_static()} || {self.is_blackhole()} || !{self.functions.is_default()}) then
                     return false;
                 if (redistribute) then {{
@@ -2326,7 +2326,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Reject blackhole routes
-            function bgp_peer_reject_blackholes(string filter_name) {{
+            function bgp_peer_reject_blackholes(string filter_name) -> bool {{
                 if !{self.is_blackhole()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_reject_blackholes] Rejecting blackhole ", {self.functions.route_info()},
@@ -2340,7 +2340,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Reject bogon routes
-            function bgp_peer_reject_bogons(string filter_name) {{
+            function bgp_peer_reject_bogons(string filter_name) -> bool {{
                 if !{self.functions.is_bogon()} then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_reject_bogons] Rejecting bogon ", {self.functions.route_info()};
@@ -2353,7 +2353,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Reject filtered routes to main BGP table
-            function bgp_peer_reject_filtered(string filter_name) {{
+            function bgp_peer_reject_filtered(string filter_name) -> bool {{
                 if (bgp_large_community !~ [(BGP_ASN, BGP_LC_FUNCTION_FILTERED, *)]) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_reject_filtered] Filtered ", {self.functions.route_info()}, " to main BGP table";
@@ -2366,7 +2366,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Reject NO_ADVERTISE routes
-            function bgp_peer_reject_noadvertise(string filter_name) {{
+            function bgp_peer_reject_noadvertise(string filter_name) -> bool {{
                 # Check for NO_ADVERTISE community
                 if (BGP_COMMUNITY_NOADVERTISE !~ bgp_community) then return false;
                 if DEBUG then print filter_name,
@@ -2381,7 +2381,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Reject NOEXPORT routes
-            function bgp_peer_reject_noexport(string filter_name) {{
+            function bgp_peer_reject_noexport(string filter_name) -> bool {{
                 if (BGP_COMMUNITY_NOEXPORT !~ bgp_community) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_peer_reject_noexport] Rejecting ", {self.functions.route_info()},
@@ -2395,7 +2395,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Reject NOEXPORT ASN routes
-            function bgp_peer_reject_noexport_asn(string filter_name; int peer_asn) {{
+            function bgp_peer_reject_noexport_asn(string filter_name; int peer_asn) -> bool {{
                 # Check for NOEXPORT large community
                 if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT, peer_asn) !~ bgp_large_community) then return false;
                 if DEBUG then print filter_name,
@@ -2410,7 +2410,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Reject EXPORT_NOCUSTOMER routes
-            function bgp_peer_reject_noexport_customer(string filter_name) {{
+            function bgp_peer_reject_noexport_customer(string filter_name) -> bool {{
                 # Check for large community to prevent export to customers
                 if (BGP_LC_EXPORT_NOCUSTOMER !~ bgp_large_community) then return false;
                 if DEBUG then print filter_name,
@@ -2425,7 +2425,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Reject EXPORT_NOPEER routes
-            function bgp_peer_reject_noexport_peer(string filter_name) {{
+            function bgp_peer_reject_noexport_peer(string filter_name) -> bool {{
                 # Check for large community to prevent export to peers
                 if (BGP_LC_EXPORT_NOPEER !~ bgp_large_community) then return false;
                 if DEBUG then print filter_name,
@@ -2440,7 +2440,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Reject EXPORT_NOTRANSIT routes
-            function bgp_peer_reject_noexport_transit(string filter_name) {{
+            function bgp_peer_reject_noexport_transit(string filter_name) -> bool {{
                 # Check for large community to prevent export to transit
                 if (BGP_LC_EXPORT_NOTRANSIT !~ bgp_large_community) then return false;
                 if DEBUG then print filter_name,
@@ -2455,7 +2455,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Reject NOEXPORT_LOCATION routes
-            function bgp_peer_reject_noexport_location(string filter_name; int location) {{
+            function bgp_peer_reject_noexport_location(string filter_name; int location) -> bool {{
                 # Check for large community to prevent export to a location
                 if ((BGP_ASN, BGP_LC_FUNCTION_NOEXPORT_LOCATION, location) !~ bgp_large_community) then return false;
                 if DEBUG then print filter_name,
@@ -2474,7 +2474,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 string filter_name;
                 int ipv4_maxlen; int ipv4_minlen;
                 int ipv6_maxlen; int ipv6_minlen
-            )
+            ) -> bool
             int prefix_maxlen;
             int prefix_minlen;
             {{
@@ -2514,7 +2514,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 string filter_name;
                 int ipv4_maxlen; int ipv4_minlen;
                 int ipv6_maxlen; int ipv6_minlen
-            )
+            ) -> bool
             int prefix_maxlen;
             int prefix_minlen;
             {{
@@ -2550,7 +2550,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Check if we need to replace the AS-PATH
-            function bgp_peer_replace_aspath(string filter_name)
+            function bgp_peer_replace_aspath(string filter_name) -> bool
             int path_len;
             {{
                 # Check for replace AS-PATH large community action
@@ -2573,7 +2573,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Remove private large communities
-            function bgp_peer_remove_lc_private(string filter_name) {{
+            function bgp_peer_remove_lc_private(string filter_name) -> bool {{
                 # Remove private large communities
                 if (bgp_large_community !~ BGP_LC_STRIP_PRIVATE) then return false;
                 if DEBUG then print filter_name,

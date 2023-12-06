@@ -40,7 +40,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
 
         return f"""\
             # Accept OSPF connected routes
-            function ospf_accept_connected(string filter_name) {{
+            function ospf_accept_connected(string filter_name) -> bool {{
                 if (proto != "direct4_ospf" && proto != "direct6_ospf" || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [ospf_accept_connected] Accepting OSPF connected route ", {self.functions.route_info()},
@@ -54,7 +54,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
 
         return f"""\
             # Accept OSPF route
-            function ospf_accept_ospf(string filter_name) {{
+            function ospf_accept_ospf(string filter_name) -> bool {{
                 if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || {self.functions.is_default()}) then
                     return false;
                 if DEBUG then print filter_name,
@@ -68,7 +68,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
 
         return f"""\
             # Accept OSPF route
-            function ospf_accept_ospf_default(string filter_name) {{
+            function ospf_accept_ospf_default(string filter_name) -> bool {{
                 if (source !~ [RTS_OSPF, RTS_OSPF_IA, RTS_OSPF_EXT1, RTS_OSPF_EXT2] || !{self.functions.is_default()}) then
                     return false;
                 if DEBUG then print filter_name,
@@ -83,7 +83,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
 
         return """\
             # Check if this is an connected route
-            function ospf_is_connected(string filter_name) {
+            function ospf_is_connected(string filter_name) -> bool {
                 if (proto = "direct4_ospf" || proto = "direct6_ospf") then return true;
                 return false;
             }"""
@@ -94,7 +94,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
 
         return f"""\
             # Accept OSPF connected routes
-            function ospf_redistribute_connected(string filter_name) {{
+            function ospf_redistribute_connected(string filter_name) -> bool {{
                 if (!{self.is_connected()} || {self.functions.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [ospf_redistribute_connected] Redistributing OSPF connected route ", {self.functions.route_info()},

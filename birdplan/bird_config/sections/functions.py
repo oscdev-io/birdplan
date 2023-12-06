@@ -154,7 +154,7 @@ class SectionFunctions(SectionBase):
 
         return """\
             # Match a prefix longer than "size"
-            function prefix_is_longer(string filter_name; int size) {
+            function prefix_is_longer(string filter_name; int size) -> bool {
                 if (net.len > size) then {
                     if DEBUG then print filter_name,
                         " [prefix_is_longer] Matched ", net, " from ", proto, " against size ", size;
@@ -170,7 +170,7 @@ class SectionFunctions(SectionBase):
 
         return """\
             # Match a prefix shorter than "size"
-            function prefix_is_shorter(string filter_name; int size) {
+            function prefix_is_shorter(string filter_name; int size) -> bool {
                 if (net.len < size) then {
                     if DEBUG then print filter_name,
                         " [prefix_is_shorter] Matched ", net, " from ", proto, " against size ", size;
@@ -185,7 +185,7 @@ class SectionFunctions(SectionBase):
 
         return f"""\
             # Accept kernel route
-            function accept_kernel(string filter_name) {{
+            function accept_kernel(string filter_name) -> bool {{
                 if (!{self.is_kernel()} || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [accept_kernel] Accepting kernel route ", {self.route_info()};
@@ -198,7 +198,7 @@ class SectionFunctions(SectionBase):
 
         return f"""\
             # Accept kernel route
-            function accept_kernel_default(string filter_name) {{
+            function accept_kernel_default(string filter_name) -> bool {{
                 if (!{self.is_kernel()} || !{self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [accept_kernel_default] Accepting kernel default route ", {self.route_info()};
@@ -211,7 +211,7 @@ class SectionFunctions(SectionBase):
 
         return f"""\
             # Accept static route
-            function accept_static(string filter_name) {{
+            function accept_static(string filter_name) -> bool {{
                 if (!{self.is_static()} || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [accept_static] Accepting static route ", {self.route_info()};
@@ -224,7 +224,7 @@ class SectionFunctions(SectionBase):
 
         return f"""\
             # Accept static default route
-            function accept_static_default(string filter_name) {{
+            function accept_static_default(string filter_name) -> bool {{
                 if (!{self.is_static()} || !{self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [accept_static] Accepting static default route ", {self.route_info()};
@@ -237,7 +237,7 @@ class SectionFunctions(SectionBase):
 
         return """\
             # Match BGP routes
-            function is_bgp(string filter_name) {
+            function is_bgp(string filter_name) -> bool {
                 if (source = RTS_BGP) then return true;
                 return false;
             }"""
@@ -248,7 +248,7 @@ class SectionFunctions(SectionBase):
 
         return f"""\
             # Match on IP bogons
-            function is_bogon(string filter_name) {{
+            function is_bogon(string filter_name) -> bool {{
                 if ((net.type = NET_IP4 && net ~ BOGONS_V4) || (net.type = NET_IP6 && net ~ BOGONS_V6)) then {{
                     if DEBUG then print filter_name,
                         " [is_bogon] Matched ", {self.route_info()};
@@ -263,7 +263,7 @@ class SectionFunctions(SectionBase):
 
         return """\
             # Match connected route
-            function is_connected(string filter_name) {
+            function is_connected(string filter_name) -> bool {
                 if (proto = "direct4" || proto = "direct6") then return true;
                 return false;
             }"""
@@ -274,7 +274,7 @@ class SectionFunctions(SectionBase):
 
         return """\
             # Match default route
-            function is_default(string filter_name) {
+            function is_default(string filter_name) -> bool {
                 if ((net.type = NET_IP4 && net = DEFAULT_ROUTE_V4) || (net.type = NET_IP6 && net = DEFAULT_ROUTE_V6)) then
                     return true;
                 return false;
@@ -287,7 +287,7 @@ class SectionFunctions(SectionBase):
         # NK: Below we explicitly exclude krt_source = 186 as we seem to import IPv6 routes into Bird for some reason
         return """\
             # Match kernel route
-            function is_kernel(string filter_name) {
+            function is_kernel(string filter_name) -> bool {
                 if (source = RTS_INHERIT && krt_source != 186) then return true;
                 return false;
             }"""
@@ -298,7 +298,7 @@ class SectionFunctions(SectionBase):
 
         return """\
             # Match static route
-            function is_static(string filter_name) {
+            function is_static(string filter_name) -> bool {
                 if (proto = "static4" || proto = "static6") then return true;
                 return false;
             }"""
@@ -309,7 +309,7 @@ class SectionFunctions(SectionBase):
 
         return f"""\
             # Accept kernel route
-            function redistribute_kernel(string filter_name) {{
+            function redistribute_kernel(string filter_name) -> bool {{
                 if (!{self.is_kernel()} || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [redistribute_kernel] Accepting kernel route ", {self.route_info()};
@@ -322,7 +322,7 @@ class SectionFunctions(SectionBase):
 
         return f"""\
             # Accept kernel route
-            function redistribute_kernel_default(string filter_name) {{
+            function redistribute_kernel_default(string filter_name) -> bool {{
                 if (!{self.is_kernel()} || !{self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [redistribute_kernel_default] Accepting kernel default route ", {self.route_info()};
@@ -335,7 +335,7 @@ class SectionFunctions(SectionBase):
 
         return f"""\
             # Accept static route
-            function redistribute_static(string filter_name) {{
+            function redistribute_static(string filter_name) -> bool {{
                 if (!{self.is_static()} || {self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [redistribute_static] Accepting static route ", {self.route_info()};
@@ -348,7 +348,7 @@ class SectionFunctions(SectionBase):
 
         return f"""\
             # Accept static default route
-            function redistribute_static_default(string filter_name) {{
+            function redistribute_static_default(string filter_name) -> bool {{
                 if (!{self.is_static()} || !{self.is_default()}) then return false;
                 if DEBUG then print filter_name,
                     " [redistribute_static] Accepting static default route ", {self.route_info()};
