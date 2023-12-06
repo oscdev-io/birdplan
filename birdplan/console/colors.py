@@ -18,7 +18,12 @@
 
 """Commandline colors."""
 
+import sys
+
 import click
+
+# Check if we should use colors or not
+USE_COLORS = sys.stdout.isatty()
 
 
 def colored(text: str, color: str) -> str:
@@ -35,4 +40,6 @@ def colored(text: str, color: str) -> str:
 
     """
 
-    return click.style(text, fg=color)
+    if USE_COLORS:
+        return click.style(text, fg=color)
+    return text
