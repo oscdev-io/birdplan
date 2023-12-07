@@ -190,7 +190,7 @@ class BirdPlan:
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.state_file}' for writing: {err}") from None
 
-    def state_bgp_peer_summary(self) -> BirdPlanBGPPeerSummary:
+    def state_bgp_peer_summary(self, bird_socket: Optional[str] = None) -> BirdPlanBGPPeerSummary:
         """
         Return BGP peer summary.
 
@@ -228,7 +228,7 @@ class BirdPlan:
             return ret
 
         # Query bird client for the current protocols
-        birdc = birdclient.BirdClient()
+        birdc = birdclient.BirdClient(control_socket=bird_socket)
         bird_protocols = birdc.show_protocols()
 
         # Check if we have any peers in our state
@@ -252,7 +252,7 @@ class BirdPlan:
 
         return ret
 
-    def state_bgp_peer_show(self, peer: str) -> BirdPlanBGPPeerShow:
+    def state_bgp_peer_show(self, peer: str, bird_socket: Optional[str] = None) -> BirdPlanBGPPeerShow:
         """
         Return the status of a specific BGP peer.
 
@@ -297,7 +297,7 @@ class BirdPlan:
         ret["name"] = peer
 
         # Query bird client for the current protocols
-        birdc = birdclient.BirdClient()
+        birdc = birdclient.BirdClient(control_socket=bird_socket)
 
         # Loop with protocols and grab live bird status
         for ipv, protocol_info in configured["protocols"].items():

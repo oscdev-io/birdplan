@@ -137,21 +137,26 @@ class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
 
         return bird_config
 
-    def show_output_text(self, data: Any) -> None:
+    def to_text(self, data: Any) -> str:
         """
-        Show command output in text.
+        Return output in text format.
 
         Parameters
         ----------
         data : str
             Bird configuration
 
+        Returns
+        -------
+        str
+            Output in text format.
+
         """
         # Skip output when we're writing a config file
         if self.config_filename and self.config_filename != "-":
-            return
+            return ""
         # Output config
-        super().show_output_text(data)
+        return super().to_text(data)
 
     def _write_config_file(self, data: Any) -> None:
         """

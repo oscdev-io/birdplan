@@ -342,6 +342,16 @@ class BirdPlanBaseTestCase:
 
                 result = birdplan_result["raw"]
 
+                # Remove since from the result
+                for _, router_data in result.items():
+                    if "protocols" not in router_data:
+                        continue
+                    for _, protocol_data in router_data["protocols"].items():
+                        if "status" not in protocol_data:
+                            continue
+                        if "since" in protocol_data["status"]:
+                            del protocol_data["status"]["since"]
+
                 # If we don't have a content match, we match as we have a sleep() after bird status
                 # The first case is when there is no expected data
                 # The second case is when this item is missing from the expected data
@@ -361,20 +371,6 @@ class BirdPlanBaseTestCase:
 
                 time.sleep(0.5)
 
-            # Remove since from the result
-            for _, router_data in result.items():
-                if "protocols" not in router_data:
-                    continue
-                for _, protocol_data in router_data["protocols"].items():
-                    if "status" not in protocol_data:
-                        continue
-                    if "since" in protocol_data["status"]:
-                        del protocol_data["status"]["since"]
-
-            result_matches = False
-            if result_expected == result:
-                result_matches = True
-
             # Add reports
             sim.add_report_obj(f"PEER_SUMMARY({router})[json]", birdplan_result["json"])
             sim.add_report_obj(f"PEER_SUMMARY({router})[text]", birdplan_result["text"])
@@ -385,7 +381,7 @@ class BirdPlanBaseTestCase:
             # Add variable so we can keep track of its expected content for later
             sim.add_variable(data_name, result)
             # If we didn't match add the incorrect result to the report too
-            if not result_matches:
+            if not content_matches:
                 report_expected = pprint.pformat(result_expected, width=132, compact=True)
                 sim.add_report_obj(f"EXPECTED_PEER_SUMMARY({router})[raw]", f"{data_name} = {report_expected}")
 
@@ -424,6 +420,14 @@ class BirdPlanBaseTestCase:
 
                     result = birdplan_result["raw"]
 
+                    # Remove since from the result
+                    if "protocols" in result:
+                        for _, protocol_data in result["protocols"].items():
+                            if "status" not in protocol_data:
+                                continue
+                            if "since" in protocol_data["status"]:
+                                del protocol_data["status"]["since"]
+
                     # If we don't have a content match, we match as we have a sleep() after bird status
                     # The first case is when there is no expected data
                     # The second case is when this item is missing from the expected data
@@ -443,18 +447,6 @@ class BirdPlanBaseTestCase:
 
                     time.sleep(0.5)
 
-                # Remove since from the result
-                if "protocols" in result:
-                    for _, protocol_data in result["protocols"].items():
-                        if "status" not in protocol_data:
-                            continue
-                        if "since" in protocol_data["status"]:
-                            del protocol_data["status"]["since"]
-
-                result_matches = False
-                if result_expected == result:
-                    result_matches = True
-
                 # Add reports
                 sim.add_report_obj(f"PEER_SHOW({router}:{peer})[json]", birdplan_result["json"])
                 sim.add_report_obj(f"PEER_SHOW({router}:{peer})[text]", birdplan_result["text"])
@@ -465,7 +457,7 @@ class BirdPlanBaseTestCase:
                 # Add variable so we can keep track of its expected content for later
                 sim.add_variable(data_name, result)
                 # If we didn't match add the incorrect result to the report too
-                if not result_matches:
+                if not content_matches:
                     report_expected = pprint.pformat(result_expected, width=132, compact=True)
                     sim.add_report_obj(f"EXPECTED_PEER_SHOW({router}:{peer})[raw]", f"{data_name} = {report_expected}")
 

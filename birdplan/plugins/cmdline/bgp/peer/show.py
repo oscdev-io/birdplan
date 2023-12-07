@@ -19,6 +19,7 @@
 """BirdPlan commandline options for BGP peer show <peer>."""
 
 import argparse
+import io
 from typing import Any, Dict
 
 from birdplan import BirdPlanBGPPeerShow
@@ -94,6 +95,9 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
 
         cmdline: BirdPlanCommandLine = args["cmdline"]
 
+        # Grab Bird control socket
+        bird_socket = cmdline.args.bird_socket[0]
+
         # Grab the peer
         peer = cmdline.args.peer[0]
 
@@ -104,20 +108,27 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
         cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
         # Try grab peer info
-        return cmdline.birdplan.state_bgp_peer_show(peer)
+        return cmdline.birdplan.state_bgp_peer_show(peer, bird_socket=bird_socket)
 
-    def show_output_text(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+    def to_text(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         self, data: BirdPlanBGPPeerShow
-    ) -> None:
+    ) -> str:
         """
-        Show command output in text.
+        Return output in text format.
 
         Parameters
         ----------
         data : BirdPlanBGPPeerShow
             Peer information.
 
+        Returns
+        -------
+        str
+            Output in text format.
+
         """
+
+        ob = io.StringIO()
 
         # Work out filter strings to use
         aspath_filters = "none"
@@ -151,13 +162,13 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
                 elif isinstance(data["filter"]["as_sets"], str):
                     as_sets_filter = data["filter"]["as_sets"]
 
-        print(f"ASN.............: {data['asn']}")
-        print(f"Type............: {data['type']}")
-        print(f"Name............: {data['name']}")
-        print(f"Description.....: {data['description']}")
-        print(f"AS-SET..........: {as_sets_filter}")
-        print(f"Origin filters..: {origin_filters}")
-        print(f"AS-Path filters.: {aspath_filters}")
+        ob.write(f"ASN.............: {data['asn']}\n")
+        ob.write(f"Type............: {data['type']}\n")
+        ob.write(f"Name............: {data['name']}\n")
+        ob.write(f"Description.....: {data['description']}\n")
+        ob.write(f"AS-SET..........: {as_sets_filter}\n")
+        ob.write(f"Origin filters..: {origin_filters}\n")
+        ob.write(f"AS-Path filters.: {aspath_filters}\n")
 
         # Loop with protocols and output data
         for protocol, protocol_data in data["protocols"].items():
@@ -183,7 +194,7 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
                             prefix_filter_strs.append(f"{count} manual")
                     prefix_filters = ", ".join(prefix_filter_strs)
 
-            print(f"\n  Protocol: {protocol_str}")
+            ob.write(f"\n  Protocol: {protocol_str}\n")
 
             # Setup o the protocol_status so we can copy-paste the below colors
             protocol_status = protocol_data["status"]
@@ -221,35 +232,39 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
                     if protocol in data["prefix_limit"]["static"]:
                         prefix_limit_str = " manual"
 
-            print(f"    Mode..............: {protocol_data['mode']}")
-            print(f"    State.............: {state} ({info}) since {protocol_status['since']}")
-            print(f"    Local AS..........: {protocol_status['local_as']}")
+            ob.write(f"    Mode..............: {protocol_data['mode']}\n")
+            ob.write(f"    State.............: {state} ({info}) since {protocol_status['since']}\n")
+            ob.write(f"    Local AS..........: {protocol_status['local_as']}\n")
 
             # Work out our source address, depending if peer is up or not
             source_address = protocol_status.get("source_address", protocol_data["source_address"])
-            print(f"    Source IP.........: {source_address}")
+            ob.write(f"    Source IP.........: {source_address}\n")
 
             if "neighbor_id" in protocol_status:
-                print(f"    Neighbor ID.......: {protocol_status['neighbor_id']}")
-            print(f"    Neighbor AS.......: {protocol_status['neighbor_as']}")
+                ob.write(f"    Neighbor ID.......: {protocol_status['neighbor_id']}\n")
+            ob.write(f"    Neighbor AS.......: {protocol_status['neighbor_as']}\n")
 
             # Check if we have an import limit
             if "import_limit" in protocol_status:
                 import_limit = protocol_status["import_limit"]
                 import_limit_action = protocol_status["import_limit_action"]
-                print(f"    Import limit......: {import_limit}{prefix_limit_str} (action: {import_limit_action})")
+                ob.write(f"    Import limit......: {import_limit}{prefix_limit_str} (action: {import_limit_action})\n")
             else:
-                print("    Import limit......: none")
+                ob.write("    Import limit......: none\n")
 
-            print(f"    Prefix filters....: {prefix_filters}")
+            ob.write(f"    Prefix filters....: {prefix_filters}\n")
 
             # Check if we have route information
             if "routes_imported" in protocol_status and "routes_exported" in protocol_status:
                 routes_imported = protocol_status["routes_imported"]
                 routes_exported = protocol_status["routes_exported"]
-                print(f"    Prefixes..........: {routes_imported} imported, {routes_exported} exported")
+                ob.write(f"    Prefixes..........: {routes_imported} imported, {routes_exported} exported\n")
 
-            print(f"    Quarantined.......: {quarantined}")
-            print(f"    Graceful shutdown.: {graceful_shutdown}")
+            ob.write(f"    Quarantined.......: {quarantined}\n")
+            ob.write(f"    Graceful shutdown.: {graceful_shutdown}\n")
 
-            print("")
+            ob.write("\n")
+
+        ob.write("\n")
+
+        return ob.getvalue()

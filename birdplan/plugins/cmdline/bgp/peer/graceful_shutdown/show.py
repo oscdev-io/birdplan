@@ -19,6 +19,7 @@
 """BirdPlan commandline options for BGP peer graceful shutdown show."""
 
 import argparse
+import io
 from typing import Any, Dict
 
 from ......cmdline import BirdPlanCommandLine
@@ -92,37 +93,44 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
         # Grab peer list
         return cmdline.birdplan.state_bgp_peer_graceful_shutdown_status()
 
-    def show_output_text(self, data: Any) -> None:  # pylint: disable= too-many-branches
+    def to_text(self, data: Any) -> str:  # pylint: disable= too-many-branches
         """
-        Show command output in text.
+        Return output in text format.
 
         Parameters
         ----------
         data : Any
             Graceful shutdown status structure.
 
+        Returns
+        -------
+        str
+            Output in text format.
+
         """
 
-        print("BGP peer graceful shutdown overrides:")
-        print("-------------------------------------")
+        ob = io.StringIO()
+
+        ob.write("BGP peer graceful shutdown overrides:\n")
+        ob.write("-------------------------------------\n")
 
         # Loop with sorted override list
         for peer in sorted(data["overrides"]):
             # Print out override
             status = colored("Enabled", "red") if data["overrides"][peer] else colored("Disabled", "green")
-            print(f"  {peer}: {status}")
+            ob.write(f"  {peer}: {status}\n")
         # If we have no overrides, just print out --none--
         if not data["overrides"]:
-            print("--none--")
+            ob.write("--none--\n")
 
-        print("\n")
+        ob.write("\n")
 
         # Get a list of all peers we know about
         peers_all = list(data["current"].keys()) + list(data["pending"].keys())
         peers_all = sorted(set(peers_all))
 
-        print("BGP peer graceful shutdown status:")
-        print("----------------------------------")
+        ob.write("BGP peer graceful shutdown status:\n")
+        ob.write("----------------------------------\n")
 
         # Loop with sorted peer list
         for peer in peers_all:
@@ -152,6 +160,8 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
                 else:
                     status_str = "OK"
 
-            print("  Peer: " + colored(peer, "cyan"))
-            print(f"    State: {status_str}")
-            print("\n")
+            ob.write("  Peer: " + colored(peer, "cyan") + "\n")
+            ob.write(f"    State: {status_str}\n")
+            ob.write("\n")
+
+        return ob.getvalue()

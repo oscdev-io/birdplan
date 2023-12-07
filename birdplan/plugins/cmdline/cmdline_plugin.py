@@ -82,7 +82,7 @@ class BirdPlanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-metho
             raise RuntimeError
         return self._subparsers
 
-    def show_output_text(self, data: Any) -> None:
+    def to_text(self, data: Any) -> str:
         """
         Show command output in text.
 
@@ -91,10 +91,15 @@ class BirdPlanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-metho
         data : Any
             Output data.
 
+        Returns
+        -------
+        str
+            Output data as text.
         """
-        print(data)
 
-    def show_output_json(self, data: Any) -> None:
+        return f"{data}"
+
+    def to_json(self, data: Any) -> str:
         """
         Show command output in json.
 
@@ -103,5 +108,10 @@ class BirdPlanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-metho
         data : Any
             Output data.
 
+        Returns
+        -------
+        str
+            Output data as json.
         """
-        print(json.dumps({"status": "success", "data": data}))
+
+        return json.dumps({"status": "success", "data": data})

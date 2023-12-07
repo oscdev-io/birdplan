@@ -33,8 +33,9 @@ from .plugin import PluginCollection
 from .version import __version__
 
 # Defaults
-BIRDPLAN_FILE = "/etc/birdplan/birdplan.yaml"
 BIRD_CONFIG_FILE = "/etc/bird.conf"
+BIRD_SOCKET = "/run/bird/bird.ctl"
+BIRDPLAN_FILE = "/etc/birdplan/birdplan.yaml"
 BIRDPLAN_STATE_FILE = "/var/lib/birdplan/birdplan.state"
 
 
@@ -175,6 +176,14 @@ class BirdPlanCommandLine:
 
         # Input and output file settings
         optional_group.add_argument(
+            "-b",
+            "--bird-socket",
+            nargs=1,
+            metavar="BIRD_SOCKET",
+            default=[BIRD_SOCKET],
+            help=f"BirdPlan needs access to the Bird control socket for some commandline functionality (default: {BIRD_SOCKET})",
+        )
+        optional_group.add_argument(
             "-i",
             "--birdplan-file",
             nargs=1,
@@ -236,15 +245,21 @@ class BirdPlanCommandLine:
         # Grab the result from the command
         result = plugins.call_plugin(plugin_name, method_name, {"cmdline": self})
 
+        ret = {
+            "raw": result,
+            "json": plugins.call_plugin(plugin_name, "to_json", result),
+            "text": plugins.call_plugin(plugin_name, "to_text", result),
+        }
+
         # Check if we should output JSON
         if self.is_console:
             if self.is_json:
-                plugins.call_plugin(plugin_name, "show_output_json", result)
+                print(ret["json"])
             # If not, we need to output text
             else:
-                plugins.call_plugin(plugin_name, "show_output_text", result)
+                print(ret["text"])
 
-        return result
+        return ret
 
     def birdplan_load_config(self, **kwargs: Any) -> None:
         """

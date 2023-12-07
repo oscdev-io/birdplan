@@ -19,6 +19,7 @@
 """BirdPlan commandline options for BGP peer summary."""
 
 import argparse
+import io
 from typing import Any, Dict
 
 from ..... import BirdPlanBGPPeerSummary
@@ -84,6 +85,9 @@ class BirdplanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
 
         cmdline: BirdPlanCommandLine = args["cmdline"]
 
+        # Grab Bird control socket
+        bird_socket = cmdline.args.bird_socket[0]
+
         # Suppress info output
         cmdline.birdplan.birdconf.birdconfig_globals.suppress_info = True
 
@@ -91,18 +95,25 @@ class BirdplanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
         cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
         # Grab peer list
-        return cmdline.birdplan.state_bgp_peer_summary()
+        return cmdline.birdplan.state_bgp_peer_summary(bird_socket=bird_socket)
 
-    def show_output_text(self, data: BirdPlanBGPPeerSummary) -> None:
+    def to_text(self, data: BirdPlanBGPPeerSummary) -> str:
         """
-        Show command output in text.
+        Return output in text format.
 
         Parameters
         ----------
         data : BirdPlanBGPPeerSummary
             Peer information.
 
+        Returns
+        -------
+        str
+            Output in text format.
+
         """
+
+        ob = io.StringIO()
 
         # Loop with each protocol
         for peer_name, peer in data.items():
@@ -126,4 +137,6 @@ class BirdplanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
                         state = colored(protocol_status["state"], "green")
                         info = colored(protocol_status["info"], "green")
 
-                print(f"| {peer_name} | {ipv} | {state} | {since} | {info} |")
+                ob.write(f"| {peer_name} | {ipv} | {state} | {since} | {info} |\n")
+
+        return ob.getvalue()
