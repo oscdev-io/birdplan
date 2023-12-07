@@ -212,3 +212,11 @@ class Template(BirdPlanBaseTestCase):
 
         # Restore global
         peeringdb.PEERINGDB_16BIT_LOWER = limit_save
+
+    def test_bird_cmdline_bgp_peer_summary(self, sim, tmpdir):
+        """Test showing BGP peer summary."""
+        self._test_bird_cmdline_bgp_peer_summary(sim, tmpdir)
+
+    def test_bird_cmdline_bgp_peer_show(self, sim, tmpdir):
+        """Test showing BGP peer."""
+        self._test_bird_cmdline_bgp_peer_show(sim, tmpdir)

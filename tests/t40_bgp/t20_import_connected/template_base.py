@@ -136,3 +136,11 @@ class TemplateBase(BirdPlanBaseTestCase):
     def test_os_rib_inet6(self, sim):
         """Test OS RIB for inet6."""
         self._test_os_rib(sim, "inet6")
+
+    def test_bird_cmdline_bgp_peer_summary(self, sim, tmpdir):
+        """Test showing BGP peer summary."""
+        self._test_bird_cmdline_bgp_peer_summary(sim, tmpdir)
+
+    def test_bird_cmdline_bgp_peer_show(self, sim, tmpdir):
+        """Test showing BGP peer."""
+        self._test_bird_cmdline_bgp_peer_show(sim, tmpdir)

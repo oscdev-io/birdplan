@@ -115,7 +115,11 @@ class BirdPlanBaseTestCase:
         # Configure our simulator with the BIRD routers
         configured_routers = self._configure_bird_routers(sim, tmpdir)
         for router in configured_routers:
-            sim.add_node(BirdRouterNode(name=router, configfile=f"{tmpdir}/bird.conf.{router}", debug=False))
+            sim.add_node(
+                BirdRouterNode(
+                    name=router, configfile=f"{tmpdir}/bird.conf.{router}", controlsocket=f"{tmpdir}/bird.ctl.{router}", debug=False
+                )
+            )
 
         # Loop with our ExaBGP's and create the nodes
         self._configure_exabgps(sim, tmpdir)
@@ -306,6 +310,167 @@ class BirdPlanBaseTestCase:
         # Return the two chunks of data for later assertion
         return (result, result_expected)
 
+    def _test_bird_cmdline_bgp_peer_summary(self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None):
+        """Test showing BGP peer summary."""
+
+        # Check if we didn't get a router list override, if we didn't, then use all routers
+        if not routers:
+            routers = self.routers
+
+        # Loop with routers
+        for router in routers:
+            # Skip over routers not configured
+            if not sim.node(router):
+                continue
+
+            # Work out variable names
+            data_name = f"{router}_peer_summary"
+
+            # Grab table data
+            result_expected = sim.get_data(data_name)
+
+            # Save the start time
+            time_start = time.time()
+
+            # Start with a blank result
+            expect_timeout = 120
+            result = None
+            content_matches = False
+            while True:
+                # Get peer summary
+                birdplan_result = self._birdplan_run(sim, tmpdir, router, ["bgp", "peer", "summary"])
+
+                result = birdplan_result["raw"]
+
+                # If we don't have a content match, we match as we have a sleep() after bird status
+                # The first case is when there is no expected data
+                # The second case is when this item is missing from the expected data
+                if result_expected is None or isinstance(result_expected, ValueError):  # noqa: SIM114
+                    content_matches = True
+                # Else check that the result contains the content we're looking for
+                elif result_expected == result:
+                    content_matches = True
+
+                # Check if have what we expected
+                if content_matches:
+                    break
+
+                # If not, check to see if we've exceeded our timeout
+                if time.time() - time_start > expect_timeout:
+                    break
+
+                time.sleep(0.5)
+
+            # Remove since from the result
+            for _, router_data in result.items():
+                if "protocols" not in router_data:
+                    continue
+                for _, protocol_data in router_data["protocols"].items():
+                    if "status" not in protocol_data:
+                        continue
+                    if "since" in protocol_data["status"]:
+                        del protocol_data["status"]["since"]
+
+            result_matches = False
+            if result_expected == result:
+                result_matches = True
+
+            # Add reports
+            sim.add_report_obj(f"PEER_SUMMARY({router})[json]", birdplan_result["json"])
+            sim.add_report_obj(f"PEER_SUMMARY({router})[text]", birdplan_result["text"])
+
+            report_result = pprint.pformat(result, width=132, compact=True)
+            sim.add_report_obj(f"PEER_SUMMARY({router})[raw]", f"{data_name} = {report_result}")
+
+            # Add variable so we can keep track of its expected content for later
+            sim.add_variable(data_name, result)
+            # If we didn't match add the incorrect result to the report too
+            if not result_matches:
+                report_expected = pprint.pformat(result_expected, width=132, compact=True)
+                sim.add_report_obj(f"EXPECTED_PEER_SUMMARY({router})[raw]", f"{data_name} = {report_expected}")
+
+            assert result == result_expected, f"BIRD router '{router}' peer summary does not match what it should be"
+
+    def _test_bird_cmdline_bgp_peer_show(self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None):
+        """Test showing BGP peer show."""
+
+        # Check if we didn't get a router list override, if we didn't, then use all routers
+        if not routers:
+            routers = self.routers
+
+        # Loop with routers
+        for router in routers:
+            # Skip over routers not configured
+            if not sim.node(router):
+                continue
+            # Loop with all the routers peers
+            for peer in sim.config(router).birdconf.protocols.bgp.peers:
+                # Work out variable names
+                data_name = f"{router}_peer_show_{peer}"
+
+                # Grab table data
+                result_expected = sim.get_data(data_name)
+
+                # Save the start time
+                time_start = time.time()
+
+                # Start with a blank result
+                expect_timeout = 120
+                result = None
+                content_matches = False
+                while True:
+                    # Get peer show
+                    birdplan_result = self._birdplan_run(sim, tmpdir, router, ["bgp", "peer", "show", peer])
+
+                    result = birdplan_result["raw"]
+
+                    # If we don't have a content match, we match as we have a sleep() after bird status
+                    # The first case is when there is no expected data
+                    # The second case is when this item is missing from the expected data
+                    if result_expected is None or isinstance(result_expected, ValueError):  # noqa: SIM114
+                        content_matches = True
+                    # Else check that the result contains the content we're looking for
+                    elif result_expected == result:
+                        content_matches = True
+
+                    # Check if have what we expected
+                    if content_matches:
+                        break
+
+                    # If not, check to see if we've exceeded our timeout
+                    if time.time() - time_start > expect_timeout:
+                        break
+
+                    time.sleep(0.5)
+
+                # Remove since from the result
+                if "protocols" in result:
+                    for _, protocol_data in result["protocols"].items():
+                        if "status" not in protocol_data:
+                            continue
+                        if "since" in protocol_data["status"]:
+                            del protocol_data["status"]["since"]
+
+                result_matches = False
+                if result_expected == result:
+                    result_matches = True
+
+                # Add reports
+                sim.add_report_obj(f"PEER_SHOW({router}:{peer})[json]", birdplan_result["json"])
+                sim.add_report_obj(f"PEER_SHOW({router}:{peer})[text]", birdplan_result["text"])
+
+                report_result = pprint.pformat(result, width=132, compact=True)
+                sim.add_report_obj(f"PEER_SHOW({router}:{peer})[raw]", f"{data_name} = {report_result}")
+
+                # Add variable so we can keep track of its expected content for later
+                sim.add_variable(data_name, result)
+                # If we didn't match add the incorrect result to the report too
+                if not result_matches:
+                    report_expected = pprint.pformat(result_expected, width=132, compact=True)
+                    sim.add_report_obj(f"EXPECTED_PEER_SHOW({router}:{peer})[raw]", f"{data_name} = {report_expected}")
+
+                assert result == result_expected, f"BIRD router '{router}' peer show on '{peer}' does not match what it should be"
+
     def _test_os_rib(self, sim: Simulation, table_name: str, routers: Optional[List[str]] = None):
         """Test OS routing table."""
 
@@ -486,6 +651,7 @@ class BirdPlanBaseTestCase:
         bird_conffile = f"{tmpdir}/bird.conf.{router}"
         bird_statefile = f"{tmpdir}/bird.state.{router}"
         bird_logfile = f"{tmpdir}/bird.log.{router}"
+        bird_socket = f"{tmpdir}/bird.ctl.{router}"
 
         # Work out what attributes we support for macros
         attr_list = [
@@ -569,6 +735,8 @@ class BirdPlanBaseTestCase:
 
         # Work out our commandline arguments
         cmdline_args = [
+            "--bird-socket",
+            bird_socket,
             "--birdplan-file",
             birdplan_file,
             "--birdplan-state-file",
