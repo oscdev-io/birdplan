@@ -40,7 +40,9 @@ class Test(Template):
         self._birdplan_run(sim, tmpdir, "r2", ["ospf", "interface", "ecmp-weight", "set", "0", "eth2", "1"])
 
         # Check router status
-        interface_status = self._birdplan_run(sim, tmpdir, "r2", ["ospf", "interface", "show"])
+        birdplan_result = self._birdplan_run(sim, tmpdir, "r2", ["ospf", "interface", "show"])
+
+        interface_status = birdplan_result["raw"]
         assert interface_status == {
             "current": {
                 "areas": {
@@ -75,7 +77,9 @@ class Test(Template):
         self._birdplan_run(sim, tmpdir, "r2", ["configure"])
 
         # Check r2 status again
-        interface_status = self._birdplan_run(sim, tmpdir, "r2", ["ospf", "interface", "show"])
+        birdplan_result = self._birdplan_run(sim, tmpdir, "r2", ["ospf", "interface", "show"])
+        
+        interface_status = birdplan_result["raw"]
         assert interface_status == {
             "current": {
                 "areas": {

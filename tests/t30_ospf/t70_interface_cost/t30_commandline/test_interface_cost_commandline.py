@@ -58,7 +58,9 @@ class Test(Template):
         self._birdplan_run(sim, tmpdir, "r4", ["ospf", "interface", "cost", "set", "0", "eth1", "12"])
 
         # Check r4 status
-        interface_status = self._birdplan_run(sim, tmpdir, "r4", ["ospf", "interface", "show"])
+        birdplan_result = self._birdplan_run(sim, tmpdir, "r4", ["ospf", "interface", "show"])
+
+        interface_status = birdplan_result["raw"]
         assert interface_status == {
             "current": {
                 "areas": {"0": {"interfaces": {"eth0": {"cost": 14, "ecmp_weight": 1}, "eth1": {"cost": 14, "ecmp_weight": 1}}}}
@@ -73,7 +75,9 @@ class Test(Template):
         self._birdplan_run(sim, tmpdir, "r4", ["configure"])
 
         # Check r4 status again
-        interface_status = self._birdplan_run(sim, tmpdir, "r4", ["ospf", "interface", "show"])
+        birdplan_result = self._birdplan_run(sim, tmpdir, "r4", ["ospf", "interface", "show"])
+
+        interface_status = birdplan_result["raw"]
         assert interface_status == {
             "current": {
                 "areas": {"0": {"interfaces": {"eth0": {"cost": 12, "ecmp_weight": 1}, "eth1": {"cost": 12, "ecmp_weight": 1}}}}
