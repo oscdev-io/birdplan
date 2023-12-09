@@ -68,6 +68,14 @@ class Template(BirdPlanBaseTestCase):
         """Test BIRD status."""
         self._test_bird_status(sim)
 
+    def test_bird_cmdline_bgp_peer_summary(self, sim, tmpdir):
+        """Test showing BGP peer summary."""
+        self._test_bird_cmdline_bgp_peer_summary(sim, tmpdir)
+
+    def test_bird_cmdline_bgp_peer_show(self, sim, tmpdir):
+        """Test showing BGP peer."""
+        self._test_bird_cmdline_bgp_peer_show(sim, tmpdir)
+
     def test_bird_route_limit_exceeded(self, sim):
         """Check logs to see if we reached the prefix limit."""
 
@@ -80,11 +88,3 @@ class Template(BirdPlanBaseTestCase):
 
         route_limit_exceeded = self._bird_log_matches(sim, "r1", r"bgp6_AS6500[01]_e1: Route limit exceeded, shutting down")
         assert route_limit_exceeded, "Failed to shut down IPv6 connection when route limit exceeded"
-
-    def test_bird_cmdline_bgp_peer_summary(self, sim, tmpdir):
-        """Test showing BGP peer summary."""
-        self._test_bird_cmdline_bgp_peer_summary(sim, tmpdir)
-
-    def test_bird_cmdline_bgp_peer_show(self, sim, tmpdir):
-        """Test showing BGP peer."""
-        self._test_bird_cmdline_bgp_peer_show(sim, tmpdir)

@@ -78,7 +78,7 @@ class Test(Template):
 
         # Check r2 status again
         birdplan_result = self._birdplan_run(sim, tmpdir, "r2", ["ospf", "interface", "show"])
-        
+
         interface_status = birdplan_result["raw"]
         assert interface_status == {
             "current": {

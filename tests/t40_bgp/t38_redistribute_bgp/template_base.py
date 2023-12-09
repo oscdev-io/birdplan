@@ -205,6 +205,14 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Test BIRD status."""
         self._test_bird_status(sim)
 
+    def test_bird_cmdline_bgp_peer_summary(self, sim, tmpdir):
+        """Test showing BGP peer summary."""
+        self._test_bird_cmdline_bgp_peer_summary(sim, tmpdir)
+
+    def test_bird_cmdline_bgp_peer_show(self, sim, tmpdir):
+        """Test showing BGP peer."""
+        self._test_bird_cmdline_bgp_peer_show(sim, tmpdir)
+
     def test_bird_tables_bgp4_peer(self, sim):
         """Test BIRD BGP4 peer table."""
         self._test_bird_routers_table_bgp_peers(sim, 4)
@@ -244,11 +252,3 @@ class TemplateBase(BirdPlanBaseTestCase):
     def test_os_rib_inet6(self, sim):
         """Test OS RIB for inet6."""
         self._test_os_rib(sim, "inet6")
-
-    def test_bird_cmdline_bgp_peer_summary(self, sim, tmpdir):
-        """Test showing BGP peer summary."""
-        self._test_bird_cmdline_bgp_peer_summary(sim, tmpdir)
-
-    def test_bird_cmdline_bgp_peer_show(self, sim, tmpdir):
-        """Test showing BGP peer."""
-        self._test_bird_cmdline_bgp_peer_show(sim, tmpdir)
