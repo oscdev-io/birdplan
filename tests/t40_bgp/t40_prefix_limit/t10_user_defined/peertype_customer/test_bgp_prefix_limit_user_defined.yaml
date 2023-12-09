@@ -1,1 +1,94 @@
-{}
+r1_peer_show_e1:
+  asn: 65001
+  description: BGP session to e1
+  filter:
+    as_sets: []
+    aspath_asns:
+      calculated:
+      - 65001
+    origin_asns:
+      static:
+      - 65001
+  graceful_shutdown: false
+  name: e1
+  prefix_limit:
+    static:
+      ipv4: 5
+      ipv6: 5
+  protocols:
+    ipv4:
+      mode: passive
+      name: bgp4_AS65001_e1
+      neighbor: 100.64.0.2
+      prefix_limit: 5
+      source_address: 100.64.0.1
+      status:
+        channel: ipv4
+        igp_table: master4
+        import_limit: 5
+        import_limit_action: restart
+        info: idle
+        input_filter: f_bgp_AS65001_e1_peer_import
+        last_error: 'automatic shutdown: route limit exceeded'
+        local_as: 65000
+        neighbor_address: 100.64.0.2
+        neighbor_as: 65001
+        output_filter: f_bgp_AS65001_e1_peer_export
+        preference: 100
+        state: down
+        table: t_bgp4_AS65001_e1_peer
+    ipv6:
+      mode: passive
+      name: bgp6_AS65001_e1
+      neighbor: fc00:100::2
+      prefix_limit: 5
+      source_address: fc00:100::1
+      status:
+        channel: ipv6
+        igp_table: master6
+        import_limit: 5
+        import_limit_action: restart
+        info: idle
+        input_filter: f_bgp_AS65001_e1_peer_import
+        last_error: 'automatic shutdown: route limit exceeded'
+        local_as: 65000
+        neighbor_address: fc00:100::2
+        neighbor_as: 65001
+        output_filter: f_bgp_AS65001_e1_peer_export
+        preference: 100
+        state: down
+        table: t_bgp6_AS65001_e1_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65001_e1_peer
+    ipv6: t_bgp6_AS65001_e1_peer
+  type: customer
+r1_peer_summary:
+  e1:
+    asn: 65001
+    description: BGP session to e1
+    protocols:
+      ipv4:
+        mode: passive
+        name: bgp4_AS65001_e1
+        neighbor: 100.64.0.2
+        prefix_limit: 5
+        source_address: 100.64.0.1
+        status:
+          info: idle
+          info_extra: 'automatic shutdown: route limit exceeded'
+          name: bgp4_AS65001_e1
+          proto: BGP
+          state: down
+      ipv6:
+        mode: passive
+        name: bgp6_AS65001_e1
+        neighbor: fc00:100::2
+        prefix_limit: 5
+        source_address: fc00:100::1
+        status:
+          info: idle
+          info_extra: 'automatic shutdown: route limit exceeded'
+          name: bgp6_AS65001_e1
+          proto: BGP
+          state: down

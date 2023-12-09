@@ -1,3 +1,85 @@
+r10_peer_show_r1:
+  asn: 65000
+  description: BGP session to r1
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r1
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r1
+      neighbor: 100.64.0.1
+      source_address: 100.64.0.10
+      status:
+        bgp_nexthop: 100.64.0.10
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65009
+        neighbor_address: 100.64.0.1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: 100.64.0.10
+        state: up
+        table: t_bgp4_AS65000_r1_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r1
+      neighbor: fc00:100::1
+      source_address: fc00:100::10
+      status:
+        bgp_nexthop: fc00:100::10
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65009
+        neighbor_address: fc00:100::1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: fc00:100::10
+        state: up
+        table: t_bgp6_AS65000_r1_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r1_peer
+    ipv6: t_bgp6_AS65000_r1_peer
+  type: transit
+r10_peer_summary:
+  r1:
+    asn: 65000
+    description: BGP session to r1
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r1
+        neighbor: 100.64.0.1
+        source_address: 100.64.0.10
+        status:
+          info: established
+          name: bgp4_AS65000_r1
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r1
+        neighbor: fc00:100::1
+        source_address: fc00:100::10
+        status:
+          info: established
+          name: bgp6_AS65000_r1
+          proto: BGP
+          state: up
 r10_t_bgp4:
   100.64.101.0/24:
   - asn: AS65000
@@ -136,6 +218,847 @@ r10_t_bgp6_AS65000_r1_peer:
     type:
     - BGP
     - univ
+r1_peer_show_e1:
+  asn: 65000
+  description: BGP session to e1
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: e1
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_e1
+      neighbor: 100.64.0.100
+      source_address: 100.64.0.1
+      status:
+        bgp_nexthop: 100.64.0.1
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_e1_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.100
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.100
+        output_filter: f_bgp_AS65000_e1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: 100.64.0.1
+        state: up
+        table: t_bgp4_AS65000_e1_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_e1
+      neighbor: fc00:100::100
+      source_address: fc00:100::1
+      status:
+        bgp_nexthop: fc00:100::1
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_e1_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::100
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.100
+        output_filter: f_bgp_AS65000_e1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: fc00:100::1
+        state: up
+        table: t_bgp6_AS65000_e1_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_e1_peer
+    ipv6: t_bgp6_AS65000_e1_peer
+  type: rrserver
+r1_peer_show_r10:
+  asn: 65009
+  description: BGP session to r10
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r10
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65009_r10
+      neighbor: 100.64.0.10
+      source_address: 100.64.0.1
+      status:
+        bgp_nexthop: 100.64.0.1
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65009_r10_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.10
+        neighbor_as: 65009
+        neighbor_id: 0.0.0.10
+        output_filter: f_bgp_AS65009_r10_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: 100.64.0.1
+        state: up
+        table: t_bgp4_AS65009_r10_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65009_r10
+      neighbor: fc00:100::10
+      source_address: fc00:100::1
+      status:
+        bgp_nexthop: fc00:100::1
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65009_r10_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::10
+        neighbor_as: 65009
+        neighbor_id: 0.0.0.10
+        output_filter: f_bgp_AS65009_r10_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: fc00:100::1
+        state: up
+        table: t_bgp6_AS65009_r10_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65009_r10_peer
+    ipv6: t_bgp6_AS65009_r10_peer
+  type: transit
+r1_peer_show_r2:
+  asn: 65001
+  description: BGP session to r2
+  filter:
+    as_sets: []
+    aspath_asns:
+      calculated:
+      - 65001
+    origin_asns:
+      static:
+      - 65001
+  graceful_shutdown: false
+  name: r2
+  prefix_limit:
+    static:
+      ipv4: 100
+      ipv6: 100
+  protocols:
+    ipv4:
+      mode: passive
+      name: bgp4_AS65001_r2
+      neighbor: 100.64.0.2
+      prefix_limit: 100
+      source_address: 100.64.0.1
+      status:
+        bgp_nexthop: 100.64.0.1
+        channel: ipv4
+        igp_table: master4
+        import_limit: 100
+        import_limit_action: restart
+        info: established
+        input_filter: f_bgp_AS65001_r2_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.2
+        neighbor_as: 65001
+        neighbor_id: 0.0.0.2
+        output_filter: f_bgp_AS65001_r2_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: 100.64.0.1
+        state: up
+        table: t_bgp4_AS65001_r2_peer
+    ipv6:
+      mode: passive
+      name: bgp6_AS65001_r2
+      neighbor: fc00:100::2
+      prefix_limit: 100
+      source_address: fc00:100::1
+      status:
+        bgp_nexthop: fc00:100::1
+        channel: ipv6
+        igp_table: master6
+        import_limit: 100
+        import_limit_action: restart
+        info: established
+        input_filter: f_bgp_AS65001_r2_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::2
+        neighbor_as: 65001
+        neighbor_id: 0.0.0.2
+        output_filter: f_bgp_AS65001_r2_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: fc00:100::1
+        state: up
+        table: t_bgp6_AS65001_r2_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65001_r2_peer
+    ipv6: t_bgp6_AS65001_r2_peer
+  type: customer
+r1_peer_show_r3:
+  asn: 65000
+  description: BGP session to r3
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r3
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r3
+      neighbor: 100.64.0.3
+      source_address: 100.64.0.1
+      status:
+        bgp_nexthop: 100.64.0.1
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_r3_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.3
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.3
+        output_filter: f_bgp_AS65000_r3_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: 100.64.0.1
+        state: up
+        table: t_bgp4_AS65000_r3_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r3
+      neighbor: fc00:100::3
+      source_address: fc00:100::1
+      status:
+        bgp_nexthop: fc00:100::1
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_r3_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::3
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.3
+        output_filter: f_bgp_AS65000_r3_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: fc00:100::1
+        state: up
+        table: t_bgp6_AS65000_r3_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r3_peer
+    ipv6: t_bgp6_AS65000_r3_peer
+  type: internal
+r1_peer_show_r4:
+  asn: 65003
+  description: BGP session to r4
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r4
+  prefix_limit:
+    static:
+      ipv4: 100
+      ipv6: 100
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65003_r4
+      neighbor: 100.64.0.4
+      prefix_limit: 100
+      source_address: 100.64.0.1
+      status:
+        bgp_nexthop: 100.64.0.1
+        channel: ipv4
+        igp_table: master4
+        import_limit: 100
+        import_limit_action: restart
+        info: established
+        input_filter: f_bgp_AS65003_r4_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.4
+        neighbor_as: 65003
+        neighbor_id: 0.0.0.4
+        output_filter: f_bgp_AS65003_r4_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: 100.64.0.1
+        state: up
+        table: t_bgp4_AS65003_r4_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65003_r4
+      neighbor: fc00:100::4
+      prefix_limit: 100
+      source_address: fc00:100::1
+      status:
+        bgp_nexthop: fc00:100::1
+        channel: ipv6
+        igp_table: master6
+        import_limit: 100
+        import_limit_action: restart
+        info: established
+        input_filter: f_bgp_AS65003_r4_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::4
+        neighbor_as: 65003
+        neighbor_id: 0.0.0.4
+        output_filter: f_bgp_AS65003_r4_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: fc00:100::1
+        state: up
+        table: t_bgp6_AS65003_r4_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65003_r4_peer
+    ipv6: t_bgp6_AS65003_r4_peer
+  type: peer
+r1_peer_show_r5:
+  asn: 65004
+  description: BGP session to r5
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r5
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65004_r5
+      neighbor: 100.64.0.5
+      source_address: 100.64.0.1
+      status:
+        bgp_nexthop: 100.64.0.1
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65004_r5_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.5
+        neighbor_as: 65004
+        neighbor_id: 0.0.0.5
+        output_filter: f_bgp_AS65004_r5_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: 100.64.0.1
+        state: up
+        table: t_bgp4_AS65004_r5_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65004_r5
+      neighbor: fc00:100::5
+      source_address: fc00:100::1
+      status:
+        bgp_nexthop: fc00:100::1
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65004_r5_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::5
+        neighbor_as: 65004
+        neighbor_id: 0.0.0.5
+        output_filter: f_bgp_AS65004_r5_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: fc00:100::1
+        state: up
+        table: t_bgp6_AS65004_r5_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65004_r5_peer
+    ipv6: t_bgp6_AS65004_r5_peer
+  type: routecollector
+r1_peer_show_r6:
+  asn: 65005
+  description: BGP session to r6
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r6
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65005_r6
+      neighbor: 100.64.0.6
+      source_address: 100.64.0.1
+      status:
+        bgp_nexthop: 100.64.0.1
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65005_r6_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.6
+        neighbor_as: 65005
+        neighbor_id: 0.0.0.6
+        output_filter: f_bgp_AS65005_r6_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: 100.64.0.1
+        state: up
+        table: t_bgp4_AS65005_r6_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65005_r6
+      neighbor: fc00:100::6
+      source_address: fc00:100::1
+      status:
+        bgp_nexthop: fc00:100::1
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65005_r6_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::6
+        neighbor_as: 65005
+        neighbor_id: 0.0.0.6
+        output_filter: f_bgp_AS65005_r6_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: fc00:100::1
+        state: up
+        table: t_bgp6_AS65005_r6_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65005_r6_peer
+    ipv6: t_bgp6_AS65005_r6_peer
+  type: routeserver
+r1_peer_show_r7:
+  asn: 65000
+  description: BGP session to r7
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r7
+  protocols:
+    ipv4:
+      mode: passive
+      name: bgp4_AS65000_r7
+      neighbor: 100.64.0.7
+      source_address: 100.64.0.1
+      status:
+        bgp_nexthop: 100.64.0.1
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_r7_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.7
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.7
+        output_filter: f_bgp_AS65000_r7_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: 100.64.0.1
+        state: up
+        table: t_bgp4_AS65000_r7_peer
+    ipv6:
+      mode: passive
+      name: bgp6_AS65000_r7
+      neighbor: fc00:100::7
+      source_address: fc00:100::1
+      status:
+        bgp_nexthop: fc00:100::1
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_r7_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::7
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.7
+        output_filter: f_bgp_AS65000_r7_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: fc00:100::1
+        state: up
+        table: t_bgp6_AS65000_r7_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r7_peer
+    ipv6: t_bgp6_AS65000_r7_peer
+  type: rrclient
+r1_peer_show_r8:
+  asn: 65000
+  description: BGP session to r8
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r8
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r8
+      neighbor: 100.64.0.8
+      source_address: 100.64.0.1
+      status:
+        bgp_nexthop: 100.64.0.1
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_r8_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.8
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.8
+        output_filter: f_bgp_AS65000_r8_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: 100.64.0.1
+        state: up
+        table: t_bgp4_AS65000_r8_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r8
+      neighbor: fc00:100::8
+      source_address: fc00:100::1
+      status:
+        bgp_nexthop: fc00:100::1
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_r8_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::8
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.8
+        output_filter: f_bgp_AS65000_r8_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: fc00:100::1
+        state: up
+        table: t_bgp6_AS65000_r8_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r8_peer
+    ipv6: t_bgp6_AS65000_r8_peer
+  type: rrserver
+r1_peer_show_r9:
+  asn: 65000
+  description: BGP session to r9
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r9
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r9
+      neighbor: 100.64.0.9
+      source_address: 100.64.0.1
+      status:
+        bgp_nexthop: 100.64.0.1
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_r9_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.9
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.9
+        output_filter: f_bgp_AS65000_r9_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: 100.64.0.1
+        state: up
+        table: t_bgp4_AS65000_r9_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r9
+      neighbor: fc00:100::9
+      source_address: fc00:100::1
+      status:
+        bgp_nexthop: fc00:100::1
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_r9_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::9
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.9
+        output_filter: f_bgp_AS65000_r9_peer_export
+        preference: 100
+        routes_exported: 1
+        routes_imported: 0
+        source_address: fc00:100::1
+        state: up
+        table: t_bgp6_AS65000_r9_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r9_peer
+    ipv6: t_bgp6_AS65000_r9_peer
+  type: rrserver-rrserver
+r1_peer_summary:
+  e1:
+    asn: 65000
+    description: BGP session to e1
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_e1
+        neighbor: 100.64.0.100
+        source_address: 100.64.0.1
+        status:
+          info: established
+          name: bgp4_AS65000_e1
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_e1
+        neighbor: fc00:100::100
+        source_address: fc00:100::1
+        status:
+          info: established
+          name: bgp6_AS65000_e1
+          proto: BGP
+          state: up
+  r10:
+    asn: 65009
+    description: BGP session to r10
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65009_r10
+        neighbor: 100.64.0.10
+        source_address: 100.64.0.1
+        status:
+          info: established
+          name: bgp4_AS65009_r10
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65009_r10
+        neighbor: fc00:100::10
+        source_address: fc00:100::1
+        status:
+          info: established
+          name: bgp6_AS65009_r10
+          proto: BGP
+          state: up
+  r2:
+    asn: 65001
+    description: BGP session to r2
+    protocols:
+      ipv4:
+        mode: passive
+        name: bgp4_AS65001_r2
+        neighbor: 100.64.0.2
+        prefix_limit: 100
+        source_address: 100.64.0.1
+        status:
+          info: established
+          name: bgp4_AS65001_r2
+          proto: BGP
+          state: up
+      ipv6:
+        mode: passive
+        name: bgp6_AS65001_r2
+        neighbor: fc00:100::2
+        prefix_limit: 100
+        source_address: fc00:100::1
+        status:
+          info: established
+          name: bgp6_AS65001_r2
+          proto: BGP
+          state: up
+  r3:
+    asn: 65000
+    description: BGP session to r3
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r3
+        neighbor: 100.64.0.3
+        source_address: 100.64.0.1
+        status:
+          info: established
+          name: bgp4_AS65000_r3
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r3
+        neighbor: fc00:100::3
+        source_address: fc00:100::1
+        status:
+          info: established
+          name: bgp6_AS65000_r3
+          proto: BGP
+          state: up
+  r4:
+    asn: 65003
+    description: BGP session to r4
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65003_r4
+        neighbor: 100.64.0.4
+        prefix_limit: 100
+        source_address: 100.64.0.1
+        status:
+          info: established
+          name: bgp4_AS65003_r4
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65003_r4
+        neighbor: fc00:100::4
+        prefix_limit: 100
+        source_address: fc00:100::1
+        status:
+          info: established
+          name: bgp6_AS65003_r4
+          proto: BGP
+          state: up
+  r5:
+    asn: 65004
+    description: BGP session to r5
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65004_r5
+        neighbor: 100.64.0.5
+        source_address: 100.64.0.1
+        status:
+          info: established
+          name: bgp4_AS65004_r5
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65004_r5
+        neighbor: fc00:100::5
+        source_address: fc00:100::1
+        status:
+          info: established
+          name: bgp6_AS65004_r5
+          proto: BGP
+          state: up
+  r6:
+    asn: 65005
+    description: BGP session to r6
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65005_r6
+        neighbor: 100.64.0.6
+        source_address: 100.64.0.1
+        status:
+          info: established
+          name: bgp4_AS65005_r6
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65005_r6
+        neighbor: fc00:100::6
+        source_address: fc00:100::1
+        status:
+          info: established
+          name: bgp6_AS65005_r6
+          proto: BGP
+          state: up
+  r7:
+    asn: 65000
+    description: BGP session to r7
+    protocols:
+      ipv4:
+        mode: passive
+        name: bgp4_AS65000_r7
+        neighbor: 100.64.0.7
+        source_address: 100.64.0.1
+        status:
+          info: established
+          name: bgp4_AS65000_r7
+          proto: BGP
+          state: up
+      ipv6:
+        mode: passive
+        name: bgp6_AS65000_r7
+        neighbor: fc00:100::7
+        source_address: fc00:100::1
+        status:
+          info: established
+          name: bgp6_AS65000_r7
+          proto: BGP
+          state: up
+  r8:
+    asn: 65000
+    description: BGP session to r8
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r8
+        neighbor: 100.64.0.8
+        source_address: 100.64.0.1
+        status:
+          info: established
+          name: bgp4_AS65000_r8
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r8
+        neighbor: fc00:100::8
+        source_address: fc00:100::1
+        status:
+          info: established
+          name: bgp6_AS65000_r8
+          proto: BGP
+          state: up
+  r9:
+    asn: 65000
+    description: BGP session to r9
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r9
+        neighbor: 100.64.0.9
+        source_address: 100.64.0.1
+        status:
+          info: established
+          name: bgp4_AS65000_r9
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r9
+        neighbor: fc00:100::9
+        source_address: fc00:100::1
+        status:
+          info: established
+          name: bgp6_AS65000_r9
+          proto: BGP
+          state: up
 r1_t_bgp4:
   100.64.101.0/24:
   - attributes:
@@ -760,6 +1683,108 @@ r1_t_bgp6_AS65009_r10_peer:
     type:
     - BGP
     - univ
+r2_peer_show_r1:
+  asn: 65000
+  description: BGP session to r1
+  filter:
+    as_sets: []
+    aspath_asns:
+      calculated:
+      - 65000
+      - 65100
+    origin_asns:
+      static:
+      - 65000
+      - 65100
+  graceful_shutdown: false
+  name: r1
+  prefix_limit:
+    static:
+      ipv4: 100
+      ipv6: 100
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r1
+      neighbor: 100.64.0.1
+      prefix_limit: 100
+      source_address: 100.64.0.2
+      status:
+        bgp_nexthop: 100.64.0.2
+        channel: ipv4
+        igp_table: master4
+        import_limit: 100
+        import_limit_action: restart
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65001
+        neighbor_address: 100.64.0.1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: 100.64.0.2
+        state: up
+        table: t_bgp4_AS65000_r1_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r1
+      neighbor: fc00:100::1
+      prefix_limit: 100
+      source_address: fc00:100::2
+      status:
+        bgp_nexthop: fc00:100::2
+        channel: ipv6
+        igp_table: master6
+        import_limit: 100
+        import_limit_action: restart
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65001
+        neighbor_address: fc00:100::1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: fc00:100::2
+        state: up
+        table: t_bgp6_AS65000_r1_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r1_peer
+    ipv6: t_bgp6_AS65000_r1_peer
+  type: customer
+r2_peer_summary:
+  r1:
+    asn: 65000
+    description: BGP session to r1
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r1
+        neighbor: 100.64.0.1
+        prefix_limit: 100
+        source_address: 100.64.0.2
+        status:
+          info: established
+          name: bgp4_AS65000_r1
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r1
+        neighbor: fc00:100::1
+        prefix_limit: 100
+        source_address: fc00:100::2
+        status:
+          info: established
+          name: bgp6_AS65000_r1
+          proto: BGP
+          state: up
 r2_t_bgp4:
   100.64.101.0/24:
   - asn: AS65000
@@ -898,10 +1923,186 @@ r2_t_bgp6_AS65000_r1_peer:
     type:
     - BGP
     - univ
+r3_peer_show_r1:
+  asn: 65000
+  description: BGP session to r1
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r1
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r1
+      neighbor: 100.64.0.1
+      source_address: 100.64.0.3
+      status:
+        bgp_nexthop: 100.64.0.3
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: 100.64.0.3
+        state: up
+        table: t_bgp4_AS65000_r1_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r1
+      neighbor: fc00:100::1
+      source_address: fc00:100::3
+      status:
+        bgp_nexthop: fc00:100::3
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: fc00:100::3
+        state: up
+        table: t_bgp6_AS65000_r1_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r1_peer
+    ipv6: t_bgp6_AS65000_r1_peer
+  type: internal
+r3_peer_summary:
+  r1:
+    asn: 65000
+    description: BGP session to r1
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r1
+        neighbor: 100.64.0.1
+        source_address: 100.64.0.3
+        status:
+          info: established
+          name: bgp4_AS65000_r1
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r1
+        neighbor: fc00:100::1
+        source_address: fc00:100::3
+        status:
+          info: established
+          name: bgp6_AS65000_r1
+          proto: BGP
+          state: up
 r3_t_bgp4: {}
 r3_t_bgp4_AS65000_r1_peer: {}
 r3_t_bgp6: {}
 r3_t_bgp6_AS65000_r1_peer: {}
+r4_peer_show_r1:
+  asn: 65000
+  description: BGP session to r1
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r1
+  prefix_limit:
+    static:
+      ipv4: 100
+      ipv6: 100
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r1
+      neighbor: 100.64.0.1
+      prefix_limit: 100
+      source_address: 100.64.0.4
+      status:
+        bgp_nexthop: 100.64.0.4
+        channel: ipv4
+        igp_table: master4
+        import_limit: 100
+        import_limit_action: restart
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65003
+        neighbor_address: 100.64.0.1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: 100.64.0.4
+        state: up
+        table: t_bgp4_AS65000_r1_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r1
+      neighbor: fc00:100::1
+      prefix_limit: 100
+      source_address: fc00:100::4
+      status:
+        bgp_nexthop: fc00:100::4
+        channel: ipv6
+        igp_table: master6
+        import_limit: 100
+        import_limit_action: restart
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65003
+        neighbor_address: fc00:100::1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: fc00:100::4
+        state: up
+        table: t_bgp6_AS65000_r1_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r1_peer
+    ipv6: t_bgp6_AS65000_r1_peer
+  type: peer
+r4_peer_summary:
+  r1:
+    asn: 65000
+    description: BGP session to r1
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r1
+        neighbor: 100.64.0.1
+        prefix_limit: 100
+        source_address: 100.64.0.4
+        status:
+          info: established
+          name: bgp4_AS65000_r1
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r1
+        neighbor: fc00:100::1
+        prefix_limit: 100
+        source_address: fc00:100::4
+        status:
+          info: established
+          name: bgp6_AS65000_r1
+          proto: BGP
+          state: up
 r4_t_bgp4:
   100.64.101.0/24:
   - asn: AS65000
@@ -1040,6 +2241,88 @@ r4_t_bgp6_AS65000_r1_peer:
     type:
     - BGP
     - univ
+r5_peer_show_r1:
+  asn: 65000
+  description: BGP session to r1
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r1
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r1
+      neighbor: 100.64.0.1
+      source_address: 100.64.0.5
+      status:
+        bgp_nexthop: 100.64.0.5
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65004
+        neighbor_address: 100.64.0.1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: 100.64.0.5
+        state: up
+        table: t_bgp4_AS65000_r1_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r1
+      neighbor: fc00:100::1
+      source_address: fc00:100::5
+      status:
+        bgp_nexthop: fc00:100::5
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65004
+        neighbor_address: fc00:100::1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: fc00:100::5
+        state: up
+        table: t_bgp6_AS65000_r1_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r1_peer
+    ipv6: t_bgp6_AS65000_r1_peer
+  type: routecollector
+r5_peer_summary:
+  r1:
+    asn: 65000
+    description: BGP session to r1
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r1
+        neighbor: 100.64.0.1
+        source_address: 100.64.0.5
+        status:
+          info: established
+          name: bgp4_AS65000_r1
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r1
+        neighbor: fc00:100::1
+        source_address: fc00:100::5
+        status:
+          info: established
+          name: bgp6_AS65000_r1
+          proto: BGP
+          state: up
 r5_t_bgp4: {}
 r5_t_bgp4_AS65000_r1_peer:
   100.64.101.0/24:
@@ -1111,6 +2394,88 @@ r5_t_bgp6_AS65000_r1_peer:
     type:
     - BGP
     - univ
+r6_peer_show_r1:
+  asn: 65000
+  description: BGP session to r1
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r1
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r1
+      neighbor: 100.64.0.1
+      source_address: 100.64.0.6
+      status:
+        bgp_nexthop: 100.64.0.6
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65005
+        neighbor_address: 100.64.0.1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: 100.64.0.6
+        state: up
+        table: t_bgp4_AS65000_r1_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r1
+      neighbor: fc00:100::1
+      source_address: fc00:100::6
+      status:
+        bgp_nexthop: fc00:100::6
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65005
+        neighbor_address: fc00:100::1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 1
+        source_address: fc00:100::6
+        state: up
+        table: t_bgp6_AS65000_r1_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r1_peer
+    ipv6: t_bgp6_AS65000_r1_peer
+  type: routeserver
+r6_peer_summary:
+  r1:
+    asn: 65000
+    description: BGP session to r1
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r1
+        neighbor: 100.64.0.1
+        source_address: 100.64.0.6
+        status:
+          info: established
+          name: bgp4_AS65000_r1
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r1
+        neighbor: fc00:100::1
+        source_address: fc00:100::6
+        status:
+          info: established
+          name: bgp6_AS65000_r1
+          proto: BGP
+          state: up
 r6_t_bgp4:
   100.64.101.0/24:
   - asn: AS65000
@@ -1261,14 +2626,260 @@ r6_t_bgp6_AS65000_r1_peer:
     type:
     - BGP
     - univ
+r7_peer_show_r1:
+  asn: 65000
+  description: BGP session to r1
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r1
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r1
+      neighbor: 100.64.0.1
+      source_address: 100.64.0.7
+      status:
+        bgp_nexthop: 100.64.0.7
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: 100.64.0.7
+        state: up
+        table: t_bgp4_AS65000_r1_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r1
+      neighbor: fc00:100::1
+      source_address: fc00:100::7
+      status:
+        bgp_nexthop: fc00:100::7
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: fc00:100::7
+        state: up
+        table: t_bgp6_AS65000_r1_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r1_peer
+    ipv6: t_bgp6_AS65000_r1_peer
+  type: rrclient
+r7_peer_summary:
+  r1:
+    asn: 65000
+    description: BGP session to r1
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r1
+        neighbor: 100.64.0.1
+        source_address: 100.64.0.7
+        status:
+          info: established
+          name: bgp4_AS65000_r1
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r1
+        neighbor: fc00:100::1
+        source_address: fc00:100::7
+        status:
+          info: established
+          name: bgp6_AS65000_r1
+          proto: BGP
+          state: up
 r7_t_bgp4: {}
 r7_t_bgp4_AS65000_r1_peer: {}
 r7_t_bgp6: {}
 r7_t_bgp6_AS65000_r1_peer: {}
+r8_peer_show_r1:
+  asn: 65000
+  description: BGP session to r1
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r1
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r1
+      neighbor: 100.64.0.1
+      source_address: 100.64.0.8
+      status:
+        bgp_nexthop: 100.64.0.8
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: 100.64.0.8
+        state: up
+        table: t_bgp4_AS65000_r1_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r1
+      neighbor: fc00:100::1
+      source_address: fc00:100::8
+      status:
+        bgp_nexthop: fc00:100::8
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: fc00:100::8
+        state: up
+        table: t_bgp6_AS65000_r1_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r1_peer
+    ipv6: t_bgp6_AS65000_r1_peer
+  type: rrserver
+r8_peer_summary:
+  r1:
+    asn: 65000
+    description: BGP session to r1
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r1
+        neighbor: 100.64.0.1
+        source_address: 100.64.0.8
+        status:
+          info: established
+          name: bgp4_AS65000_r1
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r1
+        neighbor: fc00:100::1
+        source_address: fc00:100::8
+        status:
+          info: established
+          name: bgp6_AS65000_r1
+          proto: BGP
+          state: up
 r8_t_bgp4: {}
 r8_t_bgp4_AS65000_r1_peer: {}
 r8_t_bgp6: {}
 r8_t_bgp6_AS65000_r1_peer: {}
+r9_peer_show_r1:
+  asn: 65000
+  description: BGP session to r1
+  filter:
+    as_sets: []
+  graceful_shutdown: false
+  name: r1
+  protocols:
+    ipv4:
+      mode: active
+      name: bgp4_AS65000_r1
+      neighbor: 100.64.0.1
+      source_address: 100.64.0.9
+      status:
+        bgp_nexthop: 100.64.0.9
+        channel: ipv4
+        igp_table: master4
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65000
+        neighbor_address: 100.64.0.1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: 100.64.0.9
+        state: up
+        table: t_bgp4_AS65000_r1_peer
+    ipv6:
+      mode: active
+      name: bgp6_AS65000_r1
+      neighbor: fc00:100::1
+      source_address: fc00:100::9
+      status:
+        bgp_nexthop: fc00:100::9
+        channel: ipv6
+        igp_table: master6
+        info: established
+        input_filter: f_bgp_AS65000_r1_peer_import
+        local_as: 65000
+        neighbor_address: fc00:100::1
+        neighbor_as: 65000
+        neighbor_id: 0.0.0.1
+        output_filter: f_bgp_AS65000_r1_peer_export
+        preference: 100
+        routes_exported: 0
+        routes_imported: 0
+        source_address: fc00:100::9
+        state: up
+        table: t_bgp6_AS65000_r1_peer
+  quarantine: false
+  tables:
+    ipv4: t_bgp4_AS65000_r1_peer
+    ipv6: t_bgp6_AS65000_r1_peer
+  type: rrserver-rrserver
+r9_peer_summary:
+  r1:
+    asn: 65000
+    description: BGP session to r1
+    protocols:
+      ipv4:
+        mode: active
+        name: bgp4_AS65000_r1
+        neighbor: 100.64.0.1
+        source_address: 100.64.0.9
+        status:
+          info: established
+          name: bgp4_AS65000_r1
+          proto: BGP
+          state: up
+      ipv6:
+        mode: active
+        name: bgp6_AS65000_r1
+        neighbor: fc00:100::1
+        source_address: fc00:100::9
+        status:
+          info: established
+          name: bgp6_AS65000_r1
+          proto: BGP
+          state: up
 r9_t_bgp4: {}
 r9_t_bgp4_AS65000_r1_peer: {}
 r9_t_bgp6: {}
