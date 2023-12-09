@@ -90,7 +90,7 @@ class BirdplanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
 
         """
 
-        if not self._subparser:
+        if not self._subparser:  # pragma: no cover
             raise RuntimeError()
 
         cmdline: BirdPlanCommandLine = args["cmdline"]
@@ -99,7 +99,7 @@ class BirdplanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
         peer = cmdline.args.peer[0]
 
         # Check value is valid
-        if cmdline.args.value[0] not in ("true", "false"):
+        if cmdline.args.value[0] not in ("true", "false"):  # pragma: no cover
             raise BirdPlanErrorUsage("BGP peer quarantine override flag value must be 'true' or 'false'", self._subparser)
         value = cmdline.args.value[0] == "true"
 
