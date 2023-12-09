@@ -208,21 +208,21 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
                 # Work out the cost string
                 cost_str = None
                 if (current_cost is not None) and (pending_cost is not None):
-                    cost_str = (
-                        f"{current_cost} → " + colored(pending_cost, "yellow")
-                        if (current_cost != pending_cost)
-                        else f"{pending_cost}"
-                    )
+                    cost_str = f"{current_cost} → "
+                    if current_cost != pending_cost:
+                        cost_str += colored(f"{pending_cost}", "yellow")
+                    else:
+                        cost_str += f"{pending_cost}"
                 else:
                     cost_str = colored(f"{pending_cost}", "green")
                 # Work out the ECMP weight
                 ecmp_weight_str = None
                 if (current_ecmp_weight is not None) and (pending_ecmp_weight is not None):
-                    ecmp_weight_str = (
-                        f"{current_ecmp_weight} → " + colored(pending_ecmp_weight, "yellow")
-                        if (current_ecmp_weight != pending_ecmp_weight)
-                        else f"{pending_ecmp_weight}"
-                    )
+                    ecmp_weight_str = f"{current_ecmp_weight} → "
+                    if current_ecmp_weight != pending_ecmp_weight:
+                        ecmp_weight_str += colored(f"{pending_ecmp_weight}", "yellow")
+                    else:
+                        ecmp_weight_str += f"{pending_ecmp_weight}"
                 else:
                     ecmp_weight_str = colored(f"{pending_ecmp_weight}", "green")
 
