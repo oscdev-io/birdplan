@@ -27,8 +27,8 @@ from typing import Any, Dict, List, Optional, Union
 
 import birdclient
 import jinja2
-import yaml
 import packaging.version
+import yaml
 
 from .bird_config import BirdConfig
 from .console.colors import colored
