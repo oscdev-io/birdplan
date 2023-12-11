@@ -91,7 +91,7 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
 
         """
 
-        if not self._subparser:
+        if not self._subparser:  # pragma: no cover
             raise RuntimeError()
 
         cmdline: BirdPlanCommandLine = args["cmdline"]

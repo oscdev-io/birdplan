@@ -30,9 +30,9 @@ dependencies = [
     "nsnetsim @ git+https://gitlab.oscdev.io/software/nsnetsim.git@master",
     "click",
     "jinja2",
+    "packaging",
     "pyyaml",
     "requests",
-    "setuptools",
 ]
 
 [project.scripts]
