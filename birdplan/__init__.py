@@ -28,6 +28,7 @@ from typing import Any, Dict, List, Optional, Union
 import birdclient
 import jinja2
 import yaml
+import packaging.version
 
 from .bird_config import BirdConfig
 from .console.colors import colored
@@ -45,6 +46,10 @@ BirdPlanBGPPeerShow = Dict[str, Any]
 BirdPlanBGPPeerGracefulShutdownStatus = Dict[str, Dict[str, bool]]
 BirdPlanBGPPeerQuarantineStatus = Dict[str, Dict[str, bool]]
 BirdPlanOSPFInterfaceStatus = Dict[str, Dict[str, Dict[str, Any]]]
+
+# Check we have a sufficiently new version of birdclient
+if packaging.version.parse(birdclient.__version__) < packaging.version.parse("0.0.8"):
+    raise BirdPlanError("birdplan requires birdclient version 0.0.8 or newer")
 
 
 class BirdPlan:
