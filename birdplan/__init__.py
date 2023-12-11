@@ -46,6 +46,7 @@ BirdPlanBGPPeerShow = Dict[str, Any]
 BirdPlanBGPPeerGracefulShutdownStatus = Dict[str, Dict[str, bool]]
 BirdPlanBGPPeerQuarantineStatus = Dict[str, Dict[str, bool]]
 BirdPlanOSPFInterfaceStatus = Dict[str, Dict[str, Dict[str, Any]]]
+BirdPlanOSPFSummary = Dict[str, Dict[str, Any]]
 
 # Check we have a sufficiently new version of birdclient
 if packaging.version.parse(birdclient.__version__) < packaging.version.parse("0.0.8"):
@@ -195,6 +196,53 @@ class BirdPlan:
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.state_file}' for writing: {err}") from None
 
+    def state_ospf_summary(self, bird_socket: Optional[str] = None) -> BirdPlanOSPFSummary:
+        """
+        Return OSPF summary.
+
+        Returns
+        -------
+        BirdPlanOSPFSummary
+            Dictionary containing the OSPF summary.
+
+            eg.
+            {
+                'name1': {
+                    'proto': ...,
+                    'table': ...,
+                    'state': ...,
+                    'since': ...,
+                    'info': ...,
+                }
+                'name2': {
+                    ...,
+                }
+            }
+
+        """  # noqa: RST201,RST203,RST301
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF summary requires a state file, none loaded")
+
+        # Initialize our return structure
+        ret: BirdPlanOSPFSummary = {}
+
+        # Return if we don't have any BGP state
+        if "ospf" not in self.state:
+            return ret
+
+        # Query bird client for the current protocols
+        birdc = birdclient.BirdClient(control_socket=bird_socket)
+        bird_protocols = birdc.show_protocols()
+
+        for name, data in bird_protocols.items():
+            if data["proto"] != "OSPF":
+                continue
+            ret[name] = data
+
+        return ret
+
     def state_bgp_peer_summary(self, bird_socket: Optional[str] = None) -> BirdPlanBGPPeerSummary:
         """
         Return BGP peer summary.
@@ -223,7 +271,7 @@ class BirdPlan:
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("The use of BGP peer status requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP peer summary requires a state file, none loaded")
 
         # Initialize our return structure
         ret: BirdPlanBGPPeerSummary = {}
@@ -283,7 +331,7 @@ class BirdPlan:
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
-            raise BirdPlanError("The use of BGP peer status requires a state file, none loaded")
+            raise BirdPlanError("The use of BGP peer show requires a state file, none loaded")
 
         # Return if we don't have any BGP state
         if "bgp" not in self.state:
