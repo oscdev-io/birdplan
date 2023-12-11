@@ -30,6 +30,8 @@ from nsnetsim.topology import Topology
 
 from birdplan import BirdPlan  # pylint: disable=import-error
 
+__all__ = ["YAMLSafeLoader", "Simulation"]
+
 
 class YAMLSafeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
     """Safe YAML loader wtih some specific datatypes."""

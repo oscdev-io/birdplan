@@ -23,6 +23,8 @@
 
 from ..template import Template
 
+__all__ = ["Test"]
+
 
 class Test(Template):
     """RIP test case for redistribution of kernel default routes, with redistribute:kernel_default set to true."""

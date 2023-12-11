@@ -24,6 +24,8 @@
 from ....config.peertype_routecollector.peer.r1r2 import PeerTypeConfig
 from ..template_redistribute_bgp_transit_default_true import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP redistribution test case."""

@@ -23,6 +23,8 @@
 
 from ...basetests import BirdPlanBaseTestCase
 
+__all__ = ["Template"]
+
 
 class Template(BirdPlanBaseTestCase):
     """RIP basic test case template."""

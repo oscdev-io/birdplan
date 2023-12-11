@@ -24,6 +24,8 @@
 from ....config.peertype_internal.r1r2 import PeerTypeConfig
 from ..template_quarantine_outbound_configfile_global import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP quarantine test case."""

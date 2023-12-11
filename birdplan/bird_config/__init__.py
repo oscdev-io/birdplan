@@ -26,6 +26,8 @@ from .sections.constants import SectionConstants
 from .sections.protocols import SectionProtocols
 from .sections.tables import SectionTables
 
+__all__ = ["BirdConfig"]
+
 
 class BirdConfig:
     """BirdConfig is responsible for configuring Bird."""

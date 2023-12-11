@@ -22,6 +22,8 @@ from typing import Optional
 
 from .......exceptions import BirdPlanError
 
+__all__ = ["OSPFAreaInterfaceAttributes"]
+
 
 class OSPFAreaInterfaceAttributes:  # pylint: disable=too-few-public-methods
     """

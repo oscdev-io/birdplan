@@ -25,6 +25,9 @@ import requests
 
 from .exceptions import BirdPlanError
 
+__all__ = ["PeeringDB"]
+
+
 PeeringDBInfo = Dict[str, Any]
 
 

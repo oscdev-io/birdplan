@@ -25,6 +25,8 @@ from ......cmdline import BirdPlanCommandLine
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineBGPPeerQuarantineSet"]
+
 
 class BirdplanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer quarantine set" command."""

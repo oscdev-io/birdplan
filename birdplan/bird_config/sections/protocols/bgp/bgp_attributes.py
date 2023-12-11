@@ -20,6 +20,8 @@
 
 from typing import Dict, List, Optional, Union
 
+__all__ = ["BGPRoutePolicyAccept", "BGPRoutePolicyImport", "BGPPeertypeConstraints", "BGPAttributes"]
+
 
 class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
     """

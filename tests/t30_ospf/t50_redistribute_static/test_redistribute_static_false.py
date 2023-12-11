@@ -23,6 +23,8 @@
 
 from .template import Template
 
+__all__ = ["Test"]
+
 
 class Test(Template):
     """Test case for redistribution of static routes via OSPF, with ospf:redistribute:static set to False."""

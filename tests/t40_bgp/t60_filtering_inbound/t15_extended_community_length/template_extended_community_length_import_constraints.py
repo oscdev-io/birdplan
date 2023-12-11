@@ -23,6 +23,8 @@
 
 from ..template_base_community_tests import TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP too many extended communities test case template."""

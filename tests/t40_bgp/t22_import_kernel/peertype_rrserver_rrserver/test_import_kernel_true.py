@@ -24,6 +24,8 @@
 from ...config.peertype_rrserver_rrserver.r1r2 import PeerTypeConfig
 from ..template_import_kernel_true import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP import kernel route test case."""

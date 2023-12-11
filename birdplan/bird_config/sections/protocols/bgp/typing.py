@@ -20,4 +20,6 @@
 
 from typing import Any, Dict
 
+_all__ = ["BGPPeerConfig"]
+
 BGPPeerConfig = Dict[str, Any]

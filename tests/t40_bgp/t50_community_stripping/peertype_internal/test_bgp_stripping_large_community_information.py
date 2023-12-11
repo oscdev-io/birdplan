@@ -24,6 +24,8 @@
 from ...config.peertype_internal.e1r1 import PeerTypeConfig
 from ..template_stripping_large_community_information import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP large community (information function) stripping test case."""

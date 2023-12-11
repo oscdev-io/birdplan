@@ -24,6 +24,8 @@ from typing import Any, Dict
 from ......cmdline import BirdPlanCommandLine
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineOSPFInterfaceECMPWeightRemove"]
+
 
 class BirdplanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
     """Birdplan "ospf interface ecmp-weight remove" command."""

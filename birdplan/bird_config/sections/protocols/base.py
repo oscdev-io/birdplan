@@ -24,6 +24,8 @@ from ..constants import SectionConstants
 from ..functions import SectionFunctions
 from ..tables import SectionTables
 
+__all__ = ["SectionProtocolBase"]
+
 
 class SectionProtocolBase(SectionBase):
     """BIRD protocol base class."""

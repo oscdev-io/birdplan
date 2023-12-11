@@ -24,6 +24,8 @@ from ....globals import BirdConfigGlobals
 from ...functions import BirdFunction, SectionFunctions
 from ..base_protocol_functions import ProtocolFunctionsBase
 
+__all__ = ["OSPFFunctions"]
+
 
 class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods
     """OSPF protocol specific functions class."""

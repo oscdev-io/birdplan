@@ -24,6 +24,8 @@
 from ....config.peertype_customer.e1r1_no_filter import PeerTypeConfig
 from ..template_as_sets_blackhole import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""

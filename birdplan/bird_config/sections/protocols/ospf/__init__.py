@@ -29,10 +29,13 @@ from ..base import SectionProtocolBase
 from ..direct import ProtocolDirect
 from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from .area import ProtocolOSPFArea
+from .area.typing import OSPFAreaConfig
 from .ospf_attributes import OSPFAttributes, OSPFRoutePolicyAccept, OSPFRoutePolicyRedistribute
 from .ospf_functions import OSPFFunctions
 
-OSPFAreaConfig = Dict[str, str]
+__all__ = ["ProtocolOSPF"]
+
+
 OSPFAreas = Dict[str, ProtocolOSPFArea]
 
 

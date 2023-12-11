@@ -32,6 +32,9 @@ from .exceptions import BirdPlanError, BirdPlanErrorUsage
 from .plugin import PluginCollection
 from .version import __version__
 
+__all__ = ["ColorFormatter", "BirdPlanArgumentParser", "BirdPlanCommandLine"]
+
+
 # Defaults
 BIRD_CONFIG_FILE = "/etc/bird.conf"
 BIRD_SOCKET = "/run/bird/bird.ctl"

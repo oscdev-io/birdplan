@@ -28,6 +28,9 @@ from ..tables import SectionTables
 from .base import SectionProtocolBase
 from .pipe import ProtocolPipe
 
+__all__ = ["ProtocolStatic"]
+
+
 StaticRoutes = Dict[str, str]
 
 

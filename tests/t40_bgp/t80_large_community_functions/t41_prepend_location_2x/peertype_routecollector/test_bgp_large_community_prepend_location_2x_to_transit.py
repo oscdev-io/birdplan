@@ -24,6 +24,8 @@
 from ....config.peertype_routecollector.r1_to_r10 import PeerTypeConfig
 from ..template_large_community_prepend_location_2x_to_transit import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP large community functions test case."""

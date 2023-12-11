@@ -27,6 +27,8 @@ from ......cmdline import BirdPlanCommandLine
 from ......console.colors import colored
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineBGPPeerQuarantineShow"]
+
 
 class BirdplanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer quarantine show" command."""

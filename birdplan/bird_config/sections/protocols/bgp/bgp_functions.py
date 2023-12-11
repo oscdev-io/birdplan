@@ -26,6 +26,8 @@ from ....globals import BirdConfigGlobals
 from ...functions import BirdFunction, BirdVariable, SectionFunctions
 from ..base_protocol_functions import ProtocolFunctionsBase
 
+__all__ = ["BGPFunctions"]
+
 
 class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods
     """BGP protocol specific functions class."""

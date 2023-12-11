@@ -23,6 +23,8 @@
 
 from .template_base_lc_blackhole_to_asn import TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP large community functions test case template."""

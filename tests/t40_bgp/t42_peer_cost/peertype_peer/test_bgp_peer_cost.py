@@ -24,6 +24,8 @@
 from ...config.peertype_peer.e1r1 import PeerTypeConfig
 from ..template import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP peer cost test case."""

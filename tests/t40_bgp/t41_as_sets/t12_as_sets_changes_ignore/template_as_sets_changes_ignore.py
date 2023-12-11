@@ -29,6 +29,8 @@ from birdplan import bgpq3
 from ....basetests import BirdPlanBaseTestCase
 from ....simulation import Simulation
 
+__all__ = ["Template"]
+
 
 class Template(BirdPlanBaseTestCase):
     """BGP peer AS-SET changes test case template."""

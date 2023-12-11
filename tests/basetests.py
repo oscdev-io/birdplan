@@ -39,6 +39,9 @@ from birdplan.exceptions import BirdPlanError
 
 from .simulation import Simulation
 
+__all__ = ["BirdPlanBaseTestCase"]
+
+
 BirdConfigMacros = Optional[Dict[str, Dict[str, str]]]
 
 #
@@ -313,7 +316,9 @@ class BirdPlanBaseTestCase:
         # Return the two chunks of data for later assertion
         return (result, result_expected)
 
-    def _test_bird_cmdline_bgp_peer_summary(self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None):
+    def _test_bird_cmdline_bgp_peer_summary(  # pylint: disable=too-many-locals,too-many-branches
+        self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None
+    ):
         """Test showing BGP peer summary."""
 
         # Check if we didn't get a router list override, if we didn't, then use all routers
@@ -401,7 +406,9 @@ class BirdPlanBaseTestCase:
         for router, data in router_summaries.items():
             assert data["result"] == data["expected"], f"BIRD router '{router}' peer summary does not match what it should be"
 
-    def _test_bird_cmdline_bgp_peer_show(self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None):
+    def _test_bird_cmdline_bgp_peer_show(  # pylint: disable=too-many-locals,too-many-branches
+        self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None
+    ):
         """Test showing BGP peer show."""
 
         # Check if we didn't get a router list override, if we didn't, then use all routers
@@ -411,7 +418,7 @@ class BirdPlanBaseTestCase:
         router_shows = {}
 
         # Loop with routers
-        for router in routers:
+        for router in routers:  # pylint: disable=too-many-nested-blocks
             # Skip over routers not configured
             if not sim.node(router):
                 continue

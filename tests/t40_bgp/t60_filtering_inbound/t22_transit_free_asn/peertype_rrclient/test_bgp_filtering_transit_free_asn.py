@@ -24,6 +24,8 @@
 from ....config.peertype_rrclient.e1r1 import PeerTypeConfig
 from ..template_transit_free_asn import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""

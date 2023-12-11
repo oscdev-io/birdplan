@@ -24,6 +24,8 @@
 from ....config.peertype_transit.r1_to_r10 import PeerTypeConfig
 from ..template_lc_blackhole_to_routeserver_community import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP large community functions test case."""

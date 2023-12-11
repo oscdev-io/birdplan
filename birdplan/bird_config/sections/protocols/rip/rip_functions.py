@@ -24,6 +24,8 @@ from ....globals import BirdConfigGlobals
 from ...functions import BirdFunction, SectionFunctions
 from ..base_protocol_functions import ProtocolFunctionsBase
 
+__all__ = ["RIPFunctions"]
+
 
 class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods
     """RIP protocol specific functions class."""

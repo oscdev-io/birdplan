@@ -23,6 +23,8 @@
 
 from birdplan.peeringdb import PeeringDB
 
+__all__ = ["Test"]
+
 
 class Test:
     """Basic test case for PeeringDB."""

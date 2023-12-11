@@ -24,6 +24,8 @@
 from ...config.peertype_rrserver.r1r2 import PeerTypeConfig
 from ..template import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP incoming large community test case."""

@@ -25,6 +25,8 @@ from typing import Any, Optional
 
 from ...plugin import Plugin
 
+__all__ = ["BirdPlanCmdlinePluginBase"]
+
 
 class BirdPlanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-methods
     """Birdplan commandline plugin base class."""

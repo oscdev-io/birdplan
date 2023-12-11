@@ -23,6 +23,8 @@
 
 from ...basetests import BirdPlanBaseTestCase
 
+__all__ = ["Template"]
+
 
 class Template(BirdPlanBaseTestCase):
     """BGP peer cost test template."""

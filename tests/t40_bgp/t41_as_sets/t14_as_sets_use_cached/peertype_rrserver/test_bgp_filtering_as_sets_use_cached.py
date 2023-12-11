@@ -24,6 +24,8 @@
 from ....config.peertype_rrserver.e1r1 import PeerTypeConfig
 from ..template_as_sets_use_cached import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP AS-SET test case."""

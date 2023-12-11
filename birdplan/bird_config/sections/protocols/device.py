@@ -20,6 +20,8 @@
 
 from .base import SectionProtocolBase
 
+__all__ = ["ProtocolDevice"]
+
 
 class ProtocolDevice(SectionProtocolBase):
     """BIRD device protocol configuration."""

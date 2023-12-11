@@ -26,6 +26,9 @@ from typing import Any, Dict, List, Optional, Union
 
 from .exceptions import BirdPlanError
 
+__all__ = ["BGPQ3"]
+
+
 # Keep a cache for results returned while loaded into memory
 #
 # Example:

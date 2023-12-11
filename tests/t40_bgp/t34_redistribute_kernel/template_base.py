@@ -23,6 +23,8 @@
 
 from ...basetests import BirdPlanBaseTestCase
 
+__all__ = ["TemplateBase"]
+
 
 class TemplateBase(BirdPlanBaseTestCase):
     """BGP redistribute kernel route test case template."""

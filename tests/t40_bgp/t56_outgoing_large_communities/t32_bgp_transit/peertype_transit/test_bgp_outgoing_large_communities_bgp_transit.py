@@ -24,6 +24,8 @@
 from ....config.peertype_transit.customer.r1r2 import PeerTypeConfig
 from ..template_outgoing_large_communities_bgp_transit import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP outgoing large communities test case."""

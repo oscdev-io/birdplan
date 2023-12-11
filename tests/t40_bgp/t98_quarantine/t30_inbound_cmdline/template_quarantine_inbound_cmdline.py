@@ -25,6 +25,8 @@ import time
 
 from ..template_base import TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP quarantine test case template."""

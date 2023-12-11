@@ -23,6 +23,8 @@
 
 from ...basetests import BirdPlanBaseTestCase
 
+__all__ = ["TemplateBase"]
+
 
 class TemplateBase(BirdPlanBaseTestCase):
     """BGP community functions test case template (base class for specific tests)."""

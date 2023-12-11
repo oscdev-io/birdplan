@@ -52,6 +52,8 @@ from .peer_attributes import (
     BGPPeerRoutePolicyRedistribute,
 )
 
+__all__ = ["ProtocolBGPPeer"]
+
 
 class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
     """BIRD BGP protocol peer configuration."""

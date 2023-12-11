@@ -24,6 +24,8 @@
 from ...config.peertype_rrclient.e1r1 import PeerTypeConfig
 from ..template_export_kernel_bgp_false import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """Basic BGP route test cases, with export_kernel:bgp set to False."""

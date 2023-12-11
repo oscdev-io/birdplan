@@ -24,6 +24,8 @@
 from ....config.peertype_customer.transit.r1r2 import PeerTypeConfig
 from ..template_redistribute_bgp_own_blackhole_false import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP redistribution test case."""

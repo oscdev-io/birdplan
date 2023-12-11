@@ -28,6 +28,8 @@ from .....console.colors import colored
 from .....exceptions import BirdPlanErrorUsage
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineBGPPeerShow"]
+
 
 class BirdplanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer summary" command."""

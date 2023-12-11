@@ -24,6 +24,8 @@
 from ....config.peertype_customer.e1r1_no_filter import PeerTypeConfig
 from ..template_prefix_filtered_without_match import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""

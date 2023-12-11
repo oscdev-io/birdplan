@@ -24,6 +24,8 @@
 from ....config.peertype_routeserver.r1_to_r10 import PeerTypeConfig
 from ..template_community_noexport import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP community functions test case."""

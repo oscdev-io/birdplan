@@ -32,6 +32,8 @@ from .pipe import ProtocolPipe
 from .rip import ProtocolRIP
 from .static import ProtocolStatic
 
+__all__ = ["SectionProtocols"]
+
 
 class SectionProtocols(SectionBase):
     """BIRD protocols section."""

@@ -24,6 +24,8 @@ from typing import Any, Dict
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineBGPPeerGracefulShutdown"]
+
 
 class BirdplanCmdlineBGPPeerGracefulShutdown(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer graceful-shutdown" command."""

@@ -26,6 +26,8 @@ from ......cmdline import BirdPlanCommandLine
 from ......console.colors import colored
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineBGPPeerGracefulShutdownShow"]
+
 
 class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer graceful-shutdown show" command."""

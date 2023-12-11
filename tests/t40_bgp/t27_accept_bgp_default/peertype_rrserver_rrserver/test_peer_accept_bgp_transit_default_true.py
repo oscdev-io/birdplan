@@ -24,6 +24,8 @@
 from ...config.peertype_rrserver_rrserver.e1r1 import PeerTypeConfig
 from ..template_peer_accept_bgp_transit_default_true import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP accept default route test cases, with peer accept:bgp_transit_default set to True."""

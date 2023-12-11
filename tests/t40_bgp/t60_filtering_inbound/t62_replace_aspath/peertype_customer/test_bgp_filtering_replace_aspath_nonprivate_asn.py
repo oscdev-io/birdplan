@@ -24,6 +24,8 @@
 from ....config.peertype_customer.e1r1 import PeerTypeConfig
 from ..template_replace_aspath_nonprivate_asn import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""

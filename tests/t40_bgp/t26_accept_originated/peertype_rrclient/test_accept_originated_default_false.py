@@ -24,6 +24,8 @@
 from ...config.peertype_rrclient.r1r2 import PeerTypeConfig
 from ..template_accept_originated_default_false import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP accept originated route test cases, with accept:originated_default set to False."""

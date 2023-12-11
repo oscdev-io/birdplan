@@ -24,6 +24,8 @@
 from ....config.peertype_rrclient.r1r2 import PeerTypeConfig
 from ..template_outgoing_large_communities_bgp_customer_blackhole import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP outgoing large communities test case."""

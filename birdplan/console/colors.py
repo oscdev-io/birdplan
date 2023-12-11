@@ -22,6 +22,8 @@ import sys
 
 import click
 
+__all__ = ["colored"]
+
 # Check if we should use colors or not
 USE_COLORS = sys.stdout.isatty()
 

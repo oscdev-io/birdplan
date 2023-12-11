@@ -26,6 +26,8 @@ from ...cmdline import BIRD_CONFIG_FILE
 from ...exceptions import BirdPlanError
 from .cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineConfigure"]
+
 
 class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
     """Birdplan "configure" command."""

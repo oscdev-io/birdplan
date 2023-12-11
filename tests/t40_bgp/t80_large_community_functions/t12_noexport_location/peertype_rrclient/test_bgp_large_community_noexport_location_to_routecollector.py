@@ -24,6 +24,8 @@
 from ....config.peertype_rrclient.r1_to_r10 import PeerTypeConfig
 from ..template_large_community_noexport_location_to_routecollector import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP large community functions test case."""

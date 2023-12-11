@@ -23,6 +23,8 @@
 
 from .template import Template
 
+__all__ = ["Test"]
+
 
 class Test(Template):
     """Basic OSPF route test cases, with export_kernel:rip set to True."""

@@ -22,6 +22,9 @@ from typing import Dict, List, Union
 
 from ..globals import BirdConfigGlobals
 
+__all__ = ["SectionBaseConfig", "SectionBase"]
+
+
 # Types
 SectionConfigItem = Union[str, List[str], "SectionBase"]
 SectionConfigItemList = List[SectionConfigItem]

@@ -29,6 +29,8 @@ from birdplan import peeringdb
 from ....basetests import BirdPlanBaseTestCase
 from ....simulation import Simulation
 
+__all__ = ["Template"]
+
 
 class Template(BirdPlanBaseTestCase):
     """BGP prefix limit test template."""

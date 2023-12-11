@@ -26,6 +26,8 @@ from birdclient.exceptions import BirdClientError
 
 from ...basetests import BirdPlanBaseTestCase
 
+__all__ = ["TemplateBase"]
+
 
 class TemplateBase(BirdPlanBaseTestCase):
     """BGP import connected test case template."""

@@ -21,6 +21,8 @@
 from ..globals import BirdConfigGlobals
 from .base import SectionBase
 
+__all__ = ["SectionRouterID"]
+
 
 class SectionRouterID(SectionBase):
     """BIRD router ID configuration section."""

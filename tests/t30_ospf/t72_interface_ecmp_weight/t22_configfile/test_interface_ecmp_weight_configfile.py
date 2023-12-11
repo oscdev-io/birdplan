@@ -23,6 +23,8 @@
 
 from ..template import Template
 
+__all__ = ["Test"]
+
 
 class Test(Template):
     """OSPF test case for interface ECMP weight using configuration file settings."""

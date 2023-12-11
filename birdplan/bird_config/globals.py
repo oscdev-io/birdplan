@@ -20,6 +20,8 @@
 
 from typing import Any, Dict, Optional
 
+__all__ = ["BirdConfigGlobals"]
+
 
 class BirdConfigGlobals:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """

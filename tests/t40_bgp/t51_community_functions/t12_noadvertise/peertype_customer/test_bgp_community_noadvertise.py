@@ -24,6 +24,8 @@
 from ....config.peertype_customer.r1_to_r10 import PeerTypeConfig
 from ..template_community_noadvertise import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP community functions test case."""

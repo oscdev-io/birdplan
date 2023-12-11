@@ -26,6 +26,8 @@ from ....bird_config.globals import BirdConfigGlobals
 from ..base import SectionBase
 from ..functions import SectionFunctions
 
+__all__ = ["ProtocolFunctionsBase"]
+
 
 class ProtocolFunctionsBase(SectionBase):  # pylint: disable=too-many-public-methods
     """BIRD protocol specific functions base class."""

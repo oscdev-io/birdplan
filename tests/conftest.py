@@ -26,6 +26,9 @@ import pytest
 
 from .simulation import Simulation
 
+__all__ = ["Helpers", "CustomPytestRegex"]
+
+
 # Make sure basetests has its asserts rewritten
 pytest.register_assert_rewrite("tests.basetests")
 

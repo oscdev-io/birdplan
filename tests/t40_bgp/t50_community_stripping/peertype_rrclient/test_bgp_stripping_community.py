@@ -24,6 +24,8 @@
 from ...config.peertype_rrclient.e1r1 import PeerTypeConfig
 from ..template_stripping_community import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP community stripping test case."""

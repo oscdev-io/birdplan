@@ -20,6 +20,8 @@
 
 from ..base import SectionBase
 
+__all__ = ["TableKernel"]
+
 
 class TableKernel(SectionBase):
     """BIRD kernel table configuration."""

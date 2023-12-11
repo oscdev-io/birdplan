@@ -24,6 +24,8 @@
 from ...config.peertype_peer.r1r2 import PeerTypeConfig
 from ..template_redistribute_static_default_true import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP redistribute static route test cases, with redistribute:static_default set to True."""

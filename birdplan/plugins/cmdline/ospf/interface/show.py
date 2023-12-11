@@ -26,6 +26,8 @@ from .....cmdline import BirdPlanCommandLine
 from .....console.colors import colored
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineOSPFInterfaceShow"]
+
 
 class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
     """Birdplan "ospf interface show" command."""

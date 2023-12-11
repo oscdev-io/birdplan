@@ -23,6 +23,8 @@ from ...base import SectionBase
 from ...protocols.pipe import ProtocolPipe, ProtocolPipeFilterType
 from .master_attributes import MasterTableAttributes, MasterTableRoutePolicyExport
 
+__all__ = ["TableMaster"]
+
 
 class TableMaster(SectionBase):
     """BIRD master table configuration."""

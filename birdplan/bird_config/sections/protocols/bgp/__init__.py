@@ -35,6 +35,9 @@ from .bgp_functions import BGPFunctions
 from .peer import ProtocolBGPPeer
 from .typing import BGPPeerConfig
 
+__all__ = ["ProtocolBGP"]
+
+
 BGPPeersConfig = Dict[str, BGPPeerConfig]
 BGPPeers = Dict[str, ProtocolBGPPeer]
 BGPOriginatedRoutes = Dict[str, str]
