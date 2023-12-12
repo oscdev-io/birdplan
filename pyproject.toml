@@ -35,8 +35,10 @@ dependencies = [
     "requests",
 ]
 
+
 [project.scripts]
 birdplan = "birdplan:cmdline.main"
+birdplan-monitor = "birdplan:monitor.main"
 
 
 [project.urls]

@@ -44,6 +44,7 @@ else:
 BIRD_SOCKET = "/run/bird/bird.ctl"
 BIRDPLAN_FILE = "/etc/birdplan/birdplan.yaml"
 BIRDPLAN_STATE_FILE = "/var/lib/birdplan/birdplan.state"
+BIRDPLAN_MONITOR_FILE = "/var/lib/birdplan/monitor.json"
 
 
 TRACE_LOG_LEVEL = 5
