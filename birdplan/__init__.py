@@ -191,7 +191,8 @@ class BirdPlan:
 
         # Write out state file
         try:
-            with open(self.state_file, "w", encoding="UTF-8") as file:
+            fd = os.open(self.state_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o640)
+            with os.fdopen(fd, "w") as file:
                 file.write(yaml_output)
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.state_file}' for writing: {err}") from None
