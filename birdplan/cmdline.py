@@ -23,6 +23,7 @@ import copy
 import json
 import logging
 import logging.handlers
+import os
 import sys
 from typing import Any, Callable, List, Literal, NoReturn, Optional
 
@@ -36,7 +37,10 @@ __all__ = ["ColorFormatter", "BirdPlanArgumentParser", "BirdPlanCommandLine"]
 
 
 # Defaults
-BIRD_CONFIG_FILE = "/etc/bird.conf"
+if os.path.exists("/etc/bird/bird.conf"):
+    BIRD_CONFIG_FILE = "/etc/bird/bird.conf"
+else:
+    BIRD_CONFIG_FILE = "/etc/bird.conf"
 BIRD_SOCKET = "/run/bird/bird.ctl"
 BIRDPLAN_FILE = "/etc/birdplan/birdplan.yaml"
 BIRDPLAN_STATE_FILE = "/var/lib/birdplan/birdplan.state"
