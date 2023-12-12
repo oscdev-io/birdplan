@@ -177,7 +177,8 @@ class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
 
         # Write out config file
         try:
-            with open(self.config_filename, "w", encoding="UTF-8") as config_file:
+            fd = os.open(self.config_filename, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o640)
+            with os.fdopen(fd, "w") as config_file:
                 config_file.write(data)
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.config_filename}' for writing: {err}") from None
