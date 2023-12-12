@@ -20,9 +20,10 @@
 
 
 import argparse
+import os
 from typing import Any, Dict, Optional
 
-from ...cmdline import BIRD_CONFIG_FILE
+from ...cmdline import BIRD_CONFIG_FILE, BirdPlanCommandLine
 from ...exceptions import BirdPlanError
 from .cmdline_plugin import BirdPlanCmdlinePluginBase
 
@@ -116,7 +117,7 @@ class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
 
         """
 
-        cmdline = args["cmdline"]
+        cmdline: BirdPlanCommandLine = args["cmdline"]
 
         # Load BirdPlan configuration
         cmdline.birdplan_load_config(

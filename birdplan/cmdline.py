@@ -25,7 +25,7 @@ import logging
 import logging.handlers
 import os
 import sys
-from typing import Any, Callable, List, Literal, NoReturn, Optional
+from typing import Any, Callable, Dict, List, Literal, NoReturn, Optional
 
 from . import BirdPlan
 from .console.colors import colored
@@ -60,7 +60,7 @@ class ColorFormatter(logging.Formatter):
     text message.
     """
 
-    level_name_colors: dict[int, Callable[[str], str]] = {
+    level_name_colors: Dict[int, Callable[[str], str]] = {
         TRACE_LOG_LEVEL: lambda level_name: colored(str(level_name), "blue"),
         logging.DEBUG: lambda level_name: colored(str(level_name), "cyan"),
         logging.INFO: lambda level_name: colored(str(level_name), "green"),
