@@ -316,6 +316,92 @@ class BirdPlanBaseTestCase:
         # Return the two chunks of data for later assertion
         return (result, result_expected)
 
+    def _test_bird_cmdline_ospf_summary(  # pylint: disable=too-many-locals,too-many-branches
+        self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None
+    ):
+        """Test showing OSPF summary."""
+
+        # Check if we didn't get a router list override, if we didn't, then use all routers
+        if not routers:
+            routers = self.routers
+
+        router_summaries = {}
+
+        # Loop with routers
+        for router in routers:
+            # Skip over routers not configured
+            if not sim.node(router):
+                continue
+            # Skip over routers with config exceptions
+            if router in self.routers_config_exception:
+                continue
+
+            # Work out variable names
+            data_name = f"{router}_ospf_summary"
+
+            # Grab table data
+            result_expected = sim.get_data(data_name)
+            router_summaries[router] = {
+                "expected": result_expected,
+            }
+
+            # Save the start time
+            time_start = time.time()
+
+            # Start with a blank result
+            expect_timeout = 60
+            result = None
+            content_matches = False
+            while True:
+                # Get peer summary
+                birdplan_result = self._birdplan_run(sim, tmpdir, router, ["ospf", "summary"])
+
+                result = birdplan_result["raw"]
+                router_summaries[router]["result"] = result
+
+                # Remove since from the result
+                for _, protocol_data in result.items():
+                    # NK: since is dynamic
+                    if "since" in protocol_data:
+                        del protocol_data["since"]
+
+                # If we don't have a content match, we match as we have a sleep() after bird status
+                # The first case is when there is no expected data
+                # The second case is when this item is missing from the expected data
+                if result_expected is None or isinstance(result_expected, ValueError):  # noqa: SIM114
+                    content_matches = True
+                # Else check that the result contains the content we're looking for
+                elif result_expected == result:
+                    content_matches = True
+
+                # Check if have what we expected
+                if content_matches:
+                    break
+
+                # If not, check to see if we've exceeded our timeout
+                if time.time() - time_start > expect_timeout:
+                    break
+
+                time.sleep(0.5)
+
+            # Add variable so we can keep track of its expected content for later
+            sim.add_variable(data_name, result)
+            # If we didn't match add the incorrect result to the report too
+            if not content_matches:
+                report_expected = pprint.pformat(result_expected, width=132, compact=True)
+                sim.add_report_obj(f"EXPECTED_OSPF_SUMMARY({router})[raw]", f"{data_name} = {report_expected}")
+
+                sim.add_report_obj(f"OSPF_SUMMARY({router})[json]", birdplan_result["json"])
+                sim.add_report_obj(f"OSPF_SUMMARY({router})[text]", birdplan_result["text"])
+
+                report_result = pprint.pformat(result, width=132, compact=True)
+                sim.add_report_obj(f"OSPF_SUMMARY({router})[raw]", f"{data_name} = {report_result}")
+
+        # Loop and assert
+        for router, data in router_summaries.items():
+            assert data["result"] == data["expected"], f"BIRD router '{router}' peer summary does not match what it should be"
+
+
     def _test_bird_cmdline_bgp_peer_summary(  # pylint: disable=too-many-locals,too-many-branches
         self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None
     ):

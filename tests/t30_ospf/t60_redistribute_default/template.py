@@ -41,6 +41,10 @@ class Template(BirdPlanBaseTestCase):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
+    def test_bird_cmdline_ospf_summary(self, sim, tmpdir: str) -> None:
+        """Test BIRD cmdline for OSPF summary."""
+        self._test_bird_cmdline_ospf_summary(sim, tmpdir)
+
     def test_add_kernel_routes(self, sim):
         """Add kernel routes to BIRD instances."""
 

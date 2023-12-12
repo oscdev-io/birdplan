@@ -117,6 +117,10 @@ class Template(BirdPlanBaseTestCase):
         """Test BIRD status."""
         self._test_bird_status(sim)
 
+    def test_bird_cmdline_ospf_summary(self, sim, tmpdir: str) -> None:
+        """Test BIRD cmdline for OSPF summary."""
+        self._test_bird_cmdline_ospf_summary(sim, tmpdir)
+
     # Test configuration of interface ECMP weight
     def test_interface_attributes(self, sim, tmpdir):
         """OSPF interface ECMP weight test to customize template."""
