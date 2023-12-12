@@ -20,9 +20,12 @@
 
 import sys
 import time
+from typing import List
 
 from .cmdline import BirdPlanCommandLine
 from .exceptions import BirdPlanError
+
+__all__: List[str] = []
 
 
 def _run_monitor() -> None:

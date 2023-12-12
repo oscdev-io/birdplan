@@ -401,7 +401,6 @@ class BirdPlanBaseTestCase:
         for router, data in router_summaries.items():
             assert data["result"] == data["expected"], f"BIRD router '{router}' peer summary does not match what it should be"
 
-
     def _test_bird_cmdline_bgp_peer_summary(  # pylint: disable=too-many-locals,too-many-branches
         self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None
     ):
