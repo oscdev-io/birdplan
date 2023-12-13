@@ -72,47 +72,122 @@ test_job:
     - public
 
 
+
 prepare_release:
   stage: prepare_release
   rules:
     - if: $CI_COMMIT_TAG
   script:
   - pacman -Syu --noconfirm
-  - pacman -S --noconfirm git
-  - mkdir build
+  - pacman -S --noconfirm grep python git
+  - pacman -S --noconfirm python-tox
+  # Build docs and packages
+  - tox -e build
+#  - tox -e docs
+  - mkdir -p build
+#  - mv docs/build/html build/docs
+  # Build compressed files and checksums
+  - cd dist
+  - |
+    find . -name "*.tar.*" -o -name "*.zip" -o -name "*.whl" | sort | xargs sha512sum > SHA512SUMS.txt
+    find . -name "*.tar.*" -o -name "*.zip" -o -name "*.whl" | sort | xargs b2sum > B2SUMS.txt
+  - cd ..
   # Work out commit range for changelog
   - LAST_TAG=$(git tag --sort -version:refname | head -n2 | tail -n1)
   - if [ -n "$LAST_TAG" ]; then COMMIT_RANGE="$LAST_TAG..$CI_COMMIT_TAG"; else COMMIT_RANGE=""; fi
   # Output description file
   - echo "Automatic release based on tag $CI_COMMIT_TAG" > build/description.txt
-  - git log --oneline --decorate --no-merges "$COMMIT_RANGE" >> build/description.txt
+  # Check if we can add the changelog
+  - CHANGELOG=$(git log --oneline --decorate --no-merges $COMMIT_RANGE)
+  - |
+    if [ -n "$CHANGELOG" ]; then
+      echo "# Changelog" >> build/description.txt
+      echo '```' >> build/description.txt
+      echo "$CHANGELOG" >> build/description.txt
+      echo '```' >> build/description.txt
+    fi
   artifacts:
     expire_in: 1 day
     paths:
     - build/
+    - dist/
 
 
-release:
+release_gitlab:
   stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
-    - if: $CI_COMMIT_TAG
+  - if: $CI_COMMIT_TAG
   script:
-    - echo "Release"
-  release:
-     name: 'Release $CI_COMMIT_TAG'
-     description: 'Automatic release based on tag $CI_COMMIT_TAG'
-     tag_name: '$CI_COMMIT_TAG'
-     ref: '$CI_COMMIT_TAG'
+  - pacman -Syu --noconfirm
+  - pacman -S --noconfirm
+      curl
+      release-cli
+  # Work out variables
+  - PACKAGE_VERSION=$(echo "$CI_COMMIT_TAG" | sed -e 's/^v//')
+  - PACKAGE_REGISTRY_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/releases/${PACKAGE_VERSION}"
+  # Grab description
+  - DESCRIPTION=$(cat build/description.txt)
+  # Build asset JSON
+  - cd dist
+  - assets=()
+  - |
+    for p in $(find . -name "*.tar.*" -o -name "*.zip" -o -name "*.whl" -o -name "*SUMS.txt" | sort); do
+      assets+=("--assets-link={\"name\":\"${p}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${p}\"}")
+    done
+  - echo -e "ASSETS:\n${assets[@]}"
+  # Upload assets
+  - |
+    for p in $(find . -name "*.tar.*" -o -name "*.zip" -o -name "*.whl" -o -name "*SUMS.txt" | sort); do
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "${p}" "${PACKAGE_REGISTRY_URL}/${p}"
+    done
+  # Release
+  - release-cli create --name "Release $CI_COMMIT_TAG" --tag-name "$CI_COMMIT_TAG" --description "$DESCRIPTION" "${assets[@]}"
 
 
-pages:
-  stage: deploy
-  only:
-  - master
-  script:
-  - echo "Deploying pages..."
-  artifacts:
-    paths:
-    - public
+# release_gitlab_package:
+#   stage: release
+#   rules:
+#     - if: $CI_COMMIT_TAG
+#   script:
+#     - pacman -Syu --noconfirm
+#     - pacman -S --noconfirm
+#         python-tox
+#     - |
+#       export TWINE_USERNAME=gitlab-ci-token
+#       export TWINE_PASSWORD=${CI_JOB_TOKEN}
+#       export PUBLISH_REPOSITORY=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
+#       tox -e publish
 
+
+#release_pypi:
+#  stage: release_pypi
+#  rules:
+#    - if: $CI_COMMIT_TAG
+#  script:
+#    - pacman -Syu --noconfirm
+#    - pacman -S --noconfirm
+#        python-tox
+#    - |
+#      if [ -n "$PYPI_USERNAME" -a -n "$PYPI_TOKEN" ]; then
+#        echo "Publishing to pypi..."
+#        export TWINE_USERNAME=${PYPI_USERNAME}
+#        export TWINE_PASSWORD=${PYPI_TOKEN}
+#        tox -e publish
+#      else
+#        echo "NOT Publishing to pypi: No PYPI_USERNAME or PYPI_TOKEN"
+#      fi
+
+
+#pages:
+#  stage: pages
+#  rules:
+#    - if: $CI_COMMIT_TAG
+#  script:
+#    # Create environment
+#    - pacman -Syu --noconfirm
+#    # Move documentation to public/
+#    # This is the only supported path in gitlab
+#    - mv build/docs public
+#  artifacts:
+#    paths:
+#    - public/
