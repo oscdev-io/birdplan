@@ -4,6 +4,7 @@ pacman -Q bird
 pacman -Q exabgp
 
 cd /root/birdplan || :
+echo "Excuting in '$(pwd)'..."
 
 ARGS=("$@")
 if [ ${#ARGS[@]} -eq 0 ]; then
@@ -14,3 +15,4 @@ fi
 
 echo "RUNNING: tox -- ${ARGS[*]}"
 nice -n 20 tox -- "${ARGS[@]}"
+nice -n 20 tox -e cov-html

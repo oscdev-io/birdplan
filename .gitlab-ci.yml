@@ -65,10 +65,8 @@ test_job:
   # Run tests
   - contrib/test-environment/runtest $EXTRA_TEST_OPTS
   # Save HTML coverage report
-  - tox -e cov-html
   - mkdir public
   - mv htmlcov public/coverage
-  # Save coverage report
   artifacts:
     paths:
     - public
