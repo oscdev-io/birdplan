@@ -23,6 +23,8 @@ from ..base import SectionBase
 from .kernel import TableKernel
 from .master import TableMaster
 
+__all__ = ["SectionTables"]
+
 
 class SectionTables(SectionBase):
     """BIRD routing tables section."""

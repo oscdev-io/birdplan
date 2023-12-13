@@ -24,6 +24,8 @@
 from ...config.peertype_customer.r1r2 import PeerTypeConfig
 from ..template_import_static_default_false import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP import static route test case."""

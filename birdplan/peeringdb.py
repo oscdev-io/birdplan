@@ -25,6 +25,9 @@ import requests
 
 from .exceptions import BirdPlanError
 
+__all__ = ["PeeringDB"]
+
+
 PeeringDBInfo = Dict[str, Any]
 
 
@@ -65,7 +68,10 @@ class PeeringDB:  # pylint: disable=too-few-public-methods
         # If we can't, grab the result from PeeringDB live
         if not result:
             # Request the PeeringDB info for this AS
-            response = requests.get(f"https://www.peeringdb.com/api/net?asn__in={asn}", timeout=10)
+            try:
+                response = requests.get(f"https://www.peeringdb.com/api/net?asn__in={asn}", timeout=10)
+            except requests.exceptions.Timeout as e:  # pragma: no cover
+                raise BirdPlanError(f"PeeringDB request timed out: {e}") from None
             # Check the result is not empty
             if not response:  # pragma: no cover
                 raise BirdPlanError("PeeringDB returned and empty result")

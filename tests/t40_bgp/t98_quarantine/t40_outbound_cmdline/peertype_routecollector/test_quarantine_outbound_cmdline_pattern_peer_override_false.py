@@ -24,6 +24,8 @@
 from ....config.peertype_routecollector.r1r2 import PeerTypeConfig
 from ..template_quarantine_outbound_cmdline_pattern_peer_override_false import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP quarantine test case."""

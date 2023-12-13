@@ -24,6 +24,8 @@
 from ....config.peertype_customer.e1r1_no_limit import PeerTypeConfig
 from ..template_prefix_limit_peeringdb_use_cache import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP prefix limit test case."""

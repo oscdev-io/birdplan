@@ -20,11 +20,14 @@
 
 
 import argparse
+import os
 from typing import Any, Dict, Optional
 
-from ...cmdline import BIRD_CONFIG_FILE
+from ...cmdline import BIRD_CONFIG_FILE, BirdPlanCommandLine
 from ...exceptions import BirdPlanError
 from .cmdline_plugin import BirdPlanCmdlinePluginBase
+
+__all__ = ["BirdplanCmdlineConfigure"]
 
 
 class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
@@ -114,7 +117,7 @@ class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
 
         """
 
-        cmdline = args["cmdline"]
+        cmdline: BirdPlanCommandLine = args["cmdline"]
 
         # Load BirdPlan configuration
         cmdline.birdplan_load_config(
@@ -137,21 +140,26 @@ class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
 
         return bird_config
 
-    def show_output_text(self, data: Any) -> None:
+    def to_text(self, data: Any) -> str:
         """
-        Show command output in text.
+        Return output in text format.
 
         Parameters
         ----------
         data : str
             Bird configuration
 
+        Returns
+        -------
+        str
+            Output in text format.
+
         """
         # Skip output when we're writing a config file
         if self.config_filename and self.config_filename != "-":
-            return
+            return ""
         # Output config
-        super().show_output_text(data)
+        return super().to_text(data)
 
     def _write_config_file(self, data: Any) -> None:
         """
@@ -169,7 +177,8 @@ class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
 
         # Write out config file
         try:
-            with open(self.config_filename, "w", encoding="UTF-8") as config_file:
+            fd = os.open(self.config_filename, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o640)
+            with os.fdopen(fd, "w") as config_file:
                 config_file.write(data)
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.config_filename}' for writing: {err}") from None

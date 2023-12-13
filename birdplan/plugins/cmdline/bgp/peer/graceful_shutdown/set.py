@@ -25,6 +25,8 @@ from ......cmdline import BirdPlanCommandLine
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineBGPPeerGracefulShutdownSet"]
+
 
 class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer graceful-shutdown set" command."""
@@ -104,6 +106,9 @@ class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
         if cmdline.args.value[0] not in ("true", "false"):
             raise BirdPlanErrorUsage("BGP peer graceful shutdown override flag value must be 'true' or 'false'", self._subparser)
         value = cmdline.args.value[0] == "true"
+
+        # Suppress info output
+        cmdline.birdplan.birdconf.birdconfig_globals.suppress_info = True
 
         # Load BirdPlan configuration using the cache
         cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)

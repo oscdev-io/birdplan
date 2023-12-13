@@ -24,6 +24,8 @@ from typing import Any, Dict
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineBGPPeerQuarantine"]
+
 
 class BirdplanCmdlineBGPPeerQuarantine(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer quarantine" command."""

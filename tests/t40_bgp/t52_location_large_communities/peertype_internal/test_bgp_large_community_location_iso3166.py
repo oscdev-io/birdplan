@@ -24,6 +24,8 @@
 from ...config.peertype_internal.e1r1 import PeerTypeConfig
 from ..template_large_community_location_iso3166 import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP location-based ISO-3166 large community test case."""

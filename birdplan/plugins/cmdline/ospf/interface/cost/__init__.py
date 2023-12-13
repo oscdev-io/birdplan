@@ -24,6 +24,8 @@ from typing import Any, Dict
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineOSPFInterfaceCost"]
+
 
 class BirdplanCmdlineOSPFInterfaceCost(BirdPlanCmdlinePluginBase):
     """Birdplan "ospf interface cost" command."""

@@ -23,6 +23,8 @@
 
 from ..template_base import TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP next hop not peer IP test case template."""

@@ -20,6 +20,8 @@
 
 from typing import List, Union
 
+__all__ = ["RIPRoutePolicyAccept", "RIPRoutePolicyRedistribute", "RIPAttributes"]
+
 
 class RIPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
     """

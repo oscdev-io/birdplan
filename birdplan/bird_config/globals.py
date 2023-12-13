@@ -20,6 +20,8 @@
 
 from typing import Any, Dict, Optional
 
+__all__ = ["BirdConfigGlobals"]
+
 
 class BirdConfigGlobals:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """
@@ -31,6 +33,8 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods,too-many-inst
         BIRD log file
     debug : bool
         Enable additional output from BIRD while running
+    supress_info : bool
+        Supress logging info unless debug is enabled
     state : Dict[str, Any]
         Current configuration state, used for persistent data storage.
     test_mode : bool
@@ -43,6 +47,7 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods,too-many-inst
 
     log_file: Optional[str]
     debug: bool
+    _suppress_info: bool
     ignore_irr_changes: bool
     ignore_peeringdb_changes: bool
     use_cached: bool
@@ -63,7 +68,18 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods,too-many-inst
 
         # Debugging
         self.debug = False
+        self._suppress_info = False
         self.test_mode = test_mode
 
         # State
         self.state = {}
+
+    @property
+    def suppress_info(self) -> bool:
+        """Return suppress info value."""
+        return self._suppress_info and not self.debug
+
+    @suppress_info.setter
+    def suppress_info(self, value: bool) -> None:
+        """Set suppress info value."""
+        self._suppress_info = value

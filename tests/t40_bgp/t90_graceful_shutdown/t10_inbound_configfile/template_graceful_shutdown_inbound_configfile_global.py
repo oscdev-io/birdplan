@@ -23,6 +23,8 @@
 
 from ..template_base import TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP graceful shutdown test case template."""

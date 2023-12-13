@@ -23,6 +23,8 @@
 
 from .template_base import TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP location-based ISO-3166 large community test case template."""

@@ -24,6 +24,8 @@
 from ...config.peertype_peer.e1r1 import PeerTypeConfig
 from ..template_peer_accept_bgp_customer_blackhole import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP accept blackhole route test case."""

@@ -24,6 +24,8 @@
 from ....config.peertype_rrserver.r1_to_r10 import PeerTypeConfig
 from ..template_large_community_replace_aspath import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP large community functions test case."""

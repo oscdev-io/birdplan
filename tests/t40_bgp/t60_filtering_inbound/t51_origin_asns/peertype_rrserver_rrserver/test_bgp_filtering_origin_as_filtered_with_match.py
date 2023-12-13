@@ -24,6 +24,8 @@
 from ....config.peertype_rrserver_rrserver.e1r1 import PeerTypeConfig
 from ..template_origin_as_filtered_with_match import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""

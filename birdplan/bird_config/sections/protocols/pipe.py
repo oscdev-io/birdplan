@@ -24,6 +24,9 @@ from typing import Callable, List, Union
 from ...globals import BirdConfigGlobals
 from ..base import SectionBase
 
+__all__ = ["ProtocolPipeFilterType", "ProtocolPipe"]
+
+
 PipeTableNameType = Union[str, Callable[[str], str]]
 
 

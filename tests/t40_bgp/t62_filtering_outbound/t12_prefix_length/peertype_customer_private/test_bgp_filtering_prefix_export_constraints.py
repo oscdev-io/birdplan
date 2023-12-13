@@ -24,6 +24,8 @@
 from ....config.peertype_customer_private.r1_to_r10 import PeerTypeConfig
 from ..template_prefix_export_constraints import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""

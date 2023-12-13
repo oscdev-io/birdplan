@@ -24,6 +24,8 @@ import os
 import pkgutil
 from typing import Any, Dict, List, Optional
 
+__all__ = ["PluginMethodException", "PluginNotFoundException", "Plugin", "PluginCollection"]
+
 
 class PluginMethodException(RuntimeError):
     """Plugin method exception raised when a method is called that does not exist."""

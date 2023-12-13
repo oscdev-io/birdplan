@@ -31,6 +31,9 @@ from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from .rip_attributes import RIPAttributes, RIPRoutePolicyAccept, RIPRoutePolicyRedistribute
 from .rip_functions import RIPFunctions
 
+__all__ = ["ProtocolRIP"]
+
+
 RIPInterfaceConfig = Union[bool, Dict[str, str]]
 RIPInterfaces = Dict[str, RIPInterfaceConfig]
 

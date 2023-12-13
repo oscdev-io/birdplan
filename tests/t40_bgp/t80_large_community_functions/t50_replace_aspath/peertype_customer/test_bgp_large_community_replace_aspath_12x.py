@@ -24,6 +24,8 @@
 from ....config.peertype_customer.r1_to_r10_highasn import PeerTypeConfig
 from ..template_large_community_replace_aspath_12x import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP large community functions test case."""

@@ -23,6 +23,8 @@
 
 from ..template_base import TemplateBase as TemplateSetBase
 
+__all__ = ["TemplateBase"]
+
 
 class TemplateBase(TemplateSetBase):
     """BGP blackhole length test case template."""

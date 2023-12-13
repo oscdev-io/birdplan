@@ -24,6 +24,8 @@
 from ....config.peertype_routeserver.e1r1 import PeerTypeConfig
 from ..template_peer_large_community_length_import_constraints import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""

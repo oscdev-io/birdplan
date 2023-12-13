@@ -25,6 +25,8 @@ import time
 
 from ..template_base import TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP quarantine test case template."""
@@ -36,7 +38,9 @@ class Template(TemplateBase):
         self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "quarantine", "set", "r2", "true"])
 
         # Check r2 status
-        quarantine_status = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "quarantine", "show"])
+        birdplan_result = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "quarantine", "show"])
+
+        quarantine_status = birdplan_result["raw"]
         assert quarantine_status == {
             "overrides": {"r2": True},
             "current": {"r2": False},
@@ -47,7 +51,9 @@ class Template(TemplateBase):
         self._birdplan_run(sim, tmpdir, "r1", ["configure"])
 
         # Check r2 status again
-        quarantine_status = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "quarantine", "show"])
+        birdplan_result = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "quarantine", "show"])
+
+        quarantine_status = birdplan_result["raw"]
         assert quarantine_status == {
             "overrides": {"r2": True},
             "current": {"r2": True},

@@ -4,6 +4,13 @@ RUN set -ex; \
     echo "Updating and installing..."; \
     pacman -Syu --noconfirm \
         git \
+        python-click \
+        python-jinja \
+        python-pytest \
+        python-pytest-cov \
+        python-pytest-xdist \
+        python-yaml \
+        python-requests \
         python-tox \
         bgpq3 \
         bird \

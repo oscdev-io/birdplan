@@ -24,6 +24,8 @@ from typing import Any, Dict
 from ......cmdline import BirdPlanCommandLine
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
+__all__ = ["BirdplanCmdlineBGPPeerGracefulShutdownRemove"]
+
 
 class BirdplanCmdlineBGPPeerGracefulShutdownRemove(BirdPlanCmdlinePluginBase):
     """Birdplan "bgp peer graceful-shutdown remove" command."""
@@ -91,6 +93,9 @@ class BirdplanCmdlineBGPPeerGracefulShutdownRemove(BirdPlanCmdlinePluginBase):
         cmdline: BirdPlanCommandLine = args["cmdline"]
 
         peer = cmdline.args.peer[0]
+
+        # Suppress info output
+        cmdline.birdplan.birdconf.birdconfig_globals.suppress_info = True
 
         # Load BirdPlan configuration using the cache
         cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)

@@ -23,6 +23,8 @@
 
 from ...basetests import BirdPlanBaseTestCase
 
+__all__ = ["Template"]
+
 
 class Template(BirdPlanBaseTestCase):
     """OSPF basic test case template."""
@@ -37,6 +39,10 @@ class Template(BirdPlanBaseTestCase):
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)
+
+    def test_bird_cmdline_ospf_summary(self, sim, tmpdir: str) -> None:
+        """Test BIRD cmdline for OSPF summary."""
+        self._test_bird_cmdline_ospf_summary(sim, tmpdir)
 
     def test_bird_tables_ospf4(self, sim):
         """Test BIRD t_ospf4 table."""

@@ -21,10 +21,12 @@
 # pylint: disable=too-many-lines
 
 import fnmatch
+import logging
 import re
 from typing import Any, Dict, List, Optional, Union
 
 from ......bgpq3 import BGPQ3
+from ......console.colors import colored
 from ......exceptions import BirdPlanError
 from ......peeringdb import PeeringDB
 from ..... import util
@@ -49,6 +51,8 @@ from .peer_attributes import (
     BGPPeerRoutePolicyAccept,
     BGPPeerRoutePolicyRedistribute,
 )
+
+__all__ = ["ProtocolBGPPeer"]
 
 
 class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
@@ -962,6 +966,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
             # Check if we're using cached values or not
             if self.birdconfig_globals.use_cached:
+                if not self.birdconfig_globals.suppress_info:
+                    logging.info("[bgp:peer:%s] Using cached PeeringDB information for prefix limits", self.name)
                 # Check if we're pulling the IPv4 limits out our cache
                 if self.prefix_limit4 == "peeringdb":
                     if not (
@@ -991,6 +997,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     # Pull entry from cache
                     peeringdb_info["info_prefixes6"] = self.prev_state["prefix_limit"]["peeringdb"]["ipv6"]
             else:
+                if not self.birdconfig_globals.suppress_info:
+                    logging.info("[bgp:peer:%s] Retrieving prefix limits from PeeringDB", self.name)
+
                 # Grab PeeringDB entries
                 peeringdb = PeeringDB()
                 peeringdb_info = peeringdb.get_prefix_limits(self.asn)
@@ -1071,6 +1080,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
             # Check if we're using cached values or not
             if self.birdconfig_globals.use_cached:
+                if not self.birdconfig_globals.suppress_info:
+                    logging.info("[bgp:peer:%s] Using cached IRR information for AS-SETs", self.name)
+
                 # Grab IRR ASNs from previous state
                 if not (
                     self.prev_state
@@ -1113,6 +1125,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 irr_prefixes["ipv6"] = self.prev_state["filter"]["prefixes"]["irr"]["ipv6"]
 
             else:
+                if not self.birdconfig_globals.suppress_info:
+                    logging.info("[bgp:peer:%s] Retrieving IRR information for AS-SETs", self.name)
+
                 # Grab BGPQ3 object to use below
                 bgpq3 = BGPQ3()
 
@@ -1223,13 +1238,21 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     if fnmatch.fnmatch(self.name, item):
                         self.quarantine = self.birdconfig_globals.state["bgp"]["+quarantine"][item]
 
-    def configure(self) -> None:  # pylint: disable=too-many-branches
+    def configure(self) -> None:  # pylint: disable=too-many-branches,too-many-statements
         """Configure BGP peer."""
+
+        if not self.birdconfig_globals.suppress_info:
+            logging.info(colored("[bgp:peer:%s] Configuring peer: asn=%s, type=%s", "blue"), self.name, self.asn, self.peer_type)
+
         super().configure()
 
         # Save basic peer information
         self.state["asn"] = self.asn
         self.state["description"] = self.description
+        self.state["type"] = self.peer_type
+
+        self.state["filter"] = {}
+        self.state["filter"]["as_sets"] = self.filter_policy.as_sets
 
         # Check for some config options we also need to save
         if self.prefix_limit4:
@@ -2370,6 +2393,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Get our source and neighbor addresses
         source_address = getattr(self, f"source_address{ipv}")
         neighbor = getattr(self, f"neighbor{ipv}")
+        # Save IP address info
+        protocol_state["source_address"] = source_address
+        protocol_state["neighbor"] = neighbor
 
         self.conf.add(f"protocol bgp {self.protocol_name(ipv)} {{")
         self.conf.add(f'  description "AS{self.asn} {self.name} - {self.description}";')
@@ -2425,6 +2451,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         prefix_limit = getattr(self, f"prefix_limit{ipv}")
         if prefix_limit:
             self.conf.add(f"    import limit {prefix_limit} action restart;")
+            protocol_state["prefix_limit"] = prefix_limit
         # Setup filters
         self.conf.add(f"    import filter {self.filter_name_import};")
         self.conf.add(f"    export filter {self.filter_name_export};")

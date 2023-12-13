@@ -23,6 +23,8 @@
 
 from .template_base import Template as TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP default route test case template."""

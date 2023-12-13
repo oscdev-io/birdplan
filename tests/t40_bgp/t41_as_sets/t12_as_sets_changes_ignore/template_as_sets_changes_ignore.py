@@ -29,6 +29,8 @@ from birdplan import bgpq3
 from ....basetests import BirdPlanBaseTestCase
 from ....simulation import Simulation
 
+__all__ = ["Template"]
+
 
 class Template(BirdPlanBaseTestCase):
     """BGP peer AS-SET changes test case template."""
@@ -217,3 +219,11 @@ class Template(BirdPlanBaseTestCase):
         # Check if we get an exception now during reconfiguration
         if getattr(self, "r1_peer_type", None) in ("customer", "peer"):
             super()._birdplan_run(sim, tmpdir, "r1", ["configure", "--ignore-irr-changes"])
+
+    def test_bird_cmdline_bgp_peer_summary(self, sim, tmpdir):
+        """Test showing BGP peer summary."""
+        self._test_bird_cmdline_bgp_peer_summary(sim, tmpdir)
+
+    def test_bird_cmdline_bgp_peer_show(self, sim, tmpdir):
+        """Test showing BGP peer."""
+        self._test_bird_cmdline_bgp_peer_show(sim, tmpdir)

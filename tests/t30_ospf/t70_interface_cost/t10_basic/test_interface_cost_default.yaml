@@ -272,6 +272,19 @@ r1_master6:
     type:
     - device
     - univ
+r1_ospf_summary:
+  ospf4:
+    info: running
+    name: ospf4
+    proto: OSPF
+    state: up
+    table: t_ospf4
+  ospf6:
+    info: running
+    name: ospf6
+    proto: OSPF
+    state: up
+    table: t_ospf6
 r1_t_kernel4:
   100.102.0.0/24:
   - attributes:
@@ -733,6 +746,19 @@ r2_master6:
     type:
     - OSPF-E2
     - univ
+r2_ospf_summary:
+  ospf4:
+    info: running
+    name: ospf4
+    proto: OSPF
+    state: up
+    table: t_ospf4
+  ospf6:
+    info: running
+    name: ospf6
+    proto: OSPF
+    state: up
+    table: t_ospf6
 r2_t_kernel4:
   100.102.0.0/24:
   - attributes:
@@ -1138,6 +1164,19 @@ r3_master6:
     type:
     - OSPF-E2
     - univ
+r3_ospf_summary:
+  ospf4:
+    info: running
+    name: ospf4
+    proto: OSPF
+    state: up
+    table: t_ospf4
+  ospf6:
+    info: running
+    name: ospf6
+    proto: OSPF
+    state: up
+    table: t_ospf6
 r3_t_kernel4:
   100.102.0.0/24:
   - attributes:
@@ -1543,6 +1582,19 @@ r4_master6:
     type:
     - OSPF-E2
     - univ
+r4_ospf_summary:
+  ospf4:
+    info: running
+    name: ospf4
+    proto: OSPF
+    state: up
+    table: t_ospf4
+  ospf6:
+    info: running
+    name: ospf6
+    proto: OSPF
+    state: up
+    table: t_ospf6
 r4_t_kernel4:
   100.102.0.0/24:
   - attributes:
@@ -1948,6 +2000,19 @@ r5_master6:
     type:
     - OSPF-E2
     - univ
+r5_ospf_summary:
+  ospf4:
+    info: running
+    name: ospf4
+    proto: OSPF
+    state: up
+    table: t_ospf4
+  ospf6:
+    info: running
+    name: ospf6
+    proto: OSPF
+    state: up
+    table: t_ospf6
 r5_t_kernel4:
   100.102.0.0/24:
   - attributes:
@@ -2353,6 +2418,19 @@ r6_master6:
     type:
     - OSPF-E2
     - univ
+r6_ospf_summary:
+  ospf4:
+    info: running
+    name: ospf4
+    proto: OSPF
+    state: up
+    table: t_ospf4
+  ospf6:
+    info: running
+    name: ospf6
+    proto: OSPF
+    state: up
+    table: t_ospf6
 r6_t_kernel4:
   100.102.0.0/24:
   - attributes:
@@ -2758,6 +2836,19 @@ r7_master6:
     type:
     - OSPF-E2
     - univ
+r7_ospf_summary:
+  ospf4:
+    info: running
+    name: ospf4
+    proto: OSPF
+    state: up
+    table: t_ospf4
+  ospf6:
+    info: running
+    name: ospf6
+    proto: OSPF
+    state: up
+    table: t_ospf6
 r7_t_kernel4:
   100.102.0.0/24:
   - attributes:
@@ -3286,6 +3377,19 @@ r8_master6:
     type:
     - OSPF-E2
     - univ
+r8_ospf_summary:
+  ospf4:
+    info: running
+    name: ospf4
+    proto: OSPF
+    state: up
+    table: t_ospf4
+  ospf6:
+    info: running
+    name: ospf6
+    proto: OSPF
+    state: up
+    table: t_ospf6
 r8_t_kernel4:
   100.102.0.0/24:
   - attributes:

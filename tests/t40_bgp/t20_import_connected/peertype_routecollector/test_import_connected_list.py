@@ -24,6 +24,8 @@
 from ...config.peertype_routecollector.r1r2 import PeerTypeConfig
 from ..template_import_connected_list import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP import connected route test case."""

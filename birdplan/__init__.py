@@ -20,14 +20,18 @@
 
 # pylint: disable=too-many-lines
 
+import logging
 import os
 import re
 from typing import Any, Dict, List, Optional, Union
 
+import birdclient
 import jinja2
+import packaging.version
 import yaml
 
 from .bird_config import BirdConfig
+from .console.colors import colored
 from .exceptions import BirdPlanError
 from .version import __version__
 
@@ -37,12 +41,19 @@ __all__ = [
 ]
 
 # Some types we need
+BirdPlanBGPPeerSummary = Dict[str, Dict[str, Any]]
+BirdPlanBGPPeerShow = Dict[str, Any]
 BirdPlanBGPPeerGracefulShutdownStatus = Dict[str, Dict[str, bool]]
 BirdPlanBGPPeerQuarantineStatus = Dict[str, Dict[str, bool]]
 BirdPlanOSPFInterfaceStatus = Dict[str, Dict[str, Dict[str, Any]]]
+BirdPlanOSPFSummary = Dict[str, Dict[str, Any]]
+
+# Check we have a sufficiently new version of birdclient
+if packaging.version.parse(birdclient.__version__) < packaging.version.parse("0.0.8"):
+    raise BirdPlanError("birdplan requires birdclient version 0.0.8 or newer")
 
 
-class BirdPlan:
+class BirdPlan:  # pylint: disable=too-many-public-methods
     """Main BirdPlan class."""
 
     _birdconf: BirdConfig
@@ -180,10 +191,178 @@ class BirdPlan:
 
         # Write out state file
         try:
-            with open(self.state_file, "w", encoding="UTF-8") as file:
+            fd = os.open(self.state_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o640)
+            with os.fdopen(fd, "w") as file:
                 file.write(yaml_output)
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.state_file}' for writing: {err}") from None
+
+    def state_ospf_summary(self, bird_socket: Optional[str] = None) -> BirdPlanOSPFSummary:
+        """
+        Return OSPF summary.
+
+        Returns
+        -------
+        BirdPlanOSPFSummary
+            Dictionary containing the OSPF summary.
+
+            eg.
+            {
+                'name1': {
+                    'proto': ...,
+                    'table': ...,
+                    'state': ...,
+                    'since': ...,
+                    'info': ...,
+                }
+                'name2': {
+                    ...,
+                }
+            }
+
+        """  # noqa: RST201,RST203,RST301
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of OSPF summary requires a state file, none loaded")
+
+        # Initialize our return structure
+        ret: BirdPlanOSPFSummary = {}
+
+        # Return if we don't have any BGP state
+        if "ospf" not in self.state:
+            return ret
+
+        # Query bird client for the current protocols
+        birdc = birdclient.BirdClient(control_socket=bird_socket)
+        bird_protocols = birdc.show_protocols()
+
+        for name, data in bird_protocols.items():
+            if data["proto"] != "OSPF":
+                continue
+            ret[name] = data
+
+        return ret
+
+    def state_bgp_peer_summary(self, bird_socket: Optional[str] = None) -> BirdPlanBGPPeerSummary:
+        """
+        Return BGP peer summary.
+
+        Returns
+        -------
+        BirdPlanBGPPeerStatus
+            Dictionary containing the BGP peer summary.
+
+            eg.
+            {
+                'peer1': {
+                    'asn': ...,
+                    'description': ...,
+                    'protocols': {
+                        'ipv4': ...,
+                        'ipv6': ...,
+                    }
+                }
+                'peer2': {
+                    ...,
+                }
+            }
+
+        """  # noqa: RST201,RST203,RST301
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of BGP peer summary requires a state file, none loaded")
+
+        # Initialize our return structure
+        ret: BirdPlanBGPPeerSummary = {}
+
+        # Return if we don't have any BGP state
+        if "bgp" not in self.state:
+            return ret
+
+        # Query bird client for the current protocols
+        birdc = birdclient.BirdClient(control_socket=bird_socket)
+        bird_protocols = birdc.show_protocols()
+
+        # Check if we have any peers in our state
+        if "peers" in self.state["bgp"]:
+            # If we do loop with them
+            for peer, peer_state in self.state["bgp"]["peers"].items():
+                # Start with a clear status
+                ret[peer] = {
+                    "asn": peer_state["asn"],
+                    "description": peer_state["description"],
+                    "protocols": peer_state["protocols"],
+                }
+
+                # Next loop through each protocol
+                for ipv, peer_state_protocol in peer_state["protocols"].items():
+                    # If we don't have a live session, skip adding it
+                    if peer_state_protocol["name"] not in bird_protocols:
+                        continue
+                    # But if we do, add it
+                    ret[peer]["protocols"][ipv]["status"] = bird_protocols[peer_state_protocol["name"]]
+
+        return ret
+
+    def state_bgp_peer_show(self, peer: str, bird_socket: Optional[str] = None) -> BirdPlanBGPPeerShow:
+        """
+        Return the status of a specific BGP peer.
+
+        Returns
+        -------
+        BirdPlanBGPPeerShow
+            Dictionary containing the status of a BGP peer.
+
+            eg.
+            {
+                'asn': ...,
+                'description': ...,
+                'protocols': {
+                    'ipv4': {
+                        ...,
+                        'status': ...,
+                    }
+                    'ipv6': ...,
+                },
+            }
+
+        """  # noqa: RST201,RST203,RST301
+
+        # Raise an exception if we don't have a state file loaded
+        if self.state_file is None:
+            raise BirdPlanError("The use of BGP peer show requires a state file, none loaded")
+
+        # Return if we don't have any BGP state
+        if "bgp" not in self.state:
+            raise BirdPlanError("No BGP state found")
+        # Check if the configured state has this peer, if not return
+        if peer not in self.state["bgp"]["peers"]:
+            raise BirdPlanError(f"BGP peer '{peer}' not found in configured state")
+
+        # Make things easier below
+        configured = self.state["bgp"]["peers"][peer]
+
+        # Set our peer info to the configured state
+        ret: BirdPlanBGPPeerShow = configured
+
+        # Add peer name
+        ret["name"] = peer
+
+        # Query bird client for the current protocols
+        birdc = birdclient.BirdClient(control_socket=bird_socket)
+
+        # Loop with protocols and grab live bird status
+        for ipv, protocol_info in configured["protocols"].items():
+            bird_state = birdc.show_protocol(protocol_info["name"])
+            # Skip if we have no bird state
+            if not bird_state:
+                continue
+            # Set the protocol status
+            ret["protocols"][ipv]["status"] = bird_state
+
+        return ret
 
     def state_bgp_peer_graceful_shutdown_set(self, peer: str, value: bool) -> None:
         """
@@ -1257,12 +1436,25 @@ class BirdPlan:
             return
 
         # Loop with peer ASN and config
+        peer_count = len(self.config["bgp"]["peers"])
+        peer_cur: int = 1
         for peer_name, peer_config in self.config["bgp"]["peers"].items():
             # Make sure peer name is valid
             if not re.match(r"^[a-z0-9]+$", peer_name):
                 raise BirdPlanError(f"The peer name '{peer_name}' specified in 'bgp:peers' is not valid, use [a-z0-9]")
+
+            # Log completion
+            if not self.birdconf.birdconfig_globals.suppress_info:
+                percentage_complete = (peer_cur / peer_count) * 100
+                logging.info(
+                    colored("Processing BGP peer %s/%s (%.2f%%): %s", "blue"), peer_cur, peer_count, percentage_complete, peer_name
+                )
+
             # Configure peer
             self._config_bgp_peers_peer(peer_name, peer_config)
+
+            # Bump current peer
+            peer_cur += 1
 
     def _config_bgp_peers_peer(  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-locals,too-many-statements
         self, peer_name: str, peer_config: Dict[str, Any]

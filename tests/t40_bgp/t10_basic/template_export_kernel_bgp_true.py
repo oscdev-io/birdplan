@@ -23,6 +23,8 @@
 
 from .template_bgp import Template as TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP basic test case template."""

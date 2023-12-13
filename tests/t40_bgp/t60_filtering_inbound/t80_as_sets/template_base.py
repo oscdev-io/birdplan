@@ -29,6 +29,8 @@ from birdplan import bgpq3
 from ....simulation import Simulation
 from ..template_base import TemplateBase as TemplateSetBase
 
+__all__ = ["TemplateBase"]
+
 
 class TemplateBase(TemplateSetBase):
     """BGP peer AS-SET filtered test case template."""

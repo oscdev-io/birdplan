@@ -24,6 +24,8 @@
 from ....config.peertype_transit.r1r2 import PeerTypeConfig
 from ..template_prepend_bgp_default import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP prepending test case."""

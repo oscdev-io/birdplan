@@ -23,6 +23,8 @@
 
 from ...basetests import BirdPlanBaseTestCase
 
+__all__ = ["Template"]
+
 
 class Template(BirdPlanBaseTestCase):
     """OSPF test case for redistribution of kernel routes."""
@@ -35,6 +37,10 @@ class Template(BirdPlanBaseTestCase):
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
+
+    def test_bird_cmdline_ospf_summary(self, sim, tmpdir: str) -> None:
+        """Test BIRD cmdline for OSPF summary."""
+        self._test_bird_cmdline_ospf_summary(sim, tmpdir)
 
     def test_add_kernel_routes(self, sim):
         """Add kernel routes to BIRD instances."""

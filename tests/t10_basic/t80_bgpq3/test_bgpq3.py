@@ -23,6 +23,8 @@
 
 from birdplan.bgpq3 import BGPQ3
 
+__all__ = ["Test"]
+
 
 class Test:
     """Basic test case for BGPQ3."""

@@ -24,6 +24,8 @@
 from ....config.peertype_routecollector.e1r1 import PeerTypeConfig
 from ..template_accept_bgp_transit_default import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""

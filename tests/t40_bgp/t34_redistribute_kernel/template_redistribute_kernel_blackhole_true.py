@@ -23,6 +23,8 @@
 
 from .template_base_redistribute_kernel_blackhole_ebgp import TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP redistribute kernel route test case template."""

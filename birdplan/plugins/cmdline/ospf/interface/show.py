@@ -19,10 +19,14 @@
 """BirdPlan commandline options for OSPF interface show."""
 
 import argparse
+import io
 from typing import Any, Dict, List
 
+from .....cmdline import BirdPlanCommandLine
 from .....console.colors import colored
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
+
+__all__ = ["BirdplanCmdlineOSPFInterfaceShow"]
 
 
 class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
@@ -89,32 +93,40 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
 
         """
 
-        if not self._subparser:
+        if not self._subparser:  # pragma: no cover
             raise RuntimeError()
 
-        cmdline = args["cmdline"]
+        cmdline: BirdPlanCommandLine = args["cmdline"]
 
-        # Load BirdPlan configuration
-        cmdline.birdplan_load_config(use_cached=True)
+        # Suppress info output
+        cmdline.birdplan.birdconf.birdconfig_globals.suppress_info = True
+
+        # Load BirdPlan configuration using the cache
+        cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
         # Grab peer list
         return cmdline.birdplan.state_ospf_interface_status()
 
-    def show_output_text(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
-        self, data: Any
-    ) -> None:
+    def to_text(self, data: Any) -> str:  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         """
-        Show command output in text.
+        Return output in text format.
 
         Parameters
         ----------
         data : BirdPlanOSPFInterfaceStatus
             OSPF interface status structure.
 
+        Returns
+        -------
+        str
+            Output in text format.
+
         """
 
-        print("OSPF interface overrides:")
-        print("-------------------------")
+        ob = io.StringIO()
+
+        ob.write("OSPF interface overrides:\n")
+        ob.write("-------------------------\n")
         # Loop with sorted override list
         if "areas" in data["overrides"]:
             for area_name, area in sorted(data["overrides"]["areas"].items()):
@@ -122,20 +134,20 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
                 if ("interfaces" not in area) or (not area["interfaces"]):
                     continue
                 # Print out override
-                print("  Area: " + colored(area_name, "cyan"))
+                ob.write("  Area: " + colored(area_name, "cyan") + "\n")
                 for interface_name, interface in area["interfaces"].items():
-                    print("    Interface: " + colored(interface_name, "cyan"))
+                    ob.write("    Interface: " + colored(interface_name, "cyan") + "\n")
                     # Check if we have a cost override
                     if "cost" in interface:
-                        print(f"      - Cost.......: {interface['cost']}")
+                        ob.write(f"      - Cost.......: {interface['cost']}\n")
                     # Check if we have a cost override
                     if "ecmp_weight" in interface:
-                        print(f"      - ECMP Weight: {interface['ecmp_weight']}")
-                print("\n")
+                        ob.write(f"      - ECMP Weight: {interface['ecmp_weight']}\n")
+                ob.write("\n")
         # If we have no overrides, just print out --none--
         if ("areas" not in data["overrides"]) or (not data["overrides"]["areas"]):
-            print("--none--")
-            print("\n")
+            ob.write("--none--\n")
+            ob.write("\n")
 
         # Get a list of all areas we know about
         areas_all = list(data["current"]["areas"].keys()) + list(data["pending"]["areas"].keys())
@@ -155,18 +167,18 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
             # Make sure the interface list is unique and sorted
             interfaces_all[area_name] = sorted(set(interfaces_all[area_name]))
 
-        print("OSPF interface status:")
-        print("----------------------")
+        ob.write("OSPF interface status:\n")
+        ob.write("----------------------\n")
 
         # Loop with areas
         for area_name, interface_list in sorted(interfaces_all.items()):
             # Create area section
-            print("  Area: " + colored(area_name, "cyan"))
+            ob.write("  Area: " + colored(area_name, "cyan") + "\n")
 
             # Loop with sorted interface list
             for interface in interface_list:
                 # Create interface section
-                print("    Interface: " + colored(interface, "cyan"))
+                ob.write("    Interface: " + colored(interface, "cyan") + "\n")
 
                 # Check if we have pending values
                 pending_cost = None
@@ -180,7 +192,7 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
 
                 # Short circuit if we don't have anything pending
                 if pending_cost is None and pending_ecmp_weight is None:
-                    print("      " + colored("-removed-", "magenta"))
+                    ob.write("      " + colored("-removed-", "magenta") + "\n")
                     continue
 
                 # Grab current cost status
@@ -198,30 +210,32 @@ class BirdplanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
                 # Work out the cost string
                 cost_str = None
                 if (current_cost is not None) and (pending_cost is not None):
-                    cost_str = (
-                        f"{current_cost} → " + colored(pending_cost, "yellow")
-                        if (current_cost != pending_cost)
-                        else f"{pending_cost}"
-                    )
+                    cost_str = f"{current_cost} → "
+                    if current_cost != pending_cost:
+                        cost_str += colored(f"{pending_cost}", "yellow")
+                    else:
+                        cost_str += f"{pending_cost}"
                 else:
                     cost_str = colored(f"{pending_cost}", "green")
                 # Work out the ECMP weight
                 ecmp_weight_str = None
                 if (current_ecmp_weight is not None) and (pending_ecmp_weight is not None):
-                    ecmp_weight_str = (
-                        f"{current_ecmp_weight} → " + colored(pending_ecmp_weight, "yellow")
-                        if (current_ecmp_weight != pending_ecmp_weight)
-                        else f"{pending_ecmp_weight}"
-                    )
+                    ecmp_weight_str = f"{current_ecmp_weight} → "
+                    if current_ecmp_weight != pending_ecmp_weight:
+                        ecmp_weight_str += colored(f"{pending_ecmp_weight}", "yellow")
+                    else:
+                        ecmp_weight_str += f"{pending_ecmp_weight}"
                 else:
                     ecmp_weight_str = colored(f"{pending_ecmp_weight}", "green")
 
-                print(f"      - Cost.......: {cost_str}")
-                print(f"      - ECMP Weight: {ecmp_weight_str}")
+                ob.write(f"      - Cost.......: {cost_str}\n")
+                ob.write(f"      - ECMP Weight: {ecmp_weight_str}\n")
             # Separate areas
-            print("\n")
+            ob.write("\n")
 
         # Add newline to end of output
-        print(colored("NEW", "green") + "        - New interface configuration")
-        print(colored("CHANGED", "yellow") + "    - Pending interface configuration")
-        print("\n")
+        ob.write(colored("NEW", "green") + "        - New interface configuration\n")
+        ob.write(colored("CHANGED", "yellow") + "    - Pending interface configuration\n")
+        ob.write("\n")
+
+        return ob.getvalue()

@@ -28,6 +28,8 @@ from .protocols import SectionProtocols
 from .router_id import SectionRouterID
 from .tables import SectionTables
 
+__all__ = ["Sections"]
+
 
 class Sections(SectionBase):
     """BIRD configuration sections."""

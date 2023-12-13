@@ -20,4 +20,6 @@
 
 from typing import Any, Dict
 
+__all__ = ["OSPFAreaInterfaceConfig"]
+
 OSPFAreaInterfaceConfig = Dict[str, Any]

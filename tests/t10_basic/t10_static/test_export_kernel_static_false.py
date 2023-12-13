@@ -23,6 +23,8 @@
 
 from .template import Template
 
+__all__ = ["Test"]
+
 
 class Test(Template):
     """Basic static route test cases, with export_kernel:static set to False."""

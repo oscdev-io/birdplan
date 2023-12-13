@@ -24,6 +24,8 @@
 from ....config.peertype_rrserver_rrserver.r1r2 import PeerTypeConfig
 from ..template_graceful_shutdown_inbound_configfile_global_peer_override_false import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP graceful shutdown test case."""

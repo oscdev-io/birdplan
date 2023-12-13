@@ -20,6 +20,8 @@
 
 from typing import List, Union
 
+__all__ = ["OSPFRoutePolicyAccept", "OSPFRoutePolicyRedistribute", "OSPFAttributes"]
+
 
 class OSPFRoutePolicyAccept:  # pylint: disable=too-few-public-methods
     """

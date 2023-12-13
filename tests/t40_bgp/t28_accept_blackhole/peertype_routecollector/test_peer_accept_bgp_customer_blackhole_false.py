@@ -24,6 +24,8 @@
 from ...config.peertype_routecollector.e1r1 import PeerTypeConfig
 from ..template_peer_accept_bgp_customer_blackhole_false import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP accept blackhole route test cases, with peer accept:bgp_customer_blackhole set to False."""

@@ -24,6 +24,8 @@
 from ....config.peertype_transit.r1_to_r10 import PeerTypeConfig
 from ..template_large_community_prepend_2x_to_internal import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP large community functions test case."""

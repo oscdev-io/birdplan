@@ -33,6 +33,9 @@ from .area_attributes import OSPFAreaAttributes
 from .interface import ProtocolOSPFAreaInterface
 from .typing import OSPFAreaConfig
 
+__all__ = ["ProtocolOSPFArea"]
+
+
 OSPFAreaInterfaceConfig = Dict[str, Any]
 OSPFAreaInterfaces = Dict[str, ProtocolOSPFAreaInterface]
 

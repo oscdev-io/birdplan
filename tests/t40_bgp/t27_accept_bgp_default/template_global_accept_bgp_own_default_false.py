@@ -23,6 +23,8 @@
 
 from .template_base_global_accept_default import TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP accept default route test case template."""

@@ -26,6 +26,8 @@ from ..functions import SectionFunctions
 from ..tables import SectionTables
 from .base import SectionProtocolBase
 
+__all__ = ["ProtocolDirect"]
+
 
 class ProtocolDirect(SectionProtocolBase):
     """BIRD direct protocol configuration."""

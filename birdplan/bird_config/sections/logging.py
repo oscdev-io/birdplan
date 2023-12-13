@@ -21,6 +21,8 @@
 from ..globals import BirdConfigGlobals
 from .base import SectionBase
 
+__all__ = ["SectionLogging"]
+
 
 class SectionLogging(SectionBase):
     """BIRD logging configuration."""

@@ -25,6 +25,8 @@ import time
 
 from ..template_base import TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP graceful shutdown test case template."""
@@ -36,7 +38,9 @@ class Template(TemplateBase):
         self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "graceful-shutdown", "set", "*", "true"])
 
         # Check r2 status
-        graceful_shutdown_status = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "graceful-shutdown", "show"])
+        birdplan_result = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "graceful-shutdown", "show"])
+
+        graceful_shutdown_status = birdplan_result["raw"]
         assert graceful_shutdown_status == {
             "overrides": {"*": True},
             "current": {"r2": False},
@@ -47,7 +51,9 @@ class Template(TemplateBase):
         self._birdplan_run(sim, tmpdir, "r1", ["configure"])
 
         # Check r2 status again
-        graceful_shutdown_status = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "graceful-shutdown", "show"])
+        birdplan_result = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "graceful-shutdown", "show"])
+
+        graceful_shutdown_status = birdplan_result["raw"]
         assert graceful_shutdown_status == {
             "overrides": {"*": True},
             "current": {"r2": True},

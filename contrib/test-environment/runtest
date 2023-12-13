@@ -3,7 +3,7 @@
 pacman -Q bird
 pacman -Q exabgp
 
-cd /root/birdplan
+cd /root/birdplan || :
 
 ARGS=("$@")
 if [ ${#ARGS[@]} -eq 0 ]; then

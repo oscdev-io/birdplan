@@ -29,6 +29,8 @@ from birdplan import peeringdb
 from ....basetests import BirdPlanBaseTestCase
 from ....simulation import Simulation
 
+__all__ = ["Template"]
+
 
 class Template(BirdPlanBaseTestCase):
     """BGP prefix limit test template."""
@@ -97,6 +99,14 @@ class Template(BirdPlanBaseTestCase):
     def test_bird_status(self, sim):
         """Test BIRD status."""
         self._test_bird_status(sim)
+
+    def test_bird_cmdline_bgp_peer_summary(self, sim, tmpdir):
+        """Test showing BGP peer summary."""
+        self._test_bird_cmdline_bgp_peer_summary(sim, tmpdir)
+
+    def test_bird_cmdline_bgp_peer_show(self, sim, tmpdir):
+        """Test showing BGP peer."""
+        self._test_bird_cmdline_bgp_peer_show(sim, tmpdir)
 
     def test_bird_route_limit_exceeded(self, sim):
         """Check logs to see if we reached the prefix limit."""

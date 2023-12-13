@@ -24,6 +24,8 @@
 from ...config.peertype_routecollector.e1r1 import PeerTypeConfig
 from ..template_peer_accept_bgp_transit_default import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP accept default route test case."""

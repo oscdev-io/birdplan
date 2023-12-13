@@ -24,6 +24,8 @@
 from ...config.peertype_rrserver.r1r2 import PeerTypeConfig
 from ..template_redistribute_kernel_blackhole import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP redistribute kernel route test case."""

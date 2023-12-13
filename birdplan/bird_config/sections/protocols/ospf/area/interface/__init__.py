@@ -32,6 +32,8 @@ from ..area_attributes import OSPFAreaAttributes
 from .interface_attributes import OSPFAreaInterfaceAttributes
 from .typing import OSPFAreaInterfaceConfig
 
+__all__ = ["ProtocolOSPFAreaInterface"]
+
 
 class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-many-public-methods,too-many-instance-attributes
     """BIRD OSPF area interface configuration."""

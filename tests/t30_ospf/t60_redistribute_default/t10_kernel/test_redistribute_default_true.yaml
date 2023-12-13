@@ -387,6 +387,19 @@ r1_master6:
     type:
     - device
     - univ
+r1_ospf_summary:
+  ospf4:
+    info: alone
+    name: ospf4
+    proto: OSPF
+    state: down
+    table: t_ospf4
+  ospf6:
+    info: alone
+    name: ospf6
+    proto: OSPF
+    state: down
+    table: t_ospf6
 r1_t_kernel4:
   0.0.0.0/0:
   - attributes:
@@ -820,6 +833,19 @@ r2_master6:
     type:
     - OSPF
     - univ
+r2_ospf_summary:
+  ospf4:
+    info: alone
+    name: ospf4
+    proto: OSPF
+    state: down
+    table: t_ospf4
+  ospf6:
+    info: alone
+    name: ospf6
+    proto: OSPF
+    state: down
+    table: t_ospf6
 r2_t_kernel4:
   100.64.0.0/24:
   - attributes:

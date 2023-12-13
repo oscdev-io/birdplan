@@ -23,6 +23,8 @@
 
 from .template_base import TemplateBase
 
+__all__ = ["Template"]
+
 
 class Template(TemplateBase):
     """BGP peer AS filtered test case template."""

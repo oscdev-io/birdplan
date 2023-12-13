@@ -23,6 +23,8 @@
 
 from .template_base_blackhole import TemplateSetBase
 
+__all__ = ["TemplateBase"]
+
 
 class TemplateBase(TemplateSetBase):
     """BGP large community functions test case template."""

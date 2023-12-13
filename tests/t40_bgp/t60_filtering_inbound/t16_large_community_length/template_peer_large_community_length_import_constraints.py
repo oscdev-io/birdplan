@@ -23,6 +23,9 @@
 
 from ..template_base_community_tests import TemplateBase
 
+__all__ = ["Template"]
+
+
 # This test is changed from 20,21 to 19,20 due to the fact we add large communities
 
 

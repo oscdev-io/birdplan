@@ -24,6 +24,8 @@
 from ...config.peertype_rrserver_rrserver.r1r2 import PeerTypeConfig
 from ..template_redistribute_connected_false import Template
 
+__all__ = ["Test"]
+
 
 class Test(PeerTypeConfig, Template):
     """BGP redistribute connected route test case."""

@@ -151,6 +151,19 @@ r1_master6:
     type:
     - static
     - univ
+r1_ospf_summary:
+  ospf4:
+    info: running
+    name: ospf4
+    proto: OSPF
+    state: up
+    table: t_ospf4
+  ospf6:
+    info: running
+    name: ospf6
+    proto: OSPF
+    state: up
+    table: t_ospf6
 r1_t_kernel4:
   10.0.0.0/24:
   - bestpath: true
@@ -387,6 +400,19 @@ r2_master6:
     type:
     - OSPF-E2
     - univ
+r2_ospf_summary:
+  ospf4:
+    info: running
+    name: ospf4
+    proto: OSPF
+    state: up
+    table: t_ospf4
+  ospf6:
+    info: running
+    name: ospf6
+    proto: OSPF
+    state: up
+    table: t_ospf6
 r2_t_kernel4: {}
 r2_t_kernel6: {}
 r2_t_ospf4:

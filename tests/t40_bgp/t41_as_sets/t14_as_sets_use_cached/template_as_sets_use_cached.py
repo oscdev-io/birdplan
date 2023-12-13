@@ -32,6 +32,8 @@ from birdplan.exceptions import BirdPlanError
 from ....basetests import BirdPlanBaseTestCase
 from ....simulation import Simulation
 
+__all__ = ["Template"]
+
 
 class Template(BirdPlanBaseTestCase):
     """BGP peer AS-SET changes test case template."""
@@ -113,3 +115,11 @@ class Template(BirdPlanBaseTestCase):
                 match=r"""Failed to query IRR ASNs from object '_BIRDPLAN:AS-SET'""",
             ):
                 super()._birdplan_run(sim, tmpdir, "r1", ["configure"])
+
+    def test_bird_cmdline_bgp_peer_summary(self, sim, tmpdir):
+        """Test showing BGP peer summary."""
+        self._test_bird_cmdline_bgp_peer_summary(sim, tmpdir)
+
+    def test_bird_cmdline_bgp_peer_show(self, sim, tmpdir):
+        """Test showing BGP peer."""
+        self._test_bird_cmdline_bgp_peer_show(sim, tmpdir)
