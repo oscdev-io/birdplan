@@ -11,7 +11,7 @@ ExecStart=/usr/bin/birdplan-monitor
 
 ConfigurationDirectory=birdplan
 StateDirectory=birdplan
-StateDirectoryMode=0750
+StateDirectoryMode=0755
 ReadWritePaths=/etc/bird/bird.conf /run/bird
 
 User=birdplan

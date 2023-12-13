@@ -22,6 +22,7 @@
 import argparse
 import datetime
 import json
+import logging
 from typing import Any, Dict, Optional
 
 from ...cmdline import BIRDPLAN_MONITOR_FILE, BirdPlanCommandLine
@@ -167,6 +168,7 @@ class BirdplanCmdlineMonitor(BirdPlanCmdlinePluginBase):
         try:
             with open(self.output_filename, "w", encoding="UTF-8") as config_file:
                 # Write out data json
+                logging.info("Writing monitor file '%s'", self.output_filename)
                 config_file.write(json.dumps(data, indent=4, sort_keys=True))
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.output_filename}' for writing: {err}") from None

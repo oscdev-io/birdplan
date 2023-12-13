@@ -132,13 +132,15 @@ release_gitlab:
   - assets=()
   - |
     for p in $(find . -name "*.tar.*" -o -name "*.zip" -o -name "*.whl" -o -name "*SUMS.txt" | sort); do
-      assets+=("--assets-link={\"name\":\"${p}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${p}\"}")
+      fn=$(basename "$p")
+      assets+=("--assets-link={\"name\":\"${fn}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${fn}\"}")
     done
   - echo -e "ASSETS:\n${assets[@]}"
   # Upload assets
   - |
     for p in $(find . -name "*.tar.*" -o -name "*.zip" -o -name "*.whl" -o -name "*SUMS.txt" | sort); do
-      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "${p}" "${PACKAGE_REGISTRY_URL}/${p}"
+      fn=$(basename "$p")
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file "${fn}" "${PACKAGE_REGISTRY_URL}/${fn}"
     done
   # Release
   - release-cli create --name "Release $CI_COMMIT_TAG" --tag-name "$CI_COMMIT_TAG" --description "$DESCRIPTION" "${assets[@]}"
