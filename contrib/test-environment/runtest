@@ -14,3 +14,4 @@ fi
 
 echo "RUNNING: tox -- ${ARGS[*]}"
 nice -n 20 tox -- "${ARGS[@]}"
+nice -n 20 tox -e cov-html
