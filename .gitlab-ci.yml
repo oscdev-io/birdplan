@@ -3,12 +3,49 @@ image: idmslinux/rolling
 include:
   - template: 'Workflows/MergeRequest-Pipelines.gitlab-ci.yml'
 
+
 # Stages we need to progress through
 stages:
+  - validate
   - test
   - prepare_release
   - release
   - deploy
+
+
+# Run for merge requests and non-protected branches
+.rules_for_mrs_tempalate: &rules_for_mrs
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+
+commitlint:
+  stage: validate
+  image: registry.conarx.tech/containers/commitlint
+  script:
+    - cd "$CI_PROJECT_DIR"
+    - echo "CI_COMMIT_BEFORE_SHA -> $CI_COMMIT_BEFORE_SHA"
+    - |
+      if [ "$CI_COMMIT_BEFORE_SHA" == "0000000000000000000000000000000000000000" ]; then
+        START_COMMIT=HEAD^
+      else
+        START_COMMIT=$CI_MERGE_REQUEST_DIFF_BASE_SHA
+      fi
+    - run-commitlint --from "$START_COMMIT" --to HEAD
+  <<: *rules_for_mrs
+
+
+shellcheck:
+  stage: validate
+  image: registry.conarx.tech/containers/shellcheck
+  script:
+    - cd "$CI_PROJECT_DIR"
+    - run-shellcheck .
+  <<: *rules_for_mrs
+
 
 test_job:
   stage: test
@@ -36,6 +73,7 @@ test_job:
     paths:
     - public
 
+
 prepare_release:
   stage: prepare_release
   rules:
@@ -55,6 +93,7 @@ prepare_release:
     paths:
     - build/
 
+
 release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
@@ -67,6 +106,7 @@ release:
      description: 'Automatic release based on tag $CI_COMMIT_TAG'
      tag_name: '$CI_COMMIT_TAG'
      ref: '$CI_COMMIT_TAG'
+
 
 pages:
   stage: deploy
