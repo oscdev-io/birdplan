@@ -100,8 +100,10 @@ load-plugins = [
     "pylint.extensions.typing",
 ]
 
+
 [tool.pylint.broad_try_clause]
 max-try-statements = 5
+
 
 [tool.pylint.message_control]
 max-line-length = 132
@@ -109,3 +111,25 @@ max-line-length = 132
 # R0801: Similar lines in X files
 # R6103: Use '....' instead (assignment on IF line)
 disable = "C0199,R0801,R6103"
+
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:$",
+    "if TYPE_CHECKING:$",
+]
+
+omit = [
+    "birdplan/__main__.py",
+    "birdplan/monitor.py",
+    "tests/**",
+]
+
+[tool.coverage.run]
+source_pkgs = ["birdplan"]
+relative_files = true

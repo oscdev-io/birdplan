@@ -4,6 +4,7 @@ pacman -Q bird
 pacman -Q exabgp
 
 cd /root/birdplan || :
+echo "Excuting in '$(pwd)'..."
 
 ARGS=("$@")
 if [ ${#ARGS[@]} -eq 0 ]; then
