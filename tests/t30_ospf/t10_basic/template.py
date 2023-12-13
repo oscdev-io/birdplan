@@ -21,8 +21,6 @@
 
 """OSPF basic test case template."""
 
-from typing import List, Optional
-from tests.simulation import Simulation
 from ...basetests import BirdPlanBaseTestCase
 
 __all__ = ["Template"]

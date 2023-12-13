@@ -53,7 +53,7 @@ if packaging.version.parse(birdclient.__version__) < packaging.version.parse("0.
     raise BirdPlanError("birdplan requires birdclient version 0.0.8 or newer")
 
 
-class BirdPlan:
+class BirdPlan:  # pylint: disable=too-many-public-methods
     """Main BirdPlan class."""
 
     _birdconf: BirdConfig
