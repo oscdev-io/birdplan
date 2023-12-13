@@ -20,8 +20,10 @@
 
 # pylint: disable=too-many-lines
 
+import grp
 import logging
 import os
+import pwd
 import re
 from typing import Any, Dict, List, Optional, Union
 
@@ -186,12 +188,26 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         if self.state_file is None:
             raise BirdPlanError("Commit of BirdPlan state requires a state file, none loaded")
 
+        # Try get user and group ID's
+        try:
+            birdplan_uid = pwd.getpwnam("birdplan").pw_uid
+        except KeyError:
+            birdplan_uid = None
+        try:
+            birdplan_gid = grp.getgrnam("birdplan").gr_gid
+        except KeyError:
+            birdplan_gid = None
+
         # Dump the state in pretty YAML
         yaml_output = yaml.dump(self.state, default_flow_style=False)
 
         # Write out state file
         try:
             fd = os.open(self.state_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o640)
+            # Chown the file if we have the user and group ID's
+            if birdplan_uid and birdplan_gid:
+                os.fchown(fd, birdplan_uid, birdplan_gid)
+            # Open for writing
             with os.fdopen(fd, "w") as file:
                 file.write(yaml_output)
         except OSError as err:  # pragma: no cover

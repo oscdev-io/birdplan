@@ -20,7 +20,9 @@
 
 
 import argparse
+import grp
 import os
+import pwd
 from typing import Any, Dict, Optional
 
 from ...cmdline import BIRD_CONFIG_FILE, BirdPlanCommandLine
@@ -175,9 +177,25 @@ class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
         if not self.config_filename:
             raise RuntimeError("Attribute 'config_filename' must be set")
 
+        # Get birdplan user id
+        try:
+            birdplan_uid = pwd.getpwnam("birdplan").pw_uid
+        except KeyError:
+            birdplan_uid = -1
+
+        # Get bird group id
+        try:
+            bird_gid = grp.getgrnam("bird").gr_gid
+        except KeyError:
+            bird_gid = None
+
         # Write out config file
         try:
             fd = os.open(self.config_filename, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o640)
+            # If we have a bird group, set it
+            if bird_gid:
+                os.fchown(fd, birdplan_uid, bird_gid)
+            # Write out config
             with os.fdopen(fd, "w") as config_file:
                 config_file.write(data)
         except OSError as err:  # pragma: no cover
