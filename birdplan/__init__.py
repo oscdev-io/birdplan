@@ -225,6 +225,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
             eg.
             {
                 'name1': {
+                    'name': ...,
                     'proto': ...,
                     'table': ...,
                     'state': ...,
@@ -272,6 +273,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
             eg.
             {
                 'peer1': {
+                    'name': ...,
                     'asn': ...,
                     'description': ...,
                     'protocols': {
@@ -307,6 +309,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
             for peer, peer_state in self.state["bgp"]["peers"].items():
                 # Start with a clear status
                 ret[peer] = {
+                    "name": peer,
                     "asn": peer_state["asn"],
                     "description": peer_state["description"],
                     "protocols": peer_state["protocols"],
@@ -317,6 +320,8 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                     # If we don't have a live session, skip adding it
                     if peer_state_protocol["name"] not in bird_protocols:
                         continue
+                    # Set protocol name
+                    ret[peer]["protocols"][ipv]["protocol"] = ipv
                     # But if we do, add it
                     ret[peer]["protocols"][ipv]["status"] = bird_protocols[peer_state_protocol["name"]]
 
