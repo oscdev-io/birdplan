@@ -1132,11 +1132,13 @@ r1_peer_summary:
   e1:
     asn: 65000
     description: BGP session to e1
+    name: e1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_e1
         neighbor: 100.64.0.3
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -1147,6 +1149,7 @@ r1_peer_summary:
         mode: active
         name: bgp6_AS65000_e1
         neighbor: fc00:100::3
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -1156,11 +1159,13 @@ r1_peer_summary:
   e2:
     asn: 65000
     description: BGP session to e2
+    name: e2
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_e2
         neighbor: 100.64.0.4
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -1171,6 +1176,7 @@ r1_peer_summary:
         mode: active
         name: bgp6_AS65000_e2
         neighbor: fc00:100::4
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -1180,12 +1186,14 @@ r1_peer_summary:
   r2:
     asn: 65001
     description: BGP session to r2
+    name: r2
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65001_r2
         neighbor: 100.64.0.2
         prefix_limit: 100
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -1197,6 +1205,7 @@ r1_peer_summary:
         name: bgp6_AS65001_r2
         neighbor: fc00:100::2
         prefix_limit: 100
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -4348,11 +4357,13 @@ r2_peer_summary:
   r1:
     asn: 65000
     description: BGP session to r1
+    name: r1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
+        protocol: ipv4
         source_address: 100.64.0.2
         status:
           info: established
@@ -4363,6 +4374,7 @@ r2_peer_summary:
         mode: active
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
+        protocol: ipv6
         source_address: fc00:100::2
         status:
           info: established
