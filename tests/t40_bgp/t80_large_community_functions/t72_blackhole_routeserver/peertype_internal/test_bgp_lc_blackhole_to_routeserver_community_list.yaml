@@ -2770,7 +2770,13 @@ r5_t_bgp4_AS65000_r1_peer:
     attributes:
       BGP.as_path:
       - 65000
-      BGP.community: []
+      BGP.community:
+      - !!python/tuple
+        - 65009
+        - 111
+      - !!python/tuple
+        - 65009
+        - 112
       BGP.large_community:
       - !!python/tuple
         - 65000
@@ -2780,10 +2786,6 @@ r5_t_bgp4_AS65000_r1_peer:
         - 65000
         - 666
         - 65413
-      - !!python/tuple
-        - 65004
-        - 1000
-        - 1
       - !!python/tuple
         - 65004
         - 1101
@@ -2810,7 +2812,13 @@ r5_t_bgp6_AS65000_r1_peer:
     attributes:
       BGP.as_path:
       - 65000
-      BGP.community: []
+      BGP.community:
+      - !!python/tuple
+        - 65009
+        - 111
+      - !!python/tuple
+        - 65009
+        - 112
       BGP.large_community:
       - !!python/tuple
         - 65000
@@ -2820,10 +2828,6 @@ r5_t_bgp6_AS65000_r1_peer:
         - 65000
         - 666
         - 65413
-      - !!python/tuple
-        - 65004
-        - 1000
-        - 1
       - !!python/tuple
         - 65004
         - 1101
@@ -3024,7 +3028,13 @@ r6_t_bgp4_AS65000_r1_peer:
     attributes:
       BGP.as_path:
       - 65000
-      BGP.community: []
+      BGP.community:
+      - !!python/tuple
+        - 65009
+        - 111
+      - !!python/tuple
+        - 65009
+        - 112
       BGP.large_community:
       - !!python/tuple
         - 65000
@@ -3034,10 +3044,6 @@ r6_t_bgp4_AS65000_r1_peer:
         - 65000
         - 666
         - 65413
-      - !!python/tuple
-        - 65005
-        - 1000
-        - 1
       - !!python/tuple
         - 65005
         - 3
@@ -3098,7 +3104,13 @@ r6_t_bgp6_AS65000_r1_peer:
     attributes:
       BGP.as_path:
       - 65000
-      BGP.community: []
+      BGP.community:
+      - !!python/tuple
+        - 65009
+        - 111
+      - !!python/tuple
+        - 65009
+        - 112
       BGP.large_community:
       - !!python/tuple
         - 65000
@@ -3108,10 +3120,6 @@ r6_t_bgp6_AS65000_r1_peer:
         - 65000
         - 666
         - 65413
-      - !!python/tuple
-        - 65005
-        - 1000
-        - 1
       - !!python/tuple
         - 65005
         - 3

@@ -11,6 +11,12 @@ r1_inet:
   gateway: 100.64.0.2
   metric: 600
   protocol: bird
+- dev: eth0
+  dst: 100.64.102.0/24
+  flags: []
+  gateway: 100.64.0.2
+  metric: 600
+  protocol: bird
 r1_inet6:
 - dev: eth0
   dst: fc00:100::/64
@@ -20,6 +26,13 @@ r1_inet6:
   protocol: kernel
 - dev: eth0
   dst: fc00:101::/48
+  flags: []
+  gateway: fc00:100::2
+  metric: 600
+  pref: medium
+  protocol: bird
+- dev: eth0
+  dst: fc00:102::/48
   flags: []
   gateway: fc00:100::2
   metric: 600
@@ -48,6 +61,33 @@ r1_master4:
       BGP.community:
       - !!python/tuple
         - 65000
+        - 1
+      BGP.large_community:
+      - !!python/tuple
+        - 65000
+        - 3
+        - 1
+      BGP.local_pref: 100
+      BGP.next_hop:
+      - 100.64.0.2
+      BGP.origin: IGP
+    bestpath: true
+    bgp_type: i
+    nexthops:
+    - gateway: 100.64.0.2
+      interface: eth0
+    pref: 100
+    prefix_type: unicast
+    protocol: bgp4_AS65000_e1
+    type:
+    - BGP
+    - univ
+  100.64.102.0/24:
+  - attributes:
+      BGP.as_path: []
+      BGP.community:
+      - !!python/tuple
+        - 64496
         - 1
       BGP.large_community:
       - !!python/tuple
@@ -107,6 +147,33 @@ r1_master6:
     type:
     - BGP
     - univ
+  fc00:102::/48:
+  - attributes:
+      BGP.as_path: []
+      BGP.community:
+      - !!python/tuple
+        - 64496
+        - 1
+      BGP.large_community:
+      - !!python/tuple
+        - 65000
+        - 3
+        - 1
+      BGP.local_pref: 100
+      BGP.next_hop:
+      - fc00:100::2
+      BGP.origin: IGP
+    bestpath: true
+    bgp_type: i
+    nexthops:
+    - gateway: fc00:100::2
+      interface: eth0
+    pref: 100
+    prefix_type: unicast
+    protocol: bgp6_AS65000_e1
+    type:
+    - BGP
+    - univ
 r1_peer_show_e1:
   asn: 65000
   description: BGP session to e1
@@ -133,7 +200,7 @@ r1_peer_show_e1:
         output_filter: f_bgp_AS65000_e1_peer_export
         preference: 100
         routes_exported: 0
-        routes_imported: 1
+        routes_imported: 2
         source_address: 100.64.0.1
         state: up
         table: t_bgp4_AS65000_e1_peer
@@ -155,7 +222,7 @@ r1_peer_show_e1:
         output_filter: f_bgp_AS65000_e1_peer_export
         preference: 100
         routes_exported: 0
-        routes_imported: 1
+        routes_imported: 2
         source_address: fc00:100::1
         state: up
         table: t_bgp6_AS65000_e1_peer
@@ -220,6 +287,33 @@ r1_t_bgp4:
     type:
     - BGP
     - univ
+  100.64.102.0/24:
+  - attributes:
+      BGP.as_path: []
+      BGP.community:
+      - !!python/tuple
+        - 64496
+        - 1
+      BGP.large_community:
+      - !!python/tuple
+        - 65000
+        - 3
+        - 1
+      BGP.local_pref: 100
+      BGP.next_hop:
+      - 100.64.0.2
+      BGP.origin: IGP
+    bestpath: true
+    bgp_type: i
+    nexthops:
+    - gateway: 100.64.0.2
+      interface: eth0
+    pref: 100
+    prefix_type: unicast
+    protocol: bgp4_AS65000_e1
+    type:
+    - BGP
+    - univ
 r1_t_bgp4_AS65000_e1_peer:
   100.64.101.0/24:
   - attributes:
@@ -227,6 +321,33 @@ r1_t_bgp4_AS65000_e1_peer:
       BGP.community:
       - !!python/tuple
         - 65000
+        - 1
+      BGP.large_community:
+      - !!python/tuple
+        - 65000
+        - 3
+        - 1
+      BGP.local_pref: 100
+      BGP.next_hop:
+      - 100.64.0.2
+      BGP.origin: IGP
+    bestpath: true
+    bgp_type: i
+    nexthops:
+    - gateway: 100.64.0.2
+      interface: eth0
+    pref: 100
+    prefix_type: unicast
+    protocol: bgp4_AS65000_e1
+    type:
+    - BGP
+    - univ
+  100.64.102.0/24:
+  - attributes:
+      BGP.as_path: []
+      BGP.community:
+      - !!python/tuple
+        - 64496
         - 1
       BGP.large_community:
       - !!python/tuple
@@ -276,6 +397,33 @@ r1_t_bgp6:
     type:
     - BGP
     - univ
+  fc00:102::/48:
+  - attributes:
+      BGP.as_path: []
+      BGP.community:
+      - !!python/tuple
+        - 64496
+        - 1
+      BGP.large_community:
+      - !!python/tuple
+        - 65000
+        - 3
+        - 1
+      BGP.local_pref: 100
+      BGP.next_hop:
+      - fc00:100::2
+      BGP.origin: IGP
+    bestpath: true
+    bgp_type: i
+    nexthops:
+    - gateway: fc00:100::2
+      interface: eth0
+    pref: 100
+    prefix_type: unicast
+    protocol: bgp6_AS65000_e1
+    type:
+    - BGP
+    - univ
 r1_t_bgp6_AS65000_e1_peer:
   fc00:101::/48:
   - attributes:
@@ -283,6 +431,33 @@ r1_t_bgp6_AS65000_e1_peer:
       BGP.community:
       - !!python/tuple
         - 65000
+        - 1
+      BGP.large_community:
+      - !!python/tuple
+        - 65000
+        - 3
+        - 1
+      BGP.local_pref: 100
+      BGP.next_hop:
+      - fc00:100::2
+      BGP.origin: IGP
+    bestpath: true
+    bgp_type: i
+    nexthops:
+    - gateway: fc00:100::2
+      interface: eth0
+    pref: 100
+    prefix_type: unicast
+    protocol: bgp6_AS65000_e1
+    type:
+    - BGP
+    - univ
+  fc00:102::/48:
+  - attributes:
+      BGP.as_path: []
+      BGP.community:
+      - !!python/tuple
+        - 64496
         - 1
       BGP.large_community:
       - !!python/tuple
@@ -332,6 +507,33 @@ r1_t_kernel4:
     type:
     - BGP
     - univ
+  100.64.102.0/24:
+  - attributes:
+      BGP.as_path: []
+      BGP.community:
+      - !!python/tuple
+        - 64496
+        - 1
+      BGP.large_community:
+      - !!python/tuple
+        - 65000
+        - 3
+        - 1
+      BGP.local_pref: 100
+      BGP.next_hop:
+      - 100.64.0.2
+      BGP.origin: IGP
+    bestpath: true
+    bgp_type: i
+    nexthops:
+    - gateway: 100.64.0.2
+      interface: eth0
+    pref: 100
+    prefix_type: unicast
+    protocol: bgp4_AS65000_e1
+    type:
+    - BGP
+    - univ
 r1_t_kernel6:
   fc00:101::/48:
   - attributes:
@@ -339,6 +541,33 @@ r1_t_kernel6:
       BGP.community:
       - !!python/tuple
         - 65000
+        - 1
+      BGP.large_community:
+      - !!python/tuple
+        - 65000
+        - 3
+        - 1
+      BGP.local_pref: 100
+      BGP.next_hop:
+      - fc00:100::2
+      BGP.origin: IGP
+    bestpath: true
+    bgp_type: i
+    nexthops:
+    - gateway: fc00:100::2
+      interface: eth0
+    pref: 100
+    prefix_type: unicast
+    protocol: bgp6_AS65000_e1
+    type:
+    - BGP
+    - univ
+  fc00:102::/48:
+  - attributes:
+      BGP.as_path: []
+      BGP.community:
+      - !!python/tuple
+        - 64496
         - 1
       BGP.large_community:
       - !!python/tuple

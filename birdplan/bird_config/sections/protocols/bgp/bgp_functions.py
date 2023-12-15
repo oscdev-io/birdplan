@@ -474,10 +474,12 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             # Strip all communities we could interpret internally
             function bgp_peer_communities_strip_all(string filter_name)
             bool stripped_community;
+            bool stripped_community_private;
             bool stripped_lc;
             bool stripped_lc_private;
             {{
                 stripped_community = false;
+                stripped_community_private = false;
                 stripped_lc = false;
                 stripped_lc_private = false;
                 # Sanitize communities
@@ -494,6 +496,14 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                     bgp_large_community.delete(BGP_LC_STRIP_ALL);
                     stripped_lc = true;
                 }}
+                # Sanitize private communities
+                if (bgp_community ~ BGP_COMMUNITY_STRIP_PRIVATE) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_communities_strip_all] Sanitizing private communities for ",
+                        {self.functions.route_info()};
+                    bgp_community.delete(BGP_COMMUNITY_STRIP_PRIVATE);
+                    stripped_community_private = true;
+                }}
                 # Sanitize private large communities
                 if (bgp_large_community ~ BGP_LC_STRIP_PRIVATE) then {{
                     if DEBUG then print filter_name,
@@ -502,11 +512,20 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                     bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);
                     stripped_lc_private = true;
                 }}
+                #
+                # Output debug info and do the actual stripping
+                #
                 if (stripped_community) then {{
                     if DEBUG then print filter_name,
                         " [bgp_peer_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ",
                         {self.functions.route_info()};
                     bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_COMMUNITY);
+                }}
+                if (stripped_community_private) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_communities_strip_all] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY_PRIVATE to ",
+                        {self.functions.route_info()};
+                    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_COMMUNITY_PRIVATE);
                 }}
                 if (stripped_lc) then {{
                     if DEBUG then print filter_name,
@@ -530,10 +549,12 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             # Strip internal communities
             function bgp_peer_communities_strip_internal(string filter_name)
             bool stripped_community;
+            bool stripped_community_private;
             bool stripped_lc;
             bool stripped_lc_private;
             {{
                 stripped_community = false;
+                stripped_community_private = false;
                 stripped_lc = false;
                 stripped_lc_private = false;
                 # Remove stripped communities
@@ -551,6 +572,14 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                     bgp_large_community.delete(BGP_LC_STRIP);
                     stripped_lc = true;
                 }}
+                # Remove stripped private communities
+                if (bgp_community ~ BGP_COMMUNITY_STRIP_PRIVATE) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_communities_strip_internal] Removing stripped private communities from ",
+                        {self.functions.route_info()};
+                    bgp_community.delete(BGP_COMMUNITY_STRIP_PRIVATE);
+                    stripped_community_private = true;
+                }}
                 # Remove stripped private large communities
                 if (bgp_large_community ~ BGP_LC_STRIP_PRIVATE) then {{
                     if DEBUG then print filter_name,
@@ -559,6 +588,9 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                     bgp_large_community.delete(BGP_LC_STRIP_PRIVATE);
                     stripped_lc_private = true;
                 }}
+                #
+                # Output debug info and do the actual stripping
+                #
                 if (stripped_community) then {{
                     if DEBUG then print filter_name,
                         " [bgp_peer_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ",
@@ -570,6 +602,12 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                         " [bgp_peer_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY to ",
                         {self.functions.route_info()};
                     bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_LC);
+                }}
+                if (stripped_community_private) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_peer_communities_strip_internal] Adding BGP_LC_INFORMATION_STRIPPED_COMMUNITY_PRIVATE to ",
+                        {self.functions.route_info()};
+                    bgp_large_community.add(BGP_LC_INFORMATION_STRIPPED_COMMUNITY_PRIVATE);
                 }}
                 if (stripped_lc_private) then {{
                     if DEBUG then print filter_name,
