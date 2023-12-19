@@ -9,7 +9,8 @@ RUN set -ex; \
         python-pytest \
         python-pytest-cov \
         python-pytest-xdist \
-        python-yaml \
+        python-ruamel-yaml \
+        python-ruamel.yaml.clib \
         python-requests \
         python-tox \
         bgpq3 \
