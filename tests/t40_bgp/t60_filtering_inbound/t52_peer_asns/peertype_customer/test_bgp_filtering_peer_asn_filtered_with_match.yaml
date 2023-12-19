@@ -104,12 +104,9 @@ r1_peer_show_e1:
   description: BGP session to e1
   filter:
     as_sets: []
-    aspath_asns:
-      calculated:
-      - 65003
-    origin_asns:
+    peer_asns:
       static:
-      - 65003
+      - 65001
   graceful_shutdown: false
   name: e1
   prefix_limit:

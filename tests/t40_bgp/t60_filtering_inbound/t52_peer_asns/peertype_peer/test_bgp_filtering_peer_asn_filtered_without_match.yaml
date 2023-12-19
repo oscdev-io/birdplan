@@ -47,7 +47,7 @@ r1_peer_show_e1:
     as_sets: []
     peer_asns:
       static:
-      - 65002
+      - 65003
   graceful_shutdown: false
   name: e1
   prefix_limit:

@@ -29,8 +29,3 @@ __all__ = ["Test"]
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
-
-    # Replace default ASN filter
-    r1_peer_extra_config = """
-        origin_asns: [65003]
-"""

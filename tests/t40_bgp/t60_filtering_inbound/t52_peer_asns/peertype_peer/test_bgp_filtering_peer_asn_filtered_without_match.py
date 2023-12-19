@@ -29,3 +29,8 @@ __all__ = ["Test"]
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
+
+    r1_template_peer_config = """
+      filter:
+        peer_asns: [65003]
+"""
