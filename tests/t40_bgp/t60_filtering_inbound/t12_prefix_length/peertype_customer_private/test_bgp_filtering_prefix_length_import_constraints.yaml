@@ -77,14 +77,8 @@ r1_master4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -106,14 +100,8 @@ r1_master4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -135,14 +123,8 @@ r1_master4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -164,14 +146,8 @@ r1_master4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -214,14 +190,8 @@ r1_master6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -243,14 +213,8 @@ r1_master6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -272,14 +236,8 @@ r1_master6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -301,14 +259,8 @@ r1_master6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -434,14 +386,8 @@ r1_t_bgp4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -463,14 +409,8 @@ r1_t_bgp4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -492,14 +432,8 @@ r1_t_bgp4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -521,14 +455,8 @@ r1_t_bgp4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -551,18 +479,9 @@ r1_t_bgp4_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1101, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -584,14 +503,8 @@ r1_t_bgp4_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -613,14 +526,8 @@ r1_t_bgp4_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -642,14 +549,8 @@ r1_t_bgp4_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -671,14 +572,8 @@ r1_t_bgp4_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -700,18 +595,9 @@ r1_t_bgp4_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 1
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1101, 1]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -733,18 +619,9 @@ r1_t_bgp4_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 1
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1101, 1]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -766,18 +643,9 @@ r1_t_bgp4_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1101, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -799,18 +667,9 @@ r1_t_bgp4_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1101, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -833,14 +692,8 @@ r1_t_bgp6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -862,14 +715,8 @@ r1_t_bgp6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -891,14 +738,8 @@ r1_t_bgp6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -920,14 +761,8 @@ r1_t_bgp6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -950,18 +785,9 @@ r1_t_bgp6_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 1
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1101, 1]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -983,18 +809,9 @@ r1_t_bgp6_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1101, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -1016,18 +833,9 @@ r1_t_bgp6_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1101, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -1049,18 +857,9 @@ r1_t_bgp6_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1101, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -1082,14 +881,8 @@ r1_t_bgp6_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -1111,14 +904,8 @@ r1_t_bgp6_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -1140,14 +927,8 @@ r1_t_bgp6_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -1169,14 +950,8 @@ r1_t_bgp6_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -1198,18 +973,9 @@ r1_t_bgp6_AS4200000000_e1_peer:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 1
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1101, 1]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -1232,14 +998,8 @@ r1_t_kernel4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -1261,14 +1021,8 @@ r1_t_kernel4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -1290,14 +1044,8 @@ r1_t_kernel4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -1319,14 +1067,8 @@ r1_t_kernel4:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.2
@@ -1349,14 +1091,8 @@ r1_t_kernel6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -1378,14 +1114,8 @@ r1_t_kernel6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -1407,14 +1137,8 @@ r1_t_kernel6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2
@@ -1436,14 +1160,8 @@ r1_t_kernel6:
       BGP.as_path:
       - 4200000000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 2
-      - !!python/tuple
-        - 65000
-        - 1200
-        - 1
+      - !!python/tuple [65000, 3, 2]
+      - !!python/tuple [65000, 1200, 1]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::2

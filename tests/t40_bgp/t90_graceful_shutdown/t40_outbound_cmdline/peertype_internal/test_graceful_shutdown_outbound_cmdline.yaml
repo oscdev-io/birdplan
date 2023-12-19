@@ -202,10 +202,7 @@ r1_t_bgp4:
   100.101.0.0/24:
   - attributes:
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 940
     bestpath: true
     nexthops:
@@ -221,14 +218,9 @@ r1_t_bgp4_AS65000_r2_peer:
   100.101.0.0/24:
   - attributes:
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 0
+      - !!python/tuple [65535, 0]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 940
     bestpath: true
     nexthops:
@@ -244,10 +236,7 @@ r1_t_bgp6:
   fc00:101::/48:
   - attributes:
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 940
     bestpath: true
     nexthops:
@@ -263,14 +252,9 @@ r1_t_bgp6_AS65000_r2_peer:
   fc00:101::/48:
   - attributes:
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 0
+      - !!python/tuple [65535, 0]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 940
     bestpath: true
     nexthops:
@@ -361,14 +345,9 @@ r2_master4:
   - attributes:
       BGP.as_path: []
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 0
+      - !!python/tuple [65535, 0]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 0
       BGP.next_hop:
       - 192.168.1.2
@@ -417,14 +396,9 @@ r2_master6:
   - attributes:
       BGP.as_path: []
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 0
+      - !!python/tuple [65535, 0]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 0
       BGP.next_hop:
       - fc01::2
@@ -538,14 +512,9 @@ r2_t_bgp4:
   - attributes:
       BGP.as_path: []
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 0
+      - !!python/tuple [65535, 0]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 0
       BGP.next_hop:
       - 192.168.1.2
@@ -564,14 +533,9 @@ r2_t_bgp4_AS65000_r1_peer:
   - attributes:
       BGP.as_path: []
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 0
+      - !!python/tuple [65535, 0]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 0
       BGP.next_hop:
       - 192.168.1.2
@@ -590,14 +554,9 @@ r2_t_bgp6:
   - attributes:
       BGP.as_path: []
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 0
+      - !!python/tuple [65535, 0]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 0
       BGP.next_hop:
       - fc01::2
@@ -616,14 +575,9 @@ r2_t_bgp6_AS65000_r1_peer:
   - attributes:
       BGP.as_path: []
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 0
+      - !!python/tuple [65535, 0]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 0
       BGP.next_hop:
       - fc01::2
@@ -642,14 +596,9 @@ r2_t_kernel4:
   - attributes:
       BGP.as_path: []
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 0
+      - !!python/tuple [65535, 0]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 0
       BGP.next_hop:
       - 192.168.1.2
@@ -668,14 +617,9 @@ r2_t_kernel6:
   - attributes:
       BGP.as_path: []
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 0
+      - !!python/tuple [65535, 0]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 0
       BGP.next_hop:
       - fc01::2

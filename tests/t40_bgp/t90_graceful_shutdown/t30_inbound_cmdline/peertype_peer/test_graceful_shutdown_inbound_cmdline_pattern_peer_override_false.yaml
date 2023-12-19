@@ -214,10 +214,7 @@ r1_t_bgp4:
   100.101.0.0/24:
   - attributes:
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 940
     bestpath: true
     nexthops:
@@ -233,10 +230,7 @@ r1_t_bgp4_AS65001_r2_peer:
   100.101.0.0/24:
   - attributes:
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 940
     bestpath: true
     nexthops:
@@ -252,10 +246,7 @@ r1_t_bgp6:
   fc00:101::/48:
   - attributes:
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 940
     bestpath: true
     nexthops:
@@ -271,10 +262,7 @@ r1_t_bgp6_AS65001_r2_peer:
   fc00:101::/48:
   - attributes:
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 940
     bestpath: true
     nexthops:
@@ -368,14 +356,8 @@ r2_master4:
       BGP.as_path:
       - 65000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.1
@@ -428,14 +410,8 @@ r2_master6:
       BGP.as_path:
       - 65000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::1
@@ -566,14 +542,8 @@ r2_t_bgp4:
       BGP.as_path:
       - 65000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.1
@@ -596,14 +566,8 @@ r2_t_bgp4_AS65000_r1_peer:
       BGP.as_path:
       - 65000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.1
@@ -626,14 +590,8 @@ r2_t_bgp6:
       BGP.as_path:
       - 65000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::1
@@ -657,14 +615,8 @@ r2_t_bgp6_AS65000_r1_peer:
       BGP.as_path:
       - 65000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::1
@@ -688,14 +640,8 @@ r2_t_kernel4:
       BGP.as_path:
       - 65000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.1
@@ -718,14 +664,8 @@ r2_t_kernel6:
       BGP.as_path:
       - 65000
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::1

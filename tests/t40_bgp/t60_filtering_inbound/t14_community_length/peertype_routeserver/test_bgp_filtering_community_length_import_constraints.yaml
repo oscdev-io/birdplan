@@ -31,311 +31,108 @@ r1_master4:
       BGP.as_path:
       - 65001
       BGP.community:
-      - !!python/tuple
-        - 1
-        - 0
-      - !!python/tuple
-        - 1
-        - 1
-      - !!python/tuple
-        - 1
-        - 2
-      - !!python/tuple
-        - 1
-        - 3
-      - !!python/tuple
-        - 1
-        - 4
-      - !!python/tuple
-        - 1
-        - 5
-      - !!python/tuple
-        - 1
-        - 6
-      - !!python/tuple
-        - 1
-        - 7
-      - !!python/tuple
-        - 1
-        - 8
-      - !!python/tuple
-        - 1
-        - 9
-      - !!python/tuple
-        - 1
-        - 10
-      - !!python/tuple
-        - 1
-        - 11
-      - !!python/tuple
-        - 1
-        - 12
-      - !!python/tuple
-        - 1
-        - 13
-      - !!python/tuple
-        - 1
-        - 14
-      - !!python/tuple
-        - 1
-        - 15
-      - !!python/tuple
-        - 1
-        - 16
-      - !!python/tuple
-        - 1
-        - 17
-      - !!python/tuple
-        - 1
-        - 18
-      - !!python/tuple
-        - 1
-        - 19
-      - !!python/tuple
-        - 1
-        - 20
-      - !!python/tuple
-        - 1
-        - 21
-      - !!python/tuple
-        - 1
-        - 22
-      - !!python/tuple
-        - 1
-        - 23
-      - !!python/tuple
-        - 1
-        - 24
-      - !!python/tuple
-        - 1
-        - 25
-      - !!python/tuple
-        - 1
-        - 26
-      - !!python/tuple
-        - 1
-        - 27
-      - !!python/tuple
-        - 1
-        - 28
-      - !!python/tuple
-        - 1
-        - 29
-      - !!python/tuple
-        - 1
-        - 30
-      - !!python/tuple
-        - 1
-        - 31
-      - !!python/tuple
-        - 1
-        - 32
-      - !!python/tuple
-        - 1
-        - 33
-      - !!python/tuple
-        - 1
-        - 34
-      - !!python/tuple
-        - 1
-        - 35
-      - !!python/tuple
-        - 1
-        - 36
-      - !!python/tuple
-        - 1
-        - 37
-      - !!python/tuple
-        - 1
-        - 38
-      - !!python/tuple
-        - 1
-        - 39
-      - !!python/tuple
-        - 1
-        - 40
-      - !!python/tuple
-        - 1
-        - 41
-      - !!python/tuple
-        - 1
-        - 42
-      - !!python/tuple
-        - 1
-        - 43
-      - !!python/tuple
-        - 1
-        - 44
-      - !!python/tuple
-        - 1
-        - 45
-      - !!python/tuple
-        - 1
-        - 46
-      - !!python/tuple
-        - 1
-        - 47
-      - !!python/tuple
-        - 1
-        - 48
-      - !!python/tuple
-        - 1
-        - 49
-      - !!python/tuple
-        - 1
-        - 50
-      - !!python/tuple
-        - 1
-        - 51
-      - !!python/tuple
-        - 1
-        - 52
-      - !!python/tuple
-        - 1
-        - 53
-      - !!python/tuple
-        - 1
-        - 54
-      - !!python/tuple
-        - 1
-        - 55
-      - !!python/tuple
-        - 1
-        - 56
-      - !!python/tuple
-        - 1
-        - 57
-      - !!python/tuple
-        - 1
-        - 58
-      - !!python/tuple
-        - 1
-        - 59
-      - !!python/tuple
-        - 1
-        - 60
-      - !!python/tuple
-        - 1
-        - 61
-      - !!python/tuple
-        - 1
-        - 62
-      - !!python/tuple
-        - 1
-        - 63
-      - !!python/tuple
-        - 1
-        - 64
-      - !!python/tuple
-        - 1
-        - 65
-      - !!python/tuple
-        - 1
-        - 66
-      - !!python/tuple
-        - 1
-        - 67
-      - !!python/tuple
-        - 1
-        - 68
-      - !!python/tuple
-        - 1
-        - 69
-      - !!python/tuple
-        - 1
-        - 70
-      - !!python/tuple
-        - 1
-        - 71
-      - !!python/tuple
-        - 1
-        - 72
-      - !!python/tuple
-        - 1
-        - 73
-      - !!python/tuple
-        - 1
-        - 74
-      - !!python/tuple
-        - 1
-        - 75
-      - !!python/tuple
-        - 1
-        - 76
-      - !!python/tuple
-        - 1
-        - 77
-      - !!python/tuple
-        - 1
-        - 78
-      - !!python/tuple
-        - 1
-        - 79
-      - !!python/tuple
-        - 1
-        - 80
-      - !!python/tuple
-        - 1
-        - 81
-      - !!python/tuple
-        - 1
-        - 82
-      - !!python/tuple
-        - 1
-        - 83
-      - !!python/tuple
-        - 1
-        - 84
-      - !!python/tuple
-        - 1
-        - 85
-      - !!python/tuple
-        - 1
-        - 86
-      - !!python/tuple
-        - 1
-        - 87
-      - !!python/tuple
-        - 1
-        - 88
-      - !!python/tuple
-        - 1
-        - 89
-      - !!python/tuple
-        - 1
-        - 90
-      - !!python/tuple
-        - 1
-        - 91
-      - !!python/tuple
-        - 1
-        - 92
-      - !!python/tuple
-        - 1
-        - 93
-      - !!python/tuple
-        - 1
-        - 94
-      - !!python/tuple
-        - 1
-        - 95
-      - !!python/tuple
-        - 1
-        - 96
-      - !!python/tuple
-        - 1
-        - 97
-      - !!python/tuple
-        - 1
-        - 98
-      - !!python/tuple
-        - 1
-        - 99
+      - !!python/tuple [1, 0]
+      - !!python/tuple [1, 1]
+      - !!python/tuple [1, 2]
+      - !!python/tuple [1, 3]
+      - !!python/tuple [1, 4]
+      - !!python/tuple [1, 5]
+      - !!python/tuple [1, 6]
+      - !!python/tuple [1, 7]
+      - !!python/tuple [1, 8]
+      - !!python/tuple [1, 9]
+      - !!python/tuple [1, 10]
+      - !!python/tuple [1, 11]
+      - !!python/tuple [1, 12]
+      - !!python/tuple [1, 13]
+      - !!python/tuple [1, 14]
+      - !!python/tuple [1, 15]
+      - !!python/tuple [1, 16]
+      - !!python/tuple [1, 17]
+      - !!python/tuple [1, 18]
+      - !!python/tuple [1, 19]
+      - !!python/tuple [1, 20]
+      - !!python/tuple [1, 21]
+      - !!python/tuple [1, 22]
+      - !!python/tuple [1, 23]
+      - !!python/tuple [1, 24]
+      - !!python/tuple [1, 25]
+      - !!python/tuple [1, 26]
+      - !!python/tuple [1, 27]
+      - !!python/tuple [1, 28]
+      - !!python/tuple [1, 29]
+      - !!python/tuple [1, 30]
+      - !!python/tuple [1, 31]
+      - !!python/tuple [1, 32]
+      - !!python/tuple [1, 33]
+      - !!python/tuple [1, 34]
+      - !!python/tuple [1, 35]
+      - !!python/tuple [1, 36]
+      - !!python/tuple [1, 37]
+      - !!python/tuple [1, 38]
+      - !!python/tuple [1, 39]
+      - !!python/tuple [1, 40]
+      - !!python/tuple [1, 41]
+      - !!python/tuple [1, 42]
+      - !!python/tuple [1, 43]
+      - !!python/tuple [1, 44]
+      - !!python/tuple [1, 45]
+      - !!python/tuple [1, 46]
+      - !!python/tuple [1, 47]
+      - !!python/tuple [1, 48]
+      - !!python/tuple [1, 49]
+      - !!python/tuple [1, 50]
+      - !!python/tuple [1, 51]
+      - !!python/tuple [1, 52]
+      - !!python/tuple [1, 53]
+      - !!python/tuple [1, 54]
+      - !!python/tuple [1, 55]
+      - !!python/tuple [1, 56]
+      - !!python/tuple [1, 57]
+      - !!python/tuple [1, 58]
+      - !!python/tuple [1, 59]
+      - !!python/tuple [1, 60]
+      - !!python/tuple [1, 61]
+      - !!python/tuple [1, 62]
+      - !!python/tuple [1, 63]
+      - !!python/tuple [1, 64]
+      - !!python/tuple [1, 65]
+      - !!python/tuple [1, 66]
+      - !!python/tuple [1, 67]
+      - !!python/tuple [1, 68]
+      - !!python/tuple [1, 69]
+      - !!python/tuple [1, 70]
+      - !!python/tuple [1, 71]
+      - !!python/tuple [1, 72]
+      - !!python/tuple [1, 73]
+      - !!python/tuple [1, 74]
+      - !!python/tuple [1, 75]
+      - !!python/tuple [1, 76]
+      - !!python/tuple [1, 77]
+      - !!python/tuple [1, 78]
+      - !!python/tuple [1, 79]
+      - !!python/tuple [1, 80]
+      - !!python/tuple [1, 81]
+      - !!python/tuple [1, 82]
+      - !!python/tuple [1, 83]
+      - !!python/tuple [1, 84]
+      - !!python/tuple [1, 85]
+      - !!python/tuple [1, 86]
+      - !!python/tuple [1, 87]
+      - !!python/tuple [1, 88]
+      - !!python/tuple [1, 89]
+      - !!python/tuple [1, 90]
+      - !!python/tuple [1, 91]
+      - !!python/tuple [1, 92]
+      - !!python/tuple [1, 93]
+      - !!python/tuple [1, 94]
+      - !!python/tuple [1, 95]
+      - !!python/tuple [1, 96]
+      - !!python/tuple [1, 97]
+      - !!python/tuple [1, 98]
+      - !!python/tuple [1, 99]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 5
+      - !!python/tuple [65000, 3, 5]
       BGP.local_pref: 450
       BGP.next_hop:
       - 100.64.0.2
@@ -464,311 +261,108 @@ r1_t_bgp4:
       BGP.as_path:
       - 65001
       BGP.community:
-      - !!python/tuple
-        - 1
-        - 0
-      - !!python/tuple
-        - 1
-        - 1
-      - !!python/tuple
-        - 1
-        - 2
-      - !!python/tuple
-        - 1
-        - 3
-      - !!python/tuple
-        - 1
-        - 4
-      - !!python/tuple
-        - 1
-        - 5
-      - !!python/tuple
-        - 1
-        - 6
-      - !!python/tuple
-        - 1
-        - 7
-      - !!python/tuple
-        - 1
-        - 8
-      - !!python/tuple
-        - 1
-        - 9
-      - !!python/tuple
-        - 1
-        - 10
-      - !!python/tuple
-        - 1
-        - 11
-      - !!python/tuple
-        - 1
-        - 12
-      - !!python/tuple
-        - 1
-        - 13
-      - !!python/tuple
-        - 1
-        - 14
-      - !!python/tuple
-        - 1
-        - 15
-      - !!python/tuple
-        - 1
-        - 16
-      - !!python/tuple
-        - 1
-        - 17
-      - !!python/tuple
-        - 1
-        - 18
-      - !!python/tuple
-        - 1
-        - 19
-      - !!python/tuple
-        - 1
-        - 20
-      - !!python/tuple
-        - 1
-        - 21
-      - !!python/tuple
-        - 1
-        - 22
-      - !!python/tuple
-        - 1
-        - 23
-      - !!python/tuple
-        - 1
-        - 24
-      - !!python/tuple
-        - 1
-        - 25
-      - !!python/tuple
-        - 1
-        - 26
-      - !!python/tuple
-        - 1
-        - 27
-      - !!python/tuple
-        - 1
-        - 28
-      - !!python/tuple
-        - 1
-        - 29
-      - !!python/tuple
-        - 1
-        - 30
-      - !!python/tuple
-        - 1
-        - 31
-      - !!python/tuple
-        - 1
-        - 32
-      - !!python/tuple
-        - 1
-        - 33
-      - !!python/tuple
-        - 1
-        - 34
-      - !!python/tuple
-        - 1
-        - 35
-      - !!python/tuple
-        - 1
-        - 36
-      - !!python/tuple
-        - 1
-        - 37
-      - !!python/tuple
-        - 1
-        - 38
-      - !!python/tuple
-        - 1
-        - 39
-      - !!python/tuple
-        - 1
-        - 40
-      - !!python/tuple
-        - 1
-        - 41
-      - !!python/tuple
-        - 1
-        - 42
-      - !!python/tuple
-        - 1
-        - 43
-      - !!python/tuple
-        - 1
-        - 44
-      - !!python/tuple
-        - 1
-        - 45
-      - !!python/tuple
-        - 1
-        - 46
-      - !!python/tuple
-        - 1
-        - 47
-      - !!python/tuple
-        - 1
-        - 48
-      - !!python/tuple
-        - 1
-        - 49
-      - !!python/tuple
-        - 1
-        - 50
-      - !!python/tuple
-        - 1
-        - 51
-      - !!python/tuple
-        - 1
-        - 52
-      - !!python/tuple
-        - 1
-        - 53
-      - !!python/tuple
-        - 1
-        - 54
-      - !!python/tuple
-        - 1
-        - 55
-      - !!python/tuple
-        - 1
-        - 56
-      - !!python/tuple
-        - 1
-        - 57
-      - !!python/tuple
-        - 1
-        - 58
-      - !!python/tuple
-        - 1
-        - 59
-      - !!python/tuple
-        - 1
-        - 60
-      - !!python/tuple
-        - 1
-        - 61
-      - !!python/tuple
-        - 1
-        - 62
-      - !!python/tuple
-        - 1
-        - 63
-      - !!python/tuple
-        - 1
-        - 64
-      - !!python/tuple
-        - 1
-        - 65
-      - !!python/tuple
-        - 1
-        - 66
-      - !!python/tuple
-        - 1
-        - 67
-      - !!python/tuple
-        - 1
-        - 68
-      - !!python/tuple
-        - 1
-        - 69
-      - !!python/tuple
-        - 1
-        - 70
-      - !!python/tuple
-        - 1
-        - 71
-      - !!python/tuple
-        - 1
-        - 72
-      - !!python/tuple
-        - 1
-        - 73
-      - !!python/tuple
-        - 1
-        - 74
-      - !!python/tuple
-        - 1
-        - 75
-      - !!python/tuple
-        - 1
-        - 76
-      - !!python/tuple
-        - 1
-        - 77
-      - !!python/tuple
-        - 1
-        - 78
-      - !!python/tuple
-        - 1
-        - 79
-      - !!python/tuple
-        - 1
-        - 80
-      - !!python/tuple
-        - 1
-        - 81
-      - !!python/tuple
-        - 1
-        - 82
-      - !!python/tuple
-        - 1
-        - 83
-      - !!python/tuple
-        - 1
-        - 84
-      - !!python/tuple
-        - 1
-        - 85
-      - !!python/tuple
-        - 1
-        - 86
-      - !!python/tuple
-        - 1
-        - 87
-      - !!python/tuple
-        - 1
-        - 88
-      - !!python/tuple
-        - 1
-        - 89
-      - !!python/tuple
-        - 1
-        - 90
-      - !!python/tuple
-        - 1
-        - 91
-      - !!python/tuple
-        - 1
-        - 92
-      - !!python/tuple
-        - 1
-        - 93
-      - !!python/tuple
-        - 1
-        - 94
-      - !!python/tuple
-        - 1
-        - 95
-      - !!python/tuple
-        - 1
-        - 96
-      - !!python/tuple
-        - 1
-        - 97
-      - !!python/tuple
-        - 1
-        - 98
-      - !!python/tuple
-        - 1
-        - 99
+      - !!python/tuple [1, 0]
+      - !!python/tuple [1, 1]
+      - !!python/tuple [1, 2]
+      - !!python/tuple [1, 3]
+      - !!python/tuple [1, 4]
+      - !!python/tuple [1, 5]
+      - !!python/tuple [1, 6]
+      - !!python/tuple [1, 7]
+      - !!python/tuple [1, 8]
+      - !!python/tuple [1, 9]
+      - !!python/tuple [1, 10]
+      - !!python/tuple [1, 11]
+      - !!python/tuple [1, 12]
+      - !!python/tuple [1, 13]
+      - !!python/tuple [1, 14]
+      - !!python/tuple [1, 15]
+      - !!python/tuple [1, 16]
+      - !!python/tuple [1, 17]
+      - !!python/tuple [1, 18]
+      - !!python/tuple [1, 19]
+      - !!python/tuple [1, 20]
+      - !!python/tuple [1, 21]
+      - !!python/tuple [1, 22]
+      - !!python/tuple [1, 23]
+      - !!python/tuple [1, 24]
+      - !!python/tuple [1, 25]
+      - !!python/tuple [1, 26]
+      - !!python/tuple [1, 27]
+      - !!python/tuple [1, 28]
+      - !!python/tuple [1, 29]
+      - !!python/tuple [1, 30]
+      - !!python/tuple [1, 31]
+      - !!python/tuple [1, 32]
+      - !!python/tuple [1, 33]
+      - !!python/tuple [1, 34]
+      - !!python/tuple [1, 35]
+      - !!python/tuple [1, 36]
+      - !!python/tuple [1, 37]
+      - !!python/tuple [1, 38]
+      - !!python/tuple [1, 39]
+      - !!python/tuple [1, 40]
+      - !!python/tuple [1, 41]
+      - !!python/tuple [1, 42]
+      - !!python/tuple [1, 43]
+      - !!python/tuple [1, 44]
+      - !!python/tuple [1, 45]
+      - !!python/tuple [1, 46]
+      - !!python/tuple [1, 47]
+      - !!python/tuple [1, 48]
+      - !!python/tuple [1, 49]
+      - !!python/tuple [1, 50]
+      - !!python/tuple [1, 51]
+      - !!python/tuple [1, 52]
+      - !!python/tuple [1, 53]
+      - !!python/tuple [1, 54]
+      - !!python/tuple [1, 55]
+      - !!python/tuple [1, 56]
+      - !!python/tuple [1, 57]
+      - !!python/tuple [1, 58]
+      - !!python/tuple [1, 59]
+      - !!python/tuple [1, 60]
+      - !!python/tuple [1, 61]
+      - !!python/tuple [1, 62]
+      - !!python/tuple [1, 63]
+      - !!python/tuple [1, 64]
+      - !!python/tuple [1, 65]
+      - !!python/tuple [1, 66]
+      - !!python/tuple [1, 67]
+      - !!python/tuple [1, 68]
+      - !!python/tuple [1, 69]
+      - !!python/tuple [1, 70]
+      - !!python/tuple [1, 71]
+      - !!python/tuple [1, 72]
+      - !!python/tuple [1, 73]
+      - !!python/tuple [1, 74]
+      - !!python/tuple [1, 75]
+      - !!python/tuple [1, 76]
+      - !!python/tuple [1, 77]
+      - !!python/tuple [1, 78]
+      - !!python/tuple [1, 79]
+      - !!python/tuple [1, 80]
+      - !!python/tuple [1, 81]
+      - !!python/tuple [1, 82]
+      - !!python/tuple [1, 83]
+      - !!python/tuple [1, 84]
+      - !!python/tuple [1, 85]
+      - !!python/tuple [1, 86]
+      - !!python/tuple [1, 87]
+      - !!python/tuple [1, 88]
+      - !!python/tuple [1, 89]
+      - !!python/tuple [1, 90]
+      - !!python/tuple [1, 91]
+      - !!python/tuple [1, 92]
+      - !!python/tuple [1, 93]
+      - !!python/tuple [1, 94]
+      - !!python/tuple [1, 95]
+      - !!python/tuple [1, 96]
+      - !!python/tuple [1, 97]
+      - !!python/tuple [1, 98]
+      - !!python/tuple [1, 99]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 5
+      - !!python/tuple [65000, 3, 5]
       BGP.local_pref: 450
       BGP.next_hop:
       - 100.64.0.2
@@ -791,311 +385,108 @@ r1_t_bgp4_AS65001_e1_peer:
       BGP.as_path:
       - 65001
       BGP.community:
-      - !!python/tuple
-        - 1
-        - 0
-      - !!python/tuple
-        - 1
-        - 1
-      - !!python/tuple
-        - 1
-        - 2
-      - !!python/tuple
-        - 1
-        - 3
-      - !!python/tuple
-        - 1
-        - 4
-      - !!python/tuple
-        - 1
-        - 5
-      - !!python/tuple
-        - 1
-        - 6
-      - !!python/tuple
-        - 1
-        - 7
-      - !!python/tuple
-        - 1
-        - 8
-      - !!python/tuple
-        - 1
-        - 9
-      - !!python/tuple
-        - 1
-        - 10
-      - !!python/tuple
-        - 1
-        - 11
-      - !!python/tuple
-        - 1
-        - 12
-      - !!python/tuple
-        - 1
-        - 13
-      - !!python/tuple
-        - 1
-        - 14
-      - !!python/tuple
-        - 1
-        - 15
-      - !!python/tuple
-        - 1
-        - 16
-      - !!python/tuple
-        - 1
-        - 17
-      - !!python/tuple
-        - 1
-        - 18
-      - !!python/tuple
-        - 1
-        - 19
-      - !!python/tuple
-        - 1
-        - 20
-      - !!python/tuple
-        - 1
-        - 21
-      - !!python/tuple
-        - 1
-        - 22
-      - !!python/tuple
-        - 1
-        - 23
-      - !!python/tuple
-        - 1
-        - 24
-      - !!python/tuple
-        - 1
-        - 25
-      - !!python/tuple
-        - 1
-        - 26
-      - !!python/tuple
-        - 1
-        - 27
-      - !!python/tuple
-        - 1
-        - 28
-      - !!python/tuple
-        - 1
-        - 29
-      - !!python/tuple
-        - 1
-        - 30
-      - !!python/tuple
-        - 1
-        - 31
-      - !!python/tuple
-        - 1
-        - 32
-      - !!python/tuple
-        - 1
-        - 33
-      - !!python/tuple
-        - 1
-        - 34
-      - !!python/tuple
-        - 1
-        - 35
-      - !!python/tuple
-        - 1
-        - 36
-      - !!python/tuple
-        - 1
-        - 37
-      - !!python/tuple
-        - 1
-        - 38
-      - !!python/tuple
-        - 1
-        - 39
-      - !!python/tuple
-        - 1
-        - 40
-      - !!python/tuple
-        - 1
-        - 41
-      - !!python/tuple
-        - 1
-        - 42
-      - !!python/tuple
-        - 1
-        - 43
-      - !!python/tuple
-        - 1
-        - 44
-      - !!python/tuple
-        - 1
-        - 45
-      - !!python/tuple
-        - 1
-        - 46
-      - !!python/tuple
-        - 1
-        - 47
-      - !!python/tuple
-        - 1
-        - 48
-      - !!python/tuple
-        - 1
-        - 49
-      - !!python/tuple
-        - 1
-        - 50
-      - !!python/tuple
-        - 1
-        - 51
-      - !!python/tuple
-        - 1
-        - 52
-      - !!python/tuple
-        - 1
-        - 53
-      - !!python/tuple
-        - 1
-        - 54
-      - !!python/tuple
-        - 1
-        - 55
-      - !!python/tuple
-        - 1
-        - 56
-      - !!python/tuple
-        - 1
-        - 57
-      - !!python/tuple
-        - 1
-        - 58
-      - !!python/tuple
-        - 1
-        - 59
-      - !!python/tuple
-        - 1
-        - 60
-      - !!python/tuple
-        - 1
-        - 61
-      - !!python/tuple
-        - 1
-        - 62
-      - !!python/tuple
-        - 1
-        - 63
-      - !!python/tuple
-        - 1
-        - 64
-      - !!python/tuple
-        - 1
-        - 65
-      - !!python/tuple
-        - 1
-        - 66
-      - !!python/tuple
-        - 1
-        - 67
-      - !!python/tuple
-        - 1
-        - 68
-      - !!python/tuple
-        - 1
-        - 69
-      - !!python/tuple
-        - 1
-        - 70
-      - !!python/tuple
-        - 1
-        - 71
-      - !!python/tuple
-        - 1
-        - 72
-      - !!python/tuple
-        - 1
-        - 73
-      - !!python/tuple
-        - 1
-        - 74
-      - !!python/tuple
-        - 1
-        - 75
-      - !!python/tuple
-        - 1
-        - 76
-      - !!python/tuple
-        - 1
-        - 77
-      - !!python/tuple
-        - 1
-        - 78
-      - !!python/tuple
-        - 1
-        - 79
-      - !!python/tuple
-        - 1
-        - 80
-      - !!python/tuple
-        - 1
-        - 81
-      - !!python/tuple
-        - 1
-        - 82
-      - !!python/tuple
-        - 1
-        - 83
-      - !!python/tuple
-        - 1
-        - 84
-      - !!python/tuple
-        - 1
-        - 85
-      - !!python/tuple
-        - 1
-        - 86
-      - !!python/tuple
-        - 1
-        - 87
-      - !!python/tuple
-        - 1
-        - 88
-      - !!python/tuple
-        - 1
-        - 89
-      - !!python/tuple
-        - 1
-        - 90
-      - !!python/tuple
-        - 1
-        - 91
-      - !!python/tuple
-        - 1
-        - 92
-      - !!python/tuple
-        - 1
-        - 93
-      - !!python/tuple
-        - 1
-        - 94
-      - !!python/tuple
-        - 1
-        - 95
-      - !!python/tuple
-        - 1
-        - 96
-      - !!python/tuple
-        - 1
-        - 97
-      - !!python/tuple
-        - 1
-        - 98
-      - !!python/tuple
-        - 1
-        - 99
+      - !!python/tuple [1, 0]
+      - !!python/tuple [1, 1]
+      - !!python/tuple [1, 2]
+      - !!python/tuple [1, 3]
+      - !!python/tuple [1, 4]
+      - !!python/tuple [1, 5]
+      - !!python/tuple [1, 6]
+      - !!python/tuple [1, 7]
+      - !!python/tuple [1, 8]
+      - !!python/tuple [1, 9]
+      - !!python/tuple [1, 10]
+      - !!python/tuple [1, 11]
+      - !!python/tuple [1, 12]
+      - !!python/tuple [1, 13]
+      - !!python/tuple [1, 14]
+      - !!python/tuple [1, 15]
+      - !!python/tuple [1, 16]
+      - !!python/tuple [1, 17]
+      - !!python/tuple [1, 18]
+      - !!python/tuple [1, 19]
+      - !!python/tuple [1, 20]
+      - !!python/tuple [1, 21]
+      - !!python/tuple [1, 22]
+      - !!python/tuple [1, 23]
+      - !!python/tuple [1, 24]
+      - !!python/tuple [1, 25]
+      - !!python/tuple [1, 26]
+      - !!python/tuple [1, 27]
+      - !!python/tuple [1, 28]
+      - !!python/tuple [1, 29]
+      - !!python/tuple [1, 30]
+      - !!python/tuple [1, 31]
+      - !!python/tuple [1, 32]
+      - !!python/tuple [1, 33]
+      - !!python/tuple [1, 34]
+      - !!python/tuple [1, 35]
+      - !!python/tuple [1, 36]
+      - !!python/tuple [1, 37]
+      - !!python/tuple [1, 38]
+      - !!python/tuple [1, 39]
+      - !!python/tuple [1, 40]
+      - !!python/tuple [1, 41]
+      - !!python/tuple [1, 42]
+      - !!python/tuple [1, 43]
+      - !!python/tuple [1, 44]
+      - !!python/tuple [1, 45]
+      - !!python/tuple [1, 46]
+      - !!python/tuple [1, 47]
+      - !!python/tuple [1, 48]
+      - !!python/tuple [1, 49]
+      - !!python/tuple [1, 50]
+      - !!python/tuple [1, 51]
+      - !!python/tuple [1, 52]
+      - !!python/tuple [1, 53]
+      - !!python/tuple [1, 54]
+      - !!python/tuple [1, 55]
+      - !!python/tuple [1, 56]
+      - !!python/tuple [1, 57]
+      - !!python/tuple [1, 58]
+      - !!python/tuple [1, 59]
+      - !!python/tuple [1, 60]
+      - !!python/tuple [1, 61]
+      - !!python/tuple [1, 62]
+      - !!python/tuple [1, 63]
+      - !!python/tuple [1, 64]
+      - !!python/tuple [1, 65]
+      - !!python/tuple [1, 66]
+      - !!python/tuple [1, 67]
+      - !!python/tuple [1, 68]
+      - !!python/tuple [1, 69]
+      - !!python/tuple [1, 70]
+      - !!python/tuple [1, 71]
+      - !!python/tuple [1, 72]
+      - !!python/tuple [1, 73]
+      - !!python/tuple [1, 74]
+      - !!python/tuple [1, 75]
+      - !!python/tuple [1, 76]
+      - !!python/tuple [1, 77]
+      - !!python/tuple [1, 78]
+      - !!python/tuple [1, 79]
+      - !!python/tuple [1, 80]
+      - !!python/tuple [1, 81]
+      - !!python/tuple [1, 82]
+      - !!python/tuple [1, 83]
+      - !!python/tuple [1, 84]
+      - !!python/tuple [1, 85]
+      - !!python/tuple [1, 86]
+      - !!python/tuple [1, 87]
+      - !!python/tuple [1, 88]
+      - !!python/tuple [1, 89]
+      - !!python/tuple [1, 90]
+      - !!python/tuple [1, 91]
+      - !!python/tuple [1, 92]
+      - !!python/tuple [1, 93]
+      - !!python/tuple [1, 94]
+      - !!python/tuple [1, 95]
+      - !!python/tuple [1, 96]
+      - !!python/tuple [1, 97]
+      - !!python/tuple [1, 98]
+      - !!python/tuple [1, 99]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 5
+      - !!python/tuple [65000, 3, 5]
       BGP.local_pref: 450
       BGP.next_hop:
       - 100.64.0.2
@@ -1117,318 +508,110 @@ r1_t_bgp4_AS65001_e1_peer:
       BGP.as_path:
       - 65001
       BGP.community:
-      - !!python/tuple
-        - 1
-        - 0
-      - !!python/tuple
-        - 1
-        - 1
-      - !!python/tuple
-        - 1
-        - 2
-      - !!python/tuple
-        - 1
-        - 3
-      - !!python/tuple
-        - 1
-        - 4
-      - !!python/tuple
-        - 1
-        - 5
-      - !!python/tuple
-        - 1
-        - 6
-      - !!python/tuple
-        - 1
-        - 7
-      - !!python/tuple
-        - 1
-        - 8
-      - !!python/tuple
-        - 1
-        - 9
-      - !!python/tuple
-        - 1
-        - 10
-      - !!python/tuple
-        - 1
-        - 11
-      - !!python/tuple
-        - 1
-        - 12
-      - !!python/tuple
-        - 1
-        - 13
-      - !!python/tuple
-        - 1
-        - 14
-      - !!python/tuple
-        - 1
-        - 15
-      - !!python/tuple
-        - 1
-        - 16
-      - !!python/tuple
-        - 1
-        - 17
-      - !!python/tuple
-        - 1
-        - 18
-      - !!python/tuple
-        - 1
-        - 19
-      - !!python/tuple
-        - 1
-        - 20
-      - !!python/tuple
-        - 1
-        - 21
-      - !!python/tuple
-        - 1
-        - 22
-      - !!python/tuple
-        - 1
-        - 23
-      - !!python/tuple
-        - 1
-        - 24
-      - !!python/tuple
-        - 1
-        - 25
-      - !!python/tuple
-        - 1
-        - 26
-      - !!python/tuple
-        - 1
-        - 27
-      - !!python/tuple
-        - 1
-        - 28
-      - !!python/tuple
-        - 1
-        - 29
-      - !!python/tuple
-        - 1
-        - 30
-      - !!python/tuple
-        - 1
-        - 31
-      - !!python/tuple
-        - 1
-        - 32
-      - !!python/tuple
-        - 1
-        - 33
-      - !!python/tuple
-        - 1
-        - 34
-      - !!python/tuple
-        - 1
-        - 35
-      - !!python/tuple
-        - 1
-        - 36
-      - !!python/tuple
-        - 1
-        - 37
-      - !!python/tuple
-        - 1
-        - 38
-      - !!python/tuple
-        - 1
-        - 39
-      - !!python/tuple
-        - 1
-        - 40
-      - !!python/tuple
-        - 1
-        - 41
-      - !!python/tuple
-        - 1
-        - 42
-      - !!python/tuple
-        - 1
-        - 43
-      - !!python/tuple
-        - 1
-        - 44
-      - !!python/tuple
-        - 1
-        - 45
-      - !!python/tuple
-        - 1
-        - 46
-      - !!python/tuple
-        - 1
-        - 47
-      - !!python/tuple
-        - 1
-        - 48
-      - !!python/tuple
-        - 1
-        - 49
-      - !!python/tuple
-        - 1
-        - 50
-      - !!python/tuple
-        - 1
-        - 51
-      - !!python/tuple
-        - 1
-        - 52
-      - !!python/tuple
-        - 1
-        - 53
-      - !!python/tuple
-        - 1
-        - 54
-      - !!python/tuple
-        - 1
-        - 55
-      - !!python/tuple
-        - 1
-        - 56
-      - !!python/tuple
-        - 1
-        - 57
-      - !!python/tuple
-        - 1
-        - 58
-      - !!python/tuple
-        - 1
-        - 59
-      - !!python/tuple
-        - 1
-        - 60
-      - !!python/tuple
-        - 1
-        - 61
-      - !!python/tuple
-        - 1
-        - 62
-      - !!python/tuple
-        - 1
-        - 63
-      - !!python/tuple
-        - 1
-        - 64
-      - !!python/tuple
-        - 1
-        - 65
-      - !!python/tuple
-        - 1
-        - 66
-      - !!python/tuple
-        - 1
-        - 67
-      - !!python/tuple
-        - 1
-        - 68
-      - !!python/tuple
-        - 1
-        - 69
-      - !!python/tuple
-        - 1
-        - 70
-      - !!python/tuple
-        - 1
-        - 71
-      - !!python/tuple
-        - 1
-        - 72
-      - !!python/tuple
-        - 1
-        - 73
-      - !!python/tuple
-        - 1
-        - 74
-      - !!python/tuple
-        - 1
-        - 75
-      - !!python/tuple
-        - 1
-        - 76
-      - !!python/tuple
-        - 1
-        - 77
-      - !!python/tuple
-        - 1
-        - 78
-      - !!python/tuple
-        - 1
-        - 79
-      - !!python/tuple
-        - 1
-        - 80
-      - !!python/tuple
-        - 1
-        - 81
-      - !!python/tuple
-        - 1
-        - 82
-      - !!python/tuple
-        - 1
-        - 83
-      - !!python/tuple
-        - 1
-        - 84
-      - !!python/tuple
-        - 1
-        - 85
-      - !!python/tuple
-        - 1
-        - 86
-      - !!python/tuple
-        - 1
-        - 87
-      - !!python/tuple
-        - 1
-        - 88
-      - !!python/tuple
-        - 1
-        - 89
-      - !!python/tuple
-        - 1
-        - 90
-      - !!python/tuple
-        - 1
-        - 91
-      - !!python/tuple
-        - 1
-        - 92
-      - !!python/tuple
-        - 1
-        - 93
-      - !!python/tuple
-        - 1
-        - 94
-      - !!python/tuple
-        - 1
-        - 95
-      - !!python/tuple
-        - 1
-        - 96
-      - !!python/tuple
-        - 1
-        - 97
-      - !!python/tuple
-        - 1
-        - 98
-      - !!python/tuple
-        - 1
-        - 99
-      - !!python/tuple
-        - 1
-        - 100
+      - !!python/tuple [1, 0]
+      - !!python/tuple [1, 1]
+      - !!python/tuple [1, 2]
+      - !!python/tuple [1, 3]
+      - !!python/tuple [1, 4]
+      - !!python/tuple [1, 5]
+      - !!python/tuple [1, 6]
+      - !!python/tuple [1, 7]
+      - !!python/tuple [1, 8]
+      - !!python/tuple [1, 9]
+      - !!python/tuple [1, 10]
+      - !!python/tuple [1, 11]
+      - !!python/tuple [1, 12]
+      - !!python/tuple [1, 13]
+      - !!python/tuple [1, 14]
+      - !!python/tuple [1, 15]
+      - !!python/tuple [1, 16]
+      - !!python/tuple [1, 17]
+      - !!python/tuple [1, 18]
+      - !!python/tuple [1, 19]
+      - !!python/tuple [1, 20]
+      - !!python/tuple [1, 21]
+      - !!python/tuple [1, 22]
+      - !!python/tuple [1, 23]
+      - !!python/tuple [1, 24]
+      - !!python/tuple [1, 25]
+      - !!python/tuple [1, 26]
+      - !!python/tuple [1, 27]
+      - !!python/tuple [1, 28]
+      - !!python/tuple [1, 29]
+      - !!python/tuple [1, 30]
+      - !!python/tuple [1, 31]
+      - !!python/tuple [1, 32]
+      - !!python/tuple [1, 33]
+      - !!python/tuple [1, 34]
+      - !!python/tuple [1, 35]
+      - !!python/tuple [1, 36]
+      - !!python/tuple [1, 37]
+      - !!python/tuple [1, 38]
+      - !!python/tuple [1, 39]
+      - !!python/tuple [1, 40]
+      - !!python/tuple [1, 41]
+      - !!python/tuple [1, 42]
+      - !!python/tuple [1, 43]
+      - !!python/tuple [1, 44]
+      - !!python/tuple [1, 45]
+      - !!python/tuple [1, 46]
+      - !!python/tuple [1, 47]
+      - !!python/tuple [1, 48]
+      - !!python/tuple [1, 49]
+      - !!python/tuple [1, 50]
+      - !!python/tuple [1, 51]
+      - !!python/tuple [1, 52]
+      - !!python/tuple [1, 53]
+      - !!python/tuple [1, 54]
+      - !!python/tuple [1, 55]
+      - !!python/tuple [1, 56]
+      - !!python/tuple [1, 57]
+      - !!python/tuple [1, 58]
+      - !!python/tuple [1, 59]
+      - !!python/tuple [1, 60]
+      - !!python/tuple [1, 61]
+      - !!python/tuple [1, 62]
+      - !!python/tuple [1, 63]
+      - !!python/tuple [1, 64]
+      - !!python/tuple [1, 65]
+      - !!python/tuple [1, 66]
+      - !!python/tuple [1, 67]
+      - !!python/tuple [1, 68]
+      - !!python/tuple [1, 69]
+      - !!python/tuple [1, 70]
+      - !!python/tuple [1, 71]
+      - !!python/tuple [1, 72]
+      - !!python/tuple [1, 73]
+      - !!python/tuple [1, 74]
+      - !!python/tuple [1, 75]
+      - !!python/tuple [1, 76]
+      - !!python/tuple [1, 77]
+      - !!python/tuple [1, 78]
+      - !!python/tuple [1, 79]
+      - !!python/tuple [1, 80]
+      - !!python/tuple [1, 81]
+      - !!python/tuple [1, 82]
+      - !!python/tuple [1, 83]
+      - !!python/tuple [1, 84]
+      - !!python/tuple [1, 85]
+      - !!python/tuple [1, 86]
+      - !!python/tuple [1, 87]
+      - !!python/tuple [1, 88]
+      - !!python/tuple [1, 89]
+      - !!python/tuple [1, 90]
+      - !!python/tuple [1, 91]
+      - !!python/tuple [1, 92]
+      - !!python/tuple [1, 93]
+      - !!python/tuple [1, 94]
+      - !!python/tuple [1, 95]
+      - !!python/tuple [1, 96]
+      - !!python/tuple [1, 97]
+      - !!python/tuple [1, 98]
+      - !!python/tuple [1, 99]
+      - !!python/tuple [1, 100]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 5
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 16
+      - !!python/tuple [65000, 3, 5]
+      - !!python/tuple [65000, 1101, 16]
       BGP.local_pref: 450
       BGP.next_hop:
       - 100.64.0.2
@@ -1452,315 +635,109 @@ r1_t_bgp6_AS65001_e1_peer:
       BGP.as_path:
       - 65001
       BGP.community:
-      - !!python/tuple
-        - 1
-        - 0
-      - !!python/tuple
-        - 1
-        - 1
-      - !!python/tuple
-        - 1
-        - 2
-      - !!python/tuple
-        - 1
-        - 3
-      - !!python/tuple
-        - 1
-        - 4
-      - !!python/tuple
-        - 1
-        - 5
-      - !!python/tuple
-        - 1
-        - 6
-      - !!python/tuple
-        - 1
-        - 7
-      - !!python/tuple
-        - 1
-        - 8
-      - !!python/tuple
-        - 1
-        - 9
-      - !!python/tuple
-        - 1
-        - 10
-      - !!python/tuple
-        - 1
-        - 11
-      - !!python/tuple
-        - 1
-        - 12
-      - !!python/tuple
-        - 1
-        - 13
-      - !!python/tuple
-        - 1
-        - 14
-      - !!python/tuple
-        - 1
-        - 15
-      - !!python/tuple
-        - 1
-        - 16
-      - !!python/tuple
-        - 1
-        - 17
-      - !!python/tuple
-        - 1
-        - 18
-      - !!python/tuple
-        - 1
-        - 19
-      - !!python/tuple
-        - 1
-        - 20
-      - !!python/tuple
-        - 1
-        - 21
-      - !!python/tuple
-        - 1
-        - 22
-      - !!python/tuple
-        - 1
-        - 23
-      - !!python/tuple
-        - 1
-        - 24
-      - !!python/tuple
-        - 1
-        - 25
-      - !!python/tuple
-        - 1
-        - 26
-      - !!python/tuple
-        - 1
-        - 27
-      - !!python/tuple
-        - 1
-        - 28
-      - !!python/tuple
-        - 1
-        - 29
-      - !!python/tuple
-        - 1
-        - 30
-      - !!python/tuple
-        - 1
-        - 31
-      - !!python/tuple
-        - 1
-        - 32
-      - !!python/tuple
-        - 1
-        - 33
-      - !!python/tuple
-        - 1
-        - 34
-      - !!python/tuple
-        - 1
-        - 35
-      - !!python/tuple
-        - 1
-        - 36
-      - !!python/tuple
-        - 1
-        - 37
-      - !!python/tuple
-        - 1
-        - 38
-      - !!python/tuple
-        - 1
-        - 39
-      - !!python/tuple
-        - 1
-        - 40
-      - !!python/tuple
-        - 1
-        - 41
-      - !!python/tuple
-        - 1
-        - 42
-      - !!python/tuple
-        - 1
-        - 43
-      - !!python/tuple
-        - 1
-        - 44
-      - !!python/tuple
-        - 1
-        - 45
-      - !!python/tuple
-        - 1
-        - 46
-      - !!python/tuple
-        - 1
-        - 47
-      - !!python/tuple
-        - 1
-        - 48
-      - !!python/tuple
-        - 1
-        - 49
-      - !!python/tuple
-        - 1
-        - 50
-      - !!python/tuple
-        - 1
-        - 51
-      - !!python/tuple
-        - 1
-        - 52
-      - !!python/tuple
-        - 1
-        - 53
-      - !!python/tuple
-        - 1
-        - 54
-      - !!python/tuple
-        - 1
-        - 55
-      - !!python/tuple
-        - 1
-        - 56
-      - !!python/tuple
-        - 1
-        - 57
-      - !!python/tuple
-        - 1
-        - 58
-      - !!python/tuple
-        - 1
-        - 59
-      - !!python/tuple
-        - 1
-        - 60
-      - !!python/tuple
-        - 1
-        - 61
-      - !!python/tuple
-        - 1
-        - 62
-      - !!python/tuple
-        - 1
-        - 63
-      - !!python/tuple
-        - 1
-        - 64
-      - !!python/tuple
-        - 1
-        - 65
-      - !!python/tuple
-        - 1
-        - 66
-      - !!python/tuple
-        - 1
-        - 67
-      - !!python/tuple
-        - 1
-        - 68
-      - !!python/tuple
-        - 1
-        - 69
-      - !!python/tuple
-        - 1
-        - 70
-      - !!python/tuple
-        - 1
-        - 71
-      - !!python/tuple
-        - 1
-        - 72
-      - !!python/tuple
-        - 1
-        - 73
-      - !!python/tuple
-        - 1
-        - 74
-      - !!python/tuple
-        - 1
-        - 75
-      - !!python/tuple
-        - 1
-        - 76
-      - !!python/tuple
-        - 1
-        - 77
-      - !!python/tuple
-        - 1
-        - 78
-      - !!python/tuple
-        - 1
-        - 79
-      - !!python/tuple
-        - 1
-        - 80
-      - !!python/tuple
-        - 1
-        - 81
-      - !!python/tuple
-        - 1
-        - 82
-      - !!python/tuple
-        - 1
-        - 83
-      - !!python/tuple
-        - 1
-        - 84
-      - !!python/tuple
-        - 1
-        - 85
-      - !!python/tuple
-        - 1
-        - 86
-      - !!python/tuple
-        - 1
-        - 87
-      - !!python/tuple
-        - 1
-        - 88
-      - !!python/tuple
-        - 1
-        - 89
-      - !!python/tuple
-        - 1
-        - 90
-      - !!python/tuple
-        - 1
-        - 91
-      - !!python/tuple
-        - 1
-        - 92
-      - !!python/tuple
-        - 1
-        - 93
-      - !!python/tuple
-        - 1
-        - 94
-      - !!python/tuple
-        - 1
-        - 95
-      - !!python/tuple
-        - 1
-        - 96
-      - !!python/tuple
-        - 1
-        - 97
-      - !!python/tuple
-        - 1
-        - 98
-      - !!python/tuple
-        - 1
-        - 99
+      - !!python/tuple [1, 0]
+      - !!python/tuple [1, 1]
+      - !!python/tuple [1, 2]
+      - !!python/tuple [1, 3]
+      - !!python/tuple [1, 4]
+      - !!python/tuple [1, 5]
+      - !!python/tuple [1, 6]
+      - !!python/tuple [1, 7]
+      - !!python/tuple [1, 8]
+      - !!python/tuple [1, 9]
+      - !!python/tuple [1, 10]
+      - !!python/tuple [1, 11]
+      - !!python/tuple [1, 12]
+      - !!python/tuple [1, 13]
+      - !!python/tuple [1, 14]
+      - !!python/tuple [1, 15]
+      - !!python/tuple [1, 16]
+      - !!python/tuple [1, 17]
+      - !!python/tuple [1, 18]
+      - !!python/tuple [1, 19]
+      - !!python/tuple [1, 20]
+      - !!python/tuple [1, 21]
+      - !!python/tuple [1, 22]
+      - !!python/tuple [1, 23]
+      - !!python/tuple [1, 24]
+      - !!python/tuple [1, 25]
+      - !!python/tuple [1, 26]
+      - !!python/tuple [1, 27]
+      - !!python/tuple [1, 28]
+      - !!python/tuple [1, 29]
+      - !!python/tuple [1, 30]
+      - !!python/tuple [1, 31]
+      - !!python/tuple [1, 32]
+      - !!python/tuple [1, 33]
+      - !!python/tuple [1, 34]
+      - !!python/tuple [1, 35]
+      - !!python/tuple [1, 36]
+      - !!python/tuple [1, 37]
+      - !!python/tuple [1, 38]
+      - !!python/tuple [1, 39]
+      - !!python/tuple [1, 40]
+      - !!python/tuple [1, 41]
+      - !!python/tuple [1, 42]
+      - !!python/tuple [1, 43]
+      - !!python/tuple [1, 44]
+      - !!python/tuple [1, 45]
+      - !!python/tuple [1, 46]
+      - !!python/tuple [1, 47]
+      - !!python/tuple [1, 48]
+      - !!python/tuple [1, 49]
+      - !!python/tuple [1, 50]
+      - !!python/tuple [1, 51]
+      - !!python/tuple [1, 52]
+      - !!python/tuple [1, 53]
+      - !!python/tuple [1, 54]
+      - !!python/tuple [1, 55]
+      - !!python/tuple [1, 56]
+      - !!python/tuple [1, 57]
+      - !!python/tuple [1, 58]
+      - !!python/tuple [1, 59]
+      - !!python/tuple [1, 60]
+      - !!python/tuple [1, 61]
+      - !!python/tuple [1, 62]
+      - !!python/tuple [1, 63]
+      - !!python/tuple [1, 64]
+      - !!python/tuple [1, 65]
+      - !!python/tuple [1, 66]
+      - !!python/tuple [1, 67]
+      - !!python/tuple [1, 68]
+      - !!python/tuple [1, 69]
+      - !!python/tuple [1, 70]
+      - !!python/tuple [1, 71]
+      - !!python/tuple [1, 72]
+      - !!python/tuple [1, 73]
+      - !!python/tuple [1, 74]
+      - !!python/tuple [1, 75]
+      - !!python/tuple [1, 76]
+      - !!python/tuple [1, 77]
+      - !!python/tuple [1, 78]
+      - !!python/tuple [1, 79]
+      - !!python/tuple [1, 80]
+      - !!python/tuple [1, 81]
+      - !!python/tuple [1, 82]
+      - !!python/tuple [1, 83]
+      - !!python/tuple [1, 84]
+      - !!python/tuple [1, 85]
+      - !!python/tuple [1, 86]
+      - !!python/tuple [1, 87]
+      - !!python/tuple [1, 88]
+      - !!python/tuple [1, 89]
+      - !!python/tuple [1, 90]
+      - !!python/tuple [1, 91]
+      - !!python/tuple [1, 92]
+      - !!python/tuple [1, 93]
+      - !!python/tuple [1, 94]
+      - !!python/tuple [1, 95]
+      - !!python/tuple [1, 96]
+      - !!python/tuple [1, 97]
+      - !!python/tuple [1, 98]
+      - !!python/tuple [1, 99]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 5
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 1
+      - !!python/tuple [65000, 3, 5]
+      - !!python/tuple [65000, 1101, 1]
       BGP.local_pref: 450
       BGP.next_hop:
       - fc00:100::2
@@ -1782,322 +759,111 @@ r1_t_bgp6_AS65001_e1_peer:
       BGP.as_path:
       - 65001
       BGP.community:
-      - !!python/tuple
-        - 1
-        - 0
-      - !!python/tuple
-        - 1
-        - 1
-      - !!python/tuple
-        - 1
-        - 2
-      - !!python/tuple
-        - 1
-        - 3
-      - !!python/tuple
-        - 1
-        - 4
-      - !!python/tuple
-        - 1
-        - 5
-      - !!python/tuple
-        - 1
-        - 6
-      - !!python/tuple
-        - 1
-        - 7
-      - !!python/tuple
-        - 1
-        - 8
-      - !!python/tuple
-        - 1
-        - 9
-      - !!python/tuple
-        - 1
-        - 10
-      - !!python/tuple
-        - 1
-        - 11
-      - !!python/tuple
-        - 1
-        - 12
-      - !!python/tuple
-        - 1
-        - 13
-      - !!python/tuple
-        - 1
-        - 14
-      - !!python/tuple
-        - 1
-        - 15
-      - !!python/tuple
-        - 1
-        - 16
-      - !!python/tuple
-        - 1
-        - 17
-      - !!python/tuple
-        - 1
-        - 18
-      - !!python/tuple
-        - 1
-        - 19
-      - !!python/tuple
-        - 1
-        - 20
-      - !!python/tuple
-        - 1
-        - 21
-      - !!python/tuple
-        - 1
-        - 22
-      - !!python/tuple
-        - 1
-        - 23
-      - !!python/tuple
-        - 1
-        - 24
-      - !!python/tuple
-        - 1
-        - 25
-      - !!python/tuple
-        - 1
-        - 26
-      - !!python/tuple
-        - 1
-        - 27
-      - !!python/tuple
-        - 1
-        - 28
-      - !!python/tuple
-        - 1
-        - 29
-      - !!python/tuple
-        - 1
-        - 30
-      - !!python/tuple
-        - 1
-        - 31
-      - !!python/tuple
-        - 1
-        - 32
-      - !!python/tuple
-        - 1
-        - 33
-      - !!python/tuple
-        - 1
-        - 34
-      - !!python/tuple
-        - 1
-        - 35
-      - !!python/tuple
-        - 1
-        - 36
-      - !!python/tuple
-        - 1
-        - 37
-      - !!python/tuple
-        - 1
-        - 38
-      - !!python/tuple
-        - 1
-        - 39
-      - !!python/tuple
-        - 1
-        - 40
-      - !!python/tuple
-        - 1
-        - 41
-      - !!python/tuple
-        - 1
-        - 42
-      - !!python/tuple
-        - 1
-        - 43
-      - !!python/tuple
-        - 1
-        - 44
-      - !!python/tuple
-        - 1
-        - 45
-      - !!python/tuple
-        - 1
-        - 46
-      - !!python/tuple
-        - 1
-        - 47
-      - !!python/tuple
-        - 1
-        - 48
-      - !!python/tuple
-        - 1
-        - 49
-      - !!python/tuple
-        - 1
-        - 50
-      - !!python/tuple
-        - 1
-        - 51
-      - !!python/tuple
-        - 1
-        - 52
-      - !!python/tuple
-        - 1
-        - 53
-      - !!python/tuple
-        - 1
-        - 54
-      - !!python/tuple
-        - 1
-        - 55
-      - !!python/tuple
-        - 1
-        - 56
-      - !!python/tuple
-        - 1
-        - 57
-      - !!python/tuple
-        - 1
-        - 58
-      - !!python/tuple
-        - 1
-        - 59
-      - !!python/tuple
-        - 1
-        - 60
-      - !!python/tuple
-        - 1
-        - 61
-      - !!python/tuple
-        - 1
-        - 62
-      - !!python/tuple
-        - 1
-        - 63
-      - !!python/tuple
-        - 1
-        - 64
-      - !!python/tuple
-        - 1
-        - 65
-      - !!python/tuple
-        - 1
-        - 66
-      - !!python/tuple
-        - 1
-        - 67
-      - !!python/tuple
-        - 1
-        - 68
-      - !!python/tuple
-        - 1
-        - 69
-      - !!python/tuple
-        - 1
-        - 70
-      - !!python/tuple
-        - 1
-        - 71
-      - !!python/tuple
-        - 1
-        - 72
-      - !!python/tuple
-        - 1
-        - 73
-      - !!python/tuple
-        - 1
-        - 74
-      - !!python/tuple
-        - 1
-        - 75
-      - !!python/tuple
-        - 1
-        - 76
-      - !!python/tuple
-        - 1
-        - 77
-      - !!python/tuple
-        - 1
-        - 78
-      - !!python/tuple
-        - 1
-        - 79
-      - !!python/tuple
-        - 1
-        - 80
-      - !!python/tuple
-        - 1
-        - 81
-      - !!python/tuple
-        - 1
-        - 82
-      - !!python/tuple
-        - 1
-        - 83
-      - !!python/tuple
-        - 1
-        - 84
-      - !!python/tuple
-        - 1
-        - 85
-      - !!python/tuple
-        - 1
-        - 86
-      - !!python/tuple
-        - 1
-        - 87
-      - !!python/tuple
-        - 1
-        - 88
-      - !!python/tuple
-        - 1
-        - 89
-      - !!python/tuple
-        - 1
-        - 90
-      - !!python/tuple
-        - 1
-        - 91
-      - !!python/tuple
-        - 1
-        - 92
-      - !!python/tuple
-        - 1
-        - 93
-      - !!python/tuple
-        - 1
-        - 94
-      - !!python/tuple
-        - 1
-        - 95
-      - !!python/tuple
-        - 1
-        - 96
-      - !!python/tuple
-        - 1
-        - 97
-      - !!python/tuple
-        - 1
-        - 98
-      - !!python/tuple
-        - 1
-        - 99
-      - !!python/tuple
-        - 1
-        - 100
+      - !!python/tuple [1, 0]
+      - !!python/tuple [1, 1]
+      - !!python/tuple [1, 2]
+      - !!python/tuple [1, 3]
+      - !!python/tuple [1, 4]
+      - !!python/tuple [1, 5]
+      - !!python/tuple [1, 6]
+      - !!python/tuple [1, 7]
+      - !!python/tuple [1, 8]
+      - !!python/tuple [1, 9]
+      - !!python/tuple [1, 10]
+      - !!python/tuple [1, 11]
+      - !!python/tuple [1, 12]
+      - !!python/tuple [1, 13]
+      - !!python/tuple [1, 14]
+      - !!python/tuple [1, 15]
+      - !!python/tuple [1, 16]
+      - !!python/tuple [1, 17]
+      - !!python/tuple [1, 18]
+      - !!python/tuple [1, 19]
+      - !!python/tuple [1, 20]
+      - !!python/tuple [1, 21]
+      - !!python/tuple [1, 22]
+      - !!python/tuple [1, 23]
+      - !!python/tuple [1, 24]
+      - !!python/tuple [1, 25]
+      - !!python/tuple [1, 26]
+      - !!python/tuple [1, 27]
+      - !!python/tuple [1, 28]
+      - !!python/tuple [1, 29]
+      - !!python/tuple [1, 30]
+      - !!python/tuple [1, 31]
+      - !!python/tuple [1, 32]
+      - !!python/tuple [1, 33]
+      - !!python/tuple [1, 34]
+      - !!python/tuple [1, 35]
+      - !!python/tuple [1, 36]
+      - !!python/tuple [1, 37]
+      - !!python/tuple [1, 38]
+      - !!python/tuple [1, 39]
+      - !!python/tuple [1, 40]
+      - !!python/tuple [1, 41]
+      - !!python/tuple [1, 42]
+      - !!python/tuple [1, 43]
+      - !!python/tuple [1, 44]
+      - !!python/tuple [1, 45]
+      - !!python/tuple [1, 46]
+      - !!python/tuple [1, 47]
+      - !!python/tuple [1, 48]
+      - !!python/tuple [1, 49]
+      - !!python/tuple [1, 50]
+      - !!python/tuple [1, 51]
+      - !!python/tuple [1, 52]
+      - !!python/tuple [1, 53]
+      - !!python/tuple [1, 54]
+      - !!python/tuple [1, 55]
+      - !!python/tuple [1, 56]
+      - !!python/tuple [1, 57]
+      - !!python/tuple [1, 58]
+      - !!python/tuple [1, 59]
+      - !!python/tuple [1, 60]
+      - !!python/tuple [1, 61]
+      - !!python/tuple [1, 62]
+      - !!python/tuple [1, 63]
+      - !!python/tuple [1, 64]
+      - !!python/tuple [1, 65]
+      - !!python/tuple [1, 66]
+      - !!python/tuple [1, 67]
+      - !!python/tuple [1, 68]
+      - !!python/tuple [1, 69]
+      - !!python/tuple [1, 70]
+      - !!python/tuple [1, 71]
+      - !!python/tuple [1, 72]
+      - !!python/tuple [1, 73]
+      - !!python/tuple [1, 74]
+      - !!python/tuple [1, 75]
+      - !!python/tuple [1, 76]
+      - !!python/tuple [1, 77]
+      - !!python/tuple [1, 78]
+      - !!python/tuple [1, 79]
+      - !!python/tuple [1, 80]
+      - !!python/tuple [1, 81]
+      - !!python/tuple [1, 82]
+      - !!python/tuple [1, 83]
+      - !!python/tuple [1, 84]
+      - !!python/tuple [1, 85]
+      - !!python/tuple [1, 86]
+      - !!python/tuple [1, 87]
+      - !!python/tuple [1, 88]
+      - !!python/tuple [1, 89]
+      - !!python/tuple [1, 90]
+      - !!python/tuple [1, 91]
+      - !!python/tuple [1, 92]
+      - !!python/tuple [1, 93]
+      - !!python/tuple [1, 94]
+      - !!python/tuple [1, 95]
+      - !!python/tuple [1, 96]
+      - !!python/tuple [1, 97]
+      - !!python/tuple [1, 98]
+      - !!python/tuple [1, 99]
+      - !!python/tuple [1, 100]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 5
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 1
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 16
+      - !!python/tuple [65000, 3, 5]
+      - !!python/tuple [65000, 1101, 1]
+      - !!python/tuple [65000, 1101, 16]
       BGP.local_pref: 450
       BGP.next_hop:
       - fc00:100::2
@@ -2120,311 +886,108 @@ r1_t_kernel4:
       BGP.as_path:
       - 65001
       BGP.community:
-      - !!python/tuple
-        - 1
-        - 0
-      - !!python/tuple
-        - 1
-        - 1
-      - !!python/tuple
-        - 1
-        - 2
-      - !!python/tuple
-        - 1
-        - 3
-      - !!python/tuple
-        - 1
-        - 4
-      - !!python/tuple
-        - 1
-        - 5
-      - !!python/tuple
-        - 1
-        - 6
-      - !!python/tuple
-        - 1
-        - 7
-      - !!python/tuple
-        - 1
-        - 8
-      - !!python/tuple
-        - 1
-        - 9
-      - !!python/tuple
-        - 1
-        - 10
-      - !!python/tuple
-        - 1
-        - 11
-      - !!python/tuple
-        - 1
-        - 12
-      - !!python/tuple
-        - 1
-        - 13
-      - !!python/tuple
-        - 1
-        - 14
-      - !!python/tuple
-        - 1
-        - 15
-      - !!python/tuple
-        - 1
-        - 16
-      - !!python/tuple
-        - 1
-        - 17
-      - !!python/tuple
-        - 1
-        - 18
-      - !!python/tuple
-        - 1
-        - 19
-      - !!python/tuple
-        - 1
-        - 20
-      - !!python/tuple
-        - 1
-        - 21
-      - !!python/tuple
-        - 1
-        - 22
-      - !!python/tuple
-        - 1
-        - 23
-      - !!python/tuple
-        - 1
-        - 24
-      - !!python/tuple
-        - 1
-        - 25
-      - !!python/tuple
-        - 1
-        - 26
-      - !!python/tuple
-        - 1
-        - 27
-      - !!python/tuple
-        - 1
-        - 28
-      - !!python/tuple
-        - 1
-        - 29
-      - !!python/tuple
-        - 1
-        - 30
-      - !!python/tuple
-        - 1
-        - 31
-      - !!python/tuple
-        - 1
-        - 32
-      - !!python/tuple
-        - 1
-        - 33
-      - !!python/tuple
-        - 1
-        - 34
-      - !!python/tuple
-        - 1
-        - 35
-      - !!python/tuple
-        - 1
-        - 36
-      - !!python/tuple
-        - 1
-        - 37
-      - !!python/tuple
-        - 1
-        - 38
-      - !!python/tuple
-        - 1
-        - 39
-      - !!python/tuple
-        - 1
-        - 40
-      - !!python/tuple
-        - 1
-        - 41
-      - !!python/tuple
-        - 1
-        - 42
-      - !!python/tuple
-        - 1
-        - 43
-      - !!python/tuple
-        - 1
-        - 44
-      - !!python/tuple
-        - 1
-        - 45
-      - !!python/tuple
-        - 1
-        - 46
-      - !!python/tuple
-        - 1
-        - 47
-      - !!python/tuple
-        - 1
-        - 48
-      - !!python/tuple
-        - 1
-        - 49
-      - !!python/tuple
-        - 1
-        - 50
-      - !!python/tuple
-        - 1
-        - 51
-      - !!python/tuple
-        - 1
-        - 52
-      - !!python/tuple
-        - 1
-        - 53
-      - !!python/tuple
-        - 1
-        - 54
-      - !!python/tuple
-        - 1
-        - 55
-      - !!python/tuple
-        - 1
-        - 56
-      - !!python/tuple
-        - 1
-        - 57
-      - !!python/tuple
-        - 1
-        - 58
-      - !!python/tuple
-        - 1
-        - 59
-      - !!python/tuple
-        - 1
-        - 60
-      - !!python/tuple
-        - 1
-        - 61
-      - !!python/tuple
-        - 1
-        - 62
-      - !!python/tuple
-        - 1
-        - 63
-      - !!python/tuple
-        - 1
-        - 64
-      - !!python/tuple
-        - 1
-        - 65
-      - !!python/tuple
-        - 1
-        - 66
-      - !!python/tuple
-        - 1
-        - 67
-      - !!python/tuple
-        - 1
-        - 68
-      - !!python/tuple
-        - 1
-        - 69
-      - !!python/tuple
-        - 1
-        - 70
-      - !!python/tuple
-        - 1
-        - 71
-      - !!python/tuple
-        - 1
-        - 72
-      - !!python/tuple
-        - 1
-        - 73
-      - !!python/tuple
-        - 1
-        - 74
-      - !!python/tuple
-        - 1
-        - 75
-      - !!python/tuple
-        - 1
-        - 76
-      - !!python/tuple
-        - 1
-        - 77
-      - !!python/tuple
-        - 1
-        - 78
-      - !!python/tuple
-        - 1
-        - 79
-      - !!python/tuple
-        - 1
-        - 80
-      - !!python/tuple
-        - 1
-        - 81
-      - !!python/tuple
-        - 1
-        - 82
-      - !!python/tuple
-        - 1
-        - 83
-      - !!python/tuple
-        - 1
-        - 84
-      - !!python/tuple
-        - 1
-        - 85
-      - !!python/tuple
-        - 1
-        - 86
-      - !!python/tuple
-        - 1
-        - 87
-      - !!python/tuple
-        - 1
-        - 88
-      - !!python/tuple
-        - 1
-        - 89
-      - !!python/tuple
-        - 1
-        - 90
-      - !!python/tuple
-        - 1
-        - 91
-      - !!python/tuple
-        - 1
-        - 92
-      - !!python/tuple
-        - 1
-        - 93
-      - !!python/tuple
-        - 1
-        - 94
-      - !!python/tuple
-        - 1
-        - 95
-      - !!python/tuple
-        - 1
-        - 96
-      - !!python/tuple
-        - 1
-        - 97
-      - !!python/tuple
-        - 1
-        - 98
-      - !!python/tuple
-        - 1
-        - 99
+      - !!python/tuple [1, 0]
+      - !!python/tuple [1, 1]
+      - !!python/tuple [1, 2]
+      - !!python/tuple [1, 3]
+      - !!python/tuple [1, 4]
+      - !!python/tuple [1, 5]
+      - !!python/tuple [1, 6]
+      - !!python/tuple [1, 7]
+      - !!python/tuple [1, 8]
+      - !!python/tuple [1, 9]
+      - !!python/tuple [1, 10]
+      - !!python/tuple [1, 11]
+      - !!python/tuple [1, 12]
+      - !!python/tuple [1, 13]
+      - !!python/tuple [1, 14]
+      - !!python/tuple [1, 15]
+      - !!python/tuple [1, 16]
+      - !!python/tuple [1, 17]
+      - !!python/tuple [1, 18]
+      - !!python/tuple [1, 19]
+      - !!python/tuple [1, 20]
+      - !!python/tuple [1, 21]
+      - !!python/tuple [1, 22]
+      - !!python/tuple [1, 23]
+      - !!python/tuple [1, 24]
+      - !!python/tuple [1, 25]
+      - !!python/tuple [1, 26]
+      - !!python/tuple [1, 27]
+      - !!python/tuple [1, 28]
+      - !!python/tuple [1, 29]
+      - !!python/tuple [1, 30]
+      - !!python/tuple [1, 31]
+      - !!python/tuple [1, 32]
+      - !!python/tuple [1, 33]
+      - !!python/tuple [1, 34]
+      - !!python/tuple [1, 35]
+      - !!python/tuple [1, 36]
+      - !!python/tuple [1, 37]
+      - !!python/tuple [1, 38]
+      - !!python/tuple [1, 39]
+      - !!python/tuple [1, 40]
+      - !!python/tuple [1, 41]
+      - !!python/tuple [1, 42]
+      - !!python/tuple [1, 43]
+      - !!python/tuple [1, 44]
+      - !!python/tuple [1, 45]
+      - !!python/tuple [1, 46]
+      - !!python/tuple [1, 47]
+      - !!python/tuple [1, 48]
+      - !!python/tuple [1, 49]
+      - !!python/tuple [1, 50]
+      - !!python/tuple [1, 51]
+      - !!python/tuple [1, 52]
+      - !!python/tuple [1, 53]
+      - !!python/tuple [1, 54]
+      - !!python/tuple [1, 55]
+      - !!python/tuple [1, 56]
+      - !!python/tuple [1, 57]
+      - !!python/tuple [1, 58]
+      - !!python/tuple [1, 59]
+      - !!python/tuple [1, 60]
+      - !!python/tuple [1, 61]
+      - !!python/tuple [1, 62]
+      - !!python/tuple [1, 63]
+      - !!python/tuple [1, 64]
+      - !!python/tuple [1, 65]
+      - !!python/tuple [1, 66]
+      - !!python/tuple [1, 67]
+      - !!python/tuple [1, 68]
+      - !!python/tuple [1, 69]
+      - !!python/tuple [1, 70]
+      - !!python/tuple [1, 71]
+      - !!python/tuple [1, 72]
+      - !!python/tuple [1, 73]
+      - !!python/tuple [1, 74]
+      - !!python/tuple [1, 75]
+      - !!python/tuple [1, 76]
+      - !!python/tuple [1, 77]
+      - !!python/tuple [1, 78]
+      - !!python/tuple [1, 79]
+      - !!python/tuple [1, 80]
+      - !!python/tuple [1, 81]
+      - !!python/tuple [1, 82]
+      - !!python/tuple [1, 83]
+      - !!python/tuple [1, 84]
+      - !!python/tuple [1, 85]
+      - !!python/tuple [1, 86]
+      - !!python/tuple [1, 87]
+      - !!python/tuple [1, 88]
+      - !!python/tuple [1, 89]
+      - !!python/tuple [1, 90]
+      - !!python/tuple [1, 91]
+      - !!python/tuple [1, 92]
+      - !!python/tuple [1, 93]
+      - !!python/tuple [1, 94]
+      - !!python/tuple [1, 95]
+      - !!python/tuple [1, 96]
+      - !!python/tuple [1, 97]
+      - !!python/tuple [1, 98]
+      - !!python/tuple [1, 99]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 5
+      - !!python/tuple [65000, 3, 5]
       BGP.local_pref: 450
       BGP.next_hop:
       - 100.64.0.2
