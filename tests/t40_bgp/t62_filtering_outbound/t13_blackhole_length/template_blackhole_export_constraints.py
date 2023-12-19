@@ -34,7 +34,6 @@ class Template(TemplateBase):
 """
 
     r1_template_peer_config = """
-      constraints:
         blackhole_import_minlen4: 23
 """
 
