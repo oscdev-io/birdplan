@@ -21,27 +21,17 @@
 """Test case simulation class."""
 
 import os
+import pathlib
 import pprint
 from typing import Any, Dict, List, Optional, Tuple
 
-import yaml
 from nsnetsim.generic_node import GenericNode
 from nsnetsim.topology import Topology
 
+import birdplan.yaml
 from birdplan import BirdPlan  # pylint: disable=import-error
 
-__all__ = ["YAMLSafeLoader", "Simulation"]
-
-
-class YAMLSafeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors
-    """Safe YAML loader wtih some specific datatypes."""
-
-    def construct_python_tuple(self, node):
-        """Tuple constructor."""
-        return tuple(self.construct_sequence(node))
-
-
-YAMLSafeLoader.add_constructor("tag:yaml.org,2002:python/tuple", YAMLSafeLoader.construct_python_tuple)
+__all__ = ["Simulation"]
 
 
 class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-public-methods
@@ -64,9 +54,12 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
     _topology: Topology
     _delay: int
 
+    _yaml: birdplan.yaml.YAML
+
     def __init__(self):
         """Initialize object."""
         self.new()
+        self._yaml = birdplan.yaml.YAML()
 
     def new(self):
         """Prepare for simulation of a new topology."""
@@ -228,17 +221,14 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
         if not os.path.exists(self.expected_data_filepath):
             return
 
-        # Write out our data
-        with open(self.expected_data_filepath, "r", encoding="UTF-8") as expected_data_file:
-            # We inherit the safe loader above, so this shouldn't be exploitable
-            self._expected_data = yaml.load(expected_data_file, Loader=YAMLSafeLoader)  # nosec
+        # Load our data
+        self._expected_data = self.yaml.load(pathlib.Path(self.expected_data_filepath))
 
     def write_data(self) -> None:
         """Write out simulation data."""
 
         # Write out our data
-        with open(self.expected_data_filepath, "w", encoding="UTF-8") as expected_data_file:
-            yaml.dump(self._variables, expected_data_file, default_flow_style=False)
+        self.yaml.dump(self._variables, pathlib.Path(self.expected_data_filepath))
 
         # Grab the expected configuration file
         expected_conf_filename_base = self.test_file.replace(".py", "")
@@ -306,3 +296,8 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
     def delay(self, delay: int):
         """Set our simulation delay."""
         self._delay = delay
+
+    @property
+    def yaml(self) -> birdplan.yaml.YAML:
+        """Return our YAML parser."""
+        return self._yaml

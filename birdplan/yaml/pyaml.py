@@ -22,7 +22,7 @@ import io
 import pathlib
 from typing import Any, Optional, Tuple, Union
 
-import yaml as pyaml  # type: ignore
+import yaml as pyaml
 from yaml import YAMLError
 
 from .base import YAMLBase
@@ -30,7 +30,7 @@ from .base import YAMLBase
 __all__ = ["YAML", "YAMLError"]
 
 
-class BirdPlanSafeLoader(pyaml.SafeLoader):  # type: ignore # pylint: disable=too-many-ancestors
+class BirdPlanSafeLoader(pyaml.SafeLoader):  # pylint: disable=too-many-ancestors
     """Safe YAML loader wtih some specific datatypes."""
 
     def construct_python_tuple(self, node: Any) -> Tuple[Any, ...]:
