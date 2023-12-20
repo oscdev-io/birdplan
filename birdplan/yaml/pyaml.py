@@ -38,7 +38,16 @@ class BirdPlanSafeLoader(pyaml.SafeLoader):  # pylint: disable=too-many-ancestor
         return tuple(self.construct_sequence(node))
 
 
+class BirdPlanSafeDumper(pyaml.SafeDumper):
+    """Safe YAML dumper with some specific datatypes."""
+
+    def represent_tuple(self, data: Tuple[Any, ...]) -> pyaml.nodes.SequenceNode:
+        """Tuple representer."""
+        return self.represent_sequence("tag:yaml.org,2002:python/tuple", data, flow_style=True)
+
+
 BirdPlanSafeLoader.add_constructor("tag:yaml.org,2002:python/tuple", BirdPlanSafeLoader.construct_python_tuple)
+BirdPlanSafeDumper.add_representer(tuple, BirdPlanSafeDumper.represent_tuple)
 
 
 class YAML(YAMLBase):
@@ -71,15 +80,17 @@ class YAML(YAMLBase):
             # Handle path objects
             if isinstance(stream, pathlib.Path):
                 with open(stream, "w", encoding="UTF-8") as dump_file:
-                    return pyaml.dump(data, stream=dump_file, encoding="UTF-8")
+                    return pyaml.dump(data, stream=dump_file, encoding="UTF-8", Dumper=BirdPlanSafeDumper)
             # Whats left over is file objects
             return pyaml.dump(
                 data,
                 stream=stream,
+                encoding="UTF-8",
+                Dumper=BirdPlanSafeDumper,
             )
 
         # Create a string IO object and dump the YAML data to it
         dumpstr = io.StringIO()  # pragma: no cover
         with dumpstr:  # pragma: no cover
-            pyaml.dump(data, dumpstr)
+            pyaml.dump(data, dumpstr, encoding="UTF-8", Dumper=BirdPlanSafeDumper)
             return dumpstr.getvalue()

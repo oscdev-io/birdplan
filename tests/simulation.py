@@ -301,3 +301,8 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
     def yaml(self) -> birdplan.yaml.YAML:
         """Return our YAML parser."""
         return self._yaml
+
+    @yaml.setter
+    def yaml(self, yaml: birdplan.yaml.YAML) -> None:
+        """Set our YAML parser."""
+        self._yaml = yaml

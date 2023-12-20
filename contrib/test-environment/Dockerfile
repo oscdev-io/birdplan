@@ -9,6 +9,7 @@ RUN set -ex; \
         python-pytest \
         python-pytest-cov \
         python-pytest-xdist \
+        python-pyaml \
         python-ruamel-yaml \
         python-ruamel.yaml.clib \
         python-requests \
