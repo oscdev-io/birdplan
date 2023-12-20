@@ -3,7 +3,7 @@ log_file: "@LOGFILE@"
 debug: True
 
 bgp:
-  asn: 65001
+  asn: @ASN@
   peers:
     r1:
       asn: 65000

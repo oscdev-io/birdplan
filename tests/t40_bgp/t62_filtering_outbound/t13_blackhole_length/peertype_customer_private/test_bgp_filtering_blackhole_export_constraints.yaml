@@ -340,19 +340,23 @@ r1_peer_show_r2:
       prefix_limit: 100
       source_address: 100.64.0.1
       status:
+        bgp_nexthop: 100.64.0.1
         channel: ipv4
         igp_table: master4
         import_limit: 100
         import_limit_action: restart
-        info: passive
+        info: established
         input_filter: f_bgp_AS4200000000_r2_peer_import
-        last_error: 'bgp error: bad peer as'
         local_as: 65000
         neighbor_address: 100.64.0.2
         neighbor_as: 4200000000
+        neighbor_id: 0.0.0.2
         output_filter: f_bgp_AS4200000000_r2_peer_export
         preference: 100
-        state: down
+        routes_exported: 0
+        routes_imported: 0
+        source_address: 100.64.0.1
+        state: up
         table: t_bgp4_AS4200000000_r2_peer
     ipv6:
       mode: passive
@@ -361,19 +365,23 @@ r1_peer_show_r2:
       prefix_limit: 100
       source_address: fc00:100::1
       status:
+        bgp_nexthop: fc00:100::1
         channel: ipv6
         igp_table: master6
         import_limit: 100
         import_limit_action: restart
-        info: passive
+        info: established
         input_filter: f_bgp_AS4200000000_r2_peer_import
-        last_error: 'bgp error: bad peer as'
         local_as: 65000
         neighbor_address: fc00:100::2
         neighbor_as: 4200000000
+        neighbor_id: 0.0.0.2
         output_filter: f_bgp_AS4200000000_r2_peer_export
         preference: 100
-        state: down
+        routes_exported: 0
+        routes_imported: 0
+        source_address: fc00:100::1
+        state: up
         table: t_bgp6_AS4200000000_r2_peer
   quarantine: false
   tables:
@@ -857,11 +865,10 @@ r1_peer_summary:
         protocol: ipv4
         source_address: 100.64.0.1
         status:
-          info: waiting
-          info_extra: 'bgp error: bad peer as'
+          info: established
           name: bgp4_AS4200000000_r2
           proto: BGP
-          state: down
+          state: up
       ipv6:
         mode: passive
         name: bgp6_AS4200000000_r2
@@ -870,11 +877,10 @@ r1_peer_summary:
         protocol: ipv6
         source_address: fc00:100::1
         status:
-          info: waiting
-          info_extra: 'bgp error: bad peer as'
+          info: established
           name: bgp6_AS4200000000_r2
           proto: BGP
-          state: down
+          state: up
   r3:
     asn: 65000
     description: BGP session to r3
@@ -2007,19 +2013,23 @@ r2_peer_show_r1:
       prefix_limit: 100
       source_address: 100.64.0.2
       status:
+        bgp_nexthop: 100.64.0.2
         channel: ipv4
         igp_table: master4
         import_limit: 100
         import_limit_action: restart
-        info: active
+        info: established
         input_filter: f_bgp_AS65000_r1_peer_import
-        last_error: 'received: bad peer as'
-        local_as: 65001
+        local_as: 4200000000
         neighbor_address: 100.64.0.1
         neighbor_as: 65000
+        neighbor_id: 0.0.0.1
         output_filter: f_bgp_AS65000_r1_peer_export
         preference: 100
-        state: down
+        routes_exported: 0
+        routes_imported: 0
+        source_address: 100.64.0.2
+        state: up
         table: t_bgp4_AS65000_r1_peer
     ipv6:
       mode: active
@@ -2028,19 +2038,23 @@ r2_peer_show_r1:
       prefix_limit: 100
       source_address: fc00:100::2
       status:
+        bgp_nexthop: fc00:100::2
         channel: ipv6
         igp_table: master6
         import_limit: 100
         import_limit_action: restart
-        info: active
+        info: established
         input_filter: f_bgp_AS65000_r1_peer_import
-        last_error: 'received: bad peer as'
-        local_as: 65001
+        local_as: 4200000000
         neighbor_address: fc00:100::1
         neighbor_as: 65000
+        neighbor_id: 0.0.0.1
         output_filter: f_bgp_AS65000_r1_peer_export
         preference: 100
-        state: down
+        routes_exported: 0
+        routes_imported: 0
+        source_address: fc00:100::2
+        state: up
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
   tables:
@@ -2061,11 +2075,10 @@ r2_peer_summary:
         protocol: ipv4
         source_address: 100.64.0.2
         status:
-          info: connecting
-          info_extra: 'received: bad peer as'
+          info: established
           name: bgp4_AS65000_r1
           proto: BGP
-          state: down
+          state: up
       ipv6:
         mode: active
         name: bgp6_AS65000_r1
@@ -2074,11 +2087,10 @@ r2_peer_summary:
         protocol: ipv6
         source_address: fc00:100::2
         status:
-          info: connecting
-          info_extra: 'received: bad peer as'
+          info: established
           name: bgp6_AS65000_r1
           proto: BGP
-          state: down
+          state: up
 r2_t_bgp4: {}
 r2_t_bgp4_AS65000_r1_peer: {}
 r2_t_bgp6: {}

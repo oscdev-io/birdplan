@@ -110,7 +110,7 @@ r2_peer_show_r1:
         igp_table: master4
         import_limit: 100
         import_limit_action: restart
-        info: connect
+        info: active
         input_filter: f_bgp_AS65000_r1_peer_import
         last_error: 'socket: no route to host'
         local_as: 65001
@@ -214,7 +214,7 @@ r3_peer_show_r1:
       status:
         channel: ipv6
         igp_table: master6
-        info: active
+        info: connect
         input_filter: f_bgp_AS65000_r1_peer_import
         last_error: 'socket: no route to host'
         local_as: 65000
@@ -286,7 +286,7 @@ r4_peer_show_r1:
         igp_table: master4
         import_limit: 100
         import_limit_action: restart
-        info: active
+        info: connect
         input_filter: f_bgp_AS65000_r1_peer_import
         last_error: 'socket: no route to host'
         local_as: 65003
@@ -372,7 +372,7 @@ r5_peer_show_r1:
       status:
         channel: ipv4
         igp_table: master4
-        info: active
+        info: connect
         input_filter: f_bgp_AS65000_r1_peer_import
         last_error: 'socket: no route to host'
         local_as: 65004
@@ -534,7 +534,7 @@ r7_peer_show_r1:
       status:
         channel: ipv4
         igp_table: master4
-        info: connect
+        info: active
         input_filter: f_bgp_AS65000_r1_peer_import
         last_error: 'socket: no route to host'
         local_as: 65000
@@ -552,7 +552,7 @@ r7_peer_show_r1:
       status:
         channel: ipv6
         igp_table: master6
-        info: connect
+        info: active
         input_filter: f_bgp_AS65000_r1_peer_import
         last_error: 'socket: no route to host'
         local_as: 65000
@@ -617,7 +617,7 @@ r8_peer_show_r1:
       status:
         channel: ipv4
         igp_table: master4
-        info: connect
+        info: active
         input_filter: f_bgp_AS65000_r1_peer_import
         last_error: 'socket: no route to host'
         local_as: 65000
