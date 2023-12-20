@@ -9,9 +9,12 @@ RUN set -ex; \
         python-pytest \
         python-pytest-cov \
         python-pytest-xdist \
-        python-yaml \
+        python-pyaml \
+        python-ruamel-yaml \
+        python-ruamel.yaml.clib \
         python-requests \
         python-tox \
+        python-types-yaml \
         bgpq3 \
         bird \
         exabgp \

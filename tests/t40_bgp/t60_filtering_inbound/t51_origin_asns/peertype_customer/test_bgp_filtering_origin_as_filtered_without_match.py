@@ -21,7 +21,7 @@
 
 """BGP filtering test case."""
 
-from ....config.peertype_customer.e1r1 import PeerTypeConfig
+from ....config.peertype_customer.e1r1_no_filter import PeerTypeConfig
 from ..template_origin_as_filtered_without_match import Template
 
 __all__ = ["Test"]

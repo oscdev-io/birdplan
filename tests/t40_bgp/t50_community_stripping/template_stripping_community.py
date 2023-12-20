@@ -53,3 +53,24 @@ class Template(TemplateBase):
                 f"large-community [{large_communities}]"
             ],
         )
+
+        #
+        # These should be stripped as they contain documentation ASN's
+        #
+
+        self._exabgpcli(
+            sim,
+            "e1",
+            [
+                "neighbor 100.64.0.1 announce route 100.64.102.0/24 next-hop 100.64.0.2 community [ 64496:1 ] "
+                f"large-community [{large_communities}]"
+            ],
+        )
+        self._exabgpcli(
+            sim,
+            "e1",
+            [
+                "neighbor fc00:100::1 announce route fc00:102::/48 next-hop fc00:100::2 community [ 64496:1 ] "
+                f"large-community [{large_communities}]"
+            ],
+        )

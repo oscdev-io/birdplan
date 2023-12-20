@@ -36,86 +36,26 @@ r1_master4:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 0
-        - 0
-      - !!python/tuple
-        - 65001
-        - 1
-        - 1
-      - !!python/tuple
-        - 65001
-        - 2
-        - 2
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 4
-        - 4
-      - !!python/tuple
-        - 65001
-        - 5
-        - 5
-      - !!python/tuple
-        - 65001
-        - 6
-        - 6
-      - !!python/tuple
-        - 65001
-        - 7
-        - 7
-      - !!python/tuple
-        - 65001
-        - 8
-        - 8
-      - !!python/tuple
-        - 65001
-        - 9
-        - 9
-      - !!python/tuple
-        - 65001
-        - 10
-        - 10
-      - !!python/tuple
-        - 65001
-        - 11
-        - 11
-      - !!python/tuple
-        - 65001
-        - 12
-        - 12
-      - !!python/tuple
-        - 65001
-        - 13
-        - 13
-      - !!python/tuple
-        - 65001
-        - 14
-        - 14
-      - !!python/tuple
-        - 65001
-        - 15
-        - 15
-      - !!python/tuple
-        - 65001
-        - 16
-        - 16
-      - !!python/tuple
-        - 65001
-        - 17
-        - 17
-      - !!python/tuple
-        - 65001
-        - 18
-        - 18
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 0, 0]
+      - !!python/tuple [65001, 1, 1]
+      - !!python/tuple [65001, 2, 2]
+      - !!python/tuple [65001, 3, 3]
+      - !!python/tuple [65001, 4, 4]
+      - !!python/tuple [65001, 5, 5]
+      - !!python/tuple [65001, 6, 6]
+      - !!python/tuple [65001, 7, 7]
+      - !!python/tuple [65001, 8, 8]
+      - !!python/tuple [65001, 9, 9]
+      - !!python/tuple [65001, 10, 10]
+      - !!python/tuple [65001, 11, 11]
+      - !!python/tuple [65001, 12, 12]
+      - !!python/tuple [65001, 13, 13]
+      - !!python/tuple [65001, 14, 14]
+      - !!python/tuple [65001, 15, 15]
+      - !!python/tuple [65001, 16, 16]
+      - !!python/tuple [65001, 17, 17]
+      - !!python/tuple [65001, 18, 18]
       BGP.local_pref: 100
       BGP.next_hop:
       - 100.64.0.2
@@ -156,86 +96,26 @@ r1_master6:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 0
-        - 0
-      - !!python/tuple
-        - 65001
-        - 1
-        - 1
-      - !!python/tuple
-        - 65001
-        - 2
-        - 2
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 4
-        - 4
-      - !!python/tuple
-        - 65001
-        - 5
-        - 5
-      - !!python/tuple
-        - 65001
-        - 6
-        - 6
-      - !!python/tuple
-        - 65001
-        - 7
-        - 7
-      - !!python/tuple
-        - 65001
-        - 8
-        - 8
-      - !!python/tuple
-        - 65001
-        - 9
-        - 9
-      - !!python/tuple
-        - 65001
-        - 10
-        - 10
-      - !!python/tuple
-        - 65001
-        - 11
-        - 11
-      - !!python/tuple
-        - 65001
-        - 12
-        - 12
-      - !!python/tuple
-        - 65001
-        - 13
-        - 13
-      - !!python/tuple
-        - 65001
-        - 14
-        - 14
-      - !!python/tuple
-        - 65001
-        - 15
-        - 15
-      - !!python/tuple
-        - 65001
-        - 16
-        - 16
-      - !!python/tuple
-        - 65001
-        - 17
-        - 17
-      - !!python/tuple
-        - 65001
-        - 18
-        - 18
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 0, 0]
+      - !!python/tuple [65001, 1, 1]
+      - !!python/tuple [65001, 2, 2]
+      - !!python/tuple [65001, 3, 3]
+      - !!python/tuple [65001, 4, 4]
+      - !!python/tuple [65001, 5, 5]
+      - !!python/tuple [65001, 6, 6]
+      - !!python/tuple [65001, 7, 7]
+      - !!python/tuple [65001, 8, 8]
+      - !!python/tuple [65001, 9, 9]
+      - !!python/tuple [65001, 10, 10]
+      - !!python/tuple [65001, 11, 11]
+      - !!python/tuple [65001, 12, 12]
+      - !!python/tuple [65001, 13, 13]
+      - !!python/tuple [65001, 14, 14]
+      - !!python/tuple [65001, 15, 15]
+      - !!python/tuple [65001, 16, 16]
+      - !!python/tuple [65001, 17, 17]
+      - !!python/tuple [65001, 18, 18]
       BGP.local_pref: 100
       BGP.next_hop:
       - fc00:100::2
@@ -312,11 +192,13 @@ r1_peer_summary:
   e1:
     asn: 65000
     description: BGP session to e1
+    name: e1
     protocols:
       ipv4:
         mode: passive
         name: bgp4_AS65000_e1
         neighbor: 100.64.0.2
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -327,6 +209,7 @@ r1_peer_summary:
         mode: passive
         name: bgp6_AS65000_e1
         neighbor: fc00:100::2
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -338,86 +221,26 @@ r1_t_bgp4:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 0
-        - 0
-      - !!python/tuple
-        - 65001
-        - 1
-        - 1
-      - !!python/tuple
-        - 65001
-        - 2
-        - 2
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 4
-        - 4
-      - !!python/tuple
-        - 65001
-        - 5
-        - 5
-      - !!python/tuple
-        - 65001
-        - 6
-        - 6
-      - !!python/tuple
-        - 65001
-        - 7
-        - 7
-      - !!python/tuple
-        - 65001
-        - 8
-        - 8
-      - !!python/tuple
-        - 65001
-        - 9
-        - 9
-      - !!python/tuple
-        - 65001
-        - 10
-        - 10
-      - !!python/tuple
-        - 65001
-        - 11
-        - 11
-      - !!python/tuple
-        - 65001
-        - 12
-        - 12
-      - !!python/tuple
-        - 65001
-        - 13
-        - 13
-      - !!python/tuple
-        - 65001
-        - 14
-        - 14
-      - !!python/tuple
-        - 65001
-        - 15
-        - 15
-      - !!python/tuple
-        - 65001
-        - 16
-        - 16
-      - !!python/tuple
-        - 65001
-        - 17
-        - 17
-      - !!python/tuple
-        - 65001
-        - 18
-        - 18
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 0, 0]
+      - !!python/tuple [65001, 1, 1]
+      - !!python/tuple [65001, 2, 2]
+      - !!python/tuple [65001, 3, 3]
+      - !!python/tuple [65001, 4, 4]
+      - !!python/tuple [65001, 5, 5]
+      - !!python/tuple [65001, 6, 6]
+      - !!python/tuple [65001, 7, 7]
+      - !!python/tuple [65001, 8, 8]
+      - !!python/tuple [65001, 9, 9]
+      - !!python/tuple [65001, 10, 10]
+      - !!python/tuple [65001, 11, 11]
+      - !!python/tuple [65001, 12, 12]
+      - !!python/tuple [65001, 13, 13]
+      - !!python/tuple [65001, 14, 14]
+      - !!python/tuple [65001, 15, 15]
+      - !!python/tuple [65001, 16, 16]
+      - !!python/tuple [65001, 17, 17]
+      - !!python/tuple [65001, 18, 18]
       BGP.local_pref: 100
       BGP.next_hop:
       - 100.64.0.2
@@ -438,86 +261,26 @@ r1_t_bgp4_AS65000_e1_peer:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 0
-        - 0
-      - !!python/tuple
-        - 65001
-        - 1
-        - 1
-      - !!python/tuple
-        - 65001
-        - 2
-        - 2
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 4
-        - 4
-      - !!python/tuple
-        - 65001
-        - 5
-        - 5
-      - !!python/tuple
-        - 65001
-        - 6
-        - 6
-      - !!python/tuple
-        - 65001
-        - 7
-        - 7
-      - !!python/tuple
-        - 65001
-        - 8
-        - 8
-      - !!python/tuple
-        - 65001
-        - 9
-        - 9
-      - !!python/tuple
-        - 65001
-        - 10
-        - 10
-      - !!python/tuple
-        - 65001
-        - 11
-        - 11
-      - !!python/tuple
-        - 65001
-        - 12
-        - 12
-      - !!python/tuple
-        - 65001
-        - 13
-        - 13
-      - !!python/tuple
-        - 65001
-        - 14
-        - 14
-      - !!python/tuple
-        - 65001
-        - 15
-        - 15
-      - !!python/tuple
-        - 65001
-        - 16
-        - 16
-      - !!python/tuple
-        - 65001
-        - 17
-        - 17
-      - !!python/tuple
-        - 65001
-        - 18
-        - 18
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 0, 0]
+      - !!python/tuple [65001, 1, 1]
+      - !!python/tuple [65001, 2, 2]
+      - !!python/tuple [65001, 3, 3]
+      - !!python/tuple [65001, 4, 4]
+      - !!python/tuple [65001, 5, 5]
+      - !!python/tuple [65001, 6, 6]
+      - !!python/tuple [65001, 7, 7]
+      - !!python/tuple [65001, 8, 8]
+      - !!python/tuple [65001, 9, 9]
+      - !!python/tuple [65001, 10, 10]
+      - !!python/tuple [65001, 11, 11]
+      - !!python/tuple [65001, 12, 12]
+      - !!python/tuple [65001, 13, 13]
+      - !!python/tuple [65001, 14, 14]
+      - !!python/tuple [65001, 15, 15]
+      - !!python/tuple [65001, 16, 16]
+      - !!python/tuple [65001, 17, 17]
+      - !!python/tuple [65001, 18, 18]
       BGP.local_pref: 100
       BGP.next_hop:
       - 100.64.0.2
@@ -537,94 +300,28 @@ r1_t_bgp4_AS65000_e1_peer:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 0
-        - 0
-      - !!python/tuple
-        - 65001
-        - 1
-        - 1
-      - !!python/tuple
-        - 65001
-        - 2
-        - 2
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 4
-        - 4
-      - !!python/tuple
-        - 65001
-        - 5
-        - 5
-      - !!python/tuple
-        - 65001
-        - 6
-        - 6
-      - !!python/tuple
-        - 65001
-        - 7
-        - 7
-      - !!python/tuple
-        - 65001
-        - 8
-        - 8
-      - !!python/tuple
-        - 65001
-        - 9
-        - 9
-      - !!python/tuple
-        - 65001
-        - 10
-        - 10
-      - !!python/tuple
-        - 65001
-        - 11
-        - 11
-      - !!python/tuple
-        - 65001
-        - 12
-        - 12
-      - !!python/tuple
-        - 65001
-        - 13
-        - 13
-      - !!python/tuple
-        - 65001
-        - 14
-        - 14
-      - !!python/tuple
-        - 65001
-        - 15
-        - 15
-      - !!python/tuple
-        - 65001
-        - 16
-        - 16
-      - !!python/tuple
-        - 65001
-        - 17
-        - 17
-      - !!python/tuple
-        - 65001
-        - 18
-        - 18
-      - !!python/tuple
-        - 65001
-        - 19
-        - 19
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 20
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 0, 0]
+      - !!python/tuple [65001, 1, 1]
+      - !!python/tuple [65001, 2, 2]
+      - !!python/tuple [65001, 3, 3]
+      - !!python/tuple [65001, 4, 4]
+      - !!python/tuple [65001, 5, 5]
+      - !!python/tuple [65001, 6, 6]
+      - !!python/tuple [65001, 7, 7]
+      - !!python/tuple [65001, 8, 8]
+      - !!python/tuple [65001, 9, 9]
+      - !!python/tuple [65001, 10, 10]
+      - !!python/tuple [65001, 11, 11]
+      - !!python/tuple [65001, 12, 12]
+      - !!python/tuple [65001, 13, 13]
+      - !!python/tuple [65001, 14, 14]
+      - !!python/tuple [65001, 15, 15]
+      - !!python/tuple [65001, 16, 16]
+      - !!python/tuple [65001, 17, 17]
+      - !!python/tuple [65001, 18, 18]
+      - !!python/tuple [65001, 19, 19]
+      - !!python/tuple [65000, 1101, 20]
       BGP.local_pref: 100
       BGP.next_hop:
       - 100.64.0.2
@@ -645,86 +342,26 @@ r1_t_bgp6:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 0
-        - 0
-      - !!python/tuple
-        - 65001
-        - 1
-        - 1
-      - !!python/tuple
-        - 65001
-        - 2
-        - 2
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 4
-        - 4
-      - !!python/tuple
-        - 65001
-        - 5
-        - 5
-      - !!python/tuple
-        - 65001
-        - 6
-        - 6
-      - !!python/tuple
-        - 65001
-        - 7
-        - 7
-      - !!python/tuple
-        - 65001
-        - 8
-        - 8
-      - !!python/tuple
-        - 65001
-        - 9
-        - 9
-      - !!python/tuple
-        - 65001
-        - 10
-        - 10
-      - !!python/tuple
-        - 65001
-        - 11
-        - 11
-      - !!python/tuple
-        - 65001
-        - 12
-        - 12
-      - !!python/tuple
-        - 65001
-        - 13
-        - 13
-      - !!python/tuple
-        - 65001
-        - 14
-        - 14
-      - !!python/tuple
-        - 65001
-        - 15
-        - 15
-      - !!python/tuple
-        - 65001
-        - 16
-        - 16
-      - !!python/tuple
-        - 65001
-        - 17
-        - 17
-      - !!python/tuple
-        - 65001
-        - 18
-        - 18
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 0, 0]
+      - !!python/tuple [65001, 1, 1]
+      - !!python/tuple [65001, 2, 2]
+      - !!python/tuple [65001, 3, 3]
+      - !!python/tuple [65001, 4, 4]
+      - !!python/tuple [65001, 5, 5]
+      - !!python/tuple [65001, 6, 6]
+      - !!python/tuple [65001, 7, 7]
+      - !!python/tuple [65001, 8, 8]
+      - !!python/tuple [65001, 9, 9]
+      - !!python/tuple [65001, 10, 10]
+      - !!python/tuple [65001, 11, 11]
+      - !!python/tuple [65001, 12, 12]
+      - !!python/tuple [65001, 13, 13]
+      - !!python/tuple [65001, 14, 14]
+      - !!python/tuple [65001, 15, 15]
+      - !!python/tuple [65001, 16, 16]
+      - !!python/tuple [65001, 17, 17]
+      - !!python/tuple [65001, 18, 18]
       BGP.local_pref: 100
       BGP.next_hop:
       - fc00:100::2
@@ -745,86 +382,26 @@ r1_t_bgp6_AS65000_e1_peer:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 0
-        - 0
-      - !!python/tuple
-        - 65001
-        - 1
-        - 1
-      - !!python/tuple
-        - 65001
-        - 2
-        - 2
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 4
-        - 4
-      - !!python/tuple
-        - 65001
-        - 5
-        - 5
-      - !!python/tuple
-        - 65001
-        - 6
-        - 6
-      - !!python/tuple
-        - 65001
-        - 7
-        - 7
-      - !!python/tuple
-        - 65001
-        - 8
-        - 8
-      - !!python/tuple
-        - 65001
-        - 9
-        - 9
-      - !!python/tuple
-        - 65001
-        - 10
-        - 10
-      - !!python/tuple
-        - 65001
-        - 11
-        - 11
-      - !!python/tuple
-        - 65001
-        - 12
-        - 12
-      - !!python/tuple
-        - 65001
-        - 13
-        - 13
-      - !!python/tuple
-        - 65001
-        - 14
-        - 14
-      - !!python/tuple
-        - 65001
-        - 15
-        - 15
-      - !!python/tuple
-        - 65001
-        - 16
-        - 16
-      - !!python/tuple
-        - 65001
-        - 17
-        - 17
-      - !!python/tuple
-        - 65001
-        - 18
-        - 18
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 0, 0]
+      - !!python/tuple [65001, 1, 1]
+      - !!python/tuple [65001, 2, 2]
+      - !!python/tuple [65001, 3, 3]
+      - !!python/tuple [65001, 4, 4]
+      - !!python/tuple [65001, 5, 5]
+      - !!python/tuple [65001, 6, 6]
+      - !!python/tuple [65001, 7, 7]
+      - !!python/tuple [65001, 8, 8]
+      - !!python/tuple [65001, 9, 9]
+      - !!python/tuple [65001, 10, 10]
+      - !!python/tuple [65001, 11, 11]
+      - !!python/tuple [65001, 12, 12]
+      - !!python/tuple [65001, 13, 13]
+      - !!python/tuple [65001, 14, 14]
+      - !!python/tuple [65001, 15, 15]
+      - !!python/tuple [65001, 16, 16]
+      - !!python/tuple [65001, 17, 17]
+      - !!python/tuple [65001, 18, 18]
       BGP.local_pref: 100
       BGP.next_hop:
       - fc00:100::2
@@ -844,94 +421,28 @@ r1_t_bgp6_AS65000_e1_peer:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 0
-        - 0
-      - !!python/tuple
-        - 65001
-        - 1
-        - 1
-      - !!python/tuple
-        - 65001
-        - 2
-        - 2
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 4
-        - 4
-      - !!python/tuple
-        - 65001
-        - 5
-        - 5
-      - !!python/tuple
-        - 65001
-        - 6
-        - 6
-      - !!python/tuple
-        - 65001
-        - 7
-        - 7
-      - !!python/tuple
-        - 65001
-        - 8
-        - 8
-      - !!python/tuple
-        - 65001
-        - 9
-        - 9
-      - !!python/tuple
-        - 65001
-        - 10
-        - 10
-      - !!python/tuple
-        - 65001
-        - 11
-        - 11
-      - !!python/tuple
-        - 65001
-        - 12
-        - 12
-      - !!python/tuple
-        - 65001
-        - 13
-        - 13
-      - !!python/tuple
-        - 65001
-        - 14
-        - 14
-      - !!python/tuple
-        - 65001
-        - 15
-        - 15
-      - !!python/tuple
-        - 65001
-        - 16
-        - 16
-      - !!python/tuple
-        - 65001
-        - 17
-        - 17
-      - !!python/tuple
-        - 65001
-        - 18
-        - 18
-      - !!python/tuple
-        - 65001
-        - 19
-        - 19
-      - !!python/tuple
-        - 65000
-        - 1101
-        - 20
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 0, 0]
+      - !!python/tuple [65001, 1, 1]
+      - !!python/tuple [65001, 2, 2]
+      - !!python/tuple [65001, 3, 3]
+      - !!python/tuple [65001, 4, 4]
+      - !!python/tuple [65001, 5, 5]
+      - !!python/tuple [65001, 6, 6]
+      - !!python/tuple [65001, 7, 7]
+      - !!python/tuple [65001, 8, 8]
+      - !!python/tuple [65001, 9, 9]
+      - !!python/tuple [65001, 10, 10]
+      - !!python/tuple [65001, 11, 11]
+      - !!python/tuple [65001, 12, 12]
+      - !!python/tuple [65001, 13, 13]
+      - !!python/tuple [65001, 14, 14]
+      - !!python/tuple [65001, 15, 15]
+      - !!python/tuple [65001, 16, 16]
+      - !!python/tuple [65001, 17, 17]
+      - !!python/tuple [65001, 18, 18]
+      - !!python/tuple [65001, 19, 19]
+      - !!python/tuple [65000, 1101, 20]
       BGP.local_pref: 100
       BGP.next_hop:
       - fc00:100::2
@@ -952,86 +463,26 @@ r1_t_kernel4:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 0
-        - 0
-      - !!python/tuple
-        - 65001
-        - 1
-        - 1
-      - !!python/tuple
-        - 65001
-        - 2
-        - 2
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 4
-        - 4
-      - !!python/tuple
-        - 65001
-        - 5
-        - 5
-      - !!python/tuple
-        - 65001
-        - 6
-        - 6
-      - !!python/tuple
-        - 65001
-        - 7
-        - 7
-      - !!python/tuple
-        - 65001
-        - 8
-        - 8
-      - !!python/tuple
-        - 65001
-        - 9
-        - 9
-      - !!python/tuple
-        - 65001
-        - 10
-        - 10
-      - !!python/tuple
-        - 65001
-        - 11
-        - 11
-      - !!python/tuple
-        - 65001
-        - 12
-        - 12
-      - !!python/tuple
-        - 65001
-        - 13
-        - 13
-      - !!python/tuple
-        - 65001
-        - 14
-        - 14
-      - !!python/tuple
-        - 65001
-        - 15
-        - 15
-      - !!python/tuple
-        - 65001
-        - 16
-        - 16
-      - !!python/tuple
-        - 65001
-        - 17
-        - 17
-      - !!python/tuple
-        - 65001
-        - 18
-        - 18
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 0, 0]
+      - !!python/tuple [65001, 1, 1]
+      - !!python/tuple [65001, 2, 2]
+      - !!python/tuple [65001, 3, 3]
+      - !!python/tuple [65001, 4, 4]
+      - !!python/tuple [65001, 5, 5]
+      - !!python/tuple [65001, 6, 6]
+      - !!python/tuple [65001, 7, 7]
+      - !!python/tuple [65001, 8, 8]
+      - !!python/tuple [65001, 9, 9]
+      - !!python/tuple [65001, 10, 10]
+      - !!python/tuple [65001, 11, 11]
+      - !!python/tuple [65001, 12, 12]
+      - !!python/tuple [65001, 13, 13]
+      - !!python/tuple [65001, 14, 14]
+      - !!python/tuple [65001, 15, 15]
+      - !!python/tuple [65001, 16, 16]
+      - !!python/tuple [65001, 17, 17]
+      - !!python/tuple [65001, 18, 18]
       BGP.local_pref: 100
       BGP.next_hop:
       - 100.64.0.2
@@ -1052,86 +503,26 @@ r1_t_kernel6:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
-      - !!python/tuple
-        - 65001
-        - 0
-        - 0
-      - !!python/tuple
-        - 65001
-        - 1
-        - 1
-      - !!python/tuple
-        - 65001
-        - 2
-        - 2
-      - !!python/tuple
-        - 65001
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 4
-        - 4
-      - !!python/tuple
-        - 65001
-        - 5
-        - 5
-      - !!python/tuple
-        - 65001
-        - 6
-        - 6
-      - !!python/tuple
-        - 65001
-        - 7
-        - 7
-      - !!python/tuple
-        - 65001
-        - 8
-        - 8
-      - !!python/tuple
-        - 65001
-        - 9
-        - 9
-      - !!python/tuple
-        - 65001
-        - 10
-        - 10
-      - !!python/tuple
-        - 65001
-        - 11
-        - 11
-      - !!python/tuple
-        - 65001
-        - 12
-        - 12
-      - !!python/tuple
-        - 65001
-        - 13
-        - 13
-      - !!python/tuple
-        - 65001
-        - 14
-        - 14
-      - !!python/tuple
-        - 65001
-        - 15
-        - 15
-      - !!python/tuple
-        - 65001
-        - 16
-        - 16
-      - !!python/tuple
-        - 65001
-        - 17
-        - 17
-      - !!python/tuple
-        - 65001
-        - 18
-        - 18
+      - !!python/tuple [65000, 3, 1]
+      - !!python/tuple [65001, 0, 0]
+      - !!python/tuple [65001, 1, 1]
+      - !!python/tuple [65001, 2, 2]
+      - !!python/tuple [65001, 3, 3]
+      - !!python/tuple [65001, 4, 4]
+      - !!python/tuple [65001, 5, 5]
+      - !!python/tuple [65001, 6, 6]
+      - !!python/tuple [65001, 7, 7]
+      - !!python/tuple [65001, 8, 8]
+      - !!python/tuple [65001, 9, 9]
+      - !!python/tuple [65001, 10, 10]
+      - !!python/tuple [65001, 11, 11]
+      - !!python/tuple [65001, 12, 12]
+      - !!python/tuple [65001, 13, 13]
+      - !!python/tuple [65001, 14, 14]
+      - !!python/tuple [65001, 15, 15]
+      - !!python/tuple [65001, 16, 16]
+      - !!python/tuple [65001, 17, 17]
+      - !!python/tuple [65001, 18, 18]
       BGP.local_pref: 100
       BGP.next_hop:
       - fc00:100::2

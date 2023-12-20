@@ -21,8 +21,10 @@
 # pylint: disable=too-many-lines
 
 import grp
+import json
 import logging
 import os
+import pathlib
 import pwd
 import re
 from typing import Any, Dict, List, Optional, Union
@@ -30,12 +32,12 @@ from typing import Any, Dict, List, Optional, Union
 import birdclient
 import jinja2
 import packaging.version
-import yaml
 
 from .bird_config import BirdConfig
 from .console.colors import colored
 from .exceptions import BirdPlanError
 from .version import __version__
+from .yaml import YAML, YAMLError
 
 __all__ = [
     "BirdConfig",
@@ -61,6 +63,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
     _birdconf: BirdConfig
     _config: Dict[str, Any]
     _state_file: Optional[str]
+    _yaml: YAML
 
     def __init__(self, test_mode: bool = False) -> None:
         """Initialize object."""
@@ -68,6 +71,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         self._birdconf = BirdConfig(test_mode=test_mode)
         self._config = {}
         self._state_file = None
+        self._yaml = YAML()
 
     def load(self, **kwargs: Any) -> None:
         """
@@ -119,33 +123,17 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         try:
             raw_config = template_env.get_template(plan_file_fname).render()
         except jinja2.TemplateError as err:
-            raise BirdPlanError(f"Failed to read BirdPlan file '{plan_file}': {err}") from None
+            raise BirdPlanError(f"Failed to template BirdPlan configuration file '{plan_file}': {err}") from None
 
         # Load configuration using YAML
         try:
-            self.config = yaml.safe_load(raw_config)
-        except ImportError as err:  # pragma: no cover
-            raise BirdPlanError(f" Failed to import BirdPlan file '{plan_file}': {err}") from None
+            self.config = self.yaml.load(raw_config)
+        except YAMLError as err:  # pragma: no cover
+            raise BirdPlanError(f" Failed to parse BirdPlan configuration in '{plan_file}': {err}") from None
 
-        # Load state using YAML
-        if state_file:
-            # Set our state file
-            self.state_file = state_file
-
-            # Check if the state file exists...
-            if os.path.isfile(state_file):
-                # Read in state file
-                try:
-                    with open(state_file, "r", encoding="UTF-8") as file:
-                        raw_state = file.read()
-                except OSError as err:
-                    raise BirdPlanError(f"Failed to read BirdPlan state file '{state_file}': {err}") from None
-                # Load state using YAML
-                try:
-                    self.state = yaml.safe_load(raw_state)
-                except ImportError as err:  # pragma: no cover
-                    # We use the state_file here because the size of raw_state may be larger than 100MiB
-                    raise BirdPlanError(f" Failed to load BirdPlan state '{state_file}': {err}") from None
+        # Set our state file and load state
+        self.state_file = state_file
+        self.load_state()
 
         # Make sure we have configuration...
         if not self.config:
@@ -198,9 +186,6 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         except KeyError:
             birdplan_gid = None
 
-        # Dump the state in pretty YAML
-        yaml_output = yaml.dump(self.state, default_flow_style=False)
-
         # Write out state file
         try:
             fd = os.open(self.state_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o640)
@@ -209,9 +194,30 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 os.fchown(fd, birdplan_uid, birdplan_gid)
             # Open for writing
             with os.fdopen(fd, "w") as file:
-                file.write(yaml_output)
+                file.write(json.dumps(self.state))
         except OSError as err:  # pragma: no cover
             raise BirdPlanError(f"Failed to open '{self.state_file}' for writing: {err}") from None
+
+    def load_state(self) -> None:
+        """Load our state."""
+
+        # Clear state
+        self.state = {}
+
+        # Skip if we don't have a state file
+        if not self.state_file:
+            return
+
+        # Check if the state file exists...
+        if os.path.isfile(self.state_file):
+            # Read in state file
+            try:
+                self.state = json.loads(pathlib.Path(self.state_file).read_text(encoding="UTF-8"))
+            except OSError as err:
+                raise BirdPlanError(f"Failed to read BirdPlan state file '{self.state_file}': {err}") from None
+            except json.JSONDecodeError as err:  # pragma: no cover
+                # We use the state_file here because the size of raw_state may be larger than 100MiB
+                raise BirdPlanError(f" Failed to parse BirdPlan state file '{self.state_file}': {err}") from None
 
     def state_ospf_summary(self, bird_socket: Optional[str] = None) -> BirdPlanOSPFSummary:
         """
@@ -225,6 +231,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
             eg.
             {
                 'name1': {
+                    'name': ...,
                     'proto': ...,
                     'table': ...,
                     'state': ...,
@@ -272,6 +279,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
             eg.
             {
                 'peer1': {
+                    'name': ...,
                     'asn': ...,
                     'description': ...,
                     'protocols': {
@@ -307,6 +315,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
             for peer, peer_state in self.state["bgp"]["peers"].items():
                 # Start with a clear status
                 ret[peer] = {
+                    "name": peer,
                     "asn": peer_state["asn"],
                     "description": peer_state["description"],
                     "protocols": peer_state["protocols"],
@@ -317,6 +326,8 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                     # If we don't have a live session, skip adding it
                     if peer_state_protocol["name"] not in bird_protocols:
                         continue
+                    # Set protocol name
+                    ret[peer]["protocols"][ipv]["protocol"] = ipv
                     # But if we do, add it
                     ret[peer]["protocols"][ipv]["status"] = bird_protocols[peer_state_protocol["name"]]
 
@@ -1779,6 +1790,11 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         return self._state_file
 
     @state_file.setter
-    def state_file(self, state_file: str) -> None:
+    def state_file(self, state_file: Optional[str]) -> None:
         """Set our state file."""
         self._state_file = state_file
+
+    @property
+    def yaml(self) -> YAML:
+        """Return our YAML parser."""
+        return self._yaml

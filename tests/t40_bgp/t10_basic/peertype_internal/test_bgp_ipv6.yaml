@@ -51,10 +51,7 @@ r1_master6:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 100
       BGP.next_hop:
       - fc00:100::2
@@ -108,11 +105,13 @@ r1_peer_summary:
   e1:
     asn: 65000
     description: BGP session to e1
+    name: e1
     protocols:
       ipv6:
         mode: active
         name: bgp6_AS65000_e1
         neighbor: fc00:100::2
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -125,10 +124,7 @@ r1_t_bgp6:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 100
       BGP.next_hop:
       - fc00:100::2
@@ -149,10 +145,7 @@ r1_t_bgp6_AS65000_e1_peer:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 100
       BGP.next_hop:
       - fc00:100::2
@@ -174,10 +167,7 @@ r1_t_kernel6:
   - attributes:
       BGP.as_path: []
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 1
+      - !!python/tuple [65000, 3, 1]
       BGP.local_pref: 100
       BGP.next_hop:
       - fc00:100::2

@@ -21,7 +21,7 @@
 
 """BGP filtering test case."""
 
-from ....config.peertype_customer.e1r1 import PeerTypeConfig
+from ....config.peertype_customer.e1r1_no_filter import PeerTypeConfig
 from ..template_peer_asn_filtered_without_match import Template
 
 __all__ = ["Test"]
@@ -30,7 +30,7 @@ __all__ = ["Test"]
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
 
-    # Replace default ASN filter
-    r1_peer_extra_config = """
-        origin_asns: [65003]
+    r1_template_peer_config = """
+      filter:
+        peer_asns: [65003]
 """

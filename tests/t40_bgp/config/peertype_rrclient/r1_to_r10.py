@@ -28,8 +28,5 @@ class PeerTypeConfig:
 
     r1_peer_asn = 65000
     r1_peer_type = "rrclient"
-    r1_global_config = """
-  rr_cluster_id: 0.0.0.1
-"""
 
     e1_asn = 65000

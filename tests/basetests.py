@@ -790,20 +790,18 @@ class BirdPlanBaseTestCase:
         extra_attr_list = getattr(self, "template_macros", None)
         if extra_attr_list:
             attr_list.extend(extra_attr_list)
-
         # Loop with supported attributes that translate into macros
         internal_macros = {}
         for attr in attr_list:
             # Router specific lookup for an attribute to add a macro for
             router_attr = f"{router}_{attr}"
+            value = ""
             if hasattr(self, router_attr):
                 symbol = getattr(self, router_attr)
                 if callable(symbol):
                     value = symbol()
                 else:
                     value = symbol
-            else:
-                value = ""
             # Add our macro
             internal_macros[f"@{attr.upper()}@"] = value
 

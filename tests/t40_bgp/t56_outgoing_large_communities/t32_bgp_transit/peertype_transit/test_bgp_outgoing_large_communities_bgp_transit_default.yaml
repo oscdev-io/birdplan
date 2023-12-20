@@ -107,12 +107,14 @@ r2_peer_summary:
   r1:
     asn: 65000
     description: BGP session to r1
+    name: r1
     protocols:
       ipv4:
         mode: passive
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
         prefix_limit: 100
+        protocol: ipv4
         source_address: 100.64.0.2
         status:
           info: waiting
@@ -124,6 +126,7 @@ r2_peer_summary:
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
         prefix_limit: 100
+        protocol: ipv6
         source_address: fc00:100::2
         status:
           info: waiting

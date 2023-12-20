@@ -252,12 +252,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         # NK: IMPORTANT IF THE ABOVE CHANGES UPDATE THE BELOW
         self.constants.conf.append("# Community stripping")
-        if self.birdconfig_globals.test_mode:
-            self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (2..65534, *) ];  # TESTING: Start changed from 1 to 2")
-        else:
-            self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ (1..65534, *) ];")
+        self.constants.conf.append("define BGP_COMMUNITY_STRIP = [ ")
+        self.constants.conf.append("  (23456, *),")
+        self.constants.conf.append("  (64496..64511, *)")  # Documentation
+        self.constants.conf.append("];")
+
         # This is used for stripping large communities from customers mostly
         self.constants.conf.append("define BGP_LC_STRIP = [ ")
+        self.constants.conf.append("  (23456, *, *),")
+        self.constants.conf.append("  (64496..64511, *, *),")  # Documentation
+        self.constants.conf.append("  (65552..131071, *, *),")  # Reserved
         self.constants.conf.append("  (BGP_ASN, 1..3, *),")  # Strip route learned functions
         # Allow client traffic engineering: 4, 5, 6, 7, 8
         self.constants.conf.append("  (BGP_ASN, 9..60, *),")  # Strip unused
@@ -272,18 +276,41 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("  (BGP_ASN, 63, BGP_ASN),")
         self.constants.conf.append("  (BGP_ASN, 666, BGP_ASN)")
         self.constants.conf.append("];")
-        # Strip communities from all peer types
-        self.constants.conf.append("define BGP_COMMUNITY_STRIP_ALL = BGP_COMMUNITY_STRIP;")
+
+        # Strip communities mostly for peers and transit providers
+        self.constants.conf.append("define BGP_COMMUNITY_STRIP_ALL = [")
+        # This is first because of the , we need
+        if self.asn and self.asn < 65535:
+            self.constants.conf.append("  (BGP_ASN, *),")
+        else:
+            self.constants.conf.append("  # (BGP_ASN, *),  # Not stripping due to 4-byte ASN")
+        self.constants.conf.append("  (23456, *),")
+        self.constants.conf.append("  (64496..64511, *)")  # Documentation
+        self.constants.conf.append("];")
         # This is used for stripping large communities from peers and transit providers
-        self.constants.conf.append("define BGP_LC_STRIP_ALL = [ (BGP_ASN, *, *) ];")
+        self.constants.conf.append("define BGP_LC_STRIP_ALL = [")
+        self.constants.conf.append("  (23456, *, *),")
+        self.constants.conf.append("  (64496..64511, *, *),")  # Documentation
+        self.constants.conf.append("  (65552..131071, *, *),")  # Reserved
+        self.constants.conf.append("  (BGP_ASN, *, *)")
+        self.constants.conf.append("];")
+
+        # Stripping private communities
+        self.constants.conf.append("define BGP_COMMUNITY_STRIP_PRIVATE = [")
+        if self.birdconfig_globals.test_mode:
+            self.constants.conf.append("  # EXCLUDING DUE TO TESTING: (64512..65534, *)")  # Private
+        else:
+            self.constants.conf.append("  (64512..65534, *)")  # Private
+        self.constants.conf.append("];")
+
         self.constants.conf.append("define BGP_LC_STRIP_PRIVATE = [")
         # Don't strip the lower private ASN range during testing
         if self.birdconfig_globals.test_mode:
-            self.constants.conf.append("  # EXCLUDING DUE TO TESTING: (64512..65534, *, *)")
+            self.constants.conf.append("  # EXCLUDING DUE TO TESTING: (64512..65534, *, *)")  # Private
             self.constants.conf.append("  # EXCLUDING DUE TO TESTING: (4200000000..4294967294, *, *)")
             self.constants.conf.append("  (4200000000..4294900000, *, *) # ADJUSTED FOR TESTING")
         else:
-            self.constants.conf.append("  (64512..65534, *, *),")
+            self.constants.conf.append("  (64512..65534, *, *),")  # Private
             self.constants.conf.append("  (4200000000..4294967294, *, *)")
         self.constants.conf.append("];")
 
@@ -346,6 +373,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         self.constants.conf.append("# Large community information")
         self.constants.conf.append("define BGP_LC_INFORMATION_STRIPPED_COMMUNITY = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 1);")
+        self.constants.conf.append(
+            "define BGP_LC_INFORMATION_STRIPPED_COMMUNITY_PRIVATE = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 2);"
+        )
         self.constants.conf.append("define BGP_LC_INFORMATION_STRIPPED_LC = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 3);")
         self.constants.conf.append("define BGP_LC_INFORMATION_STRIPPED_LC_PRIVATE = (BGP_ASN, BGP_LC_FUNCTION_INFORMATION, 4);")
         self.constants.conf.append("")

@@ -59,11 +59,13 @@ r10_peer_summary:
   r1:
     asn: 65000
     description: BGP session to r1
+    name: r1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
+        protocol: ipv4
         source_address: 100.64.0.10
         status:
           info: established
@@ -74,6 +76,7 @@ r10_peer_summary:
         mode: active
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
+        protocol: ipv6
         source_address: fc00:100::10
         status:
           info: established
@@ -694,12 +697,14 @@ r1_peer_summary:
   e1:
     asn: 65100
     description: BGP session to e1
+    name: e1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65100_e1
         neighbor: 100.64.0.100
         prefix_limit: 100
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -711,6 +716,7 @@ r1_peer_summary:
         name: bgp6_AS65100_e1
         neighbor: fc00:100::100
         prefix_limit: 100
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -720,11 +726,13 @@ r1_peer_summary:
   r10:
     asn: 65009
     description: BGP session to r10
+    name: r10
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65009_r10
         neighbor: 100.64.0.10
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -735,6 +743,7 @@ r1_peer_summary:
         mode: active
         name: bgp6_AS65009_r10
         neighbor: fc00:100::10
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -744,12 +753,14 @@ r1_peer_summary:
   r2:
     asn: 65001
     description: BGP session to r2
+    name: r2
     protocols:
       ipv4:
         mode: passive
         name: bgp4_AS65001_r2
         neighbor: 100.64.0.2
         prefix_limit: 100
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -761,6 +772,7 @@ r1_peer_summary:
         name: bgp6_AS65001_r2
         neighbor: fc00:100::2
         prefix_limit: 100
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -770,11 +782,13 @@ r1_peer_summary:
   r3:
     asn: 65000
     description: BGP session to r3
+    name: r3
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r3
         neighbor: 100.64.0.3
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -785,6 +799,7 @@ r1_peer_summary:
         mode: active
         name: bgp6_AS65000_r3
         neighbor: fc00:100::3
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -794,12 +809,14 @@ r1_peer_summary:
   r4:
     asn: 65003
     description: BGP session to r4
+    name: r4
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65003_r4
         neighbor: 100.64.0.4
         prefix_limit: 100
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -811,6 +828,7 @@ r1_peer_summary:
         name: bgp6_AS65003_r4
         neighbor: fc00:100::4
         prefix_limit: 100
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -820,11 +838,13 @@ r1_peer_summary:
   r5:
     asn: 65004
     description: BGP session to r5
+    name: r5
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65004_r5
         neighbor: 100.64.0.5
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -835,6 +855,7 @@ r1_peer_summary:
         mode: active
         name: bgp6_AS65004_r5
         neighbor: fc00:100::5
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -844,11 +865,13 @@ r1_peer_summary:
   r6:
     asn: 65005
     description: BGP session to r6
+    name: r6
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65005_r6
         neighbor: 100.64.0.6
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -859,6 +882,7 @@ r1_peer_summary:
         mode: active
         name: bgp6_AS65005_r6
         neighbor: fc00:100::6
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -868,11 +892,13 @@ r1_peer_summary:
   r7:
     asn: 65000
     description: BGP session to r7
+    name: r7
     protocols:
       ipv4:
         mode: passive
         name: bgp4_AS65000_r7
         neighbor: 100.64.0.7
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -883,6 +909,7 @@ r1_peer_summary:
         mode: passive
         name: bgp6_AS65000_r7
         neighbor: fc00:100::7
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -892,11 +919,13 @@ r1_peer_summary:
   r8:
     asn: 65000
     description: BGP session to r8
+    name: r8
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r8
         neighbor: 100.64.0.8
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -907,6 +936,7 @@ r1_peer_summary:
         mode: active
         name: bgp6_AS65000_r8
         neighbor: fc00:100::8
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -916,11 +946,13 @@ r1_peer_summary:
   r9:
     asn: 65000
     description: BGP session to r9
+    name: r9
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r9
         neighbor: 100.64.0.9
+        protocol: ipv4
         source_address: 100.64.0.1
         status:
           info: established
@@ -931,6 +963,7 @@ r1_peer_summary:
         mode: active
         name: bgp6_AS65000_r9
         neighbor: fc00:100::9
+        protocol: ipv6
         source_address: fc00:100::1
         status:
           info: established
@@ -944,10 +977,7 @@ r1_t_bgp4:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -969,14 +999,9 @@ r1_t_bgp4:
       BGP.as_path:
       - 65100
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 65282
+      - !!python/tuple [65535, 65282]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -999,10 +1024,7 @@ r1_t_bgp4_AS65000_r3_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -1025,10 +1047,7 @@ r1_t_bgp4_AS65000_r7_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -1051,10 +1070,7 @@ r1_t_bgp4_AS65000_r8_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -1077,10 +1093,7 @@ r1_t_bgp4_AS65000_r9_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -1103,10 +1116,7 @@ r1_t_bgp4_AS65001_r2_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -1133,10 +1143,7 @@ r1_t_bgp4_AS65100_e1_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -1158,14 +1165,9 @@ r1_t_bgp4_AS65100_e1_peer:
       BGP.as_path:
       - 65100
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 65282
+      - !!python/tuple [65535, 65282]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -1188,10 +1190,7 @@ r1_t_bgp6:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -1213,14 +1212,9 @@ r1_t_bgp6:
       BGP.as_path:
       - 65100
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 65282
+      - !!python/tuple [65535, 65282]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -1243,10 +1237,7 @@ r1_t_bgp6_AS65000_r3_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -1269,10 +1260,7 @@ r1_t_bgp6_AS65000_r7_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -1295,10 +1283,7 @@ r1_t_bgp6_AS65000_r8_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -1321,10 +1306,7 @@ r1_t_bgp6_AS65000_r9_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -1347,10 +1329,7 @@ r1_t_bgp6_AS65001_r2_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -1377,10 +1356,7 @@ r1_t_bgp6_AS65100_e1_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -1402,14 +1378,9 @@ r1_t_bgp6_AS65100_e1_peer:
       BGP.as_path:
       - 65100
       BGP.community:
-      - !!python/tuple
-        - 65535
-        - 65282
+      - !!python/tuple [65535, 65282]
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -1504,12 +1475,14 @@ r2_peer_summary:
   r1:
     asn: 65000
     description: BGP session to r1
+    name: r1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
         prefix_limit: 100
+        protocol: ipv4
         source_address: 100.64.0.2
         status:
           info: established
@@ -1521,6 +1494,7 @@ r2_peer_summary:
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
         prefix_limit: 100
+        protocol: ipv6
         source_address: fc00:100::2
         status:
           info: established
@@ -1535,14 +1509,8 @@ r2_t_bgp4:
       - 65000
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 3
-        - 2
+      - !!python/tuple [65000, 3, 3]
+      - !!python/tuple [65001, 3, 2]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.1
@@ -1566,14 +1534,8 @@ r2_t_bgp4_AS65000_r1_peer:
       - 65000
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 3
-        - 2
+      - !!python/tuple [65000, 3, 3]
+      - !!python/tuple [65001, 3, 2]
       BGP.local_pref: 750
       BGP.next_hop:
       - 100.64.0.1
@@ -1597,14 +1559,8 @@ r2_t_bgp6:
       - 65000
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 3
-        - 2
+      - !!python/tuple [65000, 3, 3]
+      - !!python/tuple [65001, 3, 2]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::1
@@ -1629,14 +1585,8 @@ r2_t_bgp6_AS65000_r1_peer:
       - 65000
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
-      - !!python/tuple
-        - 65001
-        - 3
-        - 2
+      - !!python/tuple [65000, 3, 3]
+      - !!python/tuple [65001, 3, 2]
       BGP.local_pref: 750
       BGP.next_hop:
       - fc00:100::1
@@ -1714,11 +1664,13 @@ r3_peer_summary:
   r1:
     asn: 65000
     description: BGP session to r1
+    name: r1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
+        protocol: ipv4
         source_address: 100.64.0.3
         status:
           info: established
@@ -1729,6 +1681,7 @@ r3_peer_summary:
         mode: active
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
+        protocol: ipv6
         source_address: fc00:100::3
         status:
           info: established
@@ -1742,10 +1695,7 @@ r3_t_bgp4:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.1
@@ -1768,10 +1718,7 @@ r3_t_bgp4_AS65000_r1_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.1
@@ -1794,10 +1741,7 @@ r3_t_bgp6:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::1
@@ -1820,10 +1764,7 @@ r3_t_bgp6_AS65000_r1_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::1
@@ -1910,12 +1851,14 @@ r4_peer_summary:
   r1:
     asn: 65000
     description: BGP session to r1
+    name: r1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
         prefix_limit: 100
+        protocol: ipv4
         source_address: 100.64.0.4
         status:
           info: established
@@ -1927,6 +1870,7 @@ r4_peer_summary:
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
         prefix_limit: 100
+        protocol: ipv6
         source_address: fc00:100::4
         status:
           info: established
@@ -1998,11 +1942,13 @@ r5_peer_summary:
   r1:
     asn: 65000
     description: BGP session to r1
+    name: r1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
+        protocol: ipv4
         source_address: 100.64.0.5
         status:
           info: established
@@ -2013,6 +1959,7 @@ r5_peer_summary:
         mode: active
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
+        protocol: ipv6
         source_address: fc00:100::5
         status:
           info: established
@@ -2084,11 +2031,13 @@ r6_peer_summary:
   r1:
     asn: 65000
     description: BGP session to r1
+    name: r1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
+        protocol: ipv4
         source_address: 100.64.0.6
         status:
           info: established
@@ -2099,6 +2048,7 @@ r6_peer_summary:
         mode: active
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
+        protocol: ipv6
         source_address: fc00:100::6
         status:
           info: established
@@ -2170,11 +2120,13 @@ r7_peer_summary:
   r1:
     asn: 65000
     description: BGP session to r1
+    name: r1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
+        protocol: ipv4
         source_address: 100.64.0.7
         status:
           info: established
@@ -2185,6 +2137,7 @@ r7_peer_summary:
         mode: active
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
+        protocol: ipv6
         source_address: fc00:100::7
         status:
           info: established
@@ -2198,10 +2151,7 @@ r7_t_bgp4:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -2225,10 +2175,7 @@ r7_t_bgp4_AS65000_r1_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -2252,10 +2199,7 @@ r7_t_bgp6:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -2279,10 +2223,7 @@ r7_t_bgp6_AS65000_r1_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -2360,11 +2301,13 @@ r8_peer_summary:
   r1:
     asn: 65000
     description: BGP session to r1
+    name: r1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
+        protocol: ipv4
         source_address: 100.64.0.8
         status:
           info: established
@@ -2375,6 +2318,7 @@ r8_peer_summary:
         mode: active
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
+        protocol: ipv6
         source_address: fc00:100::8
         status:
           info: established
@@ -2388,10 +2332,7 @@ r8_t_bgp4:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.1
@@ -2414,10 +2355,7 @@ r8_t_bgp4_AS65000_r1_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.1
@@ -2440,10 +2378,7 @@ r8_t_bgp6:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::1
@@ -2466,10 +2401,7 @@ r8_t_bgp6_AS65000_r1_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::1
@@ -2546,11 +2478,13 @@ r9_peer_summary:
   r1:
     asn: 65000
     description: BGP session to r1
+    name: r1
     protocols:
       ipv4:
         mode: active
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
+        protocol: ipv4
         source_address: 100.64.0.9
         status:
           info: established
@@ -2561,6 +2495,7 @@ r9_peer_summary:
         mode: active
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
+        protocol: ipv6
         source_address: fc00:100::9
         status:
           info: established
@@ -2574,10 +2509,7 @@ r9_t_bgp4:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -2601,10 +2533,7 @@ r9_t_bgp4_AS65000_r1_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - 100.64.0.100
@@ -2628,10 +2557,7 @@ r9_t_bgp6:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
@@ -2655,10 +2581,7 @@ r9_t_bgp6_AS65000_r1_peer:
       BGP.as_path:
       - 65100
       BGP.large_community:
-      - !!python/tuple
-        - 65000
-        - 3
-        - 3
+      - !!python/tuple [65000, 3, 3]
       BGP.local_pref: 470
       BGP.next_hop:
       - fc00:100::100
