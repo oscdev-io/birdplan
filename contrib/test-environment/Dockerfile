@@ -13,6 +13,7 @@ RUN set -ex; \
         python-ruamel.yaml.clib \
         python-requests \
         python-tox \
+        python-types-yaml \
         bgpq3 \
         bird \
         exabgp \
