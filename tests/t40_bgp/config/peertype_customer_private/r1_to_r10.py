@@ -40,3 +40,5 @@ class PeerTypeConfig:
         origin_asns:
           - 65100
 """
+
+    r2_asn = "4200000000"
