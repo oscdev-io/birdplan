@@ -168,19 +168,38 @@ class BirdPlanCommandLine:
         self._argparser = BirdPlanArgumentParser(add_help=False, prog=prog)
         self._birdplan = BirdPlan(test_mode=test_mode)
 
-    def run(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
+    def run(  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-locals,too-many-statements
         self, raw_args: Optional[List[str]] = None
     ) -> Any:
         """Run BirdPlan from command line."""
 
-        # Don't output copyright when we output in JSON format
-        if self.is_console and not self.is_json:
+        # Check if we have one commandline argument, if we do and if it is --version, return our version
+        if raw_args and len(raw_args) == 1 and raw_args[0] == "--version":
+            ret = {
+                "raw": __version__,
+                "json": json.dumps({"status": "success", "data": {"version": __version__}}),
+                "text": __version__,
+            }
+
+            # Check if we should output JSON
+            if self.is_console:
+                if self.is_json:
+                    print(ret["json"])
+                # If not, we need to output text
+                else:
+                    print(ret["text"])
+
+            return ret
+
+        # If this is the console, display our version
+        if self.is_console:
             print(f"BirdPlan v{__version__} - Copyright © 2019-2023, AllWorldIT.\n", file=sys.stderr)
 
         # Add main commandline arguments
         optional_group = self.argparser.add_argument_group("Optional arguments")
         optional_group.add_argument("-h", "--help", action="help", help="Show this help message and exit")
         optional_group.add_argument("-v", "--verbose", action="store_true", help="Display verbose logging")
+        optional_group.add_argument("--version", action="store_true", help="Display version and exit")
 
         # Input and output file settings
         optional_group.add_argument(
