@@ -344,8 +344,14 @@ class BirdPlanCommandLine:
 
         # Setup console handler
         console_handler = logging.StreamHandler(sys.stderr)
+        # Build log format
+        log_format = ""
+        # Only add a timestamp if we're not running under systemd
+        if "INVOCATION_ID" not in os.environ:
+            log_format += "%(asctime)s "
+        log_format += "%(levelcolor)s %(message)s"
         # Use a better format for messages
-        console_handler.setFormatter(ColorFormatter("%(asctime)s %(levelcolor)s %(message)s", "[%Y-%m-%d %H:%M:%S]"))
+        console_handler.setFormatter(ColorFormatter(log_format, "[%Y-%m-%d %H:%M:%S]"))
         logger.addHandler(console_handler)
 
     @property
