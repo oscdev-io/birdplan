@@ -40,7 +40,7 @@ from .version import __version__
 from .yaml import YAML, YAMLError
 
 __all__ = [
-    "BirdConfig",
+    "BirdPlan",
     "__version__",
 ]
 
