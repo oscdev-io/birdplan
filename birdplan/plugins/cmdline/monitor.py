@@ -118,7 +118,6 @@ class BirdplanCmdlineMonitor(BirdPlanCmdlinePluginBase):
 
         # Build structure
         monitor_status = {
-            "timestamp": int(datetime.datetime.now().timestamp()),
             "bgp": bgp_protocol,
             "ospf": ospf_protocol,
         }
