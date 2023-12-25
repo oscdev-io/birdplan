@@ -26,11 +26,11 @@ from ......cmdline import BirdPlanCommandLine
 from ......console.colors import colored
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerGracefulShutdownShow"]
+__all__ = ["BirdPlanCmdlineBGPPeerGracefulShutdownShow"]
 
 
-class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer graceful-shutdown show" command."""
+class BirdPlanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer graceful-shutdown show" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -72,7 +72,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_graceful_shutdown_show(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer graceful-shutdown show" command.
+        BirdPlan "bgp peer graceful-shutdown show" command.
 
         Parameters
         ----------

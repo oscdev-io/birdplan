@@ -27,11 +27,11 @@ from ....cmdline import BirdPlanCommandLine
 from ....console.colors import colored
 from ..cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineOSPFShow"]
+__all__ = ["BirdPlanCmdlineOSPFShow"]
 
 
-class BirdplanCmdlineOSPFShow(BirdPlanCmdlinePluginBase):
-    """Birdplan "ospf summary" command."""
+class BirdPlanCmdlineOSPFShow(BirdPlanCmdlinePluginBase):
+    """BirdPlan "ospf summary" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -73,7 +73,7 @@ class BirdplanCmdlineOSPFShow(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_summary(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        Birdplan "ospf summary" command.
+        BirdPlan "ospf summary" command.
 
         Parameters
         ----------

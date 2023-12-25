@@ -1,9 +1,9 @@
 [![pipeline status](https://gitlab.oscdev.io/software/birdplan/badges/master/pipeline.svg)](https://gitlab.oscdev.io/software/birdplan/commits/master)
 [![coverage report](https://gitlab.oscdev.io/software/birdplan/badges/master/coverage.svg)](https://gitlab.oscdev.io/software/birdplan/commits/master)
 
-# Birdplan
+# BirdPlan
 
-Birdplan is a configuration tool for the BIRD Internet Routing Daemon.
+BirdPlan is a configuration tool for the BIRD Internet Routing Daemon.
 
 # Table Of Contents
 

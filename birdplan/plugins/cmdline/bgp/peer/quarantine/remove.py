@@ -24,11 +24,11 @@ from typing import Any, Dict
 from ......cmdline import BirdPlanCommandLine
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerQuarantineRemove"]
+__all__ = ["BirdPlanCmdlineBGPPeerQuarantineRemove"]
 
 
-class BirdplanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer quarantine remove" command."""
+class BirdPlanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer quarantine remove" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -78,7 +78,7 @@ class BirdplanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_quarantine_remove(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer quarantine remove" command.
+        BirdPlan "bgp peer quarantine remove" command.
 
         Parameters
         ----------

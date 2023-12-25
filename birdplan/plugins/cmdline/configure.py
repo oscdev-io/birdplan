@@ -29,11 +29,11 @@ from ...cmdline import BIRD_CONFIG_FILE, BirdPlanCommandLine
 from ...exceptions import BirdPlanError
 from .cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineConfigure"]
+__all__ = ["BirdPlanCmdlineConfigure"]
 
 
-class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
-    """Birdplan "configure" command."""
+class BirdPlanCmdlineConfigure(BirdPlanCmdlinePluginBase):
+    """BirdPlan "configure" command."""
 
     # Output config file
     _config_filename: Optional[str]
@@ -110,7 +110,7 @@ class BirdplanCmdlineConfigure(BirdPlanCmdlinePluginBase):
 
     def cmd_configure(self, args: Any) -> Any:
         """
-        Birdplan "configure" command.
+        BirdPlan "configure" command.
 
         Parameters
         ----------

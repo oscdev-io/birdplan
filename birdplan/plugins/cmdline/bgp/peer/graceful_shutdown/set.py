@@ -25,11 +25,11 @@ from ......cmdline import BirdPlanCommandLine
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerGracefulShutdownSet"]
+__all__ = ["BirdPlanCmdlineBGPPeerGracefulShutdownSet"]
 
 
-class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer graceful-shutdown set" command."""
+class BirdPlanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer graceful-shutdown set" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -85,7 +85,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_graceful_shutdown_set(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer graceful-shutdown set" command.
+        BirdPlan "bgp peer graceful-shutdown set" command.
 
         Parameters
         ----------

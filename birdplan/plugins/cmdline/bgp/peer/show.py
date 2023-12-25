@@ -28,11 +28,11 @@ from .....cmdline import BirdPlanCommandLine
 from .....console.colors import colored
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerShowPeerArg"]
+__all__ = ["BirdPlanCmdlineBGPPeerShowPeerArg"]
 
 
-class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer show <peer>" command."""
+class BirdPlanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer show <peer>" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -73,7 +73,7 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
             "peer",
             nargs=1,
             metavar="PEER",
-            help="Optional peer name to show",
+            help="Peer to show (its BirdPlan name)",
         )
 
         # Set our internal subparser property
@@ -83,7 +83,7 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_show(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer show <peer>" command.
+        BirdPlan "bgp peer show <peer>" command.
 
         Parameters
         ----------

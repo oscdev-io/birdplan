@@ -24,11 +24,11 @@ from typing import Any, Dict
 from ......cmdline import BirdPlanCommandLine
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineOSPFInterfaceECMPWeightRemove"]
+__all__ = ["BirdPlanCmdlineOSPFInterfaceECMPWeightRemove"]
 
 
-class BirdplanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
-    """Birdplan "ospf interface ecmp-weight remove" command."""
+class BirdPlanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
+    """BirdPlan "ospf interface ecmp-weight remove" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -82,7 +82,7 @@ class BirdplanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_ecmp_weight_remove(self, args: Any) -> Any:
         """
-        Birdplan "ospf interface ecmp_weight remove" command.
+        BirdPlan "ospf interface ecmp_weight remove" command.
 
         Parameters
         ----------

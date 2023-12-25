@@ -24,11 +24,11 @@ from typing import Any, Dict
 from ......cmdline import BirdPlanCommandLine
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerGracefulShutdownRemove"]
+__all__ = ["BirdPlanCmdlineBGPPeerGracefulShutdownRemove"]
 
 
-class BirdplanCmdlineBGPPeerGracefulShutdownRemove(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer graceful-shutdown remove" command."""
+class BirdPlanCmdlineBGPPeerGracefulShutdownRemove(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer graceful-shutdown remove" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -78,7 +78,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownRemove(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_graceful_shutdown_remove(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer graceful-shutdown remove" command.
+        BirdPlan "bgp peer graceful-shutdown remove" command.
 
         Parameters
         ----------

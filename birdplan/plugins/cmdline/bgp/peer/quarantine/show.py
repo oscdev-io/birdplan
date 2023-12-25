@@ -27,11 +27,11 @@ from ......cmdline import BirdPlanCommandLine
 from ......console.colors import colored
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerQuarantineShow"]
+__all__ = ["BirdPlanCmdlineBGPPeerQuarantineShow"]
 
 
-class BirdplanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer quarantine show" command."""
+class BirdPlanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer quarantine show" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -73,7 +73,7 @@ class BirdplanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_quarantine_show(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer quarantine show" command.
+        BirdPlan "bgp peer quarantine show" command.
 
         Parameters
         ----------

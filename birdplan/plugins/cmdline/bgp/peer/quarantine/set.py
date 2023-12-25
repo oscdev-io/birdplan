@@ -25,11 +25,11 @@ from ......cmdline import BirdPlanCommandLine
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerQuarantineSet"]
+__all__ = ["BirdPlanCmdlineBGPPeerQuarantineSet"]
 
 
-class BirdplanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer quarantine set" command."""
+class BirdPlanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer quarantine set" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -83,7 +83,7 @@ class BirdplanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_quarantine_set(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer quarantine set" command.
+        BirdPlan "bgp peer quarantine set" command.
 
         Parameters
         ----------

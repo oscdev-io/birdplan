@@ -28,11 +28,11 @@ from .....console.colors import colored
 from .....exceptions import BirdPlanErrorUsage
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerShow"]
+__all__ = ["BirdPlanCmdlineBGPPeerShow"]
 
 
-class BirdplanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer summary" command."""
+class BirdPlanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer summary" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -82,7 +82,7 @@ class BirdplanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_summary(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        Birdplan "bgp peer summary" command.
+        BirdPlan "bgp peer summary" command.
 
         Parameters
         ----------

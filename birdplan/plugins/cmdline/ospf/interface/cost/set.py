@@ -24,11 +24,11 @@ from typing import Any, Dict
 from ......cmdline import BirdPlanCommandLine
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineOSPFInterfaceCostSet"]
+__all__ = ["BirdPlanCmdlineOSPFInterfaceCostSet"]
 
 
-class BirdplanCmdlineOSPFInterfaceCostSet(BirdPlanCmdlinePluginBase):
-    """Birdplan "ospf interface cost set" command."""
+class BirdPlanCmdlineOSPFInterfaceCostSet(BirdPlanCmdlinePluginBase):
+    """BirdPlan "ospf interface cost set" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -89,7 +89,7 @@ class BirdplanCmdlineOSPFInterfaceCostSet(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_cost_set(self, args: Any) -> Any:
         """
-        Birdplan "ospf interface cost set" command.
+        BirdPlan "ospf interface cost set" command.
 
         Parameters
         ----------

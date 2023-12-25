@@ -20,7 +20,6 @@
 
 
 import argparse
-import datetime
 import json
 import logging
 from typing import Any, Dict, Optional
@@ -29,11 +28,11 @@ from ...cmdline import BIRDPLAN_MONITOR_FILE, BirdPlanCommandLine
 from ...exceptions import BirdPlanError
 from .cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineMonitor"]
+__all__ = ["BirdPlanCmdlineMonitor"]
 
 
-class BirdplanCmdlineMonitor(BirdPlanCmdlinePluginBase):
-    """Birdplan "configure" command."""
+class BirdPlanCmdlineMonitor(BirdPlanCmdlinePluginBase):
+    """BirdPlan "configure" command."""
 
     # Output filename
     _output_filename: Optional[str]
@@ -89,7 +88,7 @@ class BirdplanCmdlineMonitor(BirdPlanCmdlinePluginBase):
 
     def cmd_monitor(self, args: Any) -> Any:
         """
-        Birdplan "monitor" command.
+        BirdPlan "monitor" command.
 
         Parameters
         ----------

@@ -24,11 +24,11 @@ from typing import Any, Dict
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerGracefulShutdown"]
+__all__ = ["BirdPlanCmdlineBGPPeerGracefulShutdown"]
 
 
-class BirdplanCmdlineBGPPeerGracefulShutdown(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer graceful-shutdown" command."""
+class BirdPlanCmdlineBGPPeerGracefulShutdown(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer graceful-shutdown" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -70,7 +70,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdown(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_graceful_shutdown(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        Birdplan "bgp peer graceful-shutdown" command.
+        BirdPlan "bgp peer graceful-shutdown" command.
 
         Parameters
         ----------

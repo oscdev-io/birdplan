@@ -24,11 +24,11 @@ from typing import Any, Dict
 from ......cmdline import BirdPlanCommandLine
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineOSPFInterfaceECMPWeightSet"]
+__all__ = ["BirdPlanCmdlineOSPFInterfaceECMPWeightSet"]
 
 
-class BirdplanCmdlineOSPFInterfaceECMPWeightSet(BirdPlanCmdlinePluginBase):
-    """Birdplan "ospf interface ecmp-weight set" command."""
+class BirdPlanCmdlineOSPFInterfaceECMPWeightSet(BirdPlanCmdlinePluginBase):
+    """BirdPlan "ospf interface ecmp-weight set" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -89,7 +89,7 @@ class BirdplanCmdlineOSPFInterfaceECMPWeightSet(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_ecmp_weight_set(self, args: Any) -> Any:
         """
-        Birdplan "ospf interface ecmp-weight set" command.
+        BirdPlan "ospf interface ecmp-weight set" command.
 
         Parameters
         ----------

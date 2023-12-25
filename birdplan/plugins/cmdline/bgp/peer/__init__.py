@@ -24,11 +24,11 @@ from typing import Any, Dict
 from .....exceptions import BirdPlanErrorUsage
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeer"]
+__all__ = ["BirdPlanCmdlineBGPPeer"]
 
 
-class BirdplanCmdlineBGPPeer(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer" command."""
+class BirdPlanCmdlineBGPPeer(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -70,7 +70,7 @@ class BirdplanCmdlineBGPPeer(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        Birdplan "bgp peer" command.
+        BirdPlan "bgp peer" command.
 
         Parameters
         ----------

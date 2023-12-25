@@ -24,11 +24,11 @@ from typing import Any, Dict
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineOSPFInterfaceCost"]
+__all__ = ["BirdPlanCmdlineOSPFInterfaceCost"]
 
 
-class BirdplanCmdlineOSPFInterfaceCost(BirdPlanCmdlinePluginBase):
-    """Birdplan "ospf interface cost" command."""
+class BirdPlanCmdlineOSPFInterfaceCost(BirdPlanCmdlinePluginBase):
+    """BirdPlan "ospf interface cost" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -70,7 +70,7 @@ class BirdplanCmdlineOSPFInterfaceCost(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_cost(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        Birdplan "ospf interface cost" command.
+        BirdPlan "ospf interface cost" command.
 
         Parameters
         ----------

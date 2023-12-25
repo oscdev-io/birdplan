@@ -29,7 +29,7 @@ __all__ = ["BirdPlanCmdlinePluginBase"]
 
 
 class BirdPlanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-methods
-    """Birdplan commandline plugin base class."""
+    """BirdPlan commandline plugin base class."""
 
     _subparser: Optional[argparse.ArgumentParser]
     _subparsers: Optional[argparse.ArgumentParser]
