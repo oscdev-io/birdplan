@@ -40,7 +40,7 @@ class Template(TemplateBase):
         # Check r2 status
         birdplan_result = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "graceful-shutdown", "show"])
 
-        graceful_shutdown_status = birdplan_result["raw"]
+        graceful_shutdown_status = birdplan_result.data
         assert graceful_shutdown_status == {
             "overrides": {"*": True},
             "current": {"r2": False},
@@ -53,7 +53,7 @@ class Template(TemplateBase):
         # Check r2 status again
         birdplan_result = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "graceful-shutdown", "show"])
 
-        graceful_shutdown_status = birdplan_result["raw"]
+        graceful_shutdown_status = birdplan_result.data
         assert graceful_shutdown_status == {
             "overrides": {"*": True},
             "current": {"r2": True},

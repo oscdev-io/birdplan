@@ -34,6 +34,6 @@ def test_load_from_string() -> None:
 
     res = bplan.run(["--version"])
 
-    test_data = res["raw"]
+    test_data = res.data
 
     assert test_data == birdplan.__version__

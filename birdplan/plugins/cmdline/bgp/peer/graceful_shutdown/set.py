@@ -21,7 +21,7 @@
 import argparse
 from typing import Any, Dict
 
-from ......cmdline import BirdPlanCommandLine
+from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
@@ -120,4 +120,5 @@ class BirdPlanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
         cmdline.birdplan_commit_state()
 
         status = "ENABLED" if value else "DISABLED"
-        return f"BGP graceful shutdown {status} for peer(s) matching '{peer}'"
+
+        return BirdPlanCommandlineResult(f"BGP graceful shutdown {status} for peer(s) matching '{peer}'")

@@ -20,7 +20,6 @@
 
 
 import argparse
-import json
 from typing import Any, Optional
 
 from ...plugin import Plugin
@@ -83,37 +82,3 @@ class BirdPlanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-metho
         if not self._subparsers:
             raise RuntimeError
         return self._subparsers
-
-    def to_text(self, data: Any) -> str:
-        """
-        Show command output in text.
-
-        Parameters
-        ----------
-        data : Any
-            Output data.
-
-        Returns
-        -------
-        str
-            Output data as text.
-        """
-
-        return f"{data}"
-
-    def to_json(self, data: Any) -> str:
-        """
-        Show command output in json.
-
-        Parameters
-        ----------
-        data : Any
-            Output data.
-
-        Returns
-        -------
-        str
-            Output data as json.
-        """
-
-        return json.dumps({"status": "success", "data": data})

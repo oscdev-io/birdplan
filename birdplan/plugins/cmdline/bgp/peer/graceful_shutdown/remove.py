@@ -21,7 +21,7 @@
 import argparse
 from typing import Any, Dict
 
-from ......cmdline import BirdPlanCommandLine
+from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 __all__ = ["BirdPlanCmdlineBGPPeerGracefulShutdownRemove"]
@@ -106,4 +106,4 @@ class BirdPlanCmdlineBGPPeerGracefulShutdownRemove(BirdPlanCmdlinePluginBase):
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return f"BGP graceful shutdown REMOVED from peer(s) matching '{peer}'"
+        return BirdPlanCommandlineResult(f"BGP graceful shutdown REMOVED from peer(s) matching '{peer}'")

@@ -231,12 +231,18 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
             eg.
             {
                 'name1': {
-                    'name': ...,
-                    'proto': ...,
-                    'table': ...,
-                    'state': ...,
-                    'since': ...,
+                    'channel': ...,
                     'info': ...,
+                    'input_filter': ...,
+                    'name': ...,
+                    'output_filter': ...,
+                    'preference': ...,
+                    'proto': ...,
+                    'routes_exported': ...,
+                    'routes_imported': ...,
+                    'since': ...,
+                    'state': ...
+                    'table': ...,
                 }
                 'name2': {
                     ...,

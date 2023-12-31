@@ -21,7 +21,7 @@
 import argparse
 from typing import Any, Dict
 
-from ......cmdline import BirdPlanCommandLine
+from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 __all__ = ["BirdPlanCmdlineOSPFInterfaceCostSet"]
@@ -120,4 +120,4 @@ class BirdPlanCmdlineOSPFInterfaceCostSet(BirdPlanCmdlinePluginBase):
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return f"OSPF area '{area}' interface '{interface}' cost override set to {cost}"
+        return BirdPlanCommandlineResult(f"OSPF area '{area}' interface '{interface}' cost override set to {cost}")

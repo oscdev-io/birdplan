@@ -148,6 +148,86 @@ class BirdPlanArgumentParser(argparse.ArgumentParser):
         raise BirdPlanErrorUsage(message, self)
 
 
+class BirdPlanCommandlineResult:  # pylint: disable=too-few-public-methods
+    """BirdPlan commandline result class."""
+
+    _data: Any
+    _has_console_output: bool
+
+    def __init__(self, data: Any, has_console_output: bool = True) -> None:
+        """Initialize object."""
+
+        self._data = data
+        self._has_console_output = has_console_output
+
+    def as_console(self) -> str:
+        """
+        Return data as console output.
+
+        Returns
+        -------
+        str
+            Data as console output.
+        """
+
+        return self.as_text()
+
+    def as_text(self) -> str:
+        """
+        Return data as text.
+
+        Returns
+        -------
+        str
+            Data as text.
+        """
+
+        return f"{self.data}"
+
+    def as_json(self) -> str:
+        """
+        Return data as JSON.
+
+        Parameters
+        ----------
+        data : Any
+            Output data.
+
+        Returns
+        -------
+        str
+            Return data as JSON.
+        """
+
+        return json.dumps({"status": "success", "data": self.data})
+
+    @property
+    def data(self) -> Any:
+        """
+        Return raw data.
+
+        Returns
+        -------
+        Any
+            Return data in its raw form.
+        """
+
+        return self._data
+
+    @property
+    def has_console_output(self) -> bool:
+        """
+        Return whether or not data has console output.
+
+        Returns
+        -------
+        bool
+            Return whether or not data has console output.
+        """
+
+        return self._has_console_output
+
+
 class BirdPlanCommandLine:
     """BirdPlan commandline handling class."""
 
@@ -170,26 +250,22 @@ class BirdPlanCommandLine:
 
     def run(  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-locals,too-many-statements
         self, raw_args: Optional[List[str]] = None
-    ) -> Any:
+    ) -> BirdPlanCommandlineResult:
         """Run BirdPlan from command line."""
 
         # Check if we have one commandline argument, if we do and if it is --version, return our version
         if raw_args and len(raw_args) == 1 and raw_args[0] == "--version":
-            ret = {
-                "raw": __version__,
-                "json": json.dumps({"status": "success", "data": {"version": __version__}}),
-                "text": __version__,
-            }
-
-            # Check if we should output JSON
+            result: BirdPlanCommandlineResult = BirdPlanCommandlineResult(__version__)
+            # Check if we're on a console
             if self.is_console:
+                # Check if we should output json
                 if self.is_json:
-                    print(ret["json"])
-                # If not, we need to output text
-                else:
-                    print(ret["text"])
+                    print(result.as_json())
+                # Else if we have console output, then output that
+                elif result.has_console_output:
+                    print(result.as_console())
 
-            return ret
+            return result
 
         # If this is the console, display our version
         if self.is_console:
@@ -272,21 +348,16 @@ class BirdPlanCommandLine:
         # Grab the result from the command
         result = plugins.call_plugin(plugin_name, method_name, {"cmdline": self})
 
-        ret = {
-            "raw": result,
-            "json": plugins.call_plugin(plugin_name, "to_json", result),
-            "text": plugins.call_plugin(plugin_name, "to_text", result),
-        }
-
-        # Check if we should output JSON
+        # Check if we're on a console
         if self.is_console:
+            # Check if we should output json
             if self.is_json:
-                print(ret["json"])
-            # If not, we need to output text
-            else:
-                print(ret["text"])
+                print(result.as_json())
+            # Else if we have console output, then output that
+            elif result.has_console_output:
+                print(result.as_console())
 
-        return ret
+        return result
 
     def birdplan_load_config(self, **kwargs: Any) -> None:
         """
@@ -416,7 +487,7 @@ def main() -> None:
     birdplan_cmdline = BirdPlanCommandLine(is_console=True)
 
     try:
-        birdplan_cmdline.run()
+        birdplan_cmdline.run(sys.argv[1:])
     except BirdPlanError as exception:
         if birdplan_cmdline.is_json:
             print(json.dumps({"status": "error", "message": str(exception)}))

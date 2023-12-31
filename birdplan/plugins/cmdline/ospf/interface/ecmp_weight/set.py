@@ -21,7 +21,7 @@
 import argparse
 from typing import Any, Dict
 
-from ......cmdline import BirdPlanCommandLine
+from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 __all__ = ["BirdPlanCmdlineOSPFInterfaceECMPWeightSet"]
@@ -120,4 +120,4 @@ class BirdPlanCmdlineOSPFInterfaceECMPWeightSet(BirdPlanCmdlinePluginBase):
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return f"OSPF area '{area}' interface '{interface}' ECMP weight override set to {ecmp_weight}"
+        return BirdPlanCommandlineResult(f"OSPF area '{area}' interface '{interface}' ECMP weight override set to {ecmp_weight}")

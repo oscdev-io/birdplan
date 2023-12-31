@@ -21,6 +21,7 @@
 
 """Base test classes for our tests."""
 
+import copy
 import inspect
 import logging
 import os
@@ -34,7 +35,7 @@ from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.exabgp_router_node import ExaBGPRouterNode
 from nsnetsim.switch_node import SwitchNode
 
-from birdplan.cmdline import BirdPlanCommandLine
+from birdplan.cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from birdplan.exceptions import BirdPlanError
 
 from .simulation import Simulation
@@ -354,9 +355,10 @@ class BirdPlanBaseTestCase:
             content_matches = False
             while True:
                 # Get peer summary
-                birdplan_result = self._birdplan_run(sim, tmpdir, router, ["ospf", "summary"])
+                birdplan_result: BirdPlanCommandlineResult = self._birdplan_run(sim, tmpdir, router, ["ospf", "summary"])
 
-                result = birdplan_result["raw"]
+                # We need to deep copy the data as we're removing "since" below
+                result = copy.deepcopy(birdplan_result.data)
                 router_summaries[router]["result"] = result
 
                 # Remove since from the result
@@ -389,17 +391,17 @@ class BirdPlanBaseTestCase:
             # If we didn't match add the incorrect result to the report too
             if not content_matches:
                 report_expected = pprint.pformat(result_expected, width=132, compact=True)
-                sim.add_report_obj(f"EXPECTED_OSPF_SUMMARY({router})[raw]", f"{data_name} = {report_expected}")
+                sim.add_report_obj(f"EXPECTED_OSPF_SUMMARY({router})", f"{data_name} = {report_expected}")
 
-                sim.add_report_obj(f"OSPF_SUMMARY({router})[json]", birdplan_result["json"])
-                sim.add_report_obj(f"OSPF_SUMMARY({router})[text]", birdplan_result["text"])
+                sim.add_report_obj(f"OSPF_SUMMARY({router})[json]", birdplan_result.as_json())
+                sim.add_report_obj(f"OSPF_SUMMARY({router})[text]", birdplan_result.as_text())
 
                 report_result = pprint.pformat(result, width=132, compact=True)
-                sim.add_report_obj(f"OSPF_SUMMARY({router})[raw]", f"{data_name} = {report_result}")
+                sim.add_report_obj(f"OSPF_SUMMARY({router})", f"{data_name} = {report_result}")
 
         # Loop and assert
         for router, data in router_summaries.items():
-            assert data["result"] == data["expected"], f"BIRD router '{router}' peer summary does not match what it should be"
+            assert data["result"] == data["expected"], f"BIRD router '{router}' OSPF summary does not match what it should be"
 
     def _test_bird_cmdline_bgp_peer_summary(  # pylint: disable=too-many-locals,too-many-branches
         self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None
@@ -439,9 +441,10 @@ class BirdPlanBaseTestCase:
             content_matches = False
             while True:
                 # Get peer summary
-                birdplan_result = self._birdplan_run(sim, tmpdir, router, ["bgp", "peer", "summary"])
+                birdplan_result: BirdPlanCommandlineResult = self._birdplan_run(sim, tmpdir, router, ["bgp", "peer", "summary"])
 
-                result = birdplan_result["raw"]
+                # We need to deep copy the data as we're removing "since" below
+                result = copy.deepcopy(birdplan_result.data)
                 router_summaries[router]["result"] = result
 
                 # Remove since from the result
@@ -479,13 +482,13 @@ class BirdPlanBaseTestCase:
             # If we didn't match add the incorrect result to the report too
             if not content_matches:
                 report_expected = pprint.pformat(result_expected, width=132, compact=True)
-                sim.add_report_obj(f"EXPECTED_PEER_SUMMARY({router})[raw]", f"{data_name} = {report_expected}")
+                sim.add_report_obj(f"EXPECTED_PEER_SUMMARY({router})", f"{data_name} = {report_expected}")
 
-                sim.add_report_obj(f"PEER_SUMMARY({router})[json]", birdplan_result["json"])
-                sim.add_report_obj(f"PEER_SUMMARY({router})[text]", birdplan_result["text"])
+                sim.add_report_obj(f"PEER_SUMMARY({router})[json]", birdplan_result.as_json())
+                sim.add_report_obj(f"PEER_SUMMARY({router})[text]", birdplan_result.as_text())
 
                 report_result = pprint.pformat(result, width=132, compact=True)
-                sim.add_report_obj(f"PEER_SUMMARY({router})[raw]", f"{data_name} = {report_result}")
+                sim.add_report_obj(f"PEER_SUMMARY({router})", f"{data_name} = {report_result}")
 
         # Loop and assert
         for router, data in router_summaries.items():
@@ -533,9 +536,12 @@ class BirdPlanBaseTestCase:
                 content_matches = False
                 while True:
                     # Get peer show
-                    birdplan_result = self._birdplan_run(sim, tmpdir, router, ["bgp", "peer", "show", peer])
+                    birdplan_result: BirdPlanCommandlineResult = self._birdplan_run(
+                        sim, tmpdir, router, ["bgp", "peer", "show", peer]
+                    )
 
-                    result = birdplan_result["raw"]
+                    # We need to deep copy the data as we're removing "since" below
+                    result = copy.deepcopy(birdplan_result.data)
                     router_shows[router][peer]["result"] = result
 
                     # Remove since from the result
@@ -572,14 +578,14 @@ class BirdPlanBaseTestCase:
                 # If we didn't match add the incorrect result to the report too
                 if not content_matches:
                     # Add reports
-                    sim.add_report_obj(f"PEER_SHOW({router}:{peer})[json]", birdplan_result["json"])
-                    sim.add_report_obj(f"PEER_SHOW({router}:{peer})[text]", birdplan_result["text"])
+                    sim.add_report_obj(f"PEER_SHOW({router}:{peer})[json]", birdplan_result.as_json())
+                    sim.add_report_obj(f"PEER_SHOW({router}:{peer})[text]", birdplan_result.as_text())
 
                     report_result = pprint.pformat(result, width=132, compact=True)
-                    sim.add_report_obj(f"PEER_SHOW({router}:{peer})[raw]", f"{data_name} = {report_result}")
+                    sim.add_report_obj(f"PEER_SHOW({router}:{peer})", f"{data_name} = {report_result}")
 
                     report_expected = pprint.pformat(result_expected, width=132, compact=True)
-                    sim.add_report_obj(f"EXPECTED_PEER_SHOW({router}:{peer})[raw]", f"{data_name} = {report_expected}")
+                    sim.add_report_obj(f"EXPECTED_PEER_SHOW({router}:{peer})", f"{data_name} = {report_expected}")
 
         # Lets do the asserts next
         for router, peer_shows in router_shows.items():
@@ -669,12 +675,12 @@ class BirdPlanBaseTestCase:
         configured_routers = []
         for router in self.routers:
             # If we get a positive result, add the router to the list of configured routers
-            bird_config = self._birdplan_run(sim, tmpdir, router, ["configure"])
+            bird_config: BirdPlanCommandlineResult = self._birdplan_run(sim, tmpdir, router, ["configure"])
             # If we have None it is expected
             if bird_config is None:
                 continue
             # If its however blank, raise exception
-            if not bird_config:
+            if not bird_config.data:
                 raise RuntimeError(f"BirdPlan failed to configure router '{router}'")
             # Add router to list of configured routers
             configured_routers.append(router)
@@ -760,7 +766,7 @@ class BirdPlanBaseTestCase:
 
     def _birdplan_run(  # noqa: CFQ001 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements
         self, sim: Simulation, tmpdir: str, router: str, args: List[str]
-    ) -> Any:
+    ) -> Optional[BirdPlanCommandlineResult]:
         """Run BirdPlan for a given router."""
 
         # Work out file names

@@ -25,7 +25,7 @@ import os
 import pwd
 from typing import Any, Dict, Optional
 
-from ...cmdline import BIRD_CONFIG_FILE, BirdPlanCommandLine
+from ...cmdline import BIRD_CONFIG_FILE, BirdPlanCommandLine, BirdPlanCommandlineResult
 from ...exceptions import BirdPlanError
 from .cmdline_plugin import BirdPlanCmdlinePluginBase
 
@@ -139,29 +139,9 @@ class BirdPlanCmdlineConfigure(BirdPlanCmdlinePluginBase):
         # If we're outputting to file, write it here
         if self.config_filename and self.config_filename != "-":
             self._write_config_file(bird_config)
+            return BirdPlanCommandlineResult(bird_config, has_console_output=False)
 
-        return bird_config
-
-    def to_text(self, data: Any) -> str:
-        """
-        Return output in text format.
-
-        Parameters
-        ----------
-        data : str
-            Bird configuration
-
-        Returns
-        -------
-        str
-            Output in text format.
-
-        """
-        # Skip output when we're writing a config file
-        if self.config_filename and self.config_filename != "-":
-            return ""
-        # Output config
-        return super().to_text(data)
+        return BirdPlanCommandlineResult(bird_config)
 
     def _write_config_file(self, data: Any) -> None:
         """

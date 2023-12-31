@@ -24,7 +24,7 @@ import json
 import logging
 from typing import Any, Dict, Optional
 
-from ...cmdline import BIRDPLAN_MONITOR_FILE, BirdPlanCommandLine
+from ...cmdline import BIRDPLAN_MONITOR_FILE, BirdPlanCommandLine, BirdPlanCommandlineResult
 from ...exceptions import BirdPlanError
 from .cmdline_plugin import BirdPlanCmdlinePluginBase
 
@@ -124,29 +124,9 @@ class BirdPlanCmdlineMonitor(BirdPlanCmdlinePluginBase):
         # If we're outputting to file, write it here
         if self.output_filename and self.output_filename != "-":
             self._write_monitor_file(monitor_status)
+            return BirdPlanCommandlineResult(monitor_status, has_console_output=False)
 
-        return monitor_status
-
-    def to_text(self, data: Any) -> str:
-        """
-        Return output in text format.
-
-        Parameters
-        ----------
-        data : str
-            Bird configuration
-
-        Returns
-        -------
-        str
-            Output in text format.
-
-        """
-        # Skip output when we're writing a output file
-        if self.output_filename and self.output_filename != "-":
-            return ""
-        # Output config
-        return super().to_text(data)
+        return BirdPlanCommandlineResult(monitor_status)
 
     def _write_monitor_file(self, data: Any) -> None:
         """

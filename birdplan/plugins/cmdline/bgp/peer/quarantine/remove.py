@@ -21,7 +21,7 @@
 import argparse
 from typing import Any, Dict
 
-from ......cmdline import BirdPlanCommandLine
+from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 __all__ = ["BirdPlanCmdlineBGPPeerQuarantineRemove"]
@@ -107,4 +107,4 @@ class BirdPlanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return f"BGP quarantine REMOVED from peer(s) matching '{peer}'"
+        return BirdPlanCommandlineResult(f"BGP quarantine REMOVED from peer(s) matching '{peer}'")

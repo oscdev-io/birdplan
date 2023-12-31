@@ -62,7 +62,7 @@ class Test(Template):
         # Check r4 status
         birdplan_result = self._birdplan_run(sim, tmpdir, "r4", ["ospf", "interface", "show"])
 
-        interface_status = birdplan_result["raw"]
+        interface_status = birdplan_result.data
         assert interface_status == {
             "current": {
                 "areas": {"0": {"interfaces": {"eth0": {"cost": 14, "ecmp_weight": 1}, "eth1": {"cost": 14, "ecmp_weight": 1}}}}
@@ -79,7 +79,7 @@ class Test(Template):
         # Check r4 status again
         birdplan_result = self._birdplan_run(sim, tmpdir, "r4", ["ospf", "interface", "show"])
 
-        interface_status = birdplan_result["raw"]
+        interface_status = birdplan_result.data
         assert interface_status == {
             "current": {
                 "areas": {"0": {"interfaces": {"eth0": {"cost": 12, "ecmp_weight": 1}, "eth1": {"cost": 12, "ecmp_weight": 1}}}}
