@@ -56,14 +56,17 @@ r2_peer_show_r1:
       status:
         channel: ipv4
         igp_table: master4
-        info: connect
+        info: active
+        info_extra: 'socket: no route to host'
         input_filter: f_bgp_AS65000_r1_peer_import
         last_error: 'socket: no route to host'
         local_as: 65001
+        name: bgp4_AS65000_r1
         neighbor_address: 100.64.0.1
         neighbor_as: 65000
         output_filter: f_bgp_AS65000_r1_peer_export
         preference: 100
+        proto: BGP
         state: down
         table: t_bgp4_AS65000_r1_peer
     ipv6:
@@ -77,10 +80,12 @@ r2_peer_show_r1:
         info: connect
         input_filter: f_bgp_AS65000_r1_peer_import
         local_as: 65001
+        name: bgp6_AS65000_r1
         neighbor_address: fc00:100::1
         neighbor_as: 65000
         output_filter: f_bgp_AS65000_r1_peer_export
         preference: 100
+        proto: BGP
         state: down
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
@@ -101,11 +106,21 @@ r2_peer_summary:
         protocol: ipv4
         source_address: 100.64.0.2
         status:
-          info: connecting
+          channel: ipv4
+          igp_table: master4
+          info: active
           info_extra: 'socket: no route to host'
+          input_filter: f_bgp_AS65000_r1_peer_import
+          last_error: 'socket: no route to host'
+          local_as: 65001
           name: bgp4_AS65000_r1
+          neighbor_address: 100.64.0.1
+          neighbor_as: 65000
+          output_filter: f_bgp_AS65000_r1_peer_export
+          preference: 100
           proto: BGP
           state: down
+          table: t_bgp4_AS65000_r1_peer
       ipv6:
         mode: active
         name: bgp6_AS65000_r1
@@ -113,10 +128,19 @@ r2_peer_summary:
         protocol: ipv6
         source_address: fc00:100::2
         status:
-          info: connecting
+          channel: ipv6
+          igp_table: master6
+          info: connect
+          input_filter: f_bgp_AS65000_r1_peer_import
+          local_as: 65001
           name: bgp6_AS65000_r1
+          neighbor_address: fc00:100::1
+          neighbor_as: 65000
+          output_filter: f_bgp_AS65000_r1_peer_export
+          preference: 100
           proto: BGP
           state: down
+          table: t_bgp6_AS65000_r1_peer
 r2_t_bgp4: {}
 r2_t_bgp4_AS65000_r1_peer: {}
 r2_t_bgp6: {}

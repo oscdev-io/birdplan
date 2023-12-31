@@ -389,16 +389,28 @@ r1_master6:
     - univ
 r1_ospf_summary:
   ospf4:
-    info: alone
+    channel: ipv4
+    info: running
+    input_filter: f_ospf_import
     name: ospf4
+    output_filter: f_ospf_export
+    preference: 150
     proto: OSPF
-    state: down
+    routes_exported: 0
+    routes_imported: 1
+    state: up
     table: t_ospf4
   ospf6:
-    info: alone
+    channel: ipv6
+    info: running
+    input_filter: f_ospf_import
     name: ospf6
+    output_filter: f_ospf_export
+    preference: 150
     proto: OSPF
-    state: down
+    routes_exported: 0
+    routes_imported: 1
+    state: up
     table: t_ospf6
 r1_t_kernel4:
   0.0.0.0/0:
@@ -835,16 +847,28 @@ r2_master6:
     - univ
 r2_ospf_summary:
   ospf4:
-    info: alone
+    channel: ipv4
+    info: running
+    input_filter: f_ospf_import
     name: ospf4
+    output_filter: f_ospf_export
+    preference: 150
     proto: OSPF
-    state: down
+    routes_exported: 0
+    routes_imported: 1
+    state: up
     table: t_ospf4
   ospf6:
-    info: alone
+    channel: ipv6
+    info: running
+    input_filter: f_ospf_import
     name: ospf6
+    output_filter: f_ospf_export
+    preference: 150
     proto: OSPF
-    state: down
+    routes_exported: 0
+    routes_imported: 1
+    state: up
     table: t_ospf6
 r2_t_kernel4:
   100.64.0.0/24:

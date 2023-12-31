@@ -869,11 +869,13 @@ r1_peer_show_e1:
         info: established
         input_filter: f_bgp_AS65000_e1_peer_import
         local_as: 65000
+        name: bgp4_AS65000_e1
         neighbor_address: 100.64.0.3
         neighbor_as: 65000
         neighbor_id: 0.0.0.2
         output_filter: f_bgp_AS65000_e1_peer_export
         preference: 100
+        proto: BGP
         routes_exported: 0
         routes_imported: 8
         source_address: 100.64.0.1
@@ -891,11 +893,13 @@ r1_peer_show_e1:
         info: established
         input_filter: f_bgp_AS65000_e1_peer_import
         local_as: 65000
+        name: bgp6_AS65000_e1
         neighbor_address: fc00:100::3
         neighbor_as: 65000
         neighbor_id: 0.0.0.2
         output_filter: f_bgp_AS65000_e1_peer_export
         preference: 100
+        proto: BGP
         routes_exported: 0
         routes_imported: 8
         source_address: fc00:100::1
@@ -926,11 +930,13 @@ r1_peer_show_e2:
         info: established
         input_filter: f_bgp_AS65000_e2_peer_import
         local_as: 65000
+        name: bgp4_AS65000_e2
         neighbor_address: 100.64.0.4
         neighbor_as: 65000
         neighbor_id: 0.0.0.3
         output_filter: f_bgp_AS65000_e2_peer_export
         preference: 100
+        proto: BGP
         routes_exported: 0
         routes_imported: 1
         source_address: 100.64.0.1
@@ -948,11 +954,13 @@ r1_peer_show_e2:
         info: established
         input_filter: f_bgp_AS65000_e2_peer_import
         local_as: 65000
+        name: bgp6_AS65000_e2
         neighbor_address: fc00:100::4
         neighbor_as: 65000
         neighbor_id: 0.0.0.3
         output_filter: f_bgp_AS65000_e2_peer_export
         preference: 100
+        proto: BGP
         routes_exported: 0
         routes_imported: 1
         source_address: fc00:100::1
@@ -983,11 +991,13 @@ r1_peer_show_r2:
         info: established
         input_filter: f_bgp_AS65000_r2_peer_import
         local_as: 65000
+        name: bgp4_AS65000_r2
         neighbor_address: 100.64.0.2
         neighbor_as: 65000
         neighbor_id: 0.0.0.2
         output_filter: f_bgp_AS65000_r2_peer_export
         preference: 100
+        proto: BGP
         routes_exported: 18
         routes_imported: 0
         source_address: 100.64.0.1
@@ -1005,11 +1015,13 @@ r1_peer_show_r2:
         info: established
         input_filter: f_bgp_AS65000_r2_peer_import
         local_as: 65000
+        name: bgp6_AS65000_r2
         neighbor_address: fc00:100::2
         neighbor_as: 65000
         neighbor_id: 0.0.0.2
         output_filter: f_bgp_AS65000_r2_peer_export
         preference: 100
+        proto: BGP
         routes_exported: 18
         routes_imported: 0
         source_address: fc00:100::1
@@ -1033,10 +1045,24 @@ r1_peer_summary:
         protocol: ipv4
         source_address: 100.64.0.1
         status:
+          bgp_nexthop: 100.64.0.1
+          channel: ipv4
+          igp_table: master4
           info: established
+          input_filter: f_bgp_AS65000_e1_peer_import
+          local_as: 65000
           name: bgp4_AS65000_e1
+          neighbor_address: 100.64.0.3
+          neighbor_as: 65000
+          neighbor_id: 0.0.0.2
+          output_filter: f_bgp_AS65000_e1_peer_export
+          preference: 100
           proto: BGP
+          routes_exported: 0
+          routes_imported: 8
+          source_address: 100.64.0.1
           state: up
+          table: t_bgp4_AS65000_e1_peer
       ipv6:
         mode: active
         name: bgp6_AS65000_e1
@@ -1044,10 +1070,24 @@ r1_peer_summary:
         protocol: ipv6
         source_address: fc00:100::1
         status:
+          bgp_nexthop: fc00:100::1
+          channel: ipv6
+          igp_table: master6
           info: established
+          input_filter: f_bgp_AS65000_e1_peer_import
+          local_as: 65000
           name: bgp6_AS65000_e1
+          neighbor_address: fc00:100::3
+          neighbor_as: 65000
+          neighbor_id: 0.0.0.2
+          output_filter: f_bgp_AS65000_e1_peer_export
+          preference: 100
           proto: BGP
+          routes_exported: 0
+          routes_imported: 8
+          source_address: fc00:100::1
           state: up
+          table: t_bgp6_AS65000_e1_peer
   e2:
     asn: 65000
     description: BGP session to e2
@@ -1060,10 +1100,24 @@ r1_peer_summary:
         protocol: ipv4
         source_address: 100.64.0.1
         status:
+          bgp_nexthop: 100.64.0.1
+          channel: ipv4
+          igp_table: master4
           info: established
+          input_filter: f_bgp_AS65000_e2_peer_import
+          local_as: 65000
           name: bgp4_AS65000_e2
+          neighbor_address: 100.64.0.4
+          neighbor_as: 65000
+          neighbor_id: 0.0.0.3
+          output_filter: f_bgp_AS65000_e2_peer_export
+          preference: 100
           proto: BGP
+          routes_exported: 0
+          routes_imported: 1
+          source_address: 100.64.0.1
           state: up
+          table: t_bgp4_AS65000_e2_peer
       ipv6:
         mode: active
         name: bgp6_AS65000_e2
@@ -1071,10 +1125,24 @@ r1_peer_summary:
         protocol: ipv6
         source_address: fc00:100::1
         status:
+          bgp_nexthop: fc00:100::1
+          channel: ipv6
+          igp_table: master6
           info: established
+          input_filter: f_bgp_AS65000_e2_peer_import
+          local_as: 65000
           name: bgp6_AS65000_e2
+          neighbor_address: fc00:100::4
+          neighbor_as: 65000
+          neighbor_id: 0.0.0.3
+          output_filter: f_bgp_AS65000_e2_peer_export
+          preference: 100
           proto: BGP
+          routes_exported: 0
+          routes_imported: 1
+          source_address: fc00:100::1
           state: up
+          table: t_bgp6_AS65000_e2_peer
   r2:
     asn: 65000
     description: BGP session to r2
@@ -1087,10 +1155,24 @@ r1_peer_summary:
         protocol: ipv4
         source_address: 100.64.0.1
         status:
+          bgp_nexthop: 100.64.0.1
+          channel: ipv4
+          igp_table: master4
           info: established
+          input_filter: f_bgp_AS65000_r2_peer_import
+          local_as: 65000
           name: bgp4_AS65000_r2
+          neighbor_address: 100.64.0.2
+          neighbor_as: 65000
+          neighbor_id: 0.0.0.2
+          output_filter: f_bgp_AS65000_r2_peer_export
+          preference: 100
           proto: BGP
+          routes_exported: 18
+          routes_imported: 0
+          source_address: 100.64.0.1
           state: up
+          table: t_bgp4_AS65000_r2_peer
       ipv6:
         mode: active
         name: bgp6_AS65000_r2
@@ -1098,10 +1180,24 @@ r1_peer_summary:
         protocol: ipv6
         source_address: fc00:100::1
         status:
+          bgp_nexthop: fc00:100::1
+          channel: ipv6
+          igp_table: master6
           info: established
+          input_filter: f_bgp_AS65000_r2_peer_import
+          local_as: 65000
           name: bgp6_AS65000_r2
+          neighbor_address: fc00:100::2
+          neighbor_as: 65000
+          neighbor_id: 0.0.0.2
+          output_filter: f_bgp_AS65000_r2_peer_export
+          preference: 100
           proto: BGP
+          routes_exported: 18
+          routes_imported: 0
+          source_address: fc00:100::1
           state: up
+          table: t_bgp6_AS65000_r2_peer
 r1_t_bgp4:
   0.0.0.0/0:
   - attributes:
@@ -4450,11 +4546,13 @@ r2_peer_show_r1:
         info: established
         input_filter: f_bgp_AS65000_r1_peer_import
         local_as: 65000
+        name: bgp4_AS65000_r1
         neighbor_address: 100.64.0.1
         neighbor_as: 65000
         neighbor_id: 0.0.0.1
         output_filter: f_bgp_AS65000_r1_peer_export
         preference: 100
+        proto: BGP
         routes_exported: 0
         routes_imported: 11
         source_address: 100.64.0.2
@@ -4472,11 +4570,13 @@ r2_peer_show_r1:
         info: established
         input_filter: f_bgp_AS65000_r1_peer_import
         local_as: 65000
+        name: bgp6_AS65000_r1
         neighbor_address: fc00:100::1
         neighbor_as: 65000
         neighbor_id: 0.0.0.1
         output_filter: f_bgp_AS65000_r1_peer_export
         preference: 100
+        proto: BGP
         routes_exported: 0
         routes_imported: 11
         source_address: fc00:100::2
@@ -4500,10 +4600,24 @@ r2_peer_summary:
         protocol: ipv4
         source_address: 100.64.0.2
         status:
+          bgp_nexthop: 100.64.0.2
+          channel: ipv4
+          igp_table: master4
           info: established
+          input_filter: f_bgp_AS65000_r1_peer_import
+          local_as: 65000
           name: bgp4_AS65000_r1
+          neighbor_address: 100.64.0.1
+          neighbor_as: 65000
+          neighbor_id: 0.0.0.1
+          output_filter: f_bgp_AS65000_r1_peer_export
+          preference: 100
           proto: BGP
+          routes_exported: 0
+          routes_imported: 11
+          source_address: 100.64.0.2
           state: up
+          table: t_bgp4_AS65000_r1_peer
       ipv6:
         mode: active
         name: bgp6_AS65000_r1
@@ -4511,10 +4625,24 @@ r2_peer_summary:
         protocol: ipv6
         source_address: fc00:100::2
         status:
+          bgp_nexthop: fc00:100::2
+          channel: ipv6
+          igp_table: master6
           info: established
+          input_filter: f_bgp_AS65000_r1_peer_import
+          local_as: 65000
           name: bgp6_AS65000_r1
+          neighbor_address: fc00:100::1
+          neighbor_as: 65000
+          neighbor_id: 0.0.0.1
+          output_filter: f_bgp_AS65000_r1_peer_export
+          preference: 100
           proto: BGP
+          routes_exported: 0
+          routes_imported: 11
+          source_address: fc00:100::2
           state: up
+          table: t_bgp6_AS65000_r1_peer
 r2_t_bgp4:
   100.111.0.0/24:
   - attributes:
