@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Birdplan commandline interface."""
+"""BirdPlan commandline interface."""
 
 import argparse
 import copy
@@ -148,6 +148,86 @@ class BirdPlanArgumentParser(argparse.ArgumentParser):
         raise BirdPlanErrorUsage(message, self)
 
 
+class BirdPlanCommandlineResult:  # pylint: disable=too-few-public-methods
+    """BirdPlan commandline result class."""
+
+    _data: Any
+    _has_console_output: bool
+
+    def __init__(self, data: Any, has_console_output: bool = True) -> None:
+        """Initialize object."""
+
+        self._data = data
+        self._has_console_output = has_console_output
+
+    def as_console(self) -> str:
+        """
+        Return data as console output.
+
+        Returns
+        -------
+        str
+            Data as console output.
+        """
+
+        return self.as_text()
+
+    def as_text(self) -> str:
+        """
+        Return data as text.
+
+        Returns
+        -------
+        str
+            Data as text.
+        """
+
+        return f"{self.data}"
+
+    def as_json(self) -> str:
+        """
+        Return data as JSON.
+
+        Parameters
+        ----------
+        data : Any
+            Output data.
+
+        Returns
+        -------
+        str
+            Return data as JSON.
+        """
+
+        return json.dumps({"status": "success", "data": self.data})
+
+    @property
+    def data(self) -> Any:
+        """
+        Return raw data.
+
+        Returns
+        -------
+        Any
+            Return data in its raw form.
+        """
+
+        return self._data
+
+    @property
+    def has_console_output(self) -> bool:
+        """
+        Return whether or not data has console output.
+
+        Returns
+        -------
+        bool
+            Return whether or not data has console output.
+        """
+
+        return self._has_console_output
+
+
 class BirdPlanCommandLine:
     """BirdPlan commandline handling class."""
 
@@ -168,19 +248,34 @@ class BirdPlanCommandLine:
         self._argparser = BirdPlanArgumentParser(add_help=False, prog=prog)
         self._birdplan = BirdPlan(test_mode=test_mode)
 
-    def run(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
+    def run(  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-locals,too-many-statements
         self, raw_args: Optional[List[str]] = None
-    ) -> Any:
+    ) -> BirdPlanCommandlineResult:
         """Run BirdPlan from command line."""
 
-        # Don't output copyright when we output in JSON format
-        if self.is_console and not self.is_json:
+        # Check if we have one commandline argument, if we do and if it is --version, return our version
+        if raw_args and len(raw_args) == 1 and raw_args[0] == "--version":
+            result: BirdPlanCommandlineResult = BirdPlanCommandlineResult(__version__)
+            # Check if we're on a console
+            if self.is_console:
+                # Check if we should output json
+                if self.is_json:
+                    print(result.as_json())
+                # Else if we have console output, then output that
+                elif result.has_console_output:
+                    print(result.as_console())
+
+            return result
+
+        # If this is the console, display our version
+        if self.is_console:
             print(f"BirdPlan v{__version__} - Copyright © 2019-2023, AllWorldIT.\n", file=sys.stderr)
 
         # Add main commandline arguments
         optional_group = self.argparser.add_argument_group("Optional arguments")
         optional_group.add_argument("-h", "--help", action="help", help="Show this help message and exit")
         optional_group.add_argument("-v", "--verbose", action="store_true", help="Display verbose logging")
+        optional_group.add_argument("--version", action="store_true", help="Display version and exit")
 
         # Input and output file settings
         optional_group.add_argument(
@@ -253,21 +348,16 @@ class BirdPlanCommandLine:
         # Grab the result from the command
         result = plugins.call_plugin(plugin_name, method_name, {"cmdline": self})
 
-        ret = {
-            "raw": result,
-            "json": plugins.call_plugin(plugin_name, "to_json", result),
-            "text": plugins.call_plugin(plugin_name, "to_text", result),
-        }
-
-        # Check if we should output JSON
+        # Check if we're on a console
         if self.is_console:
+            # Check if we should output json
             if self.is_json:
-                print(ret["json"])
-            # If not, we need to output text
-            else:
-                print(ret["text"])
+                print(result.as_json())
+            # Else if we have console output, then output that
+            elif result.has_console_output:
+                print(result.as_console())
 
-        return ret
+        return result
 
     def birdplan_load_config(self, **kwargs: Any) -> None:
         """
@@ -325,8 +415,14 @@ class BirdPlanCommandLine:
 
         # Setup console handler
         console_handler = logging.StreamHandler(sys.stderr)
+        # Build log format
+        log_format = ""
+        # Only add a timestamp if we're not running under systemd
+        if "INVOCATION_ID" not in os.environ:
+            log_format += "%(asctime)s "
+        log_format += "%(levelcolor)s %(message)s"
         # Use a better format for messages
-        console_handler.setFormatter(ColorFormatter("%(asctime)s %(levelcolor)s %(message)s", "[%Y-%m-%d %H:%M:%S]"))
+        console_handler.setFormatter(ColorFormatter(log_format, "[%Y-%m-%d %H:%M:%S]"))
         logger.addHandler(console_handler)
 
     @property
@@ -391,7 +487,7 @@ def main() -> None:
     birdplan_cmdline = BirdPlanCommandLine(is_console=True)
 
     try:
-        birdplan_cmdline.run()
+        birdplan_cmdline.run(sys.argv[1:])
     except BirdPlanError as exception:
         if birdplan_cmdline.is_json:
             print(json.dumps({"status": "error", "message": str(exception)}))

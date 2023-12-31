@@ -23,16 +23,82 @@ import io
 from typing import Any, Dict
 
 from ..... import BirdPlanBGPPeerSummary
-from .....cmdline import BirdPlanCommandLine
+from .....cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from .....console.colors import colored
 from .....exceptions import BirdPlanErrorUsage
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerShow"]
+__all__ = ["BirdPlanCmdlineBGPPeerShow"]
 
 
-class BirdplanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer summary" command."""
+class BirdPlanCmdlineBGPPeerShowResult(BirdPlanCommandlineResult):
+    """BirdPlan BGP peer show result."""
+
+    def as_text(self) -> str:
+        """
+        Return data in text format.
+
+        Returns
+        -------
+        str
+            Return data in text format.
+
+        """
+
+        ob = io.StringIO()
+
+        # Write out header
+        ob.write(f"+{'='*130}+\n")
+        ob.write(f"| {'BGP Peer Summary'.center(128)} |\n")
+        ob.write(f"+{'-'*34}+{'-'*10}+{'-'*10}+{'-'*21}+{'-'*51}+\n")
+        ob.write(
+            f"| {'Peer Name'.center(32)} "
+            f"| {'Proto'.center(8)} "
+            f"| {'Status'.center(8)} "
+            f"| {'Since'.center(19)} "
+            f"| {'Info'.center(49)} |\n"
+        )
+        ob.write(f"+{'-'*34}+{'-'*10}+{'-'*10}+{'-'*21}+{'-'*51}+\n")
+
+        # Loop with each protocol
+        for peer_name, peer in self.data.items():
+            # Loop with each family
+            for ipv, protocol in peer["protocols"].items():
+                protocol_status = protocol["status"]
+
+                # Start with plain strings with no color
+                state: str = protocol_status["state"]
+                info: str = protocol_status["info"]
+                since: str = protocol_status["since"]
+
+                # NK - Update in peer_arg show too
+                # Check how we're going to color entries based on their state and info
+                state_out = f"{state[:8]}".center(8)
+                info_out = f"{info[:49]}".center(49)
+                if protocol_status["state"] == "down":
+                    state_out = colored(f"{state[:8]}".center(8), "red")
+                    if "info_extra" in protocol_status:
+                        info += " - " + protocol_status["info_extra"]
+                        info_out = colored(f"{info[:49]}".center(49), "red")
+                elif protocol_status["state"] == "up":  # noqa: SIM102
+                    if protocol_status["info"] == "established":
+                        state_out = colored(f"{state[:8]}".center(8), "green")
+                        info_out = colored(f"{info[:49]}".center(49), "green")
+
+                # Center some columns
+                ipv_out = f"{ipv[:8]}".center(8)
+
+                # Write out info line
+                ob.write(f"| {peer_name[:32]:<32} | {ipv_out} | {state_out} | {since[:19]:<19} | {info_out} |\n")
+
+        # Write out footer
+        ob.write(f"+{'='*130}+\n")
+
+        return ob.getvalue()
+
+
+class BirdPlanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer summary" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -82,7 +148,7 @@ class BirdplanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_summary(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        Birdplan "bgp peer summary" command.
+        Commandline handler for "bgp peer summary" action.
 
         Parameters
         ----------
@@ -116,77 +182,10 @@ class BirdplanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
         cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
         # Grab peer list
-        peer_list = cmdline.birdplan.state_bgp_peer_summary(bird_socket=bird_socket)
+        peer_list: BirdPlanBGPPeerSummary = cmdline.birdplan.state_bgp_peer_summary(bird_socket=bird_socket)
 
         # Check if we're filtering on a specific AS
         if arg_only and arg_only[0:2] == "AS":
             peer_list = {k: v for k, v in peer_list.items() if v["asn"] == int(arg_only[2:])}
 
-        return peer_list
-
-    def to_text(self, data: BirdPlanBGPPeerSummary) -> str:
-        """
-        Return output in text format.
-
-        Parameters
-        ----------
-        data : BirdPlanBGPPeerSummary
-            Peer information.
-
-        Returns
-        -------
-        str
-            Output in text format.
-
-        """
-
-        ob = io.StringIO()
-
-        # Write out header
-        ob.write(f"+{'='*130}+\n")
-        ob.write(f"| {'BGP Peer Summary'.center(128)} |\n")
-        ob.write(f"+{'-'*34}+{'-'*10}+{'-'*10}+{'-'*21}+{'-'*51}+\n")
-        ob.write(
-            f"| {'Peer Name'.center(32)} "
-            f"| {'Proto'.center(8)} "
-            f"| {'Status'.center(8)} "
-            f"| {'Since'.center(19)} "
-            f"| {'Info'.center(49)} |\n"
-        )
-        ob.write(f"+{'-'*34}+{'-'*10}+{'-'*10}+{'-'*21}+{'-'*51}+\n")
-
-        # Loop with each protocol
-        for peer_name, peer in data.items():
-            # Loop with each family
-            for ipv, protocol in peer["protocols"].items():
-                protocol_status = protocol["status"]
-
-                # Start with plain strings with no color
-                state: str = protocol_status["state"]
-                info: str = protocol_status["info"]
-                since: str = protocol_status["since"]
-
-                # NK - Update in peer_arg show too
-                # Check how we're going to color entries based on their state and info
-                state_out = f"{state[:8]}".center(8)
-                info_out = f"{info[:49]}".center(49)
-                if protocol_status["state"] == "down":
-                    state_out = colored(f"{state[:8]}".center(8), "red")
-                    if "info_extra" in protocol_status:
-                        info += " - " + protocol_status["info_extra"]
-                        info_out = colored(f"{info[:49]}".center(49), "red")
-                elif protocol_status["state"] == "up":  # noqa: SIM102
-                    if protocol_status["info"] == "established":
-                        state_out = colored(f"{state[:8]}".center(8), "green")
-                        info_out = colored(f"{info[:49]}".center(49), "green")
-
-                # Center some columns
-                ipv_out = f"{ipv[:8]}".center(8)
-
-                # Write out info line
-                ob.write(f"| {peer_name[:32]:<32} | {ipv_out} | {state_out} | {since[:19]:<19} | {info_out} |\n")
-
-        # Write out footer
-        ob.write(f"+{'='*130}+\n")
-
-        return ob.getvalue()
+        return BirdPlanCmdlineBGPPeerShowResult(peer_list)

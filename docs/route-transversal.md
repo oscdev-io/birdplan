@@ -4,7 +4,7 @@
 ```plantuml
 @startuml
 hide circle
-title Birdplan Route Transversal
+title BirdPlan Route Transversal
 
 
 

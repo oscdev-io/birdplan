@@ -44,7 +44,7 @@ class Template(TemplateBase):
         # Check r2 status
         birdplan_result = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "quarantine", "show"])
 
-        quarantine_status = birdplan_result["raw"]
+        quarantine_status = birdplan_result.data
         assert quarantine_status == {
             "overrides": {"r2": False},
             "current": {"r2": True},
@@ -57,7 +57,7 @@ class Template(TemplateBase):
         # Check r2 status again
         birdplan_result = self._birdplan_run(sim, tmpdir, "r1", ["bgp", "peer", "quarantine", "show"])
 
-        quarantine_status = birdplan_result["raw"]
+        quarantine_status = birdplan_result.data
         assert quarantine_status == {
             "overrides": {"r2": False},
             "current": {"r2": False},

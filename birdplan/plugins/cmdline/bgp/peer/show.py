@@ -24,15 +24,171 @@ from typing import Any, Dict
 
 from birdplan import BirdPlanBGPPeerShow
 
-from .....cmdline import BirdPlanCommandLine
+from .....cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from .....console.colors import colored
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerShowPeerArg"]
+__all__ = ["BirdPlanCmdlineBGPPeerShowPeerArg"]
 
 
-class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer show <peer>" command."""
+class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
+    """BirdPlan BGP peer show peer result."""
+
+    def as_text(self) -> str:  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+        """
+        Return data in text format.
+
+        Returns
+        -------
+        str
+            Return data in text format.
+
+        """
+
+        ob = io.StringIO()
+
+        # Work out filter strings to use
+        aspath_filters = "none"
+        origin_filters = "none"
+        as_sets_filter = "none"
+        if "filter" in self.data:
+            # Check for aspath_asns in our filter
+            aspath_strs = []
+            if "aspath_asns" in self.data["filter"]:
+                if "static" in self.data["filter"]["aspath_asns"]:
+                    count = len(self.data["filter"]["aspath_asns"]["static"])
+                    aspath_strs.append(f"{count} manual")
+                if "calculated" in self.data["filter"]["aspath_asns"]:
+                    count = len(self.data["filter"]["aspath_asns"]["calculated"])
+                    aspath_strs.append(f"{count} calculated")
+                aspath_filters = ", ".join(aspath_strs)
+            # Check for origin filters
+            origin_strs = []
+            if "origin_asns" in self.data["filter"]:
+                if "static" in self.data["filter"]["origin_asns"]:
+                    count = len(self.data["filter"]["origin_asns"]["static"])
+                    origin_strs.append(f"{count} manual")
+                if "irr" in self.data["filter"]["origin_asns"]:
+                    count = len(self.data["filter"]["origin_asns"]["irr"])
+                    origin_strs.append(f"{count} from IRR")
+                origin_filters = ", ".join(origin_strs)
+            # Check for AS-SET filters
+            if "as_sets" in self.data["filter"]:
+                if isinstance(self.data["filter"]["as_sets"], list):
+                    as_sets_filter = ", ".join(self.data["filter"]["as_sets"])
+                elif isinstance(self.data["filter"]["as_sets"], str):
+                    as_sets_filter = self.data["filter"]["as_sets"]
+
+        ob.write(f"ASN.............: {self.data['asn']}\n")
+        ob.write(f"Type............: {self.data['type']}\n")
+        ob.write(f"Name............: {self.data['name']}\n")
+        ob.write(f"Description.....: {self.data['description']}\n")
+        ob.write(f"AS-SET..........: {as_sets_filter}\n")
+        ob.write(f"Origin filters..: {origin_filters}\n")
+        ob.write(f"AS-Path filters.: {aspath_filters}\n")
+
+        # Loop with protocols and output self.data
+        for protocol, protocol_data in self.data["protocols"].items():
+            # Work out better protocol string
+            protocol_str = ""
+            if protocol == "ipv4":
+                protocol_str = "IPv4"
+            elif protocol == "ipv6":
+                protocol_str = "IPv6"
+
+            # Check for prefix filters
+            prefix_filters = "none"
+            if "filter" in self.data:  # noqa: SIM102
+                if "prefixes" in self.data["filter"]:
+                    prefix_filter_strs = []
+                    if "irr" in self.data["filter"]["prefixes"]:  # noqa: SIM102
+                        if protocol in self.data["filter"]["prefixes"]["irr"]:
+                            count = len(self.data["filter"]["prefixes"]["irr"][protocol])
+                            prefix_filter_strs.append(f"{count} from IRR")
+                    if "static" in self.data["filter"]["prefixes"]:  # noqa: SIM102
+                        if protocol in self.data["filter"]["prefixes"]["static"]:
+                            count = len(self.data["filter"]["prefixes"]["static"][protocol])
+                            prefix_filter_strs.append(f"{count} manual")
+                    prefix_filters = ", ".join(prefix_filter_strs)
+
+            ob.write(f"\n  Protocol: {protocol_str}\n")
+
+            # Setup o the protocol_status so we can copy-paste the below colors
+            protocol_status = protocol_data["status"]
+            # Set the state and info with no color
+            state = protocol_status["state"]
+            info = protocol_status["info"]
+
+            # NK - Update in peer_arg show too
+            # Check how we're going to color entries based on their state and info
+            if protocol_status["state"] == "down":
+                state = colored(protocol_status["state"], "red")
+                if "last_error" in protocol_status:
+                    info += " - " + colored(protocol_status["last_error"], "red")
+            elif protocol_status["state"] == "up":  # noqa: SIM102
+                if protocol_status["info"] == "established":
+                    state = colored(protocol_status["state"], "green")
+                    info = colored(protocol_status["info"], "green")
+
+            # Check for quarantine flag
+            quarantined = "no"
+            if "quarantine" in self.data and self.data["quarantine"]:
+                quarantined = colored("yes", "red")
+
+            # Check for graceful shutdown flag
+            graceful_shutdown = "no"
+            if "graceful_shutdown" in self.data and self.data["graceful_shutdown"]:
+                graceful_shutdown = colored("yes", "red")
+
+            prefix_limit_str = ""
+            if "prefix_limit" in self.data:
+                if "peeringdb" in self.data["prefix_limit"]:
+                    if protocol in self.data["prefix_limit"]["peeringdb"]:
+                        prefix_limit_str = " from PeeringDB"
+                elif "static" in self.data["prefix_limit"]:  # noqa: SIM102
+                    if protocol in self.data["prefix_limit"]["static"]:
+                        prefix_limit_str = " manual"
+
+            ob.write(f"    Mode..............: {protocol_data['mode']}\n")
+            ob.write(f"    State.............: {state} ({info}) since {protocol_status['since']}\n")
+            ob.write(f"    Local AS..........: {protocol_status['local_as']}\n")
+
+            # Work out our source address, depending if peer is up or not
+            source_address = protocol_status.get("source_address", protocol_data["source_address"])
+            ob.write(f"    Source IP.........: {source_address}\n")
+
+            if "neighbor_id" in protocol_status:
+                ob.write(f"    Neighbor ID.......: {protocol_status['neighbor_id']}\n")
+            ob.write(f"    Neighbor AS.......: {protocol_status['neighbor_as']}\n")
+
+            # Check if we have an import limit
+            if "import_limit" in protocol_status:
+                import_limit = protocol_status["import_limit"]
+                import_limit_action = protocol_status["import_limit_action"]
+                ob.write(f"    Import limit......: {import_limit}{prefix_limit_str} (action: {import_limit_action})\n")
+            else:
+                ob.write("    Import limit......: none\n")
+
+            ob.write(f"    Prefix filters....: {prefix_filters}\n")
+
+            # Check if we have route information
+            if "routes_imported" in protocol_status and "routes_exported" in protocol_status:
+                routes_imported = protocol_status["routes_imported"]
+                routes_exported = protocol_status["routes_exported"]
+                ob.write(f"    Prefixes..........: {routes_imported} imported, {routes_exported} exported\n")
+
+            ob.write(f"    Quarantined.......: {quarantined}\n")
+            ob.write(f"    Graceful shutdown.: {graceful_shutdown}\n")
+
+            ob.write("\n")
+
+        ob.write("\n")
+
+        return ob.getvalue()
+
+
+class BirdPlanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer show <peer>" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -73,7 +229,7 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
             "peer",
             nargs=1,
             metavar="PEER",
-            help="Optional peer name to show",
+            help="Peer to show (its BirdPlan name)",
         )
 
         # Set our internal subparser property
@@ -83,7 +239,7 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_show(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer show <peer>" command.
+        Commandline handler for "bgp peer show <peer>" action.
 
         Parameters
         ----------
@@ -110,163 +266,6 @@ class BirdplanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
         cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
         # Try grab peer info
-        return cmdline.birdplan.state_bgp_peer_show(peer, bird_socket=bird_socket)
+        res: BirdPlanBGPPeerShow = cmdline.birdplan.state_bgp_peer_show(peer, bird_socket=bird_socket)
 
-    def to_text(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
-        self, data: BirdPlanBGPPeerShow
-    ) -> str:
-        """
-        Return output in text format.
-
-        Parameters
-        ----------
-        data : BirdPlanBGPPeerShow
-            Peer information.
-
-        Returns
-        -------
-        str
-            Output in text format.
-
-        """
-
-        ob = io.StringIO()
-
-        # Work out filter strings to use
-        aspath_filters = "none"
-        origin_filters = "none"
-        as_sets_filter = "none"
-        if "filter" in data:
-            # Check for aspath_asns in our filter
-            aspath_strs = []
-            if "aspath_asns" in data["filter"]:
-                if "static" in data["filter"]["aspath_asns"]:
-                    count = len(data["filter"]["aspath_asns"]["static"])
-                    aspath_strs.append(f"{count} manual")
-                if "calculated" in data["filter"]["aspath_asns"]:
-                    count = len(data["filter"]["aspath_asns"]["calculated"])
-                    aspath_strs.append(f"{count} calculated")
-                aspath_filters = ", ".join(aspath_strs)
-            # Check for origin filters
-            origin_strs = []
-            if "origin_asns" in data["filter"]:
-                if "static" in data["filter"]["origin_asns"]:
-                    count = len(data["filter"]["origin_asns"]["static"])
-                    origin_strs.append(f"{count} manual")
-                if "irr" in data["filter"]["origin_asns"]:
-                    count = len(data["filter"]["origin_asns"]["irr"])
-                    origin_strs.append(f"{count} from IRR")
-                origin_filters = ", ".join(origin_strs)
-            # Check for AS-SET filters
-            if "as_sets" in data["filter"]:
-                if isinstance(data["filter"]["as_sets"], list):
-                    as_sets_filter = ", ".join(data["filter"]["as_sets"])
-                elif isinstance(data["filter"]["as_sets"], str):
-                    as_sets_filter = data["filter"]["as_sets"]
-
-        ob.write(f"ASN.............: {data['asn']}\n")
-        ob.write(f"Type............: {data['type']}\n")
-        ob.write(f"Name............: {data['name']}\n")
-        ob.write(f"Description.....: {data['description']}\n")
-        ob.write(f"AS-SET..........: {as_sets_filter}\n")
-        ob.write(f"Origin filters..: {origin_filters}\n")
-        ob.write(f"AS-Path filters.: {aspath_filters}\n")
-
-        # Loop with protocols and output data
-        for protocol, protocol_data in data["protocols"].items():
-            # Work out better protocol string
-            protocol_str = ""
-            if protocol == "ipv4":
-                protocol_str = "IPv4"
-            elif protocol == "ipv6":
-                protocol_str = "IPv6"
-
-            # Check for prefix filters
-            prefix_filters = "none"
-            if "filter" in data:  # noqa: SIM102
-                if "prefixes" in data["filter"]:
-                    prefix_filter_strs = []
-                    if "irr" in data["filter"]["prefixes"]:  # noqa: SIM102
-                        if protocol in data["filter"]["prefixes"]["irr"]:
-                            count = len(data["filter"]["prefixes"]["irr"][protocol])
-                            prefix_filter_strs.append(f"{count} from IRR")
-                    if "static" in data["filter"]["prefixes"]:  # noqa: SIM102
-                        if protocol in data["filter"]["prefixes"]["static"]:
-                            count = len(data["filter"]["prefixes"]["static"][protocol])
-                            prefix_filter_strs.append(f"{count} manual")
-                    prefix_filters = ", ".join(prefix_filter_strs)
-
-            ob.write(f"\n  Protocol: {protocol_str}\n")
-
-            # Setup o the protocol_status so we can copy-paste the below colors
-            protocol_status = protocol_data["status"]
-            # Set the state and info with no color
-            state = protocol_status["state"]
-            info = protocol_status["info"]
-
-            # NK - Update in peer_arg show too
-            # Check how we're going to color entries based on their state and info
-            if protocol_status["state"] == "down":
-                state = colored(protocol_status["state"], "red")
-                if "last_error" in protocol_status:
-                    info += " - " + colored(protocol_status["last_error"], "red")
-            elif protocol_status["state"] == "up":  # noqa: SIM102
-                if protocol_status["info"] == "established":
-                    state = colored(protocol_status["state"], "green")
-                    info = colored(protocol_status["info"], "green")
-
-            # Check for quarantine flag
-            quarantined = "no"
-            if "quarantine" in data and data["quarantine"]:
-                quarantined = colored("yes", "red")
-
-            # Check for graceful shutdown flag
-            graceful_shutdown = "no"
-            if "graceful_shutdown" in data and data["graceful_shutdown"]:
-                graceful_shutdown = colored("yes", "orange")
-
-            prefix_limit_str = ""
-            if "prefix_limit" in data:
-                if "peeringdb" in data["prefix_limit"]:
-                    if protocol in data["prefix_limit"]["peeringdb"]:
-                        prefix_limit_str = " from PeeringDB"
-                elif "static" in data["prefix_limit"]:  # noqa: SIM102
-                    if protocol in data["prefix_limit"]["static"]:
-                        prefix_limit_str = " manual"
-
-            ob.write(f"    Mode..............: {protocol_data['mode']}\n")
-            ob.write(f"    State.............: {state} ({info}) since {protocol_status['since']}\n")
-            ob.write(f"    Local AS..........: {protocol_status['local_as']}\n")
-
-            # Work out our source address, depending if peer is up or not
-            source_address = protocol_status.get("source_address", protocol_data["source_address"])
-            ob.write(f"    Source IP.........: {source_address}\n")
-
-            if "neighbor_id" in protocol_status:
-                ob.write(f"    Neighbor ID.......: {protocol_status['neighbor_id']}\n")
-            ob.write(f"    Neighbor AS.......: {protocol_status['neighbor_as']}\n")
-
-            # Check if we have an import limit
-            if "import_limit" in protocol_status:
-                import_limit = protocol_status["import_limit"]
-                import_limit_action = protocol_status["import_limit_action"]
-                ob.write(f"    Import limit......: {import_limit}{prefix_limit_str} (action: {import_limit_action})\n")
-            else:
-                ob.write("    Import limit......: none\n")
-
-            ob.write(f"    Prefix filters....: {prefix_filters}\n")
-
-            # Check if we have route information
-            if "routes_imported" in protocol_status and "routes_exported" in protocol_status:
-                routes_imported = protocol_status["routes_imported"]
-                routes_exported = protocol_status["routes_exported"]
-                ob.write(f"    Prefixes..........: {routes_imported} imported, {routes_exported} exported\n")
-
-            ob.write(f"    Quarantined.......: {quarantined}\n")
-            ob.write(f"    Graceful shutdown.: {graceful_shutdown}\n")
-
-            ob.write("\n")
-
-        ob.write("\n")
-
-        return ob.getvalue()
+        return BirdPlanCmdlineBGPPeerShowPeerArgResult(res)

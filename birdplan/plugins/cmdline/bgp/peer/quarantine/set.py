@@ -21,15 +21,15 @@
 import argparse
 from typing import Any, Dict
 
-from ......cmdline import BirdPlanCommandLine
+from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerQuarantineSet"]
+__all__ = ["BirdPlanCmdlineBGPPeerQuarantineSet"]
 
 
-class BirdplanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer quarantine set" command."""
+class BirdPlanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer quarantine set" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -83,7 +83,7 @@ class BirdplanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_quarantine_set(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer quarantine set" command.
+        Commandline handler for "bgp peer quarantine set" action.
 
         Parameters
         ----------
@@ -118,4 +118,5 @@ class BirdplanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
         cmdline.birdplan_commit_state()
 
         status = "ENABLED" if value else "DISABLED"
-        return f"BGP quarantine {status} for peer(s) matching '{peer}'"
+
+        return BirdPlanCommandlineResult(f"BGP quarantine {status} for peer(s) matching '{peer}'")

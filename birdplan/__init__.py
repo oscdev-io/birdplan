@@ -40,7 +40,7 @@ from .version import __version__
 from .yaml import YAML, YAMLError
 
 __all__ = [
-    "BirdConfig",
+    "BirdPlan",
     "__version__",
 ]
 
@@ -53,8 +53,8 @@ BirdPlanOSPFInterfaceStatus = Dict[str, Dict[str, Dict[str, Any]]]
 BirdPlanOSPFSummary = Dict[str, Dict[str, Any]]
 
 # Check we have a sufficiently new version of birdclient
-if packaging.version.parse(birdclient.__version__) < packaging.version.parse("0.0.8"):
-    raise BirdPlanError("birdplan requires birdclient version 0.0.8 or newer")
+if packaging.version.parse(birdclient.__version__) < packaging.version.parse("0.0.9"):
+    raise BirdPlanError("birdplan requires birdclient version 0.0.9 or newer")
 
 
 class BirdPlan:  # pylint: disable=too-many-public-methods
@@ -231,12 +231,18 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
             eg.
             {
                 'name1': {
-                    'name': ...,
-                    'proto': ...,
-                    'table': ...,
-                    'state': ...,
-                    'since': ...,
+                    'channel': ...,
                     'info': ...,
+                    'input_filter': ...,
+                    'name': ...,
+                    'output_filter': ...,
+                    'preference': ...,
+                    'proto': ...,
+                    'routes_exported': ...,
+                    'routes_imported': ...,
+                    'since': ...,
+                    'state': ...
+                    'table': ...,
                 }
                 'name2': {
                     ...,

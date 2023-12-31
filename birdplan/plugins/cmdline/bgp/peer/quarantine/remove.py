@@ -21,14 +21,14 @@
 import argparse
 from typing import Any, Dict
 
-from ......cmdline import BirdPlanCommandLine
+from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerQuarantineRemove"]
+__all__ = ["BirdPlanCmdlineBGPPeerQuarantineRemove"]
 
 
-class BirdplanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer quarantine remove" command."""
+class BirdPlanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer quarantine remove" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -78,7 +78,7 @@ class BirdplanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_quarantine_remove(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer quarantine remove" command.
+        Commandline handler for "bgp peer quarantine remove" action.
 
         Parameters
         ----------
@@ -107,4 +107,4 @@ class BirdplanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return f"BGP quarantine REMOVED from peer(s) matching '{peer}'"
+        return BirdPlanCommandlineResult(f"BGP quarantine REMOVED from peer(s) matching '{peer}'")

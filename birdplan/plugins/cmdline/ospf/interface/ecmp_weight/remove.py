@@ -21,14 +21,14 @@
 import argparse
 from typing import Any, Dict
 
-from ......cmdline import BirdPlanCommandLine
+from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineOSPFInterfaceECMPWeightRemove"]
+__all__ = ["BirdPlanCmdlineOSPFInterfaceECMPWeightRemove"]
 
 
-class BirdplanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
-    """Birdplan "ospf interface ecmp-weight remove" command."""
+class BirdPlanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
+    """BirdPlan "ospf interface ecmp-weight remove" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -82,7 +82,7 @@ class BirdplanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_ecmp_weight_remove(self, args: Any) -> Any:
         """
-        Birdplan "ospf interface ecmp_weight remove" command.
+        Commandline handler for "ospf interface ecmp-weight remove" action.
 
         Parameters
         ----------
@@ -112,4 +112,4 @@ class BirdplanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return f"Removed OSPF area '{area}' interface '{interface}' ECMP weight override"
+        return BirdPlanCommandlineResult(f"Removed OSPF area '{area}' interface '{interface}' ECMP weight override")

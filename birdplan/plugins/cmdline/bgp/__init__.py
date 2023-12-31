@@ -24,11 +24,11 @@ from typing import Any, Dict
 from ....exceptions import BirdPlanErrorUsage
 from ..cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGP"]
+__all__ = ["BirdPlanCmdlineBGP"]
 
 
-class BirdplanCmdlineBGP(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp" command."""
+class BirdPlanCmdlineBGP(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -69,7 +69,7 @@ class BirdplanCmdlineBGP(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        Birdplan "bgp" command.
+        Commandline handler for "bgp" action.
 
         Parameters
         ----------

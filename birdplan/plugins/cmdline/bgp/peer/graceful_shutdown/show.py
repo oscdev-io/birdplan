@@ -22,15 +22,89 @@ import argparse
 import io
 from typing import Any, Dict
 
-from ......cmdline import BirdPlanCommandLine
+from birdplan import BirdPlanBGPPeerGracefulShutdownStatus
+
+from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ......console.colors import colored
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerGracefulShutdownShow"]
+__all__ = ["BirdPlanCmdlineBGPPeerGracefulShutdownShow"]
 
 
-class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer graceful-shutdown show" command."""
+class BirdPlanCmdlineBGPPeerGracefulShutdownShowResult(BirdPlanCommandlineResult):
+    """BirdPlan BGP peer graceful shutdown show result."""
+
+    def as_text(self) -> str:  # pylint: disable= too-many-branches
+        """
+        Return data in text format.
+
+        Returns
+        -------
+        str
+            Return data in text format.
+
+        """
+
+        ob = io.StringIO()
+
+        ob.write("BGP peer graceful shutdown overrides:\n")
+        ob.write("-------------------------------------\n")
+
+        # Loop with sorted override list
+        for peer in sorted(self.data["overrides"]):
+            # Print out override
+            status = colored("Enabled", "red") if self.data["overrides"][peer] else colored("Disabled", "green")
+            ob.write(f"  {peer}: {status}\n")
+        # If we have no overrides, just print out --none--
+        if not self.data["overrides"]:
+            ob.write("--none--\n")
+
+        ob.write("\n")
+
+        # Get a list of all peers we know about
+        peers_all = list(self.data["current"].keys()) + list(self.data["pending"].keys())
+        peers_all = sorted(set(peers_all))
+
+        ob.write("BGP peer graceful shutdown status:\n")
+        ob.write("----------------------------------\n")
+
+        # Loop with sorted peer list
+        for peer in peers_all:
+            # Grab pending status
+            pending_status = None
+            if peer in self.data["pending"]:  # noqa: SIM908
+                pending_status = self.data["pending"][peer]
+
+            # Grab current status
+            current_status = None
+            if peer in self.data["current"]:  # noqa: SIM908
+                current_status = self.data["current"][peer]
+
+            # Work out our status string
+            status_str = ""
+            if pending_status is None:
+                status_str = colored("REMOVED", "magenta")
+            else:
+                if current_status and not pending_status:
+                    status_str = colored("PENDING-GRACEFUL-SHUTDOWN-ENTER", "blue")
+                elif not current_status and pending_status:
+                    status_str = colored("PENDING-GRACEFUL-SHUTDOWN-EXIT", "yellow")
+                elif current_status is None:
+                    status_str = colored("NEW", "green")
+                elif pending_status:
+                    status_str = colored("GRACEFUL-SHUTDOWN", "red")
+                else:
+                    status_str = "OK"
+
+            ob.write("  Peer: " + colored(peer, "cyan") + "\n")
+            ob.write(f"    State: {status_str}\n")
+            ob.write("\n")
+
+        return ob.getvalue()
+
+
+class BirdPlanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer graceful-shutdown show" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -72,7 +146,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_graceful_shutdown_show(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer graceful-shutdown show" command.
+        Commandline handler for "bgp peer graceful-shutdown show" action.
 
         Parameters
         ----------
@@ -93,77 +167,6 @@ class BirdplanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
         cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
         # Grab peer list
-        return cmdline.birdplan.state_bgp_peer_graceful_shutdown_status()
+        res: BirdPlanBGPPeerGracefulShutdownStatus = cmdline.birdplan.state_bgp_peer_graceful_shutdown_status()
 
-    def to_text(self, data: Any) -> str:  # pylint: disable= too-many-branches
-        """
-        Return output in text format.
-
-        Parameters
-        ----------
-        data : Any
-            Graceful shutdown status structure.
-
-        Returns
-        -------
-        str
-            Output in text format.
-
-        """
-
-        ob = io.StringIO()
-
-        ob.write("BGP peer graceful shutdown overrides:\n")
-        ob.write("-------------------------------------\n")
-
-        # Loop with sorted override list
-        for peer in sorted(data["overrides"]):
-            # Print out override
-            status = colored("Enabled", "red") if data["overrides"][peer] else colored("Disabled", "green")
-            ob.write(f"  {peer}: {status}\n")
-        # If we have no overrides, just print out --none--
-        if not data["overrides"]:
-            ob.write("--none--\n")
-
-        ob.write("\n")
-
-        # Get a list of all peers we know about
-        peers_all = list(data["current"].keys()) + list(data["pending"].keys())
-        peers_all = sorted(set(peers_all))
-
-        ob.write("BGP peer graceful shutdown status:\n")
-        ob.write("----------------------------------\n")
-
-        # Loop with sorted peer list
-        for peer in peers_all:
-            # Grab pending status
-            pending_status = None
-            if peer in data["pending"]:  # noqa: SIM908
-                pending_status = data["pending"][peer]
-
-            # Grab current status
-            current_status = None
-            if peer in data["current"]:  # noqa: SIM908
-                current_status = data["current"][peer]
-
-            # Work out our status string
-            status_str = ""
-            if pending_status is None:
-                status_str = colored("REMOVED", "magenta")
-            else:
-                if current_status and not pending_status:
-                    status_str = colored("PENDING-GRACEFUL-SHUTDOWN-ENTER", "blue")
-                elif not current_status and pending_status:
-                    status_str = colored("PENDING-GRACEFUL-SHUTDOWN-EXIT", "yellow")
-                elif current_status is None:
-                    status_str = colored("NEW", "green")
-                elif pending_status:
-                    status_str = colored("GRACEFUL-SHUTDOWN", "red")
-                else:
-                    status_str = "OK"
-
-            ob.write("  Peer: " + colored(peer, "cyan") + "\n")
-            ob.write(f"    State: {status_str}\n")
-            ob.write("\n")
-
-        return ob.getvalue()
+        return BirdPlanCmdlineBGPPeerGracefulShutdownShowResult(res)

@@ -23,15 +23,82 @@ import io
 from typing import Any, Dict
 
 from .... import BirdPlanOSPFSummary
-from ....cmdline import BirdPlanCommandLine
+from ....cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ....console.colors import colored
 from ..cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineOSPFShow"]
+__all__ = ["BirdPlanCmdlineOSPFShow"]
 
 
-class BirdplanCmdlineOSPFShow(BirdPlanCmdlinePluginBase):
-    """Birdplan "ospf summary" command."""
+class BirdPlanCmdlineOSPFShowResult(BirdPlanCommandlineResult):
+    """BirdPlan OSPF summary result class."""
+
+    def as_text(self) -> str:
+        """
+        Return data as text.
+
+        Returns
+        -------
+        str
+            Data as text.
+
+        """
+
+        ob = io.StringIO()
+
+        # Write out header
+        ob.write(f"+{'='*130}+\n")
+        ob.write(f"| {'OSPF Summary'.center(128)} |\n")
+        ob.write(f"+{'-'*34}+{'-'*10}+{'-'*10}+{'-'*21}+{'-'*51}+\n")
+        ob.write(
+            f"| {'Name'.center(32)} "
+            f"| {'Proto'.center(8)} "
+            f"| {'Status'.center(8)} "
+            f"| {'Since'.center(19)} "
+            f"| {'Info'.center(49)} |\n"
+        )
+        ob.write(f"+{'-'*34}+{'-'*10}+{'-'*10}+{'-'*21}+{'-'*51}+\n")
+
+        # Loop with each protocol
+        for name, protocol_status in self.data.items():
+            ipv = "-"
+            if name.endswith("4"):
+                ipv = "ipv4"
+            elif name.endswith("6"):
+                ipv = "ipv6"
+            # Start with plain strings with no color
+            state: str = protocol_status["state"]
+            info: str = protocol_status["info"]
+            since: str = protocol_status["since"]
+
+            # NK - Update in peer_arg show too
+            # Check how we're going to color entries based on their state and info
+            state_out = f"{state[:8]}".center(8)
+            info_out = f"{info[:49]}".center(49)
+            if protocol_status["state"] == "down":
+                state_out = colored(f"{state[:8]}".center(8), "red")
+                if "info_extra" in protocol_status:
+                    info += " - " + protocol_status["info_extra"]
+                    info_out = colored(f"{info[:49]}".center(49), "red")
+            elif protocol_status["state"] == "up":  # noqa: SIM102
+                if protocol_status["info"] == "running":
+                    state_out = colored(f"{state[:8]}".center(8), "green")
+                    info_out = colored(f"{info[:49]}".center(49), "green")
+
+            # Center some columns
+            ipv_out = f"{ipv[:8]}".center(8)
+
+            # Write out info line
+            ob.write(f"| {name[:32]:<32} | {ipv_out} | {state_out} | {since[:19]:<19} | {info_out} |\n")
+
+        # Write out footer
+        ob.write(f"+{'='*130}+\n")
+
+        return ob.getvalue()
+
+
+class BirdPlanCmdlineOSPFShow(BirdPlanCmdlinePluginBase):
+    """BirdPlan "ospf summary" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -73,7 +140,7 @@ class BirdplanCmdlineOSPFShow(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_summary(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        Birdplan "ospf summary" command.
+        Commandline handler for "ospf summary" action.
 
         Parameters
         ----------
@@ -96,72 +163,6 @@ class BirdplanCmdlineOSPFShow(BirdPlanCmdlinePluginBase):
         # Load BirdPlan configuration using the cache
         cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
-        return cmdline.birdplan.state_ospf_summary(bird_socket=bird_socket)
+        res: BirdPlanOSPFSummary = cmdline.birdplan.state_ospf_summary(bird_socket=bird_socket)
 
-    def to_text(self, data: BirdPlanOSPFSummary) -> str:
-        """
-        Return output in text format.
-
-        Parameters
-        ----------
-        data : BirdPlanOSPFSummary
-            Peer information.
-
-        Returns
-        -------
-        str
-            Output in text format.
-
-        """
-
-        ob = io.StringIO()
-
-        # Write out header
-        ob.write(f"+{'='*130}+\n")
-        ob.write(f"| {'OSPF Summary'.center(128)} |\n")
-        ob.write(f"+{'-'*34}+{'-'*10}+{'-'*10}+{'-'*21}+{'-'*51}+\n")
-        ob.write(
-            f"| {'Name'.center(32)} "
-            f"| {'Proto'.center(8)} "
-            f"| {'Status'.center(8)} "
-            f"| {'Since'.center(19)} "
-            f"| {'Info'.center(49)} |\n"
-        )
-        ob.write(f"+{'-'*34}+{'-'*10}+{'-'*10}+{'-'*21}+{'-'*51}+\n")
-
-        # Loop with each protocol
-        for name, protocol_status in data.items():
-            ipv = "-"
-            if name.endswith("4"):
-                ipv = "ipv4"
-            elif name.endswith("6"):
-                ipv = "ipv6"
-            # Start with plain strings with no color
-            state: str = protocol_status["state"]
-            info: str = protocol_status["info"]
-            since: str = protocol_status["since"]
-
-            # NK - Update in peer_arg show too
-            # Check how we're going to color entries based on their state and info
-            state_out = f"{state[:8]}".center(8)
-            info_out = f"{info[:49]}".center(49)
-            if protocol_status["state"] == "down":
-                state_out = colored(f"{state[:8]}".center(8), "red")
-                if "info_extra" in protocol_status:
-                    info += " - " + protocol_status["info_extra"]
-                    info_out = colored(f"{info[:49]}".center(49), "red")
-            elif protocol_status["state"] == "up":  # noqa: SIM102
-                if protocol_status["info"] == "running":
-                    state_out = colored(f"{state[:8]}".center(8), "green")
-                    info_out = colored(f"{info[:49]}".center(49), "green")
-
-            # Center some columns
-            ipv_out = f"{ipv[:8]}".center(8)
-
-            # Write out info line
-            ob.write(f"| {name[:32]:<32} | {ipv_out} | {state_out} | {since[:19]:<19} | {info_out} |\n")
-
-        # Write out footer
-        ob.write(f"+{'='*130}+\n")
-
-        return ob.getvalue()
+        return BirdPlanCmdlineOSPFShowResult(res)

@@ -21,14 +21,14 @@
 import argparse
 from typing import Any, Dict
 
-from ......cmdline import BirdPlanCommandLine
+from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineOSPFInterfaceCostSet"]
+__all__ = ["BirdPlanCmdlineOSPFInterfaceCostSet"]
 
 
-class BirdplanCmdlineOSPFInterfaceCostSet(BirdPlanCmdlinePluginBase):
-    """Birdplan "ospf interface cost set" command."""
+class BirdPlanCmdlineOSPFInterfaceCostSet(BirdPlanCmdlinePluginBase):
+    """BirdPlan "ospf interface cost set" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -89,7 +89,7 @@ class BirdplanCmdlineOSPFInterfaceCostSet(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_cost_set(self, args: Any) -> Any:
         """
-        Birdplan "ospf interface cost set" command.
+        Commandline handler for "ospf interface cost set" action.
 
         Parameters
         ----------
@@ -120,4 +120,4 @@ class BirdplanCmdlineOSPFInterfaceCostSet(BirdPlanCmdlinePluginBase):
         # Commit BirdPlan our state
         cmdline.birdplan_commit_state()
 
-        return f"OSPF area '{area}' interface '{interface}' cost override set to {cost}"
+        return BirdPlanCommandlineResult(f"OSPF area '{area}' interface '{interface}' cost override set to {cost}")

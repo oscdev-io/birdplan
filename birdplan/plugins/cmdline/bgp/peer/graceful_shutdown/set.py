@@ -21,15 +21,15 @@
 import argparse
 from typing import Any, Dict
 
-from ......cmdline import BirdPlanCommandLine
+from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ......exceptions import BirdPlanErrorUsage
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
-__all__ = ["BirdplanCmdlineBGPPeerGracefulShutdownSet"]
+__all__ = ["BirdPlanCmdlineBGPPeerGracefulShutdownSet"]
 
 
-class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
-    """Birdplan "bgp peer graceful-shutdown set" command."""
+class BirdPlanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
+    """BirdPlan "bgp peer graceful-shutdown set" command."""
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -85,7 +85,7 @@ class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_graceful_shutdown_set(self, args: Any) -> Any:
         """
-        Birdplan "bgp peer graceful-shutdown set" command.
+        Commandline handler for "bgp peer graceful-shutdown set" action.
 
         Parameters
         ----------
@@ -120,4 +120,5 @@ class BirdplanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
         cmdline.birdplan_commit_state()
 
         status = "ENABLED" if value else "DISABLED"
-        return f"BGP graceful shutdown {status} for peer(s) matching '{peer}'"
+
+        return BirdPlanCommandlineResult(f"BGP graceful shutdown {status} for peer(s) matching '{peer}'")
