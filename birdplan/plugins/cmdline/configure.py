@@ -110,7 +110,7 @@ class BirdPlanCmdlineConfigure(BirdPlanCmdlinePluginBase):
 
     def cmd_configure(self, args: Any) -> Any:
         """
-        BirdPlan "configure" command.
+        Commandline handler for "configure" action.
 
         Parameters
         ----------

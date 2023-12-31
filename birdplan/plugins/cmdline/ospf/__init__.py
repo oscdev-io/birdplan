@@ -69,7 +69,7 @@ class BirdPlanCmdlineOSPF(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        BirdPlan "ospf" command.
+        Commandline handler for "ospf" action.
 
         Parameters
         ----------

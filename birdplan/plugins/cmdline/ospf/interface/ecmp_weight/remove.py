@@ -82,7 +82,7 @@ class BirdPlanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_ecmp_weight_remove(self, args: Any) -> Any:
         """
-        BirdPlan "ospf interface ecmp_weight remove" command.
+        Commandline handler for "ospf interface ecmp-weight remove" action.
 
         Parameters
         ----------

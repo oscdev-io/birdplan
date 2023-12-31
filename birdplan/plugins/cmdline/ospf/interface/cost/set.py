@@ -89,7 +89,7 @@ class BirdPlanCmdlineOSPFInterfaceCostSet(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_cost_set(self, args: Any) -> Any:
         """
-        BirdPlan "ospf interface cost set" command.
+        Commandline handler for "ospf interface cost set" action.
 
         Parameters
         ----------

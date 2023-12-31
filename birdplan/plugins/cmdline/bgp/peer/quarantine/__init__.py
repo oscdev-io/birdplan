@@ -70,7 +70,7 @@ class BirdPlanCmdlineBGPPeerQuarantine(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_quarantine(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        BirdPlan "bgp peer quarantine" command.
+        Commandline handler for "bgp peer quarantine" action.
 
         Parameters
         ----------

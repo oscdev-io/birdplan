@@ -70,7 +70,7 @@ class BirdPlanCmdlineOSPFInterfaceECMPWeight(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_ecmp_weight(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        BirdPlan "ospf interface ecmp-weight" command.
+        Commandline handler for "ospf interface ecmp-weight" action.
 
         Parameters
         ----------

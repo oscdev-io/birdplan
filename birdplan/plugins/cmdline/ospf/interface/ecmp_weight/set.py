@@ -89,7 +89,7 @@ class BirdPlanCmdlineOSPFInterfaceECMPWeightSet(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_ecmp_weight_set(self, args: Any) -> Any:
         """
-        BirdPlan "ospf interface ecmp-weight set" command.
+        Commandline handler for "ospf interface ecmp-weight set" action.
 
         Parameters
         ----------

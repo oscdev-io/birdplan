@@ -85,7 +85,7 @@ class BirdPlanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_graceful_shutdown_set(self, args: Any) -> Any:
         """
-        BirdPlan "bgp peer graceful-shutdown set" command.
+        Commandline handler for "bgp peer graceful-shutdown set" action.
 
         Parameters
         ----------

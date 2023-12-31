@@ -78,7 +78,7 @@ class BirdPlanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_quarantine_remove(self, args: Any) -> Any:
         """
-        BirdPlan "bgp peer quarantine remove" command.
+        Commandline handler for "bgp peer quarantine remove" action.
 
         Parameters
         ----------

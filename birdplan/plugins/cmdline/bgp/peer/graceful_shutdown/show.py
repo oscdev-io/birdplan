@@ -146,7 +146,7 @@ class BirdPlanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_graceful_shutdown_show(self, args: Any) -> Any:
         """
-        BirdPlan "bgp peer graceful-shutdown show" command.
+        Commandline handler for "bgp peer graceful-shutdown show" action.
 
         Parameters
         ----------

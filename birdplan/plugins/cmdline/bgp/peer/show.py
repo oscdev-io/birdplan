@@ -239,7 +239,7 @@ class BirdPlanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_show(self, args: Any) -> Any:
         """
-        BirdPlan "bgp peer show <peer>" command.
+        Commandline handler for "bgp peer show <peer>" action.
 
         Parameters
         ----------

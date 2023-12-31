@@ -70,7 +70,7 @@ class BirdPlanCmdlineBGPPeerGracefulShutdown(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_graceful_shutdown(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        BirdPlan "bgp peer graceful-shutdown" command.
+        Commandline handler for "bgp peer graceful-shutdown" action.
 
         Parameters
         ----------

@@ -82,7 +82,7 @@ class BirdPlanCmdlineOSPFInterfaceCostRemove(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_cost_remove(self, args: Any) -> Any:
         """
-        BirdPlan "ospf interface cost remove" command.
+        Commandline handler for "ospf interface cost remove" action.
 
         Parameters
         ----------

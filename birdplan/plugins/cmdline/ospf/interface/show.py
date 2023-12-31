@@ -223,7 +223,7 @@ class BirdPlanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_show(self, args: Any) -> Any:
         """
-        BirdPlan "ospf interface show" command.
+        Commandline handler for "ospf interface show" action.
 
         Parameters
         ----------

@@ -83,7 +83,7 @@ class BirdPlanCmdlineBGPPeerQuarantineSet(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_quarantine_set(self, args: Any) -> Any:
         """
-        BirdPlan "bgp peer quarantine set" command.
+        Commandline handler for "bgp peer quarantine set" action.
 
         Parameters
         ----------

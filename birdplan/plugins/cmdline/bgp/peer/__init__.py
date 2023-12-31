@@ -70,7 +70,7 @@ class BirdPlanCmdlineBGPPeer(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        BirdPlan "bgp peer" command.
+        Commandline handler for "bgp peer" action.
 
         Parameters
         ----------

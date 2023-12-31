@@ -88,7 +88,7 @@ class BirdPlanCmdlineMonitor(BirdPlanCmdlinePluginBase):
 
     def cmd_monitor(self, args: Any) -> Any:
         """
-        BirdPlan "monitor" command.
+        Commandline handler for "monitor" action.
 
         Parameters
         ----------

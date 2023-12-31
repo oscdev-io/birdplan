@@ -69,7 +69,7 @@ class BirdPlanCmdlineBGP(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        BirdPlan "bgp" command.
+        Commandline handler for "bgp" action.
 
         Parameters
         ----------

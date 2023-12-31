@@ -70,7 +70,7 @@ class BirdPlanCmdlineOSPFInterfaceCost(BirdPlanCmdlinePluginBase):
 
     def cmd_ospf_interface_cost(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        BirdPlan "ospf interface cost" command.
+        Commandline handler for "ospf interface cost" action.
 
         Parameters
         ----------

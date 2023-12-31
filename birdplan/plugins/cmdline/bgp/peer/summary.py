@@ -148,7 +148,7 @@ class BirdPlanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
 
     def cmd_bgp_peer_summary(self, args: Any) -> Any:  # pylint: disable=unused-argument
         """
-        BirdPlan "bgp peer summary" command.
+        Commandline handler for "bgp peer summary" action.
 
         Parameters
         ----------
