@@ -16,8 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""BGPQ3 support class."""
+"""BGPQ3/4 support class."""
 
+import functools
 import ipaddress
 import json
 import subprocess  # nosec
@@ -60,6 +61,19 @@ class BGPQ3:
         self._port = port
         self._sources = sources
 
+    @functools.lru_cache()
+    def _exe(self) -> str:
+        """Return the bgpq3 executable."""
+
+        # Check if bgpq4 or bgpq3 is available, preferring bgpq4 and returning its path
+        try:
+            subprocess.check_output(["bgpq4", "-V"], stderr=subprocess.STDOUT)  # nosec
+            return "bgpq4"
+        except subprocess.CalledProcessError:
+            pass
+
+        return "bgpq3"
+
     def get_asns(self, as_sets: Union[str, List[str]]) -> List[str]:
         """Get prefixes."""
 
@@ -91,7 +105,33 @@ class BGPQ3:
         if "asns" not in asns_bgpq3:  # pragma: no cover
             raise BirdPlanError(f"BGPQ3 output error, expecting 'asns': {asns_bgpq3}")
 
-        return asns_bgpq3["asns"]
+        filtered_asns = []
+        for asn in asns_bgpq3["asns"]:
+            # Convert to int for below
+            asn_i = int(asn)
+            # 0	Reserved by [RFC7607]	[RFC7607]
+            # 112	Used by the AS112 project to sink misdirected DNS queries; see [RFC7534]	[RFC7534]
+            # 23456	AS_TRANS; reserved by [RFC6793]	[RFC6793]
+            # 65535	Reserved by [RFC7300]	[RFC7300]
+            # 4294967295	Reserved by [RFC7300]	[RFC7300]
+            if asn_i in [0, 112, 23456, 65535, 4294967295]:
+                continue
+            # 64496-64511	For documentation and sample code; reserved by [RFC5398]	[RFC5398]
+            if 64496 <= asn_i <= 64511:
+                continue
+            # 64512-65534	For private use; reserved by [RFC6996]	[RFC6996]
+            if 64512 <= asn_i <= 65534:
+                continue
+            # 65536-65551	For documentation and sample code; reserved by [RFC5398]	[RFC5398]
+            if 65536 <= asn_i <= 65551:
+                continue
+            # 4200000000-4294967294	For private use; reserved by [RFC6996]	[RFC6996]
+            if 4200000000 <= asn_i <= 4294967294:
+                continue
+            # We passed all the checks, lets add to the filtered list
+            filtered_asns.append(asn)
+
+        return filtered_asns
 
     def get_prefixes(self, as_sets: Union[str, List[str]]) -> Dict[str, List[str]]:
         """Get prefixes."""
@@ -152,7 +192,7 @@ class BGPQ3:
         """Run bgpq3."""
 
         # Run the IP tool with JSON output
-        cmd_args = ["bgpq3", "-h", self.server, "-j"]
+        cmd_args = [self._exe(), "-h", self.server, "-j"]
         # Add our args
         cmd_args.extend(args)
 
