@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2023, AllWorldIT
+# Copyright (c) 2019-2024, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -156,11 +156,12 @@ class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
             # Work out our source address, depending if peer is up or not
             source_address = protocol_status.get("source_address", protocol_data["source_address"])
             ob.write(f"    Source IP.........: {source_address}\n")
+
+            ob.write(f"    Neighbor AS.......: {protocol_status['neighbor_as']}\n")
             ob.write(f"    Neighbor IP.......: {protocol_status['neighbor_address']}\n")
 
             if "neighbor_id" in protocol_status:
                 ob.write(f"    Neighbor ID.......: {protocol_status['neighbor_id']}\n")
-            ob.write(f"    Neighbor AS.......: {protocol_status['neighbor_as']}\n")
 
             # Check if we have an import limit
             if "import_limit" in protocol_status:
