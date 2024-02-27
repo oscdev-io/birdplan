@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2023, AllWorldIT
+# Copyright (c) 2019-2024, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -269,7 +269,7 @@ class BirdPlanCommandLine:
 
         # If this is the console, display our version
         if self.is_console:
-            print(f"BirdPlan v{__version__} - Copyright © 2019-2023, AllWorldIT.\n", file=sys.stderr)
+            print(f"BirdPlan v{__version__} - Copyright © 2019-2024, AllWorldIT.\n", file=sys.stderr)
 
         # Add main commandline arguments
         optional_group = self.argparser.add_argument_group("Optional arguments")
