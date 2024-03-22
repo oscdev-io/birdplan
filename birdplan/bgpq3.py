@@ -61,7 +61,7 @@ class BGPQ3:
         self._port = port
         self._sources = sources
 
-    @functools.lru_cache()
+    @functools.lru_cache()  # noqa: B019
     def _exe(self) -> str:
         """Return the bgpq3 executable."""
 
