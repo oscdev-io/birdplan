@@ -2424,6 +2424,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  multihop {self.multihop};")
         if self.password:
             self.conf.add(f'  password "{self.password}";')
+        if self.ttl_security:
+            self.conf.add('  ttl security on;')
 
         # Handle route reflector clients
         if self.peer_type in ("rrclient", "rrserver-rrserver"):

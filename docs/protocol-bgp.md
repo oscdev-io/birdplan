@@ -904,6 +904,23 @@ bgp:
 ```
 
 
+## ttl_security
+
+Enable TTL security on the BGP session.
+
+An example of enabling TTL security is below...
+```yaml
+bgp:
+  ...
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      ttl_security: true
+  ...
+```
+
+
 ## prefix_limit4
 
 IPv4 prefix limit for the peer. This is only supported for peer types `customer` and `peer`.

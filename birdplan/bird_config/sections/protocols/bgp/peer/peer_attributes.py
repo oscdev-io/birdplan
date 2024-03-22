@@ -659,6 +659,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     error_wait_time: Optional[str]
     multihop: Optional[str]
     password: Optional[str]
+    ttl_security: bool
 
     cost: int
 
@@ -712,6 +713,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.error_wait_time = None
         self.multihop = None
         self.password = None
+        self.ttl_security = False
 
         self.cost = 0
 
