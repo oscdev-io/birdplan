@@ -22,6 +22,7 @@ import functools
 import ipaddress
 import json
 import subprocess  # nosec
+import shutil
 import time
 from typing import Any, Dict, List, Optional, Union
 
@@ -61,18 +62,15 @@ class BGPQ3:
         self._port = port
         self._sources = sources
 
-    @functools.lru_cache()  # noqa: B019
+    @functools.lru_cache(maxsize=1)  # noqa: B019
     def _exe(self) -> str:
         """Return the bgpq3 executable."""
 
-        # Check if bgpq4 or bgpq3 is available, preferring bgpq4 and returning its path
-        try:
-            subprocess.check_output(["bgpq4", "-V"], stderr=subprocess.STDOUT)  # nosec
-            return "bgpq4"
-        except subprocess.CalledProcessError:
-            pass
+        for exe in ("bgpq3", "bgpq4"):
+            if shutil.which(exe):
+                return exe
 
-        return "bgpq3"
+        raise BirdPlanError("bgpq3/bgpq4 executable not found in PATH")
 
     def get_asns(self, as_sets: Union[str, List[str]]) -> List[str]:
         """Get prefixes."""
