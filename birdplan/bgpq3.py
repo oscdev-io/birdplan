@@ -22,6 +22,7 @@ import functools
 import ipaddress
 import json
 import subprocess  # nosec
+import shutil
 import time
 from typing import Any, Dict, List, Optional, Union
 
@@ -61,18 +62,15 @@ class BGPQ3:
         self._port = port
         self._sources = sources
 
-    @functools.lru_cache()
+    @functools.lru_cache(maxsize=1)  # noqa: B019
     def _exe(self) -> str:
         """Return the bgpq3 executable."""
 
-        # Check if bgpq4 or bgpq3 is available, preferring bgpq4 and returning its path
-        try:
-            subprocess.check_output(["bgpq4", "-V"], stderr=subprocess.STDOUT)  # nosec
-            return "bgpq4"
-        except subprocess.CalledProcessError:
-            pass
+        for exe in ("bgpq3", "bgpq4"):
+            if shutil.which(exe):
+                return exe
 
-        return "bgpq3"
+        raise BirdPlanError("bgpq3/bgpq4 executable not found in PATH")
 
     def get_asns(self, as_sets: Union[str, List[str]]) -> List[str]:
         """Get prefixes."""
@@ -85,6 +83,7 @@ class BGPQ3:
             objects.extend(as_sets)
 
         # Grab ASNs
+        is_birdplan_internal = False
         asns_bgpq3: Dict[str, List[str]] = {}
         for obj in objects:
             # Try pull result from our cache
@@ -98,6 +97,9 @@ class BGPQ3:
                     raise BirdPlanError(f"Failed to query IRR ASNs from object '{obj}':\n%s" % err.output.decode("UTF-8")) from None
                 # Cache the result we got
                 self._cache(f"asns:{obj}", result)
+            # Check if this is a birdplan internal object
+            if obj.startswith("_BIRDPLAN:"):
+                is_birdplan_internal = True
             # Update return value with result
             asns_bgpq3.update(result)
 
@@ -116,15 +118,22 @@ class BGPQ3:
             # 4294967295	Reserved by [RFC7300]	[RFC7300]
             if asn_i in [0, 112, 23456, 65535, 4294967295]:
                 continue
+
+            #
+            # NK: So objects that start with _BIRDPLAN are used for the tests, so we need to treat them a little differently below
+            #     if that's the case.
+            #
+
             # 64496-64511	For documentation and sample code; reserved by [RFC5398]	[RFC5398]
-            if 64496 <= asn_i <= 64511:
+            if (64496 <= asn_i <= 64511) and not is_birdplan_internal:
                 continue
             # 64512-65534	For private use; reserved by [RFC6996]	[RFC6996]
-            if 64512 <= asn_i <= 65534:
+            if (64512 <= asn_i <= 65534) and not is_birdplan_internal:
                 continue
             # 65536-65551	For documentation and sample code; reserved by [RFC5398]	[RFC5398]
-            if 65536 <= asn_i <= 65551:
+            if (65536 <= asn_i <= 65551) and not is_birdplan_internal:
                 continue
+            
             # 4200000000-4294967294	For private use; reserved by [RFC6996]	[RFC6996]
             if 4200000000 <= asn_i <= 4294967294:
                 continue

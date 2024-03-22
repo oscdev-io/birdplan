@@ -130,6 +130,13 @@ class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
                     state = colored(protocol_status["state"], "green")
                     info = colored(protocol_status["info"], "green")
 
+            # Work out what BGP security mechanisms we're using
+            bgp_security = []
+            if "password" in protocol_data and protocol_data["password"]:
+                bgp_security.append("password")
+            if "ttl_security" in protocol_data and protocol_data["ttl_security"]:
+                bgp_security.append("ttl-security")
+
             # Check for quarantine flag
             quarantined = "no"
             if "quarantine" in self.data and self.data["quarantine"]:
@@ -178,6 +185,11 @@ class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
                 routes_imported = protocol_status["routes_imported"]
                 routes_exported = protocol_status["routes_exported"]
                 ob.write(f"    Prefixes..........: {routes_imported} imported, {routes_exported} exported\n")
+
+            if bgp_security:
+                ob.write(f"    BGP security......: {', '.join(bgp_security)}\n")
+            else:
+                ob.write("    BGP security......: -\n")
 
             ob.write(f"    Quarantined.......: {quarantined}\n")
             ob.write(f"    Graceful shutdown.: {graceful_shutdown}\n")

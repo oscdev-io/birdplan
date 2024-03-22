@@ -2425,7 +2425,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.password:
             self.conf.add(f'  password "{self.password}";')
         if self.ttl_security:
-            self.conf.add('  ttl security on;')
+            self.conf.add("  ttl security on;")
 
         # Handle route reflector clients
         if self.peer_type in ("rrclient", "rrserver-rrserver"):
@@ -2691,6 +2691,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def password(self, password: str) -> None:
         """Set the value of our password option."""
         self.peer_attributes.password = password
+
+    @property
+    def ttl_security(self) -> bool:
+        """Return the value of our ttl_security option."""
+        return self.peer_attributes.ttl_security
+
+    @ttl_security.setter
+    def ttl_security(self, ttl_security: bool) -> None:
+        """Set the value of our ttl_security option."""
+        self.peer_attributes.ttl_security = ttl_security
 
     @property
     def cost(self) -> int:

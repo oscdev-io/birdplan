@@ -1513,6 +1513,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 "multihop",
                 "passive",
                 "password",
+                "ttl_security",
                 "prefix_limit4",
                 "prefix_limit6",
                 "quarantine",
