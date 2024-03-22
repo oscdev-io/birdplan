@@ -65,13 +65,9 @@ test_job:
   - export TOX_WORK_DIR=$(dirname "$PWD")/tox
   # Run tests
   - contrib/test-environment/runtest $EXTRA_TEST_OPTS
-  # Save HTML coverage report
-  - mkdir public
-  - mv htmlcov public/coverage
   artifacts:
     paths:
-    - public
-
+    - htmlcov
 
 
 prepare_release:
@@ -185,16 +181,18 @@ release_gitlab:
 #    fi
 
 
-#pages:
-#  stage: pages
-#  rules:
-#  - if: $CI_COMMIT_TAG
-#  script:
-#  # Create environment
-#  - pacman -Syu --noconfirm
-#  # Move documentation to public/
-#  # This is the only supported path in gitlab
-#  - mv build/docs public
-#  artifacts:
-#    paths:
-#    - public/
+pages:
+ stage: deploy
+ rules:
+ - if: $CI_COMMIT_TAG
+ script:
+ # Create environment
+ - pacman -Syu --noconfirm
+ # Move documentation to public/
+ # This is the only supported path in gitlab
+ # Save HTML coverage report
+ - mkdir public
+ - mv htmlcov public/coverage
+ artifacts:
+   paths:
+   - public/
