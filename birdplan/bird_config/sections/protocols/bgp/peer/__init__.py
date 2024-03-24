@@ -210,6 +210,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.multihop = peer_config["multihop"]
         if "password" in peer_config:
             self.password = peer_config["password"]
+        if "ttl_security" in peer_config:
+            self.ttl_security = peer_config["ttl_security"]
 
         if "cost" in peer_config:
             # Raise an exception if peer cost does not make sense for a specific peer type
