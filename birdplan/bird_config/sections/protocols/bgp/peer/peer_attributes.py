@@ -595,6 +595,9 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     password: Optional[str]
         BGP password.
 
+    ttl_security: bool
+        Indicate if BGP TTL security should be enabled.
+
     cost : int
         Cost of this peer, this is the number minused from the local_pref.
 

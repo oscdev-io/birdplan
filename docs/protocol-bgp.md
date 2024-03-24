@@ -906,6 +906,8 @@ bgp:
 
 ## ttl_security
 
+Supported in version: 0.0.17+
+
 Enable TTL security on the BGP session.
 
 An example of enabling TTL security is below...
