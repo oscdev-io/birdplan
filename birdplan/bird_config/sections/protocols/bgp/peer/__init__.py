@@ -1253,6 +1253,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.state["description"] = self.description
         self.state["type"] = self.peer_type
 
+        # Work out what security settings are in play
+        self.state["security"] = []
+        if self.password:
+            self.state["security"].append("password")
+        if self.ttl_security:
+            self.state["security"].append("ttl-security")
+
         self.state["filter"] = {}
         self.state["filter"]["as_sets"] = self.filter_policy.as_sets
 
