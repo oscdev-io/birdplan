@@ -180,7 +180,7 @@ class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
                 ob.write(f"    Prefixes..........: {routes_imported} imported, {routes_exported} exported\n")
 
             if "security" in self.data and self.data["security"]:
-                ob.write(f"    BGP security......: {', '.join(self.data['security'].sort())}\n")
+                ob.write(f"    BGP security......: {', '.join(sorted(self.data['security']))}\n")
 
             ob.write(f"    Quarantined.......: {quarantined}\n")
             ob.write(f"    Graceful shutdown.: {graceful_shutdown}\n")
