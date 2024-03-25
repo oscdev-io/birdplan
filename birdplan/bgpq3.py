@@ -21,8 +21,8 @@
 import functools
 import ipaddress
 import json
-import subprocess  # nosec
 import shutil
+import subprocess  # nosec
 import time
 from typing import Any, Dict, List, Optional, Union
 
@@ -72,7 +72,7 @@ class BGPQ3:
 
         raise BirdPlanError("bgpq3/bgpq4 executable not found in PATH")
 
-    def get_asns(self, as_sets: Union[str, List[str]]) -> List[str]:
+    def get_asns(self, as_sets: Union[str, List[str]]) -> List[str]:  # pylint: disable=too-many-branches
         """Get prefixes."""
 
         # Build an object list depending on the type of "objects" above
@@ -133,7 +133,7 @@ class BGPQ3:
             # 65536-65551	For documentation and sample code; reserved by [RFC5398]	[RFC5398]
             if (65536 <= asn_i <= 65551) and not is_birdplan_internal:
                 continue
-            
+
             # 4200000000-4294967294	For private use; reserved by [RFC6996]	[RFC6996]
             if 4200000000 <= asn_i <= 4294967294:
                 continue
