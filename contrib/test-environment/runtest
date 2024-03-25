@@ -7,10 +7,10 @@ cd /root/birdplan || :
 echo "Excuting in '$(pwd)'..."
 
 ARGS=("$@")
-if [ ${#ARGS[@]} -eq 0 ]; then
+if [ ${#ARGS[@]} -eq 0 ] || [ ${#ARGS[@]} -eq 1 ] && [ "${ARGS[0]}" == "--write-expected" ]; then
     cpus=$(nproc)
     jobcount=$((cpus / 2))
-    ARGS=(--numprocesses="$jobcount" --dist=loadfile)
+    ARGS+=(--numprocesses="$jobcount" --dist=loadfile)
 fi
 
 echo "RUNNING: tox -- ${ARGS[*]}"
