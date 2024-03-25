@@ -613,6 +613,7 @@ r1_peer_show_r2:
         state: up
         table: t_bgp6_AS65001_r2_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65001_r2_peer
     ipv6: t_bgp6_AS65001_r2_peer
@@ -1256,6 +1257,7 @@ r2_peer_show_r1:
         state: up
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer

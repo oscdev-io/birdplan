@@ -55,6 +55,7 @@ r10_peer_show_r1:
         state: up
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
@@ -290,6 +291,7 @@ r1_peer_show_e1:
         state: up
         table: t_bgp6_AS4200000000_e1_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS4200000000_e1_peer
     ipv6: t_bgp6_AS4200000000_e1_peer
@@ -351,6 +353,7 @@ r1_peer_show_r10:
         state: up
         table: t_bgp6_AS65009_r10_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65009_r10_peer
     ipv6: t_bgp6_AS65009_r10_peer
@@ -428,6 +431,7 @@ r1_peer_show_r2:
         state: up
         table: t_bgp6_AS65001_r2_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65001_r2_peer
     ipv6: t_bgp6_AS65001_r2_peer
@@ -489,6 +493,7 @@ r1_peer_show_r3:
         state: up
         table: t_bgp6_AS65000_r3_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r3_peer
     ipv6: t_bgp6_AS65000_r3_peer
@@ -560,6 +565,7 @@ r1_peer_show_r4:
         state: up
         table: t_bgp6_AS65003_r4_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65003_r4_peer
     ipv6: t_bgp6_AS65003_r4_peer
@@ -621,6 +627,7 @@ r1_peer_show_r5:
         state: up
         table: t_bgp6_AS65004_r5_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65004_r5_peer
     ipv6: t_bgp6_AS65004_r5_peer
@@ -682,6 +689,7 @@ r1_peer_show_r6:
         state: up
         table: t_bgp6_AS65005_r6_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65005_r6_peer
     ipv6: t_bgp6_AS65005_r6_peer
@@ -743,6 +751,7 @@ r1_peer_show_r7:
         state: up
         table: t_bgp6_AS65000_r7_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r7_peer
     ipv6: t_bgp6_AS65000_r7_peer
@@ -804,6 +813,7 @@ r1_peer_show_r8:
         state: up
         table: t_bgp6_AS65000_r8_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r8_peer
     ipv6: t_bgp6_AS65000_r8_peer
@@ -865,6 +875,7 @@ r1_peer_show_r9:
         state: up
         table: t_bgp6_AS65000_r9_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r9_peer
     ipv6: t_bgp6_AS65000_r9_peer
@@ -2297,6 +2308,7 @@ r2_peer_show_r1:
         state: up
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
@@ -2522,6 +2534,7 @@ r3_peer_show_r1:
         state: up
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
@@ -2837,6 +2850,7 @@ r4_peer_show_r1:
         state: up
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
@@ -3062,6 +3076,7 @@ r5_peer_show_r1:
         state: up
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
@@ -3232,6 +3247,7 @@ r6_peer_show_r1:
         state: up
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
@@ -3451,6 +3467,7 @@ r7_peer_show_r1:
         state: up
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
@@ -3764,6 +3781,7 @@ r8_peer_show_r1:
         state: up
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
@@ -4069,6 +4087,7 @@ r9_peer_show_r1:
         state: up
         table: t_bgp6_AS65000_r1_peer
   quarantine: false
+  security: []
   tables:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
