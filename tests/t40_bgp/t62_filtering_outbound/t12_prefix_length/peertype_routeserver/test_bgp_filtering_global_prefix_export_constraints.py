@@ -21,7 +21,7 @@
 
 """BGP filtering test case."""
 
-from ....config.peertype_routeserver.r1_to_r10 import PeerTypeConfig
+from ....config.peertype_routeserver.r1r2 import PeerTypeConfig
 from ..template_global_prefix_export_constraints import Template
 
 __all__ = ["Test"]

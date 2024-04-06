@@ -125,19 +125,19 @@ In terms of test `test_bgp_filtering_aspath_asn_filtered_without_match`:
 
 ## Tests for BGP origin AS filtered
 
-In terms of test `test_bgp_filtering_origin_as_filtered_with_match`:
+In terms of test `test_bgp_filtering_origin_asn_filtered_with_match`:
 - ExaBGP e1 should export a route where the origin AS is listed in the filter.
 
-In terms of test `test_bgp_filtering_origin_as_filtered_without_match`:
+In terms of test `test_bgp_filtering_origin_asn_filtered_without_match`:
 - ExaBGP e1 should export a route where the origin AS is not listed in the filter.
 
 
 ## Tests for BGP peer AS filtered
 
-In terms of test `test_bgp_filtering_peer_as_filtered_with_match`:
+In terms of test `test_bgp_filtering_peer_asn_filtered_with_match`:
 - ExaBGP e1 should export a route where the first AS is listed in the filter.
 
-In terms of test `test_bgp_filtering_peer_as_filtered_without_match`:
+In terms of test `test_bgp_filtering_peer_asn_filtered_without_match`:
 - ExaBGP e1 should export a route where the first AS is not listed in the filter.
 
 

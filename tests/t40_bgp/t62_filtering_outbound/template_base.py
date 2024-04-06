@@ -19,7 +19,7 @@
 # type: ignore
 # pylint: disable=import-error,too-few-public-methods
 
-"""BGP large community functions test case template (base class for specific tests)."""
+"""BGP outbound filtering functions test case template (base class for specific tests)."""
 
 from ...basetests import BirdPlanBaseTestCase
 
@@ -27,28 +27,22 @@ __all__ = ["TemplateBase"]
 
 
 class TemplateBase(BirdPlanBaseTestCase):
-    """BGP large community functions test case template (base class for specific tests)."""
+    """BGP outbound filtering functions test case template (base class for specific tests)."""
 
-    routers = ["r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10"]
+    routers = ["r1", "r2"]
+
     exabgps = ["e1"]
+    e1_asn = 65000
+    e1_interface_eth0 = {"mac": "02:e1:00:00:00:01", "ips": ["100.64.0.3/24", "fc00:100::3/64"]}
 
     template_macros = [
-        "template_r1_config",
-        "template_r2_config",
-        "template_r3_config",
-        "template_r4_config",
-        "template_r5_config",
-        "template_r6_config",
-        "template_r7_config",
-        "template_r8_config",
-        "template_r9_config",
-        "template_r10_config",
-        "r2_asn",
         "extra_r2_config",
     ]
 
-    r1_r2_asn = "65001"
     r1_extra_r2_config = ""
+    r1_global_config = """
+  rr_cluster_id: 0.0.0.1
+"""
 
     # Communities to inject into the prefix we're advertising
     e1_template_large_communities = ""
@@ -58,62 +52,53 @@ class TemplateBase(BirdPlanBaseTestCase):
     test_prefix_lengths4 = []
     test_prefix_lengths6 = []
 
-    r1_peer_asn = 65100
-    # Needed to prevent errors in IDE, as this comes from the config classes
-    r1_peer_type = ""
-
-    r4_asn = 65003
-    r4_peer_asn = 65000
-    r4_interfaces = ["eth0"]
-    r4_interface_eth0 = {"mac": "02:04:00:00:00:01", "ips": ["100.64.0.4/24", "fc00:100::4/64"]}
-    r4_switch_eth0 = "s1"
-
-    r5_asn = 65004
-    r5_peer_asn = 65000
-    r5_interfaces = ["eth0"]
-    r5_interface_eth0 = {"mac": "02:05:00:00:00:01", "ips": ["100.64.0.5/24", "fc00:100::5/64"]}
-    r5_switch_eth0 = "s1"
-
-    r6_asn = 65005
-    r6_peer_asn = 65000
-    r6_interfaces = ["eth0"]
-    r6_interface_eth0 = {"mac": "02:06:00:00:00:01", "ips": ["100.64.0.6/24", "fc00:100::6/64"]}
-    r6_switch_eth0 = "s1"
-
-    r7_asn = 65006
-    r7_peer_asn = 65000
-    r7_interfaces = ["eth0"]
-    r7_interface_eth0 = {"mac": "02:07:00:00:00:01", "ips": ["100.64.0.7/24", "fc00:100::7/64"]}
-    r7_switch_eth0 = "s1"
-
-    r8_asn = 65007
-    r8_peer_asn = 65000
-    r8_interfaces = ["eth0"]
-    r8_interface_eth0 = {"mac": "02:08:00:00:00:01", "ips": ["100.64.0.8/24", "fc00:100::8/64"]}
-    r8_switch_eth0 = "s1"
-
-    r9_asn = 65008
-    r9_peer_asn = 65000
-    r9_interfaces = ["eth0"]
-    r9_interface_eth0 = {"mac": "02:09:00:00:00:01", "ips": ["100.64.0.9/24", "fc00:100::9/64"]}
-    r9_switch_eth0 = "s1"
-
-    r10_asn = 65010
-    r10_peer_asn = 65000
-    r10_interfaces = ["eth0"]
-    r10_interface_eth0 = {"mac": "02:10:00:00:00:01", "ips": ["100.64.0.10/24", "fc00:100::10/64"]}
-    r10_switch_eth0 = "s1"
-
-    e1_asn = 65000
-    e1_interfaces = ["eth0"]
-    e1_interface_eth0 = {"mac": "02:e1:00:00:00:01", "ips": ["100.64.0.100/24", "fc00:100::100/64"]}
-    e1_switch_eth0 = "s1"
-
     def test_setup(self, sim, testpath, tmpdir):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
+    def test_bird_status(self, sim):
+        """Test BIRD status."""
+        self._test_bird_status(sim)
+
     def test_announce_routes(self, sim):
+        """Announce a prefix from ExaBGP to BIRD."""
+        self._test_announce_routes(sim)
+
+    def _generate_originated_routes(self, next_hop4: str = "blackhole", next_hop6: str = "blackhole"):
+        """Generate the routes we expect to see in BIRD."""
+        originated_str = """
+  originate:
+"""
+        # Grab lists of communities
+        communities = [x for x in self.e1_template_communities.replace(":", ",").split(" ") if x]
+        large_communities = [x for x in self.e1_template_large_communities.replace(":", ",").split(" ") if x]
+
+        # Set our originated routes as ORIGINATED_OWN
+        large_communities.append("65000,3,1")
+
+        # Work out list of communities to add
+        communities_list = []
+        if communities:
+            communities_list.extend([f"bgp_community.add(({community}));" for community in communities])
+        if large_communities:
+            communities_list.extend([f"bgp_large_community.add(({large_community}));" for large_community in large_communities])
+
+        # Build string of communities
+        communities_str = ""
+        if communities_list:
+            communities_str += "{"
+            communities_str += " ".join(communities_list)
+            communities_str += "}"
+
+        # Loop with prefix lengths
+        for prefix_length in self.test_prefix_lengths4:
+            originated_str += f"    - '10.0.0.0/{prefix_length} {next_hop4} {communities_str}'\n"
+        for prefix_length in self.test_prefix_lengths6:
+            originated_str += f"    - 'fd00::/{prefix_length} {next_hop6} {communities_str}'\n"
+
+        return originated_str
+
+    def _test_announce_routes(self, sim):
         """Announce a prefix from ExaBGP to BIRD."""
 
         # Loop with IPv4 prefix lengths and advertise each one
@@ -139,10 +124,6 @@ class TemplateBase(BirdPlanBaseTestCase):
                     f"community [ {self.e1_template_communities} ]"
                 ],
             )
-
-    def test_bird_status(self, sim):
-        """Test BIRD status."""
-        self._test_bird_status(sim)
 
     def test_bird_cmdline_bgp_peer_summary(self, sim, tmpdir):
         """Test showing BGP peer summary."""

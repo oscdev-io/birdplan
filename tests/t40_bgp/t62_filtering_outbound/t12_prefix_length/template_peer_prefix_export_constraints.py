@@ -32,33 +32,18 @@ class Template(TemplateBase):
     test_prefix_lengths4 = [19, 22, 24]
     test_prefix_lengths6 = [44, 46, 48]
 
-    def __getattr__(self, name: str):
+    def r1_template_global_config(self):
+        """Return R1 global config with the originated routes."""
+        return self._generate_originated_routes()
+
+    def r1_template_peer_config(self):
         """Work out what we're returning for what."""
 
-        # Mapping of peer types to router names
-        conf_map = {
-            "customer": "r2",
-            "internal": "r3",
-            "peer": "r4",
-            "routecollector": "r5",
-            "routeserver": "r6",
-            "rrclient": "r7",
-            "rrserver": "r8",
-            "rrserver-rrserver": "r9",
-            "transit": "r10",
-        }
-
-        # Loop with each of the map entries
-        for peer_type, router_name in conf_map.items():
-            # Check if we're configuring this specific peer type
-            if self.r1_peer_type == peer_type and name == f"r1_template_{router_name}_config":
-                # If we are, return the constraints for it
-                return """
+        # If we are, return the constraints for it
+        return """
       constraints:
         export_minlen4: 21
         export_maxlen4: 23
         export_minlen6: 45
         export_maxlen6: 47
 """
-
-        raise AttributeError("Not valid here")

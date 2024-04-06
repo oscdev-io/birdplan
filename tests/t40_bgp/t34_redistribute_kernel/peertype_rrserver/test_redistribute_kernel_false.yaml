@@ -473,9 +473,10 @@ r1_master6:
 r1_peer_show_r2:
   asn: 65000
   description: BGP session to r2
-  filter:
-    as_sets: []
+  export_filter: {}
   graceful_shutdown: false
+  import_filter:
+    as_sets: []
   name: r2
   protocols:
     ipv4:
@@ -1297,13 +1298,14 @@ r2_master6:
 r2_peer_show_r1:
   asn: 65000
   description: BGP session to r1
-  filter:
-    as_sets: []
+  export_filter: {}
   graceful_shutdown: false
+  import_filter:
+    as_sets: []
   name: r1
   protocols:
     ipv4:
-      mode: active
+      mode: passive
       name: bgp4_AS65000_r1
       neighbor: 100.64.0.1
       source_address: 100.64.0.2
@@ -1327,7 +1329,7 @@ r2_peer_show_r1:
         state: up
         table: t_bgp4_AS65000_r1_peer
     ipv6:
-      mode: active
+      mode: passive
       name: bgp6_AS65000_r1
       neighbor: fc00:100::1
       source_address: fc00:100::2
@@ -1355,7 +1357,7 @@ r2_peer_show_r1:
   tables:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
-  type: rrserver
+  type: rrclient
 r2_peer_summary:
   r1:
     asn: 65000
@@ -1363,7 +1365,7 @@ r2_peer_summary:
     name: r1
     protocols:
       ipv4:
-        mode: active
+        mode: passive
         name: bgp4_AS65000_r1
         neighbor: 100.64.0.1
         protocol: ipv4
@@ -1388,7 +1390,7 @@ r2_peer_summary:
           state: up
           table: t_bgp4_AS65000_r1_peer
       ipv6:
-        mode: active
+        mode: passive
         name: bgp6_AS65000_r1
         neighbor: fc00:100::1
         protocol: ipv6

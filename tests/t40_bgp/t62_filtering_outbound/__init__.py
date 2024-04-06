@@ -1,1 +1,1 @@
-"""BGP large community functions tests."""
+"""BGP filtering outbound functions tests."""

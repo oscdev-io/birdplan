@@ -21,7 +21,7 @@
 
 """BGP filtering test case."""
 
-from ....config.peertype_rrserver_rrserver.r1_to_r10 import PeerTypeConfig
+from ....config.peertype_rrserver_rrserver.r1r2 import PeerTypeConfig
 from ..template_global_blackhole_export_constraints import Template
 
 __all__ = ["Test"]

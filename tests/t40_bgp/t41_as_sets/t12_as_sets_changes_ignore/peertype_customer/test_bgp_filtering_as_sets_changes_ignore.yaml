@@ -1,7 +1,9 @@
 r1_peer_show_e1:
   asn: 65001
   description: BGP session to e1
-  filter:
+  export_filter: {}
+  graceful_shutdown: false
+  import_filter:
     as_sets: _BIRDPLAN:AS-SET
     aspath_asns:
       calculated:
@@ -19,7 +21,6 @@ r1_peer_show_e1:
         ipv6:
         - fc00:10::/45{48,48}
         - fc00::/46
-  graceful_shutdown: false
   name: e1
   prefix_limit:
     static:

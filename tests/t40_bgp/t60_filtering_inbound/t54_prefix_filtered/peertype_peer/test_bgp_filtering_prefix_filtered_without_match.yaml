@@ -43,7 +43,9 @@ r1_master6:
 r1_peer_show_e1:
   asn: 65001
   description: BGP session to e1
-  filter:
+  export_filter: {}
+  graceful_shutdown: false
+  import_filter:
     as_sets: []
     prefixes:
       static:
@@ -51,7 +53,6 @@ r1_peer_show_e1:
         - 100.64.102.0/24
         ipv6:
         - fc00:102::/48
-  graceful_shutdown: false
   name: e1
   prefix_limit:
     static:
