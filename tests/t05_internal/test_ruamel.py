@@ -31,13 +31,13 @@ from birdplan.yaml.ruamel import YAML
 __all__: List[str] = []
 
 
-@pytest.fixture()
+@pytest.fixture
 def yaml() -> YAML:
     """YAML object."""
     return YAML()
 
 
-@pytest.fixture()
+@pytest.fixture
 def test_data() -> dict[str, Tuple[int, int, int]]:
     """Test data."""
     return {"key": (1, 2, 3)}

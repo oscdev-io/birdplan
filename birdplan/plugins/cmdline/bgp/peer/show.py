@@ -51,33 +51,33 @@ class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
         aspath_filters = "none"
         origin_filters = "none"
         as_sets_filter = "none"
-        if "filter" in self.data:
+        if "import_filter" in self.data:
             # Check for aspath_asns in our filter
             aspath_strs = []
-            if "aspath_asns" in self.data["filter"]:
-                if "static" in self.data["filter"]["aspath_asns"]:
-                    count = len(self.data["filter"]["aspath_asns"]["static"])
+            if "aspath_asns" in self.data["import_filter"]:
+                if "static" in self.data["import_filter"]["aspath_asns"]:
+                    count = len(self.data["import_filter"]["aspath_asns"]["static"])
                     aspath_strs.append(f"{count} manual")
-                if "calculated" in self.data["filter"]["aspath_asns"]:
-                    count = len(self.data["filter"]["aspath_asns"]["calculated"])
+                if "calculated" in self.data["import_filter"]["aspath_asns"]:
+                    count = len(self.data["import_filter"]["aspath_asns"]["calculated"])
                     aspath_strs.append(f"{count} calculated")
                 aspath_filters = ", ".join(aspath_strs)
             # Check for origin filters
             origin_strs = []
-            if "origin_asns" in self.data["filter"]:
-                if "static" in self.data["filter"]["origin_asns"]:
-                    count = len(self.data["filter"]["origin_asns"]["static"])
+            if "origin_asns" in self.data["import_filter"]:
+                if "static" in self.data["import_filter"]["origin_asns"]:
+                    count = len(self.data["import_filter"]["origin_asns"]["static"])
                     origin_strs.append(f"{count} manual")
-                if "irr" in self.data["filter"]["origin_asns"]:
-                    count = len(self.data["filter"]["origin_asns"]["irr"])
+                if "irr" in self.data["import_filter"]["origin_asns"]:
+                    count = len(self.data["import_filter"]["origin_asns"]["irr"])
                     origin_strs.append(f"{count} from IRR")
                 origin_filters = ", ".join(origin_strs)
             # Check for AS-SET filters
-            if "as_sets" in self.data["filter"]:
-                if isinstance(self.data["filter"]["as_sets"], list):
-                    as_sets_filter = ", ".join(self.data["filter"]["as_sets"])
-                elif isinstance(self.data["filter"]["as_sets"], str):
-                    as_sets_filter = self.data["filter"]["as_sets"]
+            if "as_sets" in self.data["import_filter"]:
+                if isinstance(self.data["import_filter"]["as_sets"], list):
+                    as_sets_filter = ", ".join(self.data["import_filter"]["as_sets"])
+                elif isinstance(self.data["import_filter"]["as_sets"], str):
+                    as_sets_filter = self.data["import_filter"]["as_sets"]
 
         ob.write(f"ASN.............: {self.data['asn']}\n")
         ob.write(f"Type............: {self.data['type']}\n")

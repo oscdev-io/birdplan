@@ -31,7 +31,7 @@ from ...base import SectionProtocolBase
 from ..ospf_attributes import OSPFAttributes
 from .area_attributes import OSPFAreaAttributes
 from .interface import ProtocolOSPFAreaInterface
-from .typing import OSPFAreaConfig
+from .ospf_area_types import OSPFAreaConfig
 
 __all__ = ["ProtocolOSPFArea"]
 

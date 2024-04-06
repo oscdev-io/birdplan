@@ -30,7 +30,7 @@ from .....tables import SectionTables
 from ....base import SectionProtocolBase
 from ..area_attributes import OSPFAreaAttributes
 from .interface_attributes import OSPFAreaInterfaceAttributes
-from .typing import OSPFAreaInterfaceConfig
+from .ospf_area_interface_types import OSPFAreaInterfaceConfig
 
 __all__ = ["ProtocolOSPFAreaInterface"]
 

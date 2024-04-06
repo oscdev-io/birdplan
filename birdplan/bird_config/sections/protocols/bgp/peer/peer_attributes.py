@@ -28,7 +28,7 @@ __all__ = [
     "BGPPeerPrependItem",
     "BGPPeerPrepend",
     "BGPPeerRoutePolicyAccept",
-    "BGPPeerFilterPolicy",
+    "BGPPeerImportFilterPolicy",
     "BGPPeerLocation",
     "BGPPeerRoutePolicyRedistribute",
     "BGPPeerConstraints",
@@ -283,7 +283,7 @@ class BGPPeerRoutePolicyAccept:  # pylint: disable=too-few-public-methods
         self.bgp_transit_default = False
 
 
-class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
+class BGPPeerImportFilterPolicy:  # pylint: disable=too-few-public-methods
     """
     BGP filter policy for incoming routes from the BGP peer.
 
@@ -324,6 +324,27 @@ class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
         # INTERNAL attributes, these are populated during initialization
         self.origin_asns_irr = []
         self.prefixes_irr = []
+
+
+class BGPPeerExportFilterPolicy:  # pylint: disable=too-few-public-methods
+    """
+    BGP filter policy for outgoing routes to the BGP peer.
+
+    Attributes
+    ----------
+    origin_asns : BGPPeerFilterItem
+        List of origin ASNs to filter on.
+    prefixes : BGPPeerFilterItem
+        List of prefixes to filter on.
+    """
+
+    origin_asns: BGPPeerFilterItem
+    prefixes: BGPPeerFilterItem
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        self.origin_asns = []
+        self.prefixes = []
 
 
 class BGPPeerLocation:  # pylint: disable=too-few-public-methods
@@ -690,7 +711,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     route_policy_accept: BGPPeerRoutePolicyAccept
     route_policy_redistribute: BGPPeerRoutePolicyRedistribute
 
-    filter_policy: BGPPeerFilterPolicy
+    import_filter_policy: BGPPeerImportFilterPolicy
+    export_filter_policy: BGPPeerExportFilterPolicy
 
     blackhole_community: Optional[Union[List[str], bool]]
 
@@ -745,7 +767,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.route_policy_accept = BGPPeerRoutePolicyAccept()
         self.route_policy_redistribute = BGPPeerRoutePolicyRedistribute()
 
-        self.filter_policy = BGPPeerFilterPolicy()
+        self.import_filter_policy = BGPPeerImportFilterPolicy()
+        self.export_filter_policy = BGPPeerExportFilterPolicy()
 
         self.blackhole_community = None
 

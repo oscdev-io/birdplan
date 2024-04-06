@@ -38,12 +38,13 @@ from ...base import SectionProtocolBase
 from ...pipe import ProtocolPipe, ProtocolPipeFilterType
 from ..bgp_attributes import BGPAttributes, BGPPeertypeConstraints
 from ..bgp_functions import BGPFunctions
-from ..typing import BGPPeerConfig
+from ..bgp_types import BGPPeerConfig
 from .peer_attributes import (
     BGPPeerAttributes,
     BGPPeerConstraints,
+    BGPPeerExportFilterPolicy,
     BGPPeerFilterItem,
-    BGPPeerFilterPolicy,
+    BGPPeerImportFilterPolicy,
     BGPPeerLargeCommunities,
     BGPPeerLocation,
     BGPPeerPrefixLimit,
@@ -583,19 +584,33 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 )
 
         # Check for filters we need to setup
-        if "filter" in peer_config:
+        if "import_filter" in peer_config:
             # Raise an exception if filters makes no sense for this peer type
             if self.peer_type == "routecollector":
-                raise BirdPlanError(f"Having 'filter' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
+                raise BirdPlanError(
+                    f"Having 'import_filter' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
             # Add filters
-            for filter_type, filter_config in peer_config["filter"].items():
+            for filter_type, filter_config in peer_config["import_filter"].items():
                 if filter_type not in ("as_sets", "aspath_asns", "origin_asns", "peer_asns", "prefixes"):
                     raise BirdPlanError(
-                        f"BGP peer 'filter' configuration '{filter_type}' for peer '{self.name}' with type '{self.peer_type}' "
-                        "is invalid"
+                        f"BGP peer 'import_filter' configuration '{filter_type}' for peer '{self.name}' with type "
+                        f"'{self.peer_type}' is invalid"
                     )
                 # Set filter policy
-                setattr(self.filter_policy, filter_type, filter_config)
+                setattr(self.import_filter_policy, filter_type, filter_config)
+
+        # Check for filters we need to setup
+        if "export_filter" in peer_config:
+            # Add filters
+            for filter_type, filter_config in peer_config["export_filter"].items():
+                if filter_type not in ("origin_asns", "prefixes"):
+                    raise BirdPlanError(
+                        f"BGP peer 'export_filter' configuration '{filter_type}' for peer '{self.name}' with type "
+                        f"'{self.peer_type}' is invalid"
+                    )
+                # Set filter policy
+                setattr(self.export_filter_policy, filter_type, filter_config)
 
         #
         # bgp:peers:$PPER:accept
@@ -606,7 +621,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.route_policy_accept.bgp_own_blackhole = True
             self.route_policy_accept.bgp_customer_blackhole = True
         # Check if we should be accepting customer blackhole routes
-        if self.peer_type == "customer" and self.has_prefix_filter:
+        if self.peer_type == "customer" and self.has_import_prefix_filter:
             self.route_policy_accept.bgp_customer_blackhole = True
 
         # If this is a rrserver to rrserver peer, we need to by default redistribute the default route (if we have one)
@@ -655,7 +670,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 )
         # Check if this is a customer with blackholing and without a prefix filter set
         if self.peer_type == "customer":  # noqa: SIM102
-            if self.route_policy_accept.bgp_customer_blackhole and not self.has_prefix_filter:
+            if self.route_policy_accept.bgp_customer_blackhole and not self.has_import_prefix_filter:
                 raise BirdPlanError(
                     f"Having 'accept:bgp_customer_blackhole' set to True for peer '{self.name}' with type '{self.peer_type}' "
                     "and without 'filter:prefixes' or 'filter:as_sets' set makes no sense"
@@ -1075,7 +1090,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.prefix_limit6_peeringdb = peeringdb_info["info_prefixes6"]
 
         # Check if we're going to be pulling in AS-SET information
-        if self.filter_policy.as_sets:
+        if self.import_filter_policy.as_sets:
             # Setup our IRR info
             irr_asns: List[str] = []
             irr_prefixes: Dict[str, Any] = {"ipv4": [], "ipv6": []}
@@ -1088,43 +1103,43 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 # Grab IRR ASNs from previous state
                 if not (
                     self.prev_state
-                    and "filter" in self.prev_state
-                    and "origin_asns" in self.prev_state["filter"]
-                    and "irr" in self.prev_state["filter"]["origin_asns"]
+                    and "import_filter" in self.prev_state
+                    and "origin_asns" in self.prev_state["import_filter"]
+                    and "irr" in self.prev_state["import_filter"]["origin_asns"]
                 ):
                     raise BirdPlanError(
                         f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR origin ASNs"
                     )
                 # Populate irr_asns
-                irr_asns = self.prev_state["filter"]["origin_asns"]["irr"]
+                irr_asns = self.prev_state["import_filter"]["origin_asns"]["irr"]
 
                 # Grab IRR prefixes for IPv4 from previous state
                 if not (
                     self.prev_state
-                    and "filter" in self.prev_state
-                    and "prefixes" in self.prev_state["filter"]
-                    and "irr" in self.prev_state["filter"]["prefixes"]
-                    and "ipv4" in self.prev_state["filter"]["prefixes"]["irr"]
+                    and "import_filter" in self.prev_state
+                    and "prefixes" in self.prev_state["import_filter"]
+                    and "irr" in self.prev_state["import_filter"]["prefixes"]
+                    and "ipv4" in self.prev_state["import_filter"]["prefixes"]["irr"]
                 ):
                     raise BirdPlanError(
                         f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR IPv4 prefixes"
                     )
                 # Populate IRR IPv4 prefixes
-                irr_prefixes["ipv4"] = self.prev_state["filter"]["prefixes"]["irr"]["ipv4"]
+                irr_prefixes["ipv4"] = self.prev_state["import_filter"]["prefixes"]["irr"]["ipv4"]
 
                 # Grab IRR prefixes for IPv6 from previous state
                 if not (
                     self.prev_state
-                    and "filter" in self.prev_state
-                    and "prefixes" in self.prev_state["filter"]
-                    and "irr" in self.prev_state["filter"]["prefixes"]
-                    and "ipv6" in self.prev_state["filter"]["prefixes"]["irr"]
+                    and "import_filter" in self.prev_state
+                    and "prefixes" in self.prev_state["import_filter"]
+                    and "irr" in self.prev_state["import_filter"]["prefixes"]
+                    and "ipv6" in self.prev_state["import_filter"]["prefixes"]["irr"]
                 ):
                     raise BirdPlanError(
                         f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR IPv6 prefixes"
                     )
                 # Populate IRR IPv6 prefixes
-                irr_prefixes["ipv6"] = self.prev_state["filter"]["prefixes"]["irr"]["ipv6"]
+                irr_prefixes["ipv6"] = self.prev_state["import_filter"]["prefixes"]["irr"]["ipv6"]
 
             else:
                 if not self.birdconfig_globals.suppress_info:
@@ -1134,13 +1149,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 bgpq3 = BGPQ3()
 
                 # Grab ASNs from IRR
-                irr_asns = bgpq3.get_asns(self.filter_policy.as_sets)
+                irr_asns = bgpq3.get_asns(self.import_filter_policy.as_sets)
                 # Make sure we got IRR ASNs back from BGPQ3
                 if not irr_asns:
                     raise BirdPlanError(f"No IRR ASNs found for peer '{self.name}' with type '{self.peer_type}'")
 
                 # Grab IRR prefixes
-                irr_prefixes = bgpq3.get_prefixes(self.filter_policy.as_sets)
+                irr_prefixes = bgpq3.get_prefixes(self.import_filter_policy.as_sets)
                 # Make sure we got IRR prefixes back from BGPQ3
                 if ("ipv4" not in irr_prefixes or not irr_prefixes["ipv4"]) and (
                     "ipv6" not in irr_prefixes or not irr_prefixes["ipv6"]
@@ -1148,7 +1163,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     raise BirdPlanError(f"No IRR prefixes found for peer '{self.name}' with type '{self.peer_type}'")
 
             # Add our ASN's onto the filter policy origin ASNs list
-            self.filter_policy.origin_asns_irr.extend(irr_asns)
+            self.import_filter_policy.origin_asns_irr.extend(irr_asns)
 
             # Lets work out what to do with the IPv4 prefixes
             if irr_prefixes["ipv4"]:
@@ -1156,14 +1171,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 if (
                     not self.birdconfig_globals.ignore_irr_changes  # pylint: disable=too-many-boolean-expressions
                     and self.prev_state
-                    and "filter" in self.prev_state
-                    and "prefixes" in self.prev_state["filter"]
-                    and "irr" in self.prev_state["filter"]["prefixes"]
-                    and "ipv4" in self.prev_state["filter"]["prefixes"]["irr"]
+                    and "import_filter" in self.prev_state
+                    and "prefixes" in self.prev_state["import_filter"]
+                    and "irr" in self.prev_state["import_filter"]["prefixes"]
+                    and "ipv4" in self.prev_state["import_filter"]["prefixes"]["irr"]
                 ):
                     # Check if there was a substantial reduction in number of prefixes allowed
                     new_network_count = util.network_count(irr_prefixes["ipv4"])
-                    old_network_count = util.network_count(self.prev_state["filter"]["prefixes"]["irr"]["ipv4"])
+                    old_network_count = util.network_count(self.prev_state["import_filter"]["prefixes"]["irr"]["ipv4"])
                     if new_network_count * 2 < old_network_count:
                         raise BirdPlanError(
                             f"IRR IPv4 network count for peer '{self.name}' with type '{self.peer_type}' "
@@ -1178,7 +1193,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                             "last=%s, now=%s" % (old_network_count, new_network_count)
                         )
                 # All looks good, add them
-                self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv4"])
+                self.import_filter_policy.prefixes_irr.extend(irr_prefixes["ipv4"])
 
             # Lets work out what to do with the IPv6 prefixes
             if irr_prefixes["ipv6"]:
@@ -1186,14 +1201,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 if (
                     not self.birdconfig_globals.ignore_irr_changes  # pylint: disable=too-many-boolean-expressions
                     and self.prev_state
-                    and "filter" in self.prev_state
-                    and "prefixes" in self.prev_state["filter"]
-                    and "irr" in self.prev_state["filter"]["prefixes"]
-                    and "ipv6" in self.prev_state["filter"]["prefixes"]["irr"]
+                    and "import_filter" in self.prev_state
+                    and "prefixes" in self.prev_state["import_filter"]
+                    and "irr" in self.prev_state["import_filter"]["prefixes"]
+                    and "ipv6" in self.prev_state["import_filter"]["prefixes"]["irr"]
                 ):
                     # Check if there was a substantial reduction in number of prefixes allowed
                     new_network_count = util.network_count(irr_prefixes["ipv6"])
-                    old_network_count = util.network_count(self.prev_state["filter"]["prefixes"]["irr"]["ipv6"])
+                    old_network_count = util.network_count(self.prev_state["import_filter"]["prefixes"]["irr"]["ipv6"])
                     if new_network_count * 2 < old_network_count:
                         raise BirdPlanError(
                             f"IRR IPv6 network count for peer '{self.name}' with type '{self.peer_type}' "
@@ -1208,7 +1223,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                             "last=%s, now=%s" % (old_network_count, new_network_count)
                         )
                 # All looks good, add them
-                self.filter_policy.prefixes_irr.extend(irr_prefixes["ipv6"])
+                self.import_filter_policy.prefixes_irr.extend(irr_prefixes["ipv6"])
 
         # Check if we have a graceful shutdown override
         if ("bgp" in self.birdconfig_globals.state) and ("+graceful_shutdown" in self.birdconfig_globals.state["bgp"]):
@@ -1260,8 +1275,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.ttl_security:
             self.state["security"].append("ttl-security")
 
-        self.state["filter"] = {}
-        self.state["filter"]["as_sets"] = self.filter_policy.as_sets
+        self.state["import_filter"] = {}
+        self.state["import_filter"]["as_sets"] = self.import_filter_policy.as_sets
+
+        self.state["export_filter"] = {}
 
         # Check for some config options we also need to save
         if self.prefix_limit4:
@@ -1309,12 +1326,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self._setup_peer_tables()
 
         # Setup ASN lists
-        self._setup_aspath_asns()
-        self._setup_origin_asns()
-        self._setup_peer_asns()
+        self._setup_import_aspath_asns()
+        self._setup_import_origin_asns_filter()
+        self._setup_export_origin_asns_filter()
+        self._setup_import_peer_asns()
 
         # Setup allowed prefixes
-        self._setup_peer_prefixes()
+        self._setup_peer_import_prefix_filter()
+        self._setup_peer_export_prefix_filter()
 
         # BGP peer to main table
         self._setup_peer_to_bgp_filters()
@@ -1377,12 +1396,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         """Return the IP versioned BGP import filter name."""
         return f"f_bgp_AS{self.asn}_{self.name}_peer_bgp_import"
 
+    def export_prefix_list_name(self, ipv: str) -> str:
+        """Return our export prefix list name."""
+        return f"bgp{ipv}_AS{self.asn}_{self.name}_prefixes_export"
+
     def import_prefix_list_name(self, ipv: str) -> str:
-        """Return our prefix list name."""
+        """Return our import prefix list name."""
         return f"bgp{ipv}_AS{self.asn}_{self.name}_prefixes_import"
 
     def import_blackhole_prefix_list_name(self, ipv: str) -> str:
-        """Return our blackhole prefix list name."""
+        """Return our import blackhole prefix list name."""
         return f"bgp{ipv}_AS{self.asn}_{self.name}_blackhole_prefixes_import"
 
     def _setup_peer_tables(self) -> None:
@@ -1408,8 +1431,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Store our BGP table names
         self.state["tables"] = state_tables
 
-    def _setup_aspath_asns(self) -> None:  # pylint: disable=too-many-branches
-        """AS-PATH ASN list setup."""
+    def _setup_import_aspath_asns(self) -> None:  # pylint: disable=too-many-branches
+        """AS-PATH ASN import list setup."""
 
         # Short circuit and exit if we have none
         if not self.has_aspath_asn_filter:
@@ -1426,13 +1449,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             aspath_asns.append(f"{self.asn}")
 
         # Populate AS-PATH ASN list
-        if self.filter_policy.aspath_asns:
+        if self.import_filter_policy.aspath_asns:
             # Store static filter info in our state
-            state["static"] = self.filter_policy.aspath_asns
+            state["static"] = self.import_filter_policy.aspath_asns
 
             extra_aspath_asns = []
             # Loop with ASNs specified in configuration
-            for asn in self.filter_policy.aspath_asns:
+            for asn in self.import_filter_policy.aspath_asns:
                 if asn not in aspath_asns and asn not in extra_aspath_asns:
                     extra_aspath_asns.append(f"{asn}")
                 if asn not in calculated_aspath_asns:
@@ -1443,10 +1466,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # If we're a "customer" or "peer", pull in the origin_asns and irr_asns lists
         if self.peer_type in ("customer", "peer"):
             # Check if we can add our ORIGIN ASNs
-            if self.filter_policy.origin_asns:
+            if self.import_filter_policy.origin_asns:
                 extra_aspath_asns = []
                 # Loop with ASNs specified in configuration
-                for asn in self.filter_policy.origin_asns:
+                for asn in self.import_filter_policy.origin_asns:
                     # Make sure we don't add duplicates
                     if asn not in aspath_asns and asn not in extra_aspath_asns:
                         extra_aspath_asns.append(f"{asn}")
@@ -1457,16 +1480,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 aspath_asns.extend(extra_aspath_asns)
 
             # Check if we got results, if so add the IRR ASNs to the aspath_asns list
-            if self.filter_policy.origin_asns_irr:
+            if self.import_filter_policy.origin_asns_irr:
                 extra_aspath_asns = []
                 # Loop with ASNs retrieved from IRR records
-                for asn in self.filter_policy.origin_asns_irr:
+                for asn in self.import_filter_policy.origin_asns_irr:
                     if asn not in aspath_asns and asn not in extra_aspath_asns:
                         extra_aspath_asns.append(f"{asn}")
                     if asn not in calculated_aspath_asns:
                         calculated_aspath_asns.append(asn)
                 aspath_asns.append(
-                    f"# Retrieved {len(extra_aspath_asns)} items from IRR with object '{self.filter_policy.as_sets}'"
+                    f"# Retrieved {len(extra_aspath_asns)} items from IRR with object '{self.import_filter_policy.as_sets}'"
                 )
                 aspath_asns.extend(extra_aspath_asns)
 
@@ -1484,15 +1507,15 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         state["calculated"] = calculated_aspath_asns
 
         # Save state
-        if "filter" not in self.state:
-            self.state["filter"] = {}
-        self.state["filter"]["aspath_asns"] = state
+        if "import_filter" not in self.state:
+            self.state["import_filter"] = {}
+        self.state["import_filter"]["aspath_asns"] = state
 
-    def _setup_origin_asns(self) -> None:
-        """Origin ASN list setup."""
+    def _setup_import_origin_asns_filter(self) -> None:
+        """Origin ASN import list setup."""
 
         # Short circuit and exit if we have none
-        if not self.has_origin_asn_filter:
+        if not self.has_import_origin_asn_filter:
             return
 
         state = {}
@@ -1500,13 +1523,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         origin_asns = []
 
         # Populate our origin ASN list from configuration
-        if self.filter_policy.origin_asns:
+        if self.import_filter_policy.origin_asns:
             # Store filter info in our state
-            state["static"] = self.filter_policy.origin_asns
+            state["static"] = self.import_filter_policy.origin_asns
 
             extra_origin_asns = []
             # Loop with ASNs specified in configuration
-            for asn in self.filter_policy.origin_asns:
+            for asn in self.import_filter_policy.origin_asns:
                 # Make sure we don't add duplicates
                 if asn not in origin_asns and asn not in extra_origin_asns:
                     extra_origin_asns.append(f"{asn}")
@@ -1514,16 +1537,18 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             origin_asns.extend(extra_origin_asns)
 
         # Grab IRR ASNs
-        if self.filter_policy.origin_asns_irr:
+        if self.import_filter_policy.origin_asns_irr:
             # Store filter info in our state
-            state["irr"] = self.filter_policy.origin_asns_irr
+            state["irr"] = self.import_filter_policy.origin_asns_irr
 
             extra_origin_asns = []
             # Loop with ASNs retrieved from IRR records
-            for asn in self.filter_policy.origin_asns_irr:
+            for asn in self.import_filter_policy.origin_asns_irr:
                 if asn not in origin_asns and asn not in extra_origin_asns:
                     extra_origin_asns.append(f"{asn}")
-            origin_asns.append(f"# Retrieved {len(extra_origin_asns)} items from IRR with object '{self.filter_policy.as_sets}'")
+            origin_asns.append(
+                f"# Retrieved {len(extra_origin_asns)} items from IRR with object '{self.import_filter_policy.as_sets}'"
+            )
             origin_asns.extend(extra_origin_asns)
 
         self.conf.add(f"define {self.origin_asn_list_name} = [")
@@ -1537,12 +1562,52 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("")
 
         # Save state
-        if "filter" not in self.state:
-            self.state["filter"] = {}
-        self.state["filter"]["origin_asns"] = state
+        if "import_filter" not in self.state:
+            self.state["import_filter"] = {}
+        self.state["import_filter"]["origin_asns"] = state
 
-    def _setup_peer_asns(self) -> None:
-        """Peer ASN list setup."""
+    def _setup_export_origin_asns_filter(self) -> None:
+        """Origin ASN export list setup."""
+
+        # Short circuit and exit if we have none
+        if not self.has_export_origin_asn_filter:
+            return
+
+        state = {}
+
+        origin_asns = []
+
+        # Populate our origin ASN list from configuration
+        if self.export_filter_policy.origin_asns:
+            # Store filter info in our state
+            state["static"] = self.export_filter_policy.origin_asns
+
+            extra_origin_asns = []
+            # Loop with ASNs specified in configuration
+            for asn in self.export_filter_policy.origin_asns:
+                # Make sure we don't add duplicates
+                if asn not in origin_asns and asn not in extra_origin_asns:
+                    extra_origin_asns.append(f"{asn}")
+            origin_asns.append(f"# Explicitly defined {len(extra_origin_asns)} items (origin_asns)")
+            origin_asns.extend(extra_origin_asns)
+
+        self.conf.add(f"define {self.origin_asn_list_name} = [")
+        # Loop with each line and add commas where needed
+        for count, asn in enumerate(origin_asns):
+            asn_str = f"  {asn}"
+            if not asn.startswith("#") and count < len(origin_asns) - 1:
+                asn_str += ","
+            self.conf.add(asn_str)
+        self.conf.add("];")
+        self.conf.add("")
+
+        # Save state
+        if "export_filter" not in self.state:
+            self.state["export_filter"] = {}
+        self.state["export_filter"]["origin_asns"] = state
+
+    def _setup_import_peer_asns(self) -> None:
+        """Peer ASN import list setup."""
 
         # Short circuit and exit if we have none
         if not self.has_peer_asn_filter:
@@ -1553,11 +1618,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         peer_asns = []
 
         # Add ASN list with comments
-        if self.filter_policy.peer_asns:
+        if self.import_filter_policy.peer_asns:
             # Save our peer ASN list in our state
-            state["static"] = self.filter_policy.peer_asns
-            peer_asns.append(f"# Explicitly defined {len(self.filter_policy.peer_asns)} items")
-            for asn in self.filter_policy.peer_asns:
+            state["static"] = self.import_filter_policy.peer_asns
+            peer_asns.append(f"# Explicitly defined {len(self.import_filter_policy.peer_asns)} items")
+            for asn in self.import_filter_policy.peer_asns:
                 peer_asns.append(f"{asn}")
 
         self.conf.add(f"define {self.peer_asn_list_name} = [")
@@ -1571,92 +1636,98 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("")
 
         # Save state
-        if "filter" not in self.state:
-            self.state["filter"] = {}
-        self.state["filter"]["peer_asns"] = state
+        if "import_filter" not in self.state:
+            self.state["import_filter"] = {}
+        self.state["import_filter"]["peer_asns"] = state
 
-    def _setup_peer_prefixes(self) -> None:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
-        """Prefix list setup."""
+    def _setup_peer_import_prefix_filter(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+        self,
+    ) -> None:
+        """Prefix import filter setup."""
 
         # Short circuit and exit if we have none
-        if not self.has_prefix_filter:
+        if not self.has_import_prefix_filter:
             return
 
         state: Dict[str, Dict[str, Any]] = {}
 
         # Work out prefixes
-        prefix_lists: Dict[str, List[str]] = {"4": [], "6": []}
-        for prefix in sorted(self.filter_policy.prefixes):
+        import_prefix_lists: Dict[str, List[str]] = {"4": [], "6": []}
+        for prefix in sorted(self.import_filter_policy.prefixes):
             if ":" in prefix:
-                prefix_lists["6"].append(prefix)
+                import_prefix_lists["6"].append(prefix)
             else:
-                prefix_lists["4"].append(prefix)
-        prefix_lists_irr: Dict[str, List[str]] = {"4": [], "6": []}
-        for prefix in sorted(self.filter_policy.prefixes_irr):
+                import_prefix_lists["4"].append(prefix)
+        import_prefix_lists_irr: Dict[str, List[str]] = {"4": [], "6": []}
+        for prefix in sorted(self.import_filter_policy.prefixes_irr):
             if ":" in prefix:
-                prefix_lists_irr["6"].append(prefix)
+                import_prefix_lists_irr["6"].append(prefix)
             else:
-                prefix_lists_irr["4"].append(prefix)
+                import_prefix_lists_irr["4"].append(prefix)
 
         # Output prefix definitions
         for ipv in ["4", "6"]:
-            prefix_list = prefix_lists[ipv]
-            prefix_list_irr = prefix_lists_irr[ipv]
+            import_prefix_list = import_prefix_lists[ipv]
+            import_prefix_list_irr = import_prefix_lists_irr[ipv]
 
-            prefixes = []
-            blackholes = []
+            import_prefixes = []
+            import_blackholes = []
 
             # Add statically defined prefix list
-            if prefix_list:
+            if import_prefix_list:
                 # Save prefix list in our state
                 if "static" not in state:
                     state["static"] = {}
-                state["static"][f"ipv{ipv}"] = prefix_list
+                state["static"][f"ipv{ipv}"] = import_prefix_list
 
-                for prefix in prefix_list:
-                    prefixes.append(prefix)
+                for prefix in import_prefix_list:
+                    import_prefixes.append(prefix)
                     # Add blackhole
                     blackhole = re.split(r"[{+]", prefix, maxsplit=1)[0] + "+"
-                    blackholes.append(blackhole)
+                    import_blackholes.append(blackhole)
             # Sort and unique our results
-            prefixes = sorted(set(prefixes))
-            blackholes = sorted(set(blackholes))
+            import_prefixes = sorted(set(import_prefixes))
+            import_blackholes = sorted(set(import_blackholes))
             # Add title for this section
-            prefixes.insert(0, f"# {len(prefix_list)} explicitly defined")
-            blackholes.insert(0, f"# {len(prefix_list)} explicitly defined")
+            import_prefixes.insert(0, f"# {len(import_prefix_list)} explicitly defined")
+            import_blackholes.insert(0, f"# {len(import_prefix_list)} explicitly defined")
 
             # Add prefix list from IRR
-            if prefix_list_irr:
+            if import_prefix_list_irr:
                 # Save prefix list in our state
                 if "irr" not in state:
                     state["irr"] = {}
-                state["irr"][f"ipv{ipv}"] = prefix_list_irr
+                state["irr"][f"ipv{ipv}"] = import_prefix_list_irr
 
-                prefixes_irr = []
-                blackholes_irr = []
+                import_prefixes_irr = []
+                import_blackholes_irr = []
 
                 # Loop with each prefix we got from IRR
-                for prefix in prefix_list_irr:
+                for prefix in import_prefix_list_irr:
                     # Make sure we're not making duplicates
-                    if prefix not in prefixes:
-                        prefixes_irr.append(prefix)
+                    if prefix not in import_prefixes:
+                        import_prefixes_irr.append(prefix)
                     # Add blackhole, and make sure we're not duplicating here either
                     blackhole = prefix.split("{", 1)[0] + "+"
-                    if blackhole not in blackholes:
-                        blackholes_irr.append(blackhole)
+                    if blackhole not in import_blackholes:
+                        import_blackholes_irr.append(blackhole)
 
                 # Add title to top of prefixes retrieved via IRR
-                prefixes.append(f"# Retrieved {len(prefixes_irr)} items from IRR with object '{self.filter_policy.as_sets}'")
-                blackholes.append(f"# Retrieved {len(blackholes_irr)} items from IRR with object '{self.filter_policy.as_sets}'")
+                import_prefixes.append(
+                    f"# Retrieved {len(import_prefixes_irr)} items from IRR with object '{self.import_filter_policy.as_sets}'"
+                )
+                import_blackholes.append(
+                    f"# Retrieved {len(import_blackholes_irr)} items from IRR with object '{self.import_filter_policy.as_sets}'"
+                )
                 # Extend our lists
-                prefixes.extend(prefixes_irr)
-                blackholes.extend(blackholes_irr)
+                import_prefixes.extend(import_prefixes_irr)
+                import_blackholes.extend(import_blackholes_irr)
 
             self.conf.add(f"define {self.import_prefix_list_name(ipv)} = [")
             # Loop with each line and add commas where needed
-            for count, prefix in enumerate(prefixes):
+            for count, prefix in enumerate(import_prefixes):
                 prefix_str = f"  {prefix}"
-                if not prefix.startswith("#") and count < len(prefixes) - 1:
+                if not prefix.startswith("#") and count < len(import_prefixes) - 1:
                     prefix_str += ","
                 self.conf.add(prefix_str)
             self.conf.add("];")
@@ -1666,18 +1737,72 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):
                 self.conf.add(f"define {self.import_blackhole_prefix_list_name(ipv)} = [")
                 # Loop with each line and add commas where needed
-                for count, blackhole in enumerate(blackholes):
+                for count, blackhole in enumerate(import_blackholes):
                     blackhole_str = f"  {blackhole}"
-                    if not blackhole.startswith("#") and count < len(blackholes) - 1:
+                    if not blackhole.startswith("#") and count < len(import_blackholes) - 1:
                         blackhole_str += ","
                     self.conf.add(blackhole_str)
                 self.conf.add("];")
                 self.conf.add("")
 
         # Save state
-        if "filter" not in self.state:
-            self.state["filter"] = {}
-        self.state["filter"]["prefixes"] = state
+        if "import_filter" not in self.state:
+            self.state["import_filter"] = {}
+        self.state["import_filter"]["prefixes"] = state
+
+    def _setup_peer_export_prefix_filter(self) -> None:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+        """Prefix export filter setup."""
+
+        # Short circuit and exit if we have none
+        if not self.has_export_prefix_filter:
+            return
+
+        state: Dict[str, Dict[str, Any]] = {}
+
+        # Work out prefixes
+        export_prefix_lists: Dict[str, List[str]] = {"4": [], "6": []}
+        for prefix in sorted(self.export_filter_policy.prefixes):
+            if ":" in prefix:
+                export_prefix_lists["6"].append(prefix)
+            else:
+                export_prefix_lists["4"].append(prefix)
+
+        # Output prefix definitions
+        for ipv in ["4", "6"]:
+            export_prefix_list = export_prefix_lists[ipv]
+
+            export_prefixes = []
+
+            # Add statically defined prefix list
+            if export_prefix_list:
+                # Save prefix list in our state
+                if "static" not in state:
+                    state["static"] = {}
+                state["static"][f"ipv{ipv}"] = export_prefix_list
+
+                for prefix in export_prefix_list:
+                    export_prefixes.append(prefix)
+
+            # Sort and unique our results
+            export_prefixes = sorted(set(export_prefixes))
+
+            # Add title for this section
+            export_prefixes.insert(0, f"# {len(export_prefix_list)} explicitly defined")
+
+            self.conf.add(f"define {self.export_prefix_list_name(ipv)} = [")
+            # Loop with each line and add commas where needed
+            for count, prefix in enumerate(export_prefixes):
+                prefix_str = f"  {prefix}"
+                if not prefix.startswith("#") and count < len(export_prefixes) - 1:
+                    prefix_str += ","
+                self.conf.add(prefix_str)
+            self.conf.add("];")
+            self.conf.add("")
+
+        # Save state
+        if "export_filter" not in self.state:
+            self.state["export_filter"] = {}
+        self.state["export_filter"]["prefixes"] = state
 
     def _peer_to_bgp_export_filter(self) -> None:
         """Export filters into our main BGP routing table from the BGP peer table."""
@@ -1874,12 +1999,29 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add(f"  if !{self.functions.is_default()} then {{")
         # Reject bogons for eBGP peer types
         if self.peer_type not in ("internal", "rrclient", "rrserver", "rrserver-server"):
-            self.conf.add(f"     {self.bgp_functions.peer_reject_bogons()};")
-        self.conf.add(f"     if {self.bgp_functions.is_blackhole()} then {{")
-        self.conf.add(f"       {self._peer_reject_non_exportable_blackhole()};")
-        self.conf.add("     } else {")
-        self.conf.add(f"       {self._peer_reject_non_exportable()};")
-        self.conf.add("     }")
+            self.conf.add(f"    {self.bgp_functions.peer_reject_bogons()};")
+        self.conf.add(f"    if {self.bgp_functions.is_blackhole()} then {{")
+        self.conf.add(f"      {self._peer_reject_non_exportable_blackhole()};")
+        self.conf.add("    } else {")
+        self.conf.add(f"      {self._peer_reject_non_exportable()};")
+        self.conf.add("    }")
+
+        # Filter BGP routes we don't want
+        # Check if we're filtering allowed origin ASNs
+        if self.has_export_origin_asn_filter:
+            self.conf.add("  # Filter exported prefixes on origin ASN")
+            self.conf.add(
+                f"  if {self.bgp_functions.export_filter_origin_asns(BirdVariable(self.origin_asn_list_name))}"
+                " then accept_route = false;"
+            )
+        # Check if we're filtering allowed prefixes
+        if self.has_export_prefix_filter:
+            self.conf.add("  # Filter exported prefixes")
+            # Check if we have IPv4 support and output the filter
+            export_filter_prefixes = self.bgp_functions.export_filter_prefixes(
+                BirdVariable(self.export_prefix_list_name("4")), BirdVariable(self.export_prefix_list_name("6"))
+            )
+            self.conf.add(f"  if {export_filter_prefixes} then accept_route = false;")
 
         # End of BGP type tests
         self.conf.add("  }")
@@ -2164,91 +2306,91 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.peer_type == "customer":
             self.conf.add(f"  {self.bgp_functions.peer_communities_strip_internal()};")
             self.conf.add(f"  {self.bgp_functions.peer_import_customer(self.asn, self.cost)};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_default()};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_bogons()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_default()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_bogons()};")
             # The bgp_filter_prefix size test will exclude blackholes from checks
             self.conf.add(f"  {self._bgp_filter_prefix_size()};")
             # Check if we're going to accept a blackhole route
             if self.route_policy_accept.bgp_customer_blackhole:
                 self.conf.add(f"  {self._bgp_filter_blackhole_size()};")
             else:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_blackhole()};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_blackhole()};")
             # If we're replacing the ASN we only allow private ASN's in the AS-PATH
             if self.replace_aspath:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_asn_private(BirdVariable(f'[{self.asn}]'))};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_asn_private(BirdVariable(f'[{self.asn}]'))};")
             # Else, filter bogon ASN's
             else:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_asn_bogons()};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_asn_bogons()};")
             self.conf.add(
-                f"  {self.bgp_functions.peer_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
+                f"  {self.bgp_functions.import_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
             )
-            self.conf.add(f"  {self.bgp_functions.peer_filter_asn_invalid(self.asn)};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_asn_transit()};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_nexthop_not_peerip()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_asn_invalid(self.asn)};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_asn_transit()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_nexthop_not_peerip()};")
 
         # Peers
         elif self.peer_type == "peer":
             self.conf.add(f"  {self.bgp_functions.peer_communities_strip_all()};")
             self.conf.add(f"  {self.bgp_functions.peer_import_peer(self.asn, self.cost)};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_default()};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_blackhole()};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_bogons()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_default()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_blackhole()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_bogons()};")
             self.conf.add(f"  {self._bgp_filter_prefix_size()};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_asn_bogons()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_asn_bogons()};")
             self.conf.add(
-                f"  {self.bgp_functions.peer_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
+                f"  {self.bgp_functions.import_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
             )
-            self.conf.add(f"  {self.bgp_functions.peer_filter_nexthop_not_peerip()};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_asn_invalid(self.asn)};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_asn_transit()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_nexthop_not_peerip()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_asn_invalid(self.asn)};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_asn_transit()};")
 
         # Routecollector
         elif self.peer_type == "routecollector":
             self.conf.add(f"  {self.bgp_functions.peer_communities_strip_all()};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_routecollector_all()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_routecollector_all()};")
         # Routeserver
         elif self.peer_type == "routeserver":
             self.conf.add(f"  {self.bgp_functions.peer_communities_strip_all()};")
             self.conf.add(f"  {self.bgp_functions.peer_import_routeserver(self.asn, self.cost)};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_default()};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_blackhole()};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_bogons()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_default()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_blackhole()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_bogons()};")
             self.conf.add(f"  {self._bgp_filter_prefix_size()};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_asn_bogons()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_asn_bogons()};")
             self.conf.add(
-                f"  {self.bgp_functions.peer_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
+                f"  {self.bgp_functions.import_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
             )
-            self.conf.add(f"  {self.bgp_functions.peer_filter_asn_transit()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_asn_transit()};")
 
         # Internal router peer types
         elif self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
-            self.conf.add(f"  {self.bgp_functions.peer_filter_lc_no_relation()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_lc_no_relation()};")
 
             # If we are not accepting any default routes, just filter them all out
             if not self.route_policy_accept.bgp_own_default and not self.route_policy_accept.bgp_transit_default:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_default()};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_default()};")
             else:
                 # Filter own default routes if we're not accepting them
                 if not self.route_policy_accept.bgp_own_default:
-                    self.conf.add(f"  {self.bgp_functions.peer_filter_own_default()};")
+                    self.conf.add(f"  {self.bgp_functions.import_filter_own_default()};")
                 # Filter transit default routes if we're not accepting them
                 if not self.route_policy_accept.bgp_transit_default:
-                    self.conf.add(f"  {self.bgp_functions.peer_filter_transit_default()};")
+                    self.conf.add(f"  {self.bgp_functions.import_filter_transit_default()};")
                 # Filter any non-own and non-transit default routes (invalid default routes)
-                self.conf.add(f"  {self.bgp_functions.peer_filter_invalid_default()};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_invalid_default()};")
 
             # If we're not accepting any blackhole routes, just filter them all out
             if not self.route_policy_accept.bgp_customer_blackhole and not self.route_policy_accept.bgp_own_blackhole:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_blackhole()};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_blackhole()};")
             else:
                 # Filter customer blackhole routes if we're not accepting them
                 if not self.route_policy_accept.bgp_customer_blackhole:
-                    self.conf.add(f"  {self.bgp_functions.peer_filter_customer_blackhole()};")
+                    self.conf.add(f"  {self.bgp_functions.import_filter_customer_blackhole()};")
                 # Filter own blackhole routes if we're not accepting them
                 if not self.route_policy_accept.bgp_own_blackhole:
-                    self.conf.add(f"  {self.bgp_functions.peer_filter_own_blackhole()};")
+                    self.conf.add(f"  {self.bgp_functions.import_filter_own_blackhole()};")
                 # Filter any non-own and non-transit blackhole routes (invalid blackhole routes)
-                self.conf.add(f"  {self.bgp_functions.peer_filter_invalid_blackhole()};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_invalid_blackhole()};")
                 self.conf.add(f"  {self._bgp_filter_blackhole_size()};")
 
             self.conf.add("  # Bypass prefix size filters for the default route")
@@ -2256,12 +2398,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
             # Check if we're replacing the AS-PATH
             if self.peer_type == "internal" and self.replace_aspath:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_asn_private(BirdVariable('PRIVATE_ASNS'))};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_asn_private(BirdVariable('PRIVATE_ASNS'))};")
 
             # NK: Should we be filtering AS-PATH lengths for internal systems?
             # - probably safer to do so?
             self.conf.add(
-                f"  {self.bgp_functions.peer_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
+                f"  {self.bgp_functions.import_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
             )
 
         # Transit providers
@@ -2270,20 +2412,20 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.conf.add(f"  {self.bgp_functions.peer_import_transit(self.asn, self.cost)};")
             # Check if we need to filter out the default route
             if not self.route_policy_accept.bgp_transit_default:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_default()};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_default()};")
 
-            self.conf.add(f"  {self.bgp_functions.peer_filter_blackhole()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_blackhole()};")
             self.conf.add("  # Bypass bogon filters for the default route")
-            self.conf.add(f"  if !{self.functions.is_default()} then {self.bgp_functions.peer_filter_bogons()};")
+            self.conf.add(f"  if !{self.functions.is_default()} then {self.bgp_functions.import_filter_bogons()};")
             self.conf.add("  # Bypass prefix size filters for the default route")
             self.conf.add(f"  if !{self.functions.is_default()} then {self._bgp_filter_prefix_size()};")
 
-            self.conf.add(f"  {self.bgp_functions.peer_filter_asn_bogons()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_asn_bogons()};")
             self.conf.add(
-                f"  {self.bgp_functions.peer_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
+                f"  {self.bgp_functions.import_filter_aspath_length(self.aspath_import_maxlen, self.aspath_import_minlen)};"
             )
-            self.conf.add(f"  {self.bgp_functions.peer_filter_asn_invalid(self.asn)};")
-            self.conf.add(f"  {self.bgp_functions.peer_filter_nexthop_not_peerip()};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_asn_invalid(self.asn)};")
+            self.conf.add(f"  {self.bgp_functions.import_filter_nexthop_not_peerip()};")
 
         # With exception of routecollector (which is not supposed to be sending us routes), check the community lengths
         if self.peer_type != "routecollector":
@@ -2293,56 +2435,56 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # For customer and peer, it is an ALLOW list
         if self.peer_type in ("customer", "peer"):
             # Check if we're filtering allowed origin ASNs
-            if self.has_origin_asn_filter:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_origin_asns_allow(BirdVariable(self.origin_asn_list_name))};")
+            if self.has_import_origin_asn_filter:
+                self.conf.add(f"  {self.bgp_functions.import_filter_origin_asns_allow(BirdVariable(self.origin_asn_list_name))};")
             # Check if we're filtering allowed peer ASNs
             if self.has_peer_asn_filter:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_asns_allow(BirdVariable(self.peer_asn_list_name))};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_asns_allow(BirdVariable(self.peer_asn_list_name))};")
             # Check if we're filtering allowed AS-PATH ASNs
             if self.has_aspath_asn_filter:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_aspath_allow(BirdVariable(self.aspath_asn_list_name))};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_aspath_allow(BirdVariable(self.aspath_asn_list_name))};")
             # Check if we're filtering allowed prefixes
-            if self.has_prefix_filter:
+            if self.has_import_prefix_filter:
                 self.conf.add("  # Filter on the allowed prefixes")
                 # Check if we have IPv4 support and output the filter
-                peer_filter_prefixes_allow = self.bgp_functions.peer_filter_prefixes_allow(
+                import_filter_prefixes_allow = self.bgp_functions.import_filter_prefixes_allow(
                     BirdVariable(self.import_prefix_list_name("4")), BirdVariable(self.import_prefix_list_name("6"))
                 )
-                self.conf.add(f"  {peer_filter_prefixes_allow};")
+                self.conf.add(f"  {import_filter_prefixes_allow};")
 
                 # For peer types that support blackholes, add the blackhole filter
                 if self.peer_type == "customer":
-                    peer_filter_blackholes_allow = self.bgp_functions.peer_filter_prefixes_blackhole_allow(
+                    import_filter_blackholes_allow = self.bgp_functions.import_filter_prefixes_blackhole_allow(
                         BirdVariable(self.import_blackhole_prefix_list_name("4")),
                         BirdVariable(self.import_blackhole_prefix_list_name("6")),
                     )
-                    self.conf.add(f"  {peer_filter_blackholes_allow};")
+                    self.conf.add(f"  {import_filter_blackholes_allow};")
 
         # For everything else it is a DENY list
         elif self.peer_type != "routecollector":
             # Check if we're filtering denied origin ASNs
-            if self.has_origin_asn_filter:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_origin_asns_deny(BirdVariable(self.origin_asn_list_name))};")
+            if self.has_import_origin_asn_filter:
+                self.conf.add(f"  {self.bgp_functions.import_filter_origin_asns_deny(BirdVariable(self.origin_asn_list_name))};")
             # Check if we're filtering denied peer ASNs
             if self.has_peer_asn_filter:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_asns_deny(BirdVariable(self.peer_asn_list_name))};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_asns_deny(BirdVariable(self.peer_asn_list_name))};")
             # Check if we're filtering allowed AS-PATH ASNs
             if self.has_aspath_asn_filter:
-                self.conf.add(f"  {self.bgp_functions.peer_filter_aspath_deny(BirdVariable(self.aspath_asn_list_name))};")
+                self.conf.add(f"  {self.bgp_functions.import_filter_aspath_deny(BirdVariable(self.aspath_asn_list_name))};")
             # Check if we're filtering denied prefixes
-            if self.has_prefix_filter:
-                peer_filter_prefixes_deny = self.bgp_functions.peer_filter_prefixes_deny(
+            if self.has_import_prefix_filter:
+                import_filter_prefixes_deny = self.bgp_functions.import_filter_prefixes_deny(
                     BirdVariable(self.import_prefix_list_name("4")), BirdVariable(self.import_prefix_list_name("6"))
                 )
-                self.conf.add(f"  {peer_filter_prefixes_deny};")
+                self.conf.add(f"  {import_filter_prefixes_deny};")
 
                 # For peer types that support blackholes, add the blackhole filter
                 if self.peer_type in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
-                    peer_filter_blackholes_deny = self.bgp_functions.peer_filter_prefixes_blackhole_deny(
+                    import_filter_blackholes_deny = self.bgp_functions.import_filter_prefixes_blackhole_deny(
                         BirdVariable(self.import_blackhole_prefix_list_name("4")),
                         BirdVariable(self.import_blackhole_prefix_list_name("6")),
                     )
-                    self.conf.add(f"  {peer_filter_blackholes_deny};")
+                    self.conf.add(f"  {import_filter_blackholes_deny};")
 
         # Quarantine mode...
         # NK: We don't quarantine route collectors as they are automagically filtered
@@ -2511,13 +2653,13 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
     def _bgp_filter_prefix_size(self) -> str:
         """Return a BGP prefix size filter for a specific IP version."""
-        return self.bgp_functions.peer_filter_prefix_size(
+        return self.bgp_functions.import_filter_prefix_size(
             self.import_maxlen4, self.import_minlen4, self.import_maxlen6, self.import_minlen6
         )
 
     def _bgp_filter_blackhole_size(self) -> str:
         """Return a BGP blackhole size filter for a specific IP version."""
-        return self.bgp_functions.peer_filter_blackhole_size(
+        return self.bgp_functions.import_filter_blackhole_size(
             self.blackhole_import_maxlen4,
             self.blackhole_import_minlen4,
             self.blackhole_import_maxlen6,
@@ -2529,7 +2671,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         maxlen = self.community_import_maxlen
         maxlen_extended = self.extended_community_import_maxlen
         maxlen_large = self.large_community_import_maxlen
-        return self.bgp_functions.peer_filter_community_lengths(maxlen, maxlen_extended, maxlen_large)
+        return self.bgp_functions.import_filter_community_lengths(maxlen, maxlen_extended, maxlen_large)
 
     @property
     def bgp_attributes(self) -> BGPAttributes:
@@ -2772,9 +2914,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.route_policy_accept
 
     @property
-    def filter_policy(self) -> BGPPeerFilterPolicy:
-        """Return the our filter policy."""
-        return self.peer_attributes.filter_policy
+    def import_filter_policy(self) -> BGPPeerImportFilterPolicy:
+        """Return the our import filter policy."""
+        return self.peer_attributes.import_filter_policy
+
+    @property
+    def export_filter_policy(self) -> BGPPeerExportFilterPolicy:
+        """Return the our export filter policy."""
+        return self.peer_attributes.export_filter_policy
 
     @property
     def prefix_limit4(self) -> BGPPeerPrefixLimit:
@@ -3116,19 +3263,26 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # We pull in "origin_asns" here to populate the aspath_asns for better filtering
         if self.peer_type in ("customer", "peer"):
-            return self.filter_policy.aspath_asns or self.filter_policy.origin_asns or self.filter_policy.as_sets
+            return (
+                self.import_filter_policy.aspath_asns or self.import_filter_policy.origin_asns or self.import_filter_policy.as_sets
+            )
 
-        return self.filter_policy.aspath_asns
+        return self.import_filter_policy.aspath_asns
 
     @property
-    def has_origin_asn_filter(self) -> BGPPeerFilterItem:
-        """Return if we filter on origin ASNs."""
-        return self.filter_policy.origin_asns or self.filter_policy.as_sets
+    def has_import_origin_asn_filter(self) -> BGPPeerFilterItem:
+        """Return if we filter import origin ASNs."""
+        return self.import_filter_policy.origin_asns or self.import_filter_policy.as_sets
+
+    @property
+    def has_export_origin_asn_filter(self) -> BGPPeerFilterItem:
+        """Return if we filter export origin ASNs."""
+        return self.export_filter_policy.origin_asns
 
     @property
     def has_peer_asn_filter(self) -> BGPPeerFilterItem:
         """Return if we filter on peer ASNs."""
-        return self.filter_policy.peer_asns
+        return self.import_filter_policy.peer_asns
 
     @property
     def has_ipv4(self) -> bool:
@@ -3141,6 +3295,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.neighbor6 is not None
 
     @property
-    def has_prefix_filter(self) -> BGPPeerFilterItem:
-        """Peer has a prefix filter."""
-        return self.filter_policy.prefixes or self.filter_policy.as_sets
+    def has_import_prefix_filter(self) -> BGPPeerFilterItem:
+        """Peer has a import prefix filter."""
+        return self.import_filter_policy.prefixes or self.import_filter_policy.as_sets
+
+    @property
+    def has_export_prefix_filter(self) -> BGPPeerFilterItem:
+        """Peer has a export prefix filter."""
+        return self.import_filter_policy.prefixes or self.import_filter_policy.as_sets

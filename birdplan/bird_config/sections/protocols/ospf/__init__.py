@@ -29,7 +29,7 @@ from ..base import SectionProtocolBase
 from ..direct import ProtocolDirect
 from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from .area import ProtocolOSPFArea
-from .area.typing import OSPFAreaConfig
+from .area.ospf_area_types import OSPFAreaConfig
 from .ospf_attributes import OSPFAttributes, OSPFRoutePolicyAccept, OSPFRoutePolicyRedistribute
 from .ospf_functions import OSPFFunctions
 

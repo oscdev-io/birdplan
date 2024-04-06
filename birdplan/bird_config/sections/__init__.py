@@ -22,7 +22,7 @@ from ..globals import BirdConfigGlobals
 from .base import SectionBase
 from .constants import SectionConstants
 from .functions import SectionFunctions
-from .logging import SectionLogging
+from .log import SectionLogging
 from .main import SectionMain
 from .protocols import SectionProtocols
 from .router_id import SectionRouterID

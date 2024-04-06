@@ -612,7 +612,9 @@ bgp:
 ```
 
 
-## filter
+## import_filter (alias: filter)
+
+(The 'import_filter' key is supported from version v0.0.20)
 
 Filtering of routes received from a peer. Options available are below...
 
@@ -656,12 +658,45 @@ bgp:
     peer1:
       asn: 65000
       description: Some peer
-      filter:
+      import_filter:
         as_sets: AS-EXAMPLE
         origin_asns:
           - 65009
         peer_asns:
           - 65000
+        prefixes:
+          - "100.141.0.0/24"
+          - "fc00:141::/64"
+  ...
+```
+
+
+## export_filter
+
+Supported in: v0.0.20+
+
+Filtering of routes advertised to a peer. Options available are below...
+
+* `prefixes` will filter out the list of specified prefixes from being advertised.
+* `origin_asns` will filter out the list of origin ASN's from being advertised.
+
+Examples of `prefixes` filter:
+* `192.168.0.0/22+` - Matches /22 or any subset of the /22
+* `192.168.0.0/24` - Matches exactly /24
+
+Currently only the above two methods of specifying IP ranges are accepted.
+
+An example is however below...
+```yaml
+bgp:
+  ...
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      export_filter:
+        origin_asns:
+          - 65009
         prefixes:
           - "100.141.0.0/24"
           - "fc00:141::/64"

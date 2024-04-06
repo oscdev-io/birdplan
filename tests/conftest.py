@@ -88,7 +88,7 @@ class CustomPytestRegex:
         return self._regex.pattern
 
 
-@pytest.fixture()
+@pytest.fixture
 def helpers():
     """Return our helpers."""
     return Helpers
@@ -106,7 +106,7 @@ def fixture_testpath(request):
     return str(request.node.fspath)
 
 
-@pytest.fixture()
+@pytest.fixture
 def enable_performance_test(pytestconfig):
     """Get the --enable-performance-test option."""
     return pytestconfig.getoption("--enable-performance-test")
