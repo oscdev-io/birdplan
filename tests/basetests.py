@@ -197,10 +197,6 @@ class BirdPlanBaseTestCase:
             assert "router_id" in status_output, f"The status output should have 'router_id' for BIRD router '{router}'"
             assert status_output["router_id"] == f"0.0.0.{router_id}", f"The router ID should be '0.0.0.{router_id}'"
 
-        # Check if we're delaying testing (for convergeance)
-        if sim.delay:
-            time.sleep(sim.delay)
-
     def _test_bird_routers_table_bgp_peers(self, sim: Simulation, ipv: int, routers: Optional[List[str]] = None):
         """Test BIRD BGP peer routing table."""
 

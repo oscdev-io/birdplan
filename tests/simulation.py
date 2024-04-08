@@ -23,6 +23,7 @@
 import os
 import pathlib
 import pprint
+import time
 from typing import Any, Dict, List, Optional, Tuple
 
 from nsnetsim.generic_node import GenericNode
@@ -96,6 +97,9 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
     def run(self):
         """Run simulation."""
         self._topology.run()
+        # Check if we're delaying testing (for convergeance)
+        if self.delay:
+            time.sleep(self.delay)
 
     def destroy(self):
         """Destroy simulation."""
