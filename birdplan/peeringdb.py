@@ -44,6 +44,9 @@ PeeringDBInfo = Dict[str, Any]
 #  }
 peeringdb_cache: Dict[str, Dict[str, Any]] = {}
 
+# Keep track of the timestamp of our last request
+peeringdb_last_request: float = 0
+
 
 PEERINGDB_16BIT_LOWER = 64512
 PEERINGDB_16BIT_UPPER = 65534
@@ -59,6 +62,8 @@ class PeeringDB:  # pylint: disable=too-few-public-methods
 
     def get_prefix_limits(self, asn: int) -> PeeringDBInfo:
         """Return our peeringdb info entry, if there is one."""
+        global peeringdb_last_request  # pylint: disable=global-statement
+
         # We cannot do lookups on private ASN's
         if (PEERINGDB_16BIT_LOWER <= asn <= PEERINGDB_16BIT_UPPER) or (PEERINGDB_32BIT_LOWER <= asn <= PEERINGDB_32BIT_UPPER):
             return {"info_prefixes4": None, "info_prefixes6": None}
@@ -67,11 +72,19 @@ class PeeringDB:  # pylint: disable=too-few-public-methods
         result = self._cache(f"asn:{asn}")
         # If we can't, grab the result from PeeringDB live
         if not result:
+            # Sleep if last request was made within the past 5s
+            time_delta = time.time() - peeringdb_last_request + 5
+            if time_delta < 0:
+                time.sleep(abs(time_delta))
+            # Update the last request
+            peeringdb_last_request = time.time()
             # Request the PeeringDB info for this AS
             try:
                 response = requests.get(f"https://www.peeringdb.com/api/net?asn__in={asn}", timeout=10)
             except requests.exceptions.Timeout as e:  # pragma: no cover
                 raise BirdPlanError(f"PeeringDB request timed out: {e}") from None
+            # Update the last request
+            peeringdb_last_request = time.time()
             # Check the result is not empty
             if not response:  # pragma: no cover
                 raise BirdPlanError("PeeringDB returned and empty result")
