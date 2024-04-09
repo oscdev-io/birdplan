@@ -2436,7 +2436,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if self.peer_type in ("customer", "peer"):
             # Check if we're filtering allowed origin ASNs
             if self.has_import_origin_asn_filter:
-                self.conf.add(f"  {self.bgp_functions.import_filter_origin_asns_allow(BirdVariable(self.import_origin_asn_list_name))};")
+                self.conf.add(
+                    f"  {self.bgp_functions.import_filter_origin_asns_allow(BirdVariable(self.import_origin_asn_list_name))};"
+                )
             # Check if we're filtering allowed peer ASNs
             if self.has_import_peer_asn_filter:
                 self.conf.add(f"  {self.bgp_functions.import_filter_asns_allow(BirdVariable(self.import_peer_asn_list_name))};")
@@ -2464,7 +2466,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         elif self.peer_type != "routecollector":
             # Check if we're filtering denied origin ASNs
             if self.has_import_origin_asn_filter:
-                self.conf.add(f"  {self.bgp_functions.import_filter_origin_asns_deny(BirdVariable(self.import_origin_asn_list_name))};")
+                self.conf.add(
+                    f"  {self.bgp_functions.import_filter_origin_asns_deny(BirdVariable(self.import_origin_asn_list_name))};"
+                )
             # Check if we're filtering denied peer ASNs
             if self.has_import_peer_asn_filter:
                 self.conf.add(f"  {self.bgp_functions.import_filter_asns_deny(BirdVariable(self.import_peer_asn_list_name))};")

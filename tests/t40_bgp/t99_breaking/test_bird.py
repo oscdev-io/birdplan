@@ -39,7 +39,7 @@ from ...simulation import Simulation
 __all__ = ["Test"]
 
 
-@pytest.mark.incremental
+@pytest.mark.incremental()
 class Test:
     """BIRD BGP test."""
 

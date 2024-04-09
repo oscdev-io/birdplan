@@ -37,8 +37,9 @@ class Template(TemplateBase):
 
     def r1_template_extra_config(self):
         """Return R1 extra config with the blackhole community."""
-
-        if getattr(self, "r1_peer_type") in ("routeserver", "routecollector", "transit"):
+        
+        r1_peer_type = getattr(self, "r1_peer_type")  # noqa: B009
+        if r1_peer_type and r1_peer_type in ("routeserver", "routecollector", "transit"):
             return """
       blackhole_community: true
 """
