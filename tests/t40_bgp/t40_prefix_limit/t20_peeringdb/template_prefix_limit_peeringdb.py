@@ -38,6 +38,10 @@ class Template(BirdPlanBaseTestCase):
     routers = ["r1"]
     exabgps = ["e1"]
 
+    r1_template_peer_config = """
+      prefix_limit_action: disable
+"""
+
     def _birdplan_run(  # pylint: disable=too-many-arguments,too-many-locals
         self, sim: Simulation, tmpdir: str, router: str, args: List[str]
     ) -> Any:

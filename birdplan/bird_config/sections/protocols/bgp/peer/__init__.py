@@ -45,6 +45,7 @@ from .peer_attributes import (
     BGPPeerExportFilterPolicy,
     BGPPeerFilterItem,
     BGPPeerImportFilterPolicy,
+    BGPPeerImportPrefixLimitAction,
     BGPPeerLargeCommunities,
     BGPPeerLocation,
     BGPPeerPrefixLimit,
@@ -565,6 +566,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Check that we have static routes imported first
         if self.route_policy_redistribute.static and not self.bgp_attributes.route_policy_import.static:
             raise BirdPlanError(f"BGP needs static routes to be imported before they can be redistributed to peer '{self.name}'")
+
+        # Check if we have the prefix limit action defined for this peer
+        if "prefix_limit_action" in peer_config:
+            prefix_limit_action = peer_config["prefix_limit_action"]
+            try:
+                self.prefix_limit_action = BGPPeerImportPrefixLimitAction(prefix_limit_action)
+            except ValueError:
+                raise BirdPlanError(f"The BGP peer prefix limit action '{prefix_limit_action}' is invalid") from None
 
         # If the peer is a customer or peer, check if we have a prefix limit, if not add it from peeringdb
         if self.peer_type in ("customer", "peer"):
@@ -2607,7 +2616,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Setup prefix limit
         prefix_limit = getattr(self, f"prefix_limit{ipv}")
         if prefix_limit:
-            self.conf.add(f"    import limit {prefix_limit} action restart;")
+            self.conf.add(f"    import limit {prefix_limit} action {self.prefix_limit_action.value};")
             protocol_state["prefix_limit"] = prefix_limit
         # Setup filters
         self.conf.add(f"    import filter {self.filter_name_import};")
@@ -2926,6 +2935,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def export_filter_policy(self) -> BGPPeerExportFilterPolicy:
         """Return the our export filter policy."""
         return self.peer_attributes.export_filter_policy
+
+    @property
+    def prefix_limit_action(self) -> BGPPeerImportPrefixLimitAction:
+        """Return our prefix limit action."""
+        return self.peer_attributes.prefix_limit_action
+
+    @prefix_limit_action.setter
+    def prefix_limit_action(self, prefix_limit_action: BGPPeerImportPrefixLimitAction) -> None:
+        """Set our prefix limit action."""
+        self.peer_attributes.prefix_limit_action = prefix_limit_action
 
     @property
     def prefix_limit4(self) -> BGPPeerPrefixLimit:

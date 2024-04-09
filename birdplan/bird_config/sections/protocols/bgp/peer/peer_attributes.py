@@ -18,6 +18,7 @@
 
 """BIRD BGP protocol attributes."""
 
+import enum
 from typing import Dict, List, Optional, Union
 
 from ......exceptions import BirdPlanError
@@ -40,6 +41,14 @@ BGPPeerPrefixLimit = Optional[str]
 
 BGPPeerFilterItem = Union[str, List[str]]
 BGPPeerFilter = Dict[str, BGPPeerFilterItem]
+
+
+# Define BGP prefix limit action enum
+class BGPPeerImportPrefixLimitAction(enum.Enum):
+    """BGP peer import prefix limit action."""
+
+    RESTART = "restart"
+    DISABLE = "disable"
 
 
 class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
@@ -637,6 +646,9 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     quarantine : bool
         Set if the peer is quarantined.
 
+    prefix_limit_action : BGPPeerImportPrefixLimitAction
+        Prefix limit action used when the import prefix count is exceeded.
+
     prefix_limit4 : BGPPeerPrefixLimit
         Prefix limit for IPv4.
 
@@ -700,6 +712,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     quarantine: bool
 
+    prefix_limit_action: BGPPeerImportPrefixLimitAction
+
     prefix_limit4: BGPPeerPrefixLimit
     prefix_limit6: BGPPeerPrefixLimit
 
@@ -754,6 +768,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.passive = False
 
         self.quarantine = False
+
+        self.prefix_limit_action = BGPPeerImportPrefixLimitAction.RESTART
 
         self.prefix_limit4 = None
         self.prefix_limit6 = None

@@ -1000,7 +1000,7 @@ r9_peer_summary:
         status:
           channel: ipv6
           igp_table: master6
-          info: active
+          info: connect
           info_extra: 'socket: no route to host'
           input_filter: f_bgp_AS65000_r1_peer_import
           last_error: 'socket: no route to host'

@@ -18,25 +18,22 @@ r1_peer_show_e1:
       prefix_limit: 5
       source_address: 100.64.0.1
       status:
-        bgp_nexthop: 100.64.0.1
         channel: ipv4
         igp_table: master4
         import_limit: 5
-        import_limit_action: restart
-        info: established
+        import_limit_action: disable
+        info: down
+        info_extra: 'shutdown: route limit exceeded'
         input_filter: f_bgp_AS65001_e1_peer_import
+        last_error: 'automatic shutdown: route limit exceeded'
         local_as: 65000
         name: bgp4_AS65001_e1
         neighbor_address: 100.64.0.2
         neighbor_as: 65001
-        neighbor_id: 0.0.0.2
         output_filter: f_bgp_AS65001_e1_peer_export
         preference: 100
         proto: BGP
-        routes_exported: 0
-        routes_imported: 5
-        source_address: 100.64.0.1
-        state: up
+        state: down
         table: t_bgp4_AS65001_e1_peer
     ipv6:
       mode: active
@@ -45,25 +42,22 @@ r1_peer_show_e1:
       prefix_limit: 5
       source_address: fc00:100::1
       status:
-        bgp_nexthop: fc00:100::1
         channel: ipv6
         igp_table: master6
         import_limit: 5
-        import_limit_action: restart
-        info: established
+        import_limit_action: disable
+        info: down
+        info_extra: 'shutdown: route limit exceeded'
         input_filter: f_bgp_AS65001_e1_peer_import
+        last_error: 'automatic shutdown: route limit exceeded'
         local_as: 65000
         name: bgp6_AS65001_e1
         neighbor_address: fc00:100::2
         neighbor_as: 65001
-        neighbor_id: 0.0.0.2
         output_filter: f_bgp_AS65001_e1_peer_export
         preference: 100
         proto: BGP
-        routes_exported: 0
-        routes_imported: 5
-        source_address: fc00:100::1
-        state: up
+        state: down
         table: t_bgp6_AS65001_e1_peer
   quarantine: false
   security: []
@@ -85,25 +79,22 @@ r1_peer_summary:
         protocol: ipv4
         source_address: 100.64.0.1
         status:
-          bgp_nexthop: 100.64.0.1
           channel: ipv4
           igp_table: master4
           import_limit: 5
-          import_limit_action: restart
-          info: established
+          import_limit_action: disable
+          info: down
+          info_extra: 'shutdown: route limit exceeded'
           input_filter: f_bgp_AS65001_e1_peer_import
+          last_error: 'automatic shutdown: route limit exceeded'
           local_as: 65000
           name: bgp4_AS65001_e1
           neighbor_address: 100.64.0.2
           neighbor_as: 65001
-          neighbor_id: 0.0.0.2
           output_filter: f_bgp_AS65001_e1_peer_export
           preference: 100
           proto: BGP
-          routes_exported: 0
-          routes_imported: 5
-          source_address: 100.64.0.1
-          state: up
+          state: down
           table: t_bgp4_AS65001_e1_peer
       ipv6:
         mode: active
@@ -113,23 +104,20 @@ r1_peer_summary:
         protocol: ipv6
         source_address: fc00:100::1
         status:
-          bgp_nexthop: fc00:100::1
           channel: ipv6
           igp_table: master6
           import_limit: 5
-          import_limit_action: restart
-          info: established
+          import_limit_action: disable
+          info: down
+          info_extra: 'shutdown: route limit exceeded'
           input_filter: f_bgp_AS65001_e1_peer_import
+          last_error: 'automatic shutdown: route limit exceeded'
           local_as: 65000
           name: bgp6_AS65001_e1
           neighbor_address: fc00:100::2
           neighbor_as: 65001
-          neighbor_id: 0.0.0.2
           output_filter: f_bgp_AS65001_e1_peer_export
           preference: 100
           proto: BGP
-          routes_exported: 0
-          routes_imported: 5
-          source_address: fc00:100::1
-          state: up
+          state: down
           table: t_bgp6_AS65001_e1_peer

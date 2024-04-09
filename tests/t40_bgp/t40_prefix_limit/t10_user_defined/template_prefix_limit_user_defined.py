@@ -33,6 +33,7 @@ class Template(BirdPlanBaseTestCase):
     exabgps = ["e1"]
 
     r1_template_peer_config = """
+      prefix_limit_action: disable
       prefix_limit4: 5
       prefix_limit6: 5
 """

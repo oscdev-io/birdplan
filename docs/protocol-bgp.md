@@ -552,7 +552,7 @@ bgp:
 
 ## add_paths
 
-Supported in: 0.0.3
+Supported in version: v0.0.3
 
 ADD-PATH is the BGP capability described in RFC5492 which enables the sending/receiving (or both) of multiple paths for the same
 prefix.
@@ -675,7 +675,7 @@ bgp:
 
 ## export_filter
 
-Supported in: v0.0.20+
+Supported in version: v0.0.20
 
 Filtering of routes advertised to a peer. Options available are below...
 
@@ -943,7 +943,7 @@ bgp:
 
 ## ttl_security
 
-Supported in version: 0.0.17+
+Supported in version: v0.0.17
 
 Enable TTL security on the BGP session.
 
@@ -956,6 +956,30 @@ bgp:
       asn: 65000
       description: Some peer
       ttl_security: true
+  ...
+```
+
+
+## prefix_limit_action
+
+Supported in version: v0.1.0
+
+Prefix limit action taken when the prefix limit is exceeded. Supported actions include `restart`, `disable`. The default value
+is `restart`.
+
+The `restart` option will restart the BGP session. The `disable` option will disable the BGP session and require manual intervention
+to start it again.
+
+An example of specifying a prefix limit action is below...
+```yaml
+bgp:
+  ...
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prefix_limit_action: disable
+      prefix_limit4: 100
   ...
 ```
 

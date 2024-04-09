@@ -1514,6 +1514,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 "passive",
                 "password",
                 "ttl_security",
+                "prefix_limit_action",
                 "prefix_limit4",
                 "prefix_limit6",
                 "quarantine",
