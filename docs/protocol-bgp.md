@@ -173,6 +173,8 @@ bird:
   ...
 ```
 
+When originating routes, one will need to explicitly redistribute them for each protocol.
+
 
 
 # peertype_constraints
