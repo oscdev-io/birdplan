@@ -9,7 +9,21 @@ cd /root/birdplan || :
 echo "Excuting in '$(pwd)'..."
 
 ARGS=("$@")
-if [ ${#ARGS[@]} -eq 0 ] || [ ${#ARGS[@]} -eq 1 ] && [ "${ARGS[0]}" == "--write-expected" ]; then
+
+# Work out what args we're passing
+default_args="1"
+if [ ${#ARGS[@]} -gt 0 ]; then
+    default_args=""
+fi
+# If we have a single argument, we can still use default args
+if [ ${#ARGS[@]} -eq 1 ]; then
+    # As long as its not --write-expected
+    if [ "${ARGS[0]}" == "--write-expected" ]; then
+        default_args="1"
+    fi
+fi
+# Finally check if we are actually using our default args
+if [ -n "$default_args" ]; then
     cpus=$(nproc)
     jobcount=$((cpus / 2))
     ARGS+=(--numprocesses="$jobcount" --dist=loadfile)
