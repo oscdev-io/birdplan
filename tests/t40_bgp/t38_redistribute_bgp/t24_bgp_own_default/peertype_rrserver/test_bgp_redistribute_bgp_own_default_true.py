@@ -21,7 +21,7 @@
 
 """BGP redistribution test case."""
 
-from ....config.peertype_rrserver.rrclient.r1r2 import PeerTypeConfig
+from ....config.peertype_rrserver.r1r2 import PeerTypeConfig
 from ..template_redistribute_bgp_own_default_true import Template
 
 __all__ = ["Test"]

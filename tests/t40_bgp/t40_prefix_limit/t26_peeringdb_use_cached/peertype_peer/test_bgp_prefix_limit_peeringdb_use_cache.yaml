@@ -1,9 +1,10 @@
 r1_peer_show_e1:
   asn: 65001
   description: BGP session to e1
-  filter:
-    as_sets: []
+  export_filter: {}
   graceful_shutdown: false
+  import_filter:
+    as_sets: []
   name: e1
   prefix_limit:
     peeringdb:
@@ -21,7 +22,7 @@ r1_peer_show_e1:
         channel: ipv4
         igp_table: master4
         import_limit: 100
-        import_limit_action: restart
+        import_limit_action: disable
         info: established
         input_filter: f_bgp_AS65001_e1_peer_import
         local_as: 65000
@@ -48,7 +49,7 @@ r1_peer_show_e1:
         channel: ipv6
         igp_table: master6
         import_limit: 100
-        import_limit_action: restart
+        import_limit_action: disable
         info: established
         input_filter: f_bgp_AS65001_e1_peer_import
         local_as: 65000
@@ -88,7 +89,7 @@ r1_peer_summary:
           channel: ipv4
           igp_table: master4
           import_limit: 100
-          import_limit_action: restart
+          import_limit_action: disable
           info: established
           input_filter: f_bgp_AS65001_e1_peer_import
           local_as: 65000
@@ -116,7 +117,7 @@ r1_peer_summary:
           channel: ipv6
           igp_table: master6
           import_limit: 100
-          import_limit_action: restart
+          import_limit_action: disable
           info: established
           input_filter: f_bgp_AS65001_e1_peer_import
           local_as: 65000

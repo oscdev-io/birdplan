@@ -31,15 +31,9 @@ class PeerTypeConfig:
     r1_global_config = """
   rr_cluster_id: 0.0.0.1
 """
-    r1_peer_config = """
-      passive: False
-"""
 
     r2_asn = 65000
-    r2_peer_type = "rrclient"
+    r2_peer_type = "rrserver"
     r2_global_config = """
   rr_cluster_id: 0.0.0.1
-"""
-    r2_peer_config = """
-      passive: False
 """

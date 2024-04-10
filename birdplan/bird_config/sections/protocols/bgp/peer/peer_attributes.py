@@ -18,6 +18,7 @@
 
 """BIRD BGP protocol attributes."""
 
+import enum
 from typing import Dict, List, Optional, Union
 
 from ......exceptions import BirdPlanError
@@ -28,7 +29,7 @@ __all__ = [
     "BGPPeerPrependItem",
     "BGPPeerPrepend",
     "BGPPeerRoutePolicyAccept",
-    "BGPPeerFilterPolicy",
+    "BGPPeerImportFilterPolicy",
     "BGPPeerLocation",
     "BGPPeerRoutePolicyRedistribute",
     "BGPPeerConstraints",
@@ -40,6 +41,14 @@ BGPPeerPrefixLimit = Optional[str]
 
 BGPPeerFilterItem = Union[str, List[str]]
 BGPPeerFilter = Dict[str, BGPPeerFilterItem]
+
+
+# Define BGP prefix limit action enum
+class BGPPeerImportPrefixLimitAction(enum.Enum):
+    """BGP peer import prefix limit action."""
+
+    RESTART = "restart"
+    DISABLE = "disable"
 
 
 class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
@@ -283,7 +292,7 @@ class BGPPeerRoutePolicyAccept:  # pylint: disable=too-few-public-methods
         self.bgp_transit_default = False
 
 
-class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
+class BGPPeerImportFilterPolicy:  # pylint: disable=too-few-public-methods
     """
     BGP filter policy for incoming routes from the BGP peer.
 
@@ -324,6 +333,27 @@ class BGPPeerFilterPolicy:  # pylint: disable=too-few-public-methods
         # INTERNAL attributes, these are populated during initialization
         self.origin_asns_irr = []
         self.prefixes_irr = []
+
+
+class BGPPeerExportFilterPolicy:  # pylint: disable=too-few-public-methods
+    """
+    BGP filter policy for outgoing routes to the BGP peer.
+
+    Attributes
+    ----------
+    origin_asns : BGPPeerFilterItem
+        List of origin ASNs to filter on.
+    prefixes : BGPPeerFilterItem
+        List of prefixes to filter on.
+    """
+
+    origin_asns: BGPPeerFilterItem
+    prefixes: BGPPeerFilterItem
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        self.origin_asns = []
+        self.prefixes = []
 
 
 class BGPPeerLocation:  # pylint: disable=too-few-public-methods
@@ -616,6 +646,9 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     quarantine : bool
         Set if the peer is quarantined.
 
+    prefix_limit_action : BGPPeerImportPrefixLimitAction
+        Prefix limit action used when the import prefix count is exceeded.
+
     prefix_limit4 : BGPPeerPrefixLimit
         Prefix limit for IPv4.
 
@@ -679,6 +712,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     quarantine: bool
 
+    prefix_limit_action: BGPPeerImportPrefixLimitAction
+
     prefix_limit4: BGPPeerPrefixLimit
     prefix_limit6: BGPPeerPrefixLimit
 
@@ -690,7 +725,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     route_policy_accept: BGPPeerRoutePolicyAccept
     route_policy_redistribute: BGPPeerRoutePolicyRedistribute
 
-    filter_policy: BGPPeerFilterPolicy
+    import_filter_policy: BGPPeerImportFilterPolicy
+    export_filter_policy: BGPPeerExportFilterPolicy
 
     blackhole_community: Optional[Union[List[str], bool]]
 
@@ -733,6 +769,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
         self.quarantine = False
 
+        self.prefix_limit_action = BGPPeerImportPrefixLimitAction.RESTART
+
         self.prefix_limit4 = None
         self.prefix_limit6 = None
 
@@ -745,7 +783,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.route_policy_accept = BGPPeerRoutePolicyAccept()
         self.route_policy_redistribute = BGPPeerRoutePolicyRedistribute()
 
-        self.filter_policy = BGPPeerFilterPolicy()
+        self.import_filter_policy = BGPPeerImportFilterPolicy()
+        self.export_filter_policy = BGPPeerExportFilterPolicy()
 
         self.blackhole_community = None
 

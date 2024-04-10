@@ -473,7 +473,9 @@ r1_master6:
 r1_peer_show_e1:
   asn: 65001
   description: BGP session to e1
-  filter:
+  export_filter: {}
+  graceful_shutdown: false
+  import_filter:
     as_sets: []
     aspath_asns:
       calculated:
@@ -481,7 +483,6 @@ r1_peer_show_e1:
     origin_asns:
       static:
       - 65001
-  graceful_shutdown: false
   name: e1
   prefix_limit:
     static:
@@ -551,7 +552,9 @@ r1_peer_show_e1:
 r1_peer_show_e2:
   asn: 65001
   description: BGP session to e2
-  filter:
+  export_filter: {}
+  graceful_shutdown: false
+  import_filter:
     as_sets: []
     aspath_asns:
       calculated:
@@ -559,7 +562,6 @@ r1_peer_show_e2:
     origin_asns:
       static:
       - 65001
-  graceful_shutdown: false
   name: e2
   prefix_limit:
     static:

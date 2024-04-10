@@ -35,12 +35,16 @@ class Template(TemplateBase):
     def r1_template_global_config(self):
         """Output customized global config depending on the peer type constraint specified."""
 
-        peer_type = self.r1_peer_type
+        peer_type = getattr(self, "r1_peer_type")  # noqa: B009
+        if not peer_type:
+            return ""
 
-        if "replace_aspath" in getattr(self, "r1_extra_r2_config", ""):
+        if "replace_aspath" in getattr(self, "r1_extra_r2_config", []):
             peer_type = "customer.private"
 
         return f"""
+{self._generate_originated_routes()}
+
   peertype_constraints:
     {peer_type}:
       export_minlen4: 21

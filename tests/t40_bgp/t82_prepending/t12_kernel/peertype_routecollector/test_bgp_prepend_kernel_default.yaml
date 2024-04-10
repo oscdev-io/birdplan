@@ -43,9 +43,10 @@ r2_master6:
 r2_peer_show_r1:
   asn: 65000
   description: BGP session to r1
-  filter:
-    as_sets: []
+  export_filter: {}
   graceful_shutdown: false
+  import_filter:
+    as_sets: []
   name: r1
   protocols:
     ipv4:
@@ -109,7 +110,7 @@ r2_peer_summary:
         status:
           channel: ipv4
           igp_table: master4
-          info: connect
+          info: active
           info_extra: 'socket: no route to host'
           input_filter: f_bgp_AS65000_r1_peer_import
           last_error: 'socket: no route to host'

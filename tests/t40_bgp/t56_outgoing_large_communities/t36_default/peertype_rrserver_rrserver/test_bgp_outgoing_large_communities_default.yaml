@@ -852,9 +852,10 @@ r1_master6:
 r1_peer_show_e1:
   asn: 65000
   description: BGP session to e1
-  filter:
-    as_sets: []
+  export_filter: {}
   graceful_shutdown: false
+  import_filter:
+    as_sets: []
   name: e1
   protocols:
     ipv4:
@@ -914,9 +915,10 @@ r1_peer_show_e1:
 r1_peer_show_e2:
   asn: 65000
   description: BGP session to e2
-  filter:
-    as_sets: []
+  export_filter: {}
   graceful_shutdown: false
+  import_filter:
+    as_sets: []
   name: e2
   protocols:
     ipv4:
@@ -976,9 +978,10 @@ r1_peer_show_e2:
 r1_peer_show_r2:
   asn: 65000
   description: BGP session to r2
-  filter:
-    as_sets: []
+  export_filter: {}
   graceful_shutdown: false
+  import_filter:
+    as_sets: []
   name: r2
   protocols:
     ipv4:
@@ -4538,9 +4541,10 @@ r2_master6:
 r2_peer_show_r1:
   asn: 65000
   description: BGP session to r1
-  filter:
-    as_sets: []
+  export_filter: {}
   graceful_shutdown: false
+  import_filter:
+    as_sets: []
   name: r1
   protocols:
     ipv4:

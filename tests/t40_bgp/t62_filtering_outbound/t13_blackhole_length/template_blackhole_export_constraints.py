@@ -29,16 +29,22 @@ __all__ = ["Template"]
 class Template(TemplateBase):
     """BGP default blackhole export constraints test case template."""
 
-    r1_template_extra_config = """
-      blackhole_community: true
-"""
-
-    r1_template_peer_config = """
-        blackhole_import_minlen4: 23
-"""
-
     e1_template_communities = "65535:666"
     e1_template_large_communities = "65000:666:65413 65000:666:65412"
 
     test_prefix_lengths4 = [23, 24, 32]
     test_prefix_lengths6 = [63, 64, 128]
+
+    def r1_template_extra_config(self):
+        """Return R1 extra config with the blackhole community."""
+
+        r1_peer_type = getattr(self, "r1_peer_type")  # noqa: B009
+        if r1_peer_type in ("routeserver", "routecollector", "transit"):
+            return """
+      blackhole_community: true
+"""
+        return ""
+
+    def r1_template_global_config(self):
+        """Return R1 global config with the originated routes."""
+        return self._generate_originated_routes()

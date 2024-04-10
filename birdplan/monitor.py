@@ -30,7 +30,7 @@ __all__: List[str] = []
 
 def _run_monitor() -> None:
     """Run the birdplan monitor."""
-    birdplan_cmdline = BirdPlanCommandLine(is_console=True)
+    birdplan_cmdline = BirdPlanCommandLine(is_console=False)
 
     try:
         birdplan_cmdline.run(["monitor"])

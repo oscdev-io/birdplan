@@ -43,6 +43,12 @@ def pytest_addoption(parser):
 
     parser.addoption("--write-expected", action="store_true", default=False, help="Write out expected test results.")
     parser.addoption(
+        "--no-wait",
+        action="store_true",
+        default=False,
+        help="Do not wait during write-expected tests (used for updates to results).",
+    )
+    parser.addoption(
         "--enable-performance-test", action="store_true", default=False, help="WARNING: This will spawn 2,500 BIRD routers"
     )
 
@@ -181,7 +187,7 @@ def fixture_sim(request):
     simulation = Simulation()
 
     # Check if we're delaying checking of results
-    if request.config.getoption("--write-expected"):
+    if request.config.getoption("--write-expected") and not request.config.getoption("--no-wait"):
         simulation.delay = 20
 
     # Yield the simulation to the test

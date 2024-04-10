@@ -21,7 +21,7 @@
 
 """BGP filtering test case."""
 
-from ....config.peertype_customer_private.r1_to_r10 import PeerTypeConfig
+from ....config.peertype_customer_private.transit.r1r2 import PeerTypeConfig
 from ..template_peer_blackhole_export_constraints import Template
 
 __all__ = ["Test"]
@@ -29,7 +29,3 @@ __all__ = ["Test"]
 
 class Test(PeerTypeConfig, Template):
     """BGP filtering test case."""
-
-    routers_config_exception = {
-        "r1": r"Having 'blackhole_export_minlen4' specified for peer 'r2' with type 'customer' makes no sense"
-    }

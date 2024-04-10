@@ -29,43 +29,33 @@ __all__ = ["Template"]
 class Template(TemplateBase):
     """BGP peer blackhole export constraints test case template."""
 
-    r1_template_extra_config = """
-      blackhole_community: true
-"""
-
     e1_template_communities = "65535:666"
     e1_template_large_communities = "65000:666:65413 65000:666:65412"
 
     test_prefix_lengths4 = [28, 30, 32]
     test_prefix_lengths6 = [124, 126, 128]
 
-    def __getattr__(self, name: str):
+    def r1_template_extra_config(self):
+        """Return R1 extra config with the blackhole community."""
+
+        r1_peer_type = getattr(self, "r1_peer_type")  # noqa: B009
+        if r1_peer_type and r1_peer_type in ("routeserver", "routecollector", "transit"):
+            return """
+      blackhole_community: true
+"""
+        return ""
+
+    def r1_template_global_config(self):
+        """Return R1 global config with the originated routes."""
+        return self._generate_originated_routes()
+
+    def r1_template_r2_config(self):
         """Work out what we're returning for what."""
 
-        # Mapping of peer types to router names
-        conf_map = {
-            "customer": "r2",
-            "internal": "r3",
-            "peer": "r4",
-            "routecollector": "r5",
-            "routeserver": "r6",
-            "rrclient": "r7",
-            "rrserver": "r8",
-            "rrserver-rrserver": "r9",
-            "transit": "r10",
-        }
-
-        # Loop with each of the map entries
-        for peer_type, router_name in conf_map.items():
-            # Check if we're configuring this specific peer type
-            if self.r1_peer_type == peer_type and name == f"r1_template_{router_name}_config":
-                # If we are, return the constraints for it
-                return """
+        return """
       constraints:
         blackhole_export_minlen4: 29
         blackhole_export_maxlen4: 31
         blackhole_export_minlen6: 125
         blackhole_export_maxlen6: 127
 """
-
-        raise AttributeError("Not valid here")

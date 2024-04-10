@@ -102,12 +102,13 @@ r1_master6:
 r1_peer_show_e1:
   asn: 65000
   description: BGP session to e1
-  filter:
+  export_filter: {}
+  graceful_shutdown: false
+  import_filter:
     as_sets: []
     origin_asns:
       static:
       - 65002
-  graceful_shutdown: false
   name: e1
   protocols:
     ipv4:

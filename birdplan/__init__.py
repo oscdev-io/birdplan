@@ -1514,6 +1514,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 "passive",
                 "password",
                 "ttl_security",
+                "prefix_limit_action",
                 "prefix_limit4",
                 "prefix_limit6",
                 "quarantine",
@@ -1594,14 +1595,26 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                     ):
                         raise BirdPlanError(f"Configuration item '{accept}' not understood in bgp:peers:{peer_name}:accept")
                     peer["accept"][accept] = accept_config
-            # Work out filters
-            elif config_item == "filter":
-                peer["filter"] = {}
+            # Add import filters
+            elif config_item in ("import_filter", "filter"):
+                peer["import_filter"] = {}
                 # Loop with filter configuration items
                 for filter_type, filter_config in config_value.items():
                     if filter_type not in ("as_sets", "aspath_asns", "origin_asns", "peer_asns", "prefixes"):
-                        raise BirdPlanError(f"Configuration item '{filter_type}' not understood in bgp:peers:{peer_name}:filter")
-                    peer["filter"][filter_type] = filter_config
+                        raise BirdPlanError(
+                            f"Configuration item '{filter_type}' not understood in bgp:peers:{peer_name}:import_filter"
+                        )
+                    peer["import_filter"][filter_type] = filter_config
+            # Add import filters
+            elif config_item == "export_filter":
+                peer["export_filter"] = {}
+                # Loop with filter configuration items
+                for filter_type, filter_config in config_value.items():
+                    if filter_type not in ("origin_asns", "prefixes"):
+                        raise BirdPlanError(
+                            f"Configuration item '{filter_type}' not understood in bgp:peers:{peer_name}:export_filter"
+                        )
+                    peer["export_filter"][filter_type] = filter_config
 
             # Work out outgoing large community options
             elif config_item == "outgoing_large_communities":
@@ -1751,7 +1764,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         if (peer["type"] == "rrclient") and ("rr_cluster_id" not in self.config["bgp"]):
             raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' is missing 'rr_cluster_id' when having 'rrclient' peers")
         # If we are a customer type, we must have filters defined
-        if (peer["type"] == "customer") and ("filter" not in peer):
+        if (peer["type"] == "customer") and ("import_filter" not in peer) and ("filter" not in peer):
             raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' is missing 'filter' when type is 'customer'")
         # We must have a neighbor4 or neighbor6
         if ("neighbor4" not in peer) and ("neighbor6" not in peer):

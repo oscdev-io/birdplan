@@ -31,3 +31,7 @@ class Template(TemplateBase):
 
     test_prefix_lengths4 = [7, 8, 15, 16, 23, 24, 28, 30, 32]
     test_prefix_lengths6 = [15, 17, 31, 32, 47, 48, 63, 65, 128]
+
+    def r1_template_global_config(self):
+        """Return R1 global config with the originated routes."""
+        return self._generate_originated_routes()

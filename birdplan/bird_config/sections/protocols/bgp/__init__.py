@@ -32,8 +32,8 @@ from ..direct import ProtocolDirect
 from ..pipe import ProtocolPipe, ProtocolPipeFilterType
 from .bgp_attributes import BGPAttributes, BGPPeertypeConstraints, BGPRoutePolicyAccept, BGPRoutePolicyImport
 from .bgp_functions import BGPFunctions
+from .bgp_types import BGPPeerConfig
 from .peer import ProtocolBGPPeer
-from .typing import BGPPeerConfig
 
 __all__ = ["ProtocolBGP"]
 

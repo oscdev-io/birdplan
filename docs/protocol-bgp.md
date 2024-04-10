@@ -173,6 +173,8 @@ bird:
   ...
 ```
 
+When originating routes, one will need to explicitly redistribute them for each protocol.
+
 
 
 # peertype_constraints
@@ -550,7 +552,7 @@ bgp:
 
 ## add_paths
 
-Supported in: 0.0.3
+Supported in version: v0.0.3
 
 ADD-PATH is the BGP capability described in RFC5492 which enables the sending/receiving (or both) of multiple paths for the same
 prefix.
@@ -612,7 +614,9 @@ bgp:
 ```
 
 
-## filter
+## import_filter (alias: filter)
+
+(The 'import_filter' key is supported from version v0.0.20)
 
 Filtering of routes received from a peer. Options available are below...
 
@@ -656,12 +660,45 @@ bgp:
     peer1:
       asn: 65000
       description: Some peer
-      filter:
+      import_filter:
         as_sets: AS-EXAMPLE
         origin_asns:
           - 65009
         peer_asns:
           - 65000
+        prefixes:
+          - "100.141.0.0/24"
+          - "fc00:141::/64"
+  ...
+```
+
+
+## export_filter
+
+Supported in version: v0.0.20
+
+Filtering of routes advertised to a peer. Options available are below...
+
+* `prefixes` will filter out the list of specified prefixes from being advertised.
+* `origin_asns` will filter out the list of origin ASN's from being advertised.
+
+Examples of `prefixes` filter:
+* `192.168.0.0/22+` - Matches /22 or any subset of the /22
+* `192.168.0.0/24` - Matches exactly /24
+
+Currently only the above two methods of specifying IP ranges are accepted.
+
+An example is however below...
+```yaml
+bgp:
+  ...
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      export_filter:
+        origin_asns:
+          - 65009
         prefixes:
           - "100.141.0.0/24"
           - "fc00:141::/64"
@@ -906,7 +943,7 @@ bgp:
 
 ## ttl_security
 
-Supported in version: 0.0.17+
+Supported in version: v0.0.17
 
 Enable TTL security on the BGP session.
 
@@ -919,6 +956,30 @@ bgp:
       asn: 65000
       description: Some peer
       ttl_security: true
+  ...
+```
+
+
+## prefix_limit_action
+
+Supported in version: v0.1.0
+
+Prefix limit action taken when the prefix limit is exceeded. Supported actions include `restart`, `disable`. The default value
+is `restart`.
+
+The `restart` option will restart the BGP session. The `disable` option will disable the BGP session and require manual intervention
+to start it again.
+
+An example of specifying a prefix limit action is below...
+```yaml
+bgp:
+  ...
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      prefix_limit_action: disable
+      prefix_limit4: 100
   ...
 ```
 

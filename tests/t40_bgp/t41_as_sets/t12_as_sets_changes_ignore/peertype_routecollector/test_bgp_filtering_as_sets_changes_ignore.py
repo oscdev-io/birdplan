@@ -30,4 +30,4 @@ __all__ = ["Test"]
 class Test(PeerTypeConfig, Template):
     """BGP AS-SET test case."""
 
-    routers_config_exception = {"r1": r"Having 'filter' specified for peer 'e1' with type 'routecollector' makes no sense"}
+    routers_config_exception = {"r1": r"Having 'import_filter' specified for peer 'e1' with type 'routecollector' makes no sense"}

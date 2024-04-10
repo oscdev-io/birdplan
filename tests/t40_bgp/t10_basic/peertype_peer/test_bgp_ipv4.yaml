@@ -71,9 +71,10 @@ r1_master6:
 r1_peer_show_e1:
   asn: 65001
   description: BGP session to e1
-  filter:
-    as_sets: []
+  export_filter: {}
   graceful_shutdown: false
+  import_filter:
+    as_sets: []
   name: e1
   prefix_limit:
     static:

@@ -1,9 +1,10 @@
 r1_peer_show_e1:
   asn: 65001
   description: BGP session to e1
-  filter:
-    as_sets: []
+  export_filter: {}
   graceful_shutdown: false
+  import_filter:
+    as_sets: []
   name: e1
   prefix_limit:
     peeringdb:
@@ -20,11 +21,11 @@ r1_peer_show_e1:
         channel: ipv4
         igp_table: master4
         import_limit: 5
-        import_limit_action: restart
-        info: active
-        info_extra: 'socket: connection refused'
+        import_limit_action: disable
+        info: down
+        info_extra: 'shutdown: route limit exceeded'
         input_filter: f_bgp_AS65001_e1_peer_import
-        last_error: 'socket: connection refused'
+        last_error: 'automatic shutdown: route limit exceeded'
         local_as: 65000
         name: bgp4_AS65001_e1
         neighbor_address: 100.64.0.2
@@ -44,11 +45,11 @@ r1_peer_show_e1:
         channel: ipv6
         igp_table: master6
         import_limit: 5
-        import_limit_action: restart
-        info: active
-        info_extra: 'socket: connection refused'
+        import_limit_action: disable
+        info: down
+        info_extra: 'shutdown: route limit exceeded'
         input_filter: f_bgp_AS65001_e1_peer_import
-        last_error: 'socket: connection refused'
+        last_error: 'automatic shutdown: route limit exceeded'
         local_as: 65000
         name: bgp6_AS65001_e1
         neighbor_address: fc00:100::2
@@ -81,9 +82,9 @@ r1_peer_summary:
           channel: ipv4
           igp_table: master4
           import_limit: 5
-          import_limit_action: restart
-          info: idle
-          info_extra: 'automatic shutdown: route limit exceeded'
+          import_limit_action: disable
+          info: down
+          info_extra: 'shutdown: route limit exceeded'
           input_filter: f_bgp_AS65001_e1_peer_import
           last_error: 'automatic shutdown: route limit exceeded'
           local_as: 65000
@@ -106,9 +107,9 @@ r1_peer_summary:
           channel: ipv6
           igp_table: master6
           import_limit: 5
-          import_limit_action: restart
-          info: idle
-          info_extra: 'automatic shutdown: route limit exceeded'
+          import_limit_action: disable
+          info: down
+          info_extra: 'shutdown: route limit exceeded'
           input_filter: f_bgp_AS65001_e1_peer_import
           last_error: 'automatic shutdown: route limit exceeded'
           local_as: 65000

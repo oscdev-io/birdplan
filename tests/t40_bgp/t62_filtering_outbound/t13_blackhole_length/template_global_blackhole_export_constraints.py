@@ -29,25 +29,35 @@ __all__ = ["Template"]
 class Template(TemplateBase):
     """BGP global blackhole export constraints test case template."""
 
-    r1_template_extra_config = """
-      blackhole_community: true
-"""
-
     e1_template_communities = "65535:666"
     e1_template_large_communities = "65000:666:65413 65000:666:65412"
 
     test_prefix_lengths4 = [28, 30, 32]
     test_prefix_lengths6 = [124, 126, 128]
 
+    def r1_template_extra_config(self):
+        """Return R1 extra config with the blackhole community."""
+
+        r1_peer_type = getattr(self, "r1_peer_type")  # noqa: B009
+        if r1_peer_type and r1_peer_type in ("routeserver", "routecollector", "transit"):
+            return """
+      blackhole_community: true
+"""
+        return ""
+
     def r1_template_global_config(self):
         """Output customized global config depending on the peer type constraint specified."""
 
-        peer_type = self.r1_peer_type
+        peer_type = getattr(self, "r1_peer_type")  # noqa: B009
+        if not peer_type:
+            return ""
 
         if "replace_aspath" in getattr(self, "r1_extra_r2_config", ""):
             peer_type = "customer.private"
 
         return f"""
+{self._generate_originated_routes()}
+
   peertype_constraints:
     {peer_type}:
       blackhole_export_minlen4: 29
