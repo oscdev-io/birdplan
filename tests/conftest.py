@@ -20,6 +20,7 @@
 
 """Testing stuff."""
 
+import contextlib
 import os
 import re
 import signal
@@ -114,9 +115,9 @@ def enable_performance_test(pytestconfig):
     return pytestconfig.getoption("--enable-performance-test")
 
 
-def sigchld_handler(signum, frame):
+def sigchld_handler(signum, frame):  # pylint: disable=unused-argument
     """Signal handler for SIGCHLD."""
-    try:
+    with contextlib.suppress(ChildProcessError):
         while True:
             # Wait for completion of a child process without blocking
             # os.WNOHANG makes the call non-blocking; it returns immediately if no child has exited
@@ -127,9 +128,6 @@ def sigchld_handler(signum, frame):
                 break
             # Process has been reaped
             # print(f"Reaped zombie process with PID: {pid}, Exit Status: {status}")
-    except ChildProcessError:
-        # No child processes
-        pass
 
 
 def pytest_configure(config):

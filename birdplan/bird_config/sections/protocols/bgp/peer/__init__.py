@@ -1857,7 +1857,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.state["import_filter"] = {}
         self.state["import_filter"]["prefixes"] = state
 
-    def _setup_peer_import_prefix_deny_filter(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+    def _setup_peer_import_prefix_deny_filter(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         self,
     ) -> None:
         """Prefix import deny filter setup."""
