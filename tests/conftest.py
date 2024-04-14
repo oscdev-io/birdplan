@@ -20,7 +20,9 @@
 
 """Testing stuff."""
 
+import os
 import re
+import signal
 
 import pytest
 
@@ -112,14 +114,35 @@ def enable_performance_test(pytestconfig):
     return pytestconfig.getoption("--enable-performance-test")
 
 
-#
-# Incremental marker, fail subsequent tests if one fails
-#
+def sigchld_handler(signum, frame):
+    """Signal handler for SIGCHLD."""
+    try:
+        while True:
+            # Wait for completion of a child process without blocking
+            # os.WNOHANG makes the call non-blocking; it returns immediately if no child has exited
+            # pid, status = os.waitpid(-1, os.WNOHANG)
+            pid, _ = os.waitpid(-1, os.WNOHANG)
+            if pid == 0:
+                # No more zombies
+                break
+            # Process has been reaped
+            # print(f"Reaped zombie process with PID: {pid}, Exit Status: {status}")
+    except ChildProcessError:
+        # No child processes
+        pass
 
 
 def pytest_configure(config):
     """Dynamic pytest configuration."""
     config.addinivalue_line("markers", "incremental: test class is incremental")
+    # Set the signal handler for SIGCHLD when running in docker containers, this is when our PID is 1
+    if os.getpid() == 1:
+        signal.signal(signal.SIGCHLD, sigchld_handler)
+
+
+#
+# Incremental marker, fail subsequent tests if one fails
+#
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
