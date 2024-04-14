@@ -477,6 +477,7 @@ r1_peer_show_r2:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r2
   prefix_limit:
     static:
@@ -1434,6 +1435,7 @@ r2_peer_show_r1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r1
   prefix_limit:
     static:

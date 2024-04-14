@@ -483,6 +483,7 @@ r1_peer_show_r2:
     origin_asns:
       static:
       - 65001
+  import_filter_deny: {}
   name: r2
   prefix_limit:
     static:
@@ -1412,6 +1413,7 @@ r2_peer_show_r1:
     origin_asns:
       static:
       - 65000
+  import_filter_deny: {}
   name: r1
   prefix_limit:
     static:

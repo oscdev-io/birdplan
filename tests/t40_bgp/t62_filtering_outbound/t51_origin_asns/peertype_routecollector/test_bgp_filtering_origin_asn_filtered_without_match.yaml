@@ -5,6 +5,7 @@ r1_peer_show_e1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: e1
   protocols:
     ipv4:
@@ -71,6 +72,7 @@ r1_peer_show_r2:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r2
   protocols:
     ipv4:
@@ -606,6 +608,7 @@ r2_peer_show_r1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r1
   protocols:
     ipv4:

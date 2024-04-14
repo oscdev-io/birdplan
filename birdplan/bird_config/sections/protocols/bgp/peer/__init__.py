@@ -44,6 +44,7 @@ from .peer_attributes import (
     BGPPeerConstraints,
     BGPPeerExportFilterPolicy,
     BGPPeerFilterItem,
+    BGPPeerImportFilterDenyPolicy,
     BGPPeerImportFilterPolicy,
     BGPPeerImportPrefixLimitAction,
     BGPPeerLargeCommunities,
@@ -608,6 +609,23 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     )
                 # Set filter policy
                 setattr(self.import_filter_policy, filter_type, filter_config)
+
+        # Check for filters we need to setup to out right deny
+        if "import_filter_deny" in peer_config:
+            # Raise an exception if filters makes no sense for this peer type
+            if self.peer_type == "routecollector":
+                raise BirdPlanError(
+                    f"Having 'import_filter_deny' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense"
+                )
+            # Add filters
+            for filter_type, filter_config in peer_config["import_filter_deny"].items():
+                if filter_type not in ("aspath_asns", "origin_asns", "prefixes"):
+                    raise BirdPlanError(
+                        f"BGP peer 'import_filter_deny' configuration '{filter_type}' for peer '{self.name}' with type "
+                        f"'{self.peer_type}' is invalid"
+                    )
+                # Set filter policy
+                setattr(self.import_filter_deny_policy, filter_type, filter_config)
 
         # Check for filters we need to setup
         if "export_filter" in peer_config:
@@ -1287,6 +1305,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.state["import_filter"] = {}
         self.state["import_filter"]["as_sets"] = self.import_filter_policy.as_sets
 
+        self.state["import_filter_deny"] = {}
+
         self.state["export_filter"] = {}
 
         # Check for some config options we also need to save
@@ -1334,15 +1354,20 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Setup routing tables
         self._setup_peer_tables()
 
-        # Setup ASN lists
-        self._setup_import_aspath_asns()
+        # Setup filters
+        self._setup_import_aspath_asns_filter()
         self._setup_import_origin_asns_filter()
         self._setup_export_origin_asns_filter()
-        self._setup_import_peer_asns()
+        self._setup_import_peer_asns_filter()
 
         # Setup allowed prefixes
         self._setup_peer_import_prefix_filter()
         self._setup_peer_export_prefix_filter()
+
+        # Setup deny filters
+        self._setup_import_aspath_asns_deny_filter()
+        self._setup_import_origin_asns_deny_filter()
+        self._setup_peer_import_prefix_deny_filter()
 
         # BGP peer to main table
         self._setup_peer_to_bgp_filters()
@@ -1413,6 +1438,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         """Return our import prefix list name."""
         return f"bgp{ipv}_AS{self.asn}_{self.name}_prefixes_import"
 
+    def import_prefix_deny_list_name(self, ipv: str) -> str:
+        """Return our import prefix list name."""
+        return f"bgp{ipv}_AS{self.asn}_{self.name}_prefixes_deny_import"
+
     def import_blackhole_prefix_list_name(self, ipv: str) -> str:
         """Return our import blackhole prefix list name."""
         return f"bgp{ipv}_AS{self.asn}_{self.name}_blackhole_prefixes_import"
@@ -1440,7 +1469,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Store our BGP table names
         self.state["tables"] = state_tables
 
-    def _setup_import_aspath_asns(self) -> None:  # pylint: disable=too-many-branches
+    def _setup_import_aspath_asns_filter(self) -> None:  # pylint: disable=too-many-branches
         """AS-PATH ASN import list setup."""
 
         # Short circuit and exit if we have none
@@ -1542,7 +1571,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 # Make sure we don't add duplicates
                 if asn not in origin_asns and asn not in extra_origin_asns:
                     extra_origin_asns.append(f"{asn}")
-            origin_asns.append(f"# Explicitly defined {len(extra_origin_asns)} items (import:filter:origin_asns)")
+            origin_asns.append(f"# Explicitly defined {len(extra_origin_asns)} items (import_filter:origin_asns)")
             origin_asns.extend(extra_origin_asns)
 
         # Grab IRR ASNs
@@ -1574,6 +1603,75 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "import_filter" not in self.state:
             self.state["import_filter"] = {}
         self.state["import_filter"]["origin_asns"] = state
+
+    def _setup_import_aspath_asns_deny_filter(self) -> None:  # pylint: disable=too-many-branches
+        """AS-PATH ASN import deny list setup."""
+
+        # Short circuit and exit if we have none
+        if not self.has_import_aspath_asn_deny_filter:
+            return
+
+        aspath_asns: List[str] = []
+
+        # Populate AS-PATH ASN list
+        if self.import_filter_deny_policy.aspath_asns:
+            extra_aspath_asns = []
+            # Loop with ASNs specified in configuration
+            for asn in self.import_filter_deny_policy.aspath_asns:
+                if asn not in aspath_asns and asn not in extra_aspath_asns:
+                    extra_aspath_asns.append(f"{asn}")
+            aspath_asns.insert(0, f"# Explicitly defined {len(extra_aspath_asns)} items (import_filer_deny:aspath_asns)")
+            aspath_asns.extend(extra_aspath_asns)
+
+        self.conf.add(f"define {self.import_aspath_asn_deny_list_name} = [")
+        # Loop with each line and add commas where needed
+        for count, asn in enumerate(aspath_asns):
+            asn_str = f"  {asn}"
+            if not asn.startswith("#") and count < len(aspath_asns) - 1:
+                asn_str += ","
+            self.conf.add(asn_str)
+        self.conf.add("];")
+        self.conf.add("")
+
+        # Save state
+        if "import_filter_deny" not in self.state:
+            self.state["import_filter_deny"] = {}
+        self.state["import_filter_deny"]["aspath_asns"] = aspath_asns
+
+    def _setup_import_origin_asns_deny_filter(self) -> None:
+        """Origin ASN import list setup."""
+
+        # Short circuit and exit if we have none
+        if not self.has_import_origin_asn_deny_filter:
+            return
+
+        origin_asns = []
+
+        # Populate our origin ASN list from configuration
+        if self.import_filter_deny_policy.origin_asns:
+            extra_origin_asns = []
+            # Loop with ASNs specified in configuration
+            for asn in self.import_filter_deny_policy.origin_asns:
+                # Make sure we don't add duplicates
+                if asn not in origin_asns and asn not in extra_origin_asns:
+                    extra_origin_asns.append(f"{asn}")
+            origin_asns.append(f"# Explicitly defined {len(extra_origin_asns)} items (import_filter_deny:origin_asns)")
+            origin_asns.extend(extra_origin_asns)
+
+        self.conf.add(f"define {self.import_origin_asn_deny_list_name} = [")
+        # Loop with each line and add commas where needed
+        for count, asn in enumerate(origin_asns):
+            asn_str = f"  {asn}"
+            if not asn.startswith("#") and count < len(origin_asns) - 1:
+                asn_str += ","
+            self.conf.add(asn_str)
+        self.conf.add("];")
+        self.conf.add("")
+
+        # Save state
+        if "import_filter_deny" not in self.state:
+            self.state["import_filter_deny"] = {}
+        self.state["import_filter_deny"]["origin_asns"] = origin_asns
 
     def _setup_export_origin_asns_filter(self) -> None:
         """Origin ASN export list setup."""
@@ -1615,7 +1713,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.state["export_filter"] = {}
         self.state["export_filter"]["origin_asns"] = state
 
-    def _setup_import_peer_asns(self) -> None:
+    def _setup_import_peer_asns_filter(self) -> None:
         """Peer ASN import list setup."""
 
         # Short circuit and exit if we have none
@@ -1758,6 +1856,57 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "import_filter" not in self.state:
             self.state["import_filter"] = {}
         self.state["import_filter"]["prefixes"] = state
+
+    def _setup_peer_import_prefix_deny_filter(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+        self,
+    ) -> None:
+        """Prefix import deny filter setup."""
+
+        # Short circuit and exit if we have none
+        if not self.has_import_prefix_deny_filter:
+            return
+
+        state: Dict[str, List[str]] = {}
+
+        # Work out prefixes
+        import_prefix_lists: Dict[str, List[str]] = {"4": [], "6": []}
+        for prefix in sorted(self.import_filter_deny_policy.prefixes):
+            if ":" in prefix:
+                import_prefix_lists["6"].append(prefix)
+            else:
+                import_prefix_lists["4"].append(prefix)
+
+        # Output prefix definitions
+        for ipv in ["4", "6"]:
+            import_prefix_list = import_prefix_lists[ipv]
+
+            import_prefixes = []
+
+            # Add statically defined prefix list
+            if import_prefix_list:
+                state[f"ipv{ipv}"] = import_prefix_list
+                for prefix in import_prefix_list:
+                    import_prefixes.append(prefix)
+
+            # Sort and unique our results
+            import_prefixes = sorted(set(import_prefixes))
+            # Add title for this section
+            import_prefixes.insert(0, f"# {len(import_prefix_list)} explicitly defined")
+
+            self.conf.add(f"define {self.import_prefix_deny_list_name(ipv)} = [")
+            # Loop with each line and add commas where needed
+            for count, prefix in enumerate(import_prefixes):
+                prefix_str = f"  {prefix}"
+                if not prefix.startswith("#") and count < len(import_prefixes) - 1:
+                    prefix_str += ","
+                self.conf.add(prefix_str)
+            self.conf.add("];")
+            self.conf.add("")
+
+        # Save state
+        if "import_filter_deny" not in self.state:
+            self.state["import_filter_deny"] = {}
+        self.state["import_filter_deny"]["prefixes"] = state
 
     def _setup_peer_export_prefix_filter(self) -> None:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         """Prefix export filter setup."""
@@ -2499,6 +2648,22 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     )
                     self.conf.add(f"  {import_filter_blackholes_deny};")
 
+        # Implementation of the denies from import_filter_deny
+        # Deny origin AS
+        if self.has_import_origin_asn_deny_filter:
+            self.conf.add(
+                f"  {self.bgp_functions.import_filter_deny_origin_asns(BirdVariable(self.import_origin_asn_deny_list_name))};"
+            )
+        # Deny AS in path
+        if self.has_import_aspath_asn_deny_filter:
+            self.conf.add(f"  {self.bgp_functions.import_filter_deny_aspath(BirdVariable(self.import_aspath_asn_deny_list_name))};")
+        # Deny prefix
+        if self.has_import_prefix_deny_filter:
+            import_filter_prefixes_deny = self.bgp_functions.import_filter_deny_prefixes(
+                BirdVariable(self.import_prefix_deny_list_name("4")), BirdVariable(self.import_prefix_deny_list_name("6"))
+            )
+            self.conf.add(f"  {import_filter_prefixes_deny};")
+
         # Quarantine mode...
         # NK: We don't quarantine route collectors as they are automagically filtered
         if self.quarantine and self.peer_type != "routecollector":
@@ -2932,6 +3097,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.import_filter_policy
 
     @property
+    def import_filter_deny_policy(self) -> BGPPeerImportFilterDenyPolicy:
+        """Return the our import filter deny policy."""
+        return self.peer_attributes.import_filter_deny_policy
+
+    @property
     def export_filter_policy(self) -> BGPPeerExportFilterPolicy:
         """Return the our export filter policy."""
         return self.peer_attributes.export_filter_policy
@@ -3271,9 +3441,19 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return f"bgp_AS{self.asn}_{self.name}_aspath_asns_import"
 
     @property
+    def import_aspath_asn_deny_list_name(self) -> str:
+        """Return our AS-PATH ASN deny list name."""
+        return f"bgp_AS{self.asn}_{self.name}_aspath_asns_deny_import"
+
+    @property
     def import_origin_asn_list_name(self) -> str:
         """Return our origin ASN list name."""
         return f"bgp_AS{self.asn}_{self.name}_origin_asns_import"
+
+    @property
+    def import_origin_asn_deny_list_name(self) -> str:
+        """Return our origin ASN deny list name."""
+        return f"bgp_AS{self.asn}_{self.name}_origin_asns_deny_import"
 
     @property
     def export_origin_asn_list_name(self) -> str:
@@ -3298,9 +3478,20 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.import_filter_policy.aspath_asns
 
     @property
+    def has_import_aspath_asn_deny_filter(self) -> BGPPeerFilterItem:
+        """Return if we deny filter on ASNs in the AS-PATH."""
+
+        return self.import_filter_deny_policy.aspath_asns
+
+    @property
     def has_import_origin_asn_filter(self) -> BGPPeerFilterItem:
         """Return if we filter import origin ASNs."""
         return self.import_filter_policy.origin_asns or self.import_filter_policy.as_sets
+
+    @property
+    def has_import_origin_asn_deny_filter(self) -> BGPPeerFilterItem:
+        """Return if we deny filter import origin ASNs."""
+        return self.import_filter_deny_policy.origin_asns
 
     @property
     def has_export_origin_asn_filter(self) -> BGPPeerFilterItem:
@@ -3326,6 +3517,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def has_import_prefix_filter(self) -> BGPPeerFilterItem:
         """Peer has a import prefix filter."""
         return self.import_filter_policy.prefixes or self.import_filter_policy.as_sets
+
+    @property
+    def has_import_prefix_deny_filter(self) -> BGPPeerFilterItem:
+        """Peer has a import prefix deny filter."""
+        return self.import_filter_deny_policy.prefixes
 
     @property
     def has_export_prefix_filter(self) -> BGPPeerFilterItem:

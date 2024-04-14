@@ -55,6 +55,7 @@ r1_peer_show_e1:
       static:
       - 4200000000
       - 4200000002
+  import_filter_deny: {}
   name: e1
   prefix_limit:
     static:

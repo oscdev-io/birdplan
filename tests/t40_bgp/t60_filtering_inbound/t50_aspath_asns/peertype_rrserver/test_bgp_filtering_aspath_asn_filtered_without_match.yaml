@@ -172,6 +172,7 @@ r1_peer_show_e1:
       - 65002
       - 65004
       - 65005
+  import_filter_deny: {}
   name: e1
   protocols:
     ipv4:

@@ -114,6 +114,7 @@ In terms of test `test_bgp_filtering_first_as_not_peer_as`:
 In terms of test `test_bgp_filtering_next_hop_not_peer_ip`:
 - ExaBGP e1 should export a route where the next hop IP is not the peer IP.
 
+
 ## Tests for BGP AS-PATH ASN filtered
 
 In terms of test `test_bgp_filtering_aspath_asn_filtered_with_match`:
@@ -123,6 +124,15 @@ In terms of test `test_bgp_filtering_aspath_asn_filtered_without_match`:
 - ExaBGP e1 should export a route where a specific set of ASN is listed in the filter.
 
 
+## Tests for BGP AS-PATH ASN deny
+
+In terms of test `test_bgp_filtering_aspath_asn_deny_with_match`:
+- ExaBGP e1 should export a route where a specific set of ASN is denied import.
+
+In terms of test `test_bgp_filtering_aspath_asn_deny_without_match`:
+- ExaBGP e1 should export a route where a specific set of ASN is denied import.
+
+
 ## Tests for BGP origin AS filtered
 
 In terms of test `test_bgp_filtering_origin_asn_filtered_with_match`:
@@ -130,6 +140,15 @@ In terms of test `test_bgp_filtering_origin_asn_filtered_with_match`:
 
 In terms of test `test_bgp_filtering_origin_asn_filtered_without_match`:
 - ExaBGP e1 should export a route where the origin AS is not listed in the filter.
+
+
+## Tests for BGP origin AS deny
+
+In terms of test `test_bgp_filtering_origin_asn_deny_with_match`:
+- ExaBGP e1 should export a route where the origin AS is denied import.
+
+In terms of test `test_bgp_filtering_origin_asn_deny_without_match`:
+- ExaBGP e1 should export a route where the origin AS is not denied import.
 
 
 ## Tests for BGP peer AS filtered
@@ -148,6 +167,15 @@ In terms of test `test_bgp_filtering_prefix_filtered_with_match`:
 
 In terms of test `test_bgp_filtering_prefix_filtered_without_match`:
 - ExaBGP e1 should export a route where the prefix is not listed in the filter.
+
+
+## Tests for BGP prefix deny
+
+In terms of test `test_bgp_filtering_prefix_deny_with_match`:
+- ExaBGP e1 should export a route where the prefix is denied import.
+
+In terms of test `test_bgp_filtering_prefix_deny_without_match`:
+- ExaBGP e1 should export a route where the prefix is not denied import.
 
 
 ## Tests for BGP quarantine filtering

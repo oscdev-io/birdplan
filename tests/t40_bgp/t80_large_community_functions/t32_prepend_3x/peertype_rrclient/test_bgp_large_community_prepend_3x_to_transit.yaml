@@ -5,6 +5,7 @@ r10_peer_show_r1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r1
   protocols:
     ipv4:
@@ -238,6 +239,7 @@ r1_peer_show_e1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: e1
   protocols:
     ipv4:
@@ -301,6 +303,7 @@ r1_peer_show_r10:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r10
   protocols:
     ipv4:
@@ -370,6 +373,7 @@ r1_peer_show_r2:
     origin_asns:
       static:
       - 65001
+  import_filter_deny: {}
   name: r2
   prefix_limit:
     static:
@@ -443,6 +447,7 @@ r1_peer_show_r3:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r3
   protocols:
     ipv4:
@@ -506,6 +511,7 @@ r1_peer_show_r4:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r4
   prefix_limit:
     static:
@@ -579,6 +585,7 @@ r1_peer_show_r5:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r5
   protocols:
     ipv4:
@@ -642,6 +649,7 @@ r1_peer_show_r6:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r6
   protocols:
     ipv4:
@@ -705,6 +713,7 @@ r1_peer_show_r7:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r7
   protocols:
     ipv4:
@@ -768,6 +777,7 @@ r1_peer_show_r8:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r8
   protocols:
     ipv4:
@@ -831,6 +841,7 @@ r1_peer_show_r9:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r9
   protocols:
     ipv4:
@@ -1957,6 +1968,7 @@ r2_peer_show_r1:
       static:
       - 65000
       - 65100
+  import_filter_deny: {}
   name: r1
   prefix_limit:
     static:
@@ -2194,6 +2206,7 @@ r3_peer_show_r1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r1
   protocols:
     ipv4:
@@ -2413,6 +2426,7 @@ r4_peer_show_r1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r1
   prefix_limit:
     static:
@@ -2650,6 +2664,7 @@ r5_peer_show_r1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r1
   protocols:
     ipv4:
@@ -2822,6 +2837,7 @@ r6_peer_show_r1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r1
   protocols:
     ipv4:
@@ -3043,6 +3059,7 @@ r7_peer_show_r1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r1
   protocols:
     ipv4:
@@ -3166,6 +3183,7 @@ r8_peer_show_r1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r1
   protocols:
     ipv4:
@@ -3385,6 +3403,7 @@ r9_peer_show_r1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r1
   protocols:
     ipv4:

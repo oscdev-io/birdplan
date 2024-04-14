@@ -489,6 +489,7 @@ r1_peer_show_e1:
         - 100.104.0.0/22+
         ipv6:
         - fc00:104::/48+
+  import_filter_deny: {}
   name: e1
   prefix_limit:
     static:
@@ -574,6 +575,7 @@ r1_peer_show_e2:
         - 100.104.0.0/22+
         ipv6:
         - fc00:104::/48+
+  import_filter_deny: {}
   name: e2
   prefix_limit:
     static:

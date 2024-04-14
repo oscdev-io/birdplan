@@ -21,6 +21,7 @@ r1_peer_show_e1:
         ipv6:
         - fc00:10::/43{48,48}
         - fc00::/46
+  import_filter_deny: {}
   name: e1
   prefix_limit:
     static:

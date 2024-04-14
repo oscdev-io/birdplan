@@ -213,6 +213,9 @@ Internally set, not allowable from any BGP peer type.
 | (OWN_ASN, 1101, 24) | Blackhole length too long |
 | (OWN_ASN, 1101, 25) | Blackhole length too short |
 | (OWN_ASN, 1101, 26) | Blackhole not allowed |
+| (OWN_ASN, 1101, 27) | Deny origin AS |
+| (OWN_ASN, 1101, 28) | Deny AS in AS path |
+| (OWN_ASN, 1101, 29) | Deny prefix |
 
 ## Action Communities
 

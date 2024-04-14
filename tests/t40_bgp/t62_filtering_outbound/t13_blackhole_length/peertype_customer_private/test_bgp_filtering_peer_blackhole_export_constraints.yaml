@@ -5,6 +5,7 @@ r1_peer_show_e1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: e1
   protocols:
     ipv4:
@@ -74,6 +75,7 @@ r1_peer_show_r2:
     origin_asns:
       static:
       - 65100
+  import_filter_deny: {}
   name: r2
   prefix_limit:
     static:
@@ -660,6 +662,7 @@ r2_peer_show_r1:
   graceful_shutdown: false
   import_filter:
     as_sets: []
+  import_filter_deny: {}
   name: r1
   protocols:
     ipv4:

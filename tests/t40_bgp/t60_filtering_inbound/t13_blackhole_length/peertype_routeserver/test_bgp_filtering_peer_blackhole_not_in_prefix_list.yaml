@@ -53,6 +53,7 @@ r1_peer_show_e1:
         - 100.102.0.0/22+
         ipv6:
         - fc00:102::/46+
+  import_filter_deny: {}
   name: e1
   protocols:
     ipv4:
