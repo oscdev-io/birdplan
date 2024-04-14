@@ -125,6 +125,10 @@ class BirdPlanBaseTestCase:
                 )
             )
 
+        # Loop with switches to create
+        for switch in self.switches:
+            sim.add_node(SwitchNode(switch))
+
         # Loop with our ExaBGP's and create the nodes
         self._configure_exabgps(sim, tmpdir)
         for exabgp in self.exabgps:
@@ -134,10 +138,6 @@ class BirdPlanBaseTestCase:
             exabgp_logfile = sim.node(exabgp).logfile
             # sim.add_logfile(f"EXABGP_LOGFILE({exabgp}) => {exabgp_logfile}", exabgp_logfile)
             sim.add_logfile(f"EXABGP_LOGFILE({exabgp})", exabgp_logfile)
-
-        # Loop with switches to create
-        for switch in self.switches:
-            sim.add_node(SwitchNode(switch))
 
         # Loop with routers
         for router in configured_routers:
@@ -490,7 +490,7 @@ class BirdPlanBaseTestCase:
         for router, data in router_summaries.items():
             assert data["result"] == data["expected"], f"BIRD router '{router}' peer summary does not match what it should be"
 
-    def _test_bird_cmdline_bgp_peer_show(  # pylint: disable=too-many-locals,too-many-branches
+    def _test_bird_cmdline_bgp_peer_show(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches
         self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None
     ):
         """Test showing BGP peer show."""
@@ -548,6 +548,24 @@ class BirdPlanBaseTestCase:
                             # NK: since is dynamic
                             if "since" in protocol_data["status"]:
                                 del protocol_data["status"]["since"]
+                    # Result used for compare so we can modify it below for data changes when making updates
+                    result_compare = copy.deepcopy(result)
+
+                    # NKDEBUG - hook in here to modify data for comparison
+                    # if "protocols" in result_compare:
+                    #     # for _, protocol_data in result["protocols"].items():
+                    #     #     if "prefix_limit_action" in protocol_data:
+                    #     #         del protocol_data["prefix_limit_action"]
+                    #     if "import_filter_deny" in result_compare:
+                    #         del result_compare["import_filter_deny"]
+                    # if result_expected and not isinstance(result_expected, ValueError) and "protocols" in result_expected:
+                    #     # for _, protocol_data in result_expected["protocols"].items():
+                    #     #     if "prefix_limit_action" in protocol_data:
+                    #     #         del protocol_data["prefix_limit_action"]
+                    #     if "import_filter_deny" in result_expected:
+                    #         del result_expected["import_filter_deny"]
+                    # router_shows[router][peer]["result"] = result_compare
+                    # NKDEBUG end
 
                     # If we don't have a content match, we match as we have a sleep() after bird status
                     # The first case is when there is no expected data
@@ -555,7 +573,7 @@ class BirdPlanBaseTestCase:
                     if result_expected is None or isinstance(result_expected, ValueError):  # noqa: SIM114
                         content_matches = True
                     # Else check that the result contains the content we're looking for
-                    elif result_expected == result:
+                    elif result_expected == result_compare:
                         content_matches = True
 
                     # Check if have what we expected

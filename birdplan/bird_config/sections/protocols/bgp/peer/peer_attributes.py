@@ -292,6 +292,33 @@ class BGPPeerRoutePolicyAccept:  # pylint: disable=too-few-public-methods
         self.bgp_transit_default = False
 
 
+class BGPPeerImportFilterDenyPolicy:  # pylint: disable=too-few-public-methods
+    """
+    BGP filter deny policy for incoming routes from the BGP peer.
+
+    Attributes
+    ----------
+    aspath_asns : BGPPeerFilterItem
+        List of ASNs to filter in the AS-PATH.
+    origin_asns : BGPPeerFilterItem
+        List of origin ASNs to filter on.
+    prefixes : BGPPeerFilterItem
+        List of prefixes to filter on.
+
+
+    """
+
+    aspath_asns: BGPPeerFilterItem
+    origin_asns: BGPPeerFilterItem
+    prefixes: BGPPeerFilterItem
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        self.aspath_asns = []
+        self.origin_asns = []
+        self.prefixes = []
+
+
 class BGPPeerImportFilterPolicy:  # pylint: disable=too-few-public-methods
     """
     BGP filter policy for incoming routes from the BGP peer.
@@ -670,8 +697,17 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     route_policy_redistribute : BGPPeerRoutePolicyRedistribute
         Route policy for redistribution of routes to the BGP peer.
 
-    filter: BGPPeerFilter
-        BGP peer filtering options.
+    import_filter_policy: BGPPeerImportFilterPolicy
+        BGP peer import filter policy.
+
+    import_filter_deny_policy: BGPPeerImportFilterDenyPolicy
+        BGP peer import filter deny policy.
+
+    export_filter_policy: BGPPeerExportFilterPolicy
+        BGP peer export filter policy.
+
+    blackhole_community: Optional[Union[List[str], bool]]
+        Blackhole community to use for blackhole routes.
 
     constraints: BGPPeerConstraints
         BGP peer constraint overrides.
@@ -726,6 +762,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     route_policy_redistribute: BGPPeerRoutePolicyRedistribute
 
     import_filter_policy: BGPPeerImportFilterPolicy
+    import_filter_deny_policy: BGPPeerImportFilterDenyPolicy
     export_filter_policy: BGPPeerExportFilterPolicy
 
     blackhole_community: Optional[Union[List[str], bool]]
@@ -784,6 +821,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.route_policy_redistribute = BGPPeerRoutePolicyRedistribute()
 
         self.import_filter_policy = BGPPeerImportFilterPolicy()
+        self.import_filter_deny_policy = BGPPeerImportFilterDenyPolicy()
         self.export_filter_policy = BGPPeerExportFilterPolicy()
 
         self.blackhole_community = None

@@ -124,6 +124,7 @@ r1_peer_show_e1:
         - fc00:0:100::/46
         - fc00:0:100::/46{48,48}
         - fc00:0:104::/48
+  import_filter_deny: {}
   name: e1
   prefix_limit:
     static:

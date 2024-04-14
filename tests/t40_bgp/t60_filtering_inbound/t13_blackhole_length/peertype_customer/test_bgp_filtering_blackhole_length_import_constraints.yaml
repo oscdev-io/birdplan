@@ -233,6 +233,7 @@ r1_peer_show_e1:
         - 100.101.0.0/22+
         ipv6:
         - fc00:101::/46+
+  import_filter_deny: {}
   name: e1
   prefix_limit:
     static:

@@ -53,6 +53,7 @@ r2_peer_show_r1:
     origin_asns:
       static:
       - 65000
+  import_filter_deny: {}
   name: r1
   prefix_limit:
     static:

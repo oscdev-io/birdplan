@@ -646,9 +646,10 @@ In the context of peer types `internal`, `rrclient`, `rrserver`, `rrserver-rrser
 
 Examples of `prefixes` filter:
 * `192.168.0.0/22+` - Matches /22 or any subset of the /22
+* `192.168.0.0/32-` - Matches if the prefix covered by route being tested
 * `192.168.0.0/24` - Matches exactly /24
 
-Currently only the above two methods of specifying IP ranges are accepted.
+Currently only the above methods of specifying IP ranges are accepted.
 
 The prefix sizes are controlled by the prefix and blackhole length constraints, so one does not need to specify the min and max sizes here.
 
@@ -666,6 +667,33 @@ bgp:
           - 65009
         peer_asns:
           - 65000
+        prefixes:
+          - "100.141.0.0/24"
+          - "fc00:141::/64"
+  ...
+```
+
+
+## import_filter_deny
+
+Supported in version: v0.0.21
+
+Filtering of routes received from a peer. Options available are below...
+
+* `prefixes` will filter on a list of prefixes to deny.
+* `aspath_asns` will filter on a list of ASNs in the AS-PATH.
+* `origin_asns` will filter on a list of origin ASN's.
+
+An example is however below...
+```yaml
+bgp:
+  ...
+  peers:
+    peer1:
+      asn: 65000
+      description: Some peer
+      ...
+      import_filter_deny:
         prefixes:
           - "100.141.0.0/24"
           - "fc00:141::/64"

@@ -672,6 +672,20 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_ASPATH_NOT_ALLOWED);
             }}"""
 
+    @BirdFunction("bgp_import_filter_deny_aspath")
+    def import_filter_deny_aspath(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_import_filter_deny_aspath function."""
+
+        return f"""\
+            function bgp_import_filter_deny_aspath(string filter_name; int set asn_list) -> bool {{
+                if (bgp_path !~ asn_list) then return false;
+                if (bgp_large_community ~ [BGP_LC_FILTERED_ORIGIN_AS, BGP_LC_FILTERED_PEER_AS]) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_import_filter_deny_aspath] Adding BGP_LC_FILTERED_DENY_ASPATH to ",
+                    {self.functions.route_info()};
+                bgp_large_community.add(BGP_LC_FILTERED_DENY_ASPATH);
+            }}"""
+
     @BirdFunction("bgp_import_filter_asn_private")
     def import_filter_asn_private(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_import_filter_asn_private function."""
@@ -975,6 +989,20 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_ORIGIN_AS);
             }}"""
 
+    @BirdFunction("bgp_import_filter_deny_origin_asns")
+    def import_filter_deny_origin_asns(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_import_filter_deny_origin_asns function."""
+
+        return f"""\
+            # Import filter origin ASNs (import_filter_deny)
+            function bgp_import_filter_deny_origin_asns(string filter_name; int set asns) -> bool {{
+                if (bgp_path.last_nonaggregated !~ asns) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_import_filter_deny_origin_asns] Adding BGP_LC_FILTERED_DENY_ORIGIN_AS to ",
+                    {self.functions.route_info()};
+                bgp_large_community.add(BGP_LC_FILTERED_DENY_ORIGIN_AS);
+            }}"""
+
     @BirdFunction("bgp_import_filter_own_blackhole")
     def import_filter_own_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_import_filter_own_blackhole function."""
@@ -1080,6 +1108,24 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if DEBUG then print filter_name,
                     " [bgp_import_filter_prefixes_deny] Adding BGP_LC_FILTERED_PREFIX_FILTERED to ", {self.functions.route_info()};
                 bgp_large_community.add(BGP_LC_FILTERED_PREFIX_FILTERED);
+            }}"""
+
+    @BirdFunction("bgp_import_filter_deny_prefixes")
+    def import_filter_deny_prefixes(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_import_filter_deny_prefixes function."""
+
+        return f"""\
+            # Import filter prefixes (DENY)
+            function bgp_import_filter_deny_prefixes(
+                string filter_name;
+                prefix set prefix_list4; prefix set prefix_list6
+            ) -> bool {{
+                if {self.is_blackhole()} then return false;
+                if (net.type = NET_IP4 && net !~ prefix_list4) then return false;
+                if (net.type = NET_IP6 && net !~ prefix_list6) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_import_filter_deny_prefixes] Adding BGP_LC_FILTERED_DENY_PREFIX to ", {self.functions.route_info()};
+                bgp_large_community.add(BGP_LC_FILTERED_DENY_PREFIX);
             }}"""
 
     @BirdFunction("bgp_export_filter_prefixes")

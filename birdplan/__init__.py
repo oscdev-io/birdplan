@@ -1606,6 +1606,16 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                         )
                     peer["import_filter"][filter_type] = filter_config
             # Add import filters
+            elif config_item == "import_filter_deny":
+                peer["import_filter_deny"] = {}
+                # Loop with filter configuration items
+                for filter_type, filter_config in config_value.items():
+                    if filter_type not in ("aspath_asns", "origin_asns", "prefixes"):
+                        raise BirdPlanError(
+                            f"Configuration item '{filter_type}' not understood in bgp:peers:{peer_name}:import_filter_deny"
+                        )
+                    peer["import_filter_deny"][filter_type] = filter_config
+            # Add import filters
             elif config_item == "export_filter":
                 peer["export_filter"] = {}
                 # Loop with filter configuration items
@@ -1765,7 +1775,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
             raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' is missing 'rr_cluster_id' when having 'rrclient' peers")
         # If we are a customer type, we must have filters defined
         if (peer["type"] == "customer") and ("import_filter" not in peer) and ("filter" not in peer):
-            raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' is missing 'filter' when type is 'customer'")
+            raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' is missing 'import_filter' when type is 'customer'")
         # We must have a neighbor4 or neighbor6
         if ("neighbor4" not in peer) and ("neighbor6" not in peer):
             raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' is missing 'neighbor4' or 'neighbor6' config")
