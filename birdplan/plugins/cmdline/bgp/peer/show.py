@@ -96,18 +96,18 @@ class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
             elif protocol == "ipv6":
                 protocol_str = "IPv6"
 
-            # Check for prefix filters
+            # Check for import prefix filters
             prefix_filters = "none"
-            if "filter" in self.data:  # noqa: SIM102
-                if "prefixes" in self.data["filter"]:
+            if "import_filter" in self.data:  # noqa: SIM102
+                if "prefixes" in self.data["import_filter"]:
                     prefix_filter_strs = []
-                    if "irr" in self.data["filter"]["prefixes"]:  # noqa: SIM102
-                        if protocol in self.data["filter"]["prefixes"]["irr"]:
-                            count = len(self.data["filter"]["prefixes"]["irr"][protocol])
+                    if "irr" in self.data["import_filter"]["prefixes"]:  # noqa: SIM102
+                        if protocol in self.data["import_filter"]["prefixes"]["irr"]:
+                            count = len(self.data["import_filter"]["prefixes"]["irr"][protocol])
                             prefix_filter_strs.append(f"{count} from IRR")
-                    if "static" in self.data["filter"]["prefixes"]:  # noqa: SIM102
-                        if protocol in self.data["filter"]["prefixes"]["static"]:
-                            count = len(self.data["filter"]["prefixes"]["static"][protocol])
+                    if "static" in self.data["import_filter"]["prefixes"]:  # noqa: SIM102
+                        if protocol in self.data["import_filter"]["prefixes"]["static"]:
+                            count = len(self.data["import_filter"]["prefixes"]["static"][protocol])
                             prefix_filter_strs.append(f"{count} manual")
                     prefix_filters = ", ".join(prefix_filter_strs)
 
