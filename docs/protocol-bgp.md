@@ -712,6 +712,7 @@ Filtering of routes advertised to a peer. Options available are below...
 
 Examples of `prefixes` filter:
 * `192.168.0.0/22+` - Matches /22 or any subset of the /22
+* `192.168.0.0/32-` - Matches if the prefix covered by route being tested
 * `192.168.0.0/24` - Matches exactly /24
 
 Currently only the above two methods of specifying IP ranges are accepted.
