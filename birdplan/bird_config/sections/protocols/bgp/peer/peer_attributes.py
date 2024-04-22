@@ -51,6 +51,112 @@ class BGPPeerImportPrefixLimitAction(enum.Enum):
     DISABLE = "disable"
 
 
+class BGPPeerCommunitiesOutgoing:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
+    """
+    BGP peer outgoing communities.
+
+    Attributes
+    ----------
+    connected: List[str]
+        Connected route outgoing communities.
+    kernel: List[str]
+        Kernel route outgoing communities.
+    kernel_blackhole: List[str]
+        Kernel blackhole route outgoing communities.
+    kernel_default: List[str]
+        Kernel default route outgoing communities.
+    originated: List[str]
+        Originated route outgoing communities.
+    originated_default: List[str]
+        Originated default route outgoing communities.
+    static: List[str]
+        Static route outgoing communities.
+    static_blackhole: List[str]
+        Static blackhole route outgoing communities.
+    static_default: List[str]
+        Static default route outgoing communities.
+    bgp_own: List[str]
+        BGP own route outgoing communities.
+    bgp_own_blackhole: List[str]
+        BGP own blackhole route outgoing communities.
+    bgp_own_default: List[str]
+        BGP own default route outgoing communities.
+    bgp_customer: List[str]
+        BGP customer route outgoing communities.
+    bgp_customer_blackhole: List[str]
+        BGP customer blackhole route outgoing communities.
+    bgp_peering: List[str]
+        BGP peering route outgoing communities.
+    bgp_transit: List[str]
+        BGP transit route outgoing communities.
+    bgp_transit_default: List[str]
+        BGP transit default route outgoing communities.
+
+    """
+
+    connected: List[str]
+    kernel: List[str]
+    kernel_blackhole: List[str]
+    kernel_default: List[str]
+    originated: List[str]
+    originated_default: List[str]
+    static: List[str]
+    static_blackhole: List[str]
+    static_default: List[str]
+    bgp: List[str]
+    bgp_own: List[str]
+    bgp_own_blackhole: List[str]
+    bgp_own_default: List[str]
+    bgp_customer: List[str]
+    bgp_customer_blackhole: List[str]
+    bgp_peering: List[str]
+    bgp_transit: List[str]
+    bgp_transit_default: List[str]
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        self.connected = []
+        self.kernel = []
+        self.kernel_blackhole = []
+        self.kernel_default = []
+        self.originated = []
+        self.originated_default = []
+        self.static = []
+        self.static_blackhole = []
+        self.static_default = []
+        self.bgp_own = []
+        self.bgp_own_blackhole = []
+        self.bgp_own_default = []
+        self.bgp_customer = []
+        self.bgp_customer_blackhole = []
+        self.bgp_peering = []
+        self.bgp_transit = []
+        self.bgp_transit_default = []
+
+
+class BGPPeerCommunities:  # pylint: disable=too-few-public-methods
+    """
+    BGP peer communities.
+
+    Attributes
+    ----------
+    incoming : List[str]
+        List of communities to add to incoming prefixes.
+    outgoing : BGPPeerCommunitiesOutgoing
+        List of communities to add to outgoing prefixes.
+
+    """
+
+    incoming: List[str]
+
+    outgoing: BGPPeerCommunitiesOutgoing
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        self.incoming = []
+        self.outgoing = BGPPeerCommunitiesOutgoing()
+
+
 class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """
     BGP peer outgoing large communities.
@@ -661,6 +767,9 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     graceful_shutdown : bool
         Set peer in GRACEFUL_SHUTDOWN mode.
 
+    communities: BGPPeerCommunities
+        Incoming and outgoing communities.
+
     large_communities: BGPPeerLargeCommunities
         Incoming and outgoing large communities.
 
@@ -739,6 +848,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     graceful_shutdown: bool
 
+    communities: BGPPeerCommunities
     large_communities: BGPPeerLargeCommunities
 
     prepend: BGPPeerPrepend
@@ -797,6 +907,7 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
         self.graceful_shutdown = False
 
+        self.communities = BGPPeerCommunities()
         self.large_communities = BGPPeerLargeCommunities()
 
         self.prepend = BGPPeerPrepend()
