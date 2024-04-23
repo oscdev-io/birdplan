@@ -1626,6 +1626,52 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                         )
                     peer["export_filter"][filter_type] = filter_config
 
+            # Work out outgoing community options
+            elif config_item == "outgoing_communities":
+                if isinstance(config_value, dict):
+                    # Loop with outgoing community configuration items
+                    for lc_type, lc_config in config_value.items():
+                        if lc_type not in (
+                            "blackhole",
+                            "default",
+                            "connected",
+                            "kernel",
+                            "kernel_blackhole",
+                            "kernel_default",
+                            "static",
+                            "static_blackhole",
+                            "static_default",
+                            "originated",
+                            "originated_default",
+                            "bgp",
+                            "bgp_own",
+                            "bgp_own_blackhole",
+                            "bgp_own_default",
+                            "bgp_customer",
+                            "bgp_customer_blackhole",
+                            "bgp_peering",
+                            "bgp_transit",
+                            "bgp_transit_default",
+                            "bgp_blackhole",
+                            "bgp_default",
+                        ):
+                            raise BirdPlanError(
+                                f"Configuration item '{lc_type}' not understood in bgp:peers:{peer_name}:outgoing_communities"
+                            )
+                        # Make sure we have a prepend key
+                        if "outgoing_communities" not in peer:
+                            peer["outgoing_communities"] = {}
+                        # Then add the config...
+                        peer["outgoing_communities"][lc_type] = lc_config
+
+                # Check in the case it is a list
+                elif isinstance(config_value, list):
+                    peer["outgoing_communities"] = config_value
+
+                # Else if we don't know what it is, then throw an exception
+                else:
+                    raise BirdPlanError(f"Configuration item bgp:peers:{peer_name}:outgoing_communities has incorrect type")
+
             # Work out outgoing large community options
             elif config_item == "outgoing_large_communities":
                 if isinstance(config_value, dict):

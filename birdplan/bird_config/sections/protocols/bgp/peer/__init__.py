@@ -41,6 +41,7 @@ from ..bgp_functions import BGPFunctions
 from ..bgp_types import BGPPeerConfig
 from .peer_attributes import (
     BGPPeerAttributes,
+    BGPPeerCommunities,
     BGPPeerConstraints,
     BGPPeerExportFilterPolicy,
     BGPPeerFilterItem,
@@ -240,6 +241,170 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Add incoming large communities
             for large_community in sorted(peer_config["incoming_large_communities"]):
                 self.large_communities.incoming.append(util.sanitize_community(large_community))
+
+        #
+        # bgp:peers:$PEER:outgoing_communities
+        #
+
+        # Check for outgoing_communities we need to setup
+        if "outgoing_communities" in peer_config:
+            # Add outgoing_communities configuration
+            if isinstance(peer_config["outgoing_communities"], dict):
+                # Check if we're adding large communities to blackhole routes
+                if "blackhole" in peer_config["outgoing_communities"]:
+                    community_option = util.sanitize_community_list(peer_config["outgoing_communities"]["blackhole"])
+                    self.communities.outgoing.kernel_blackhole = community_option
+                    self.communities.outgoing.static_blackhole = community_option
+                    self.communities.outgoing.bgp_customer_blackhole = community_option
+                    self.communities.outgoing.bgp_own_blackhole = community_option
+                # Check if we're adding large communities to default routes
+                if "default" in peer_config["outgoing_communities"]:
+                    community_option = util.sanitize_community_list(peer_config["outgoing_communities"]["default"])
+                    self.communities.outgoing.kernel_default = community_option
+                    self.communities.outgoing.originated_default = community_option
+                    self.communities.outgoing.static_default = community_option
+                    self.communities.outgoing.bgp_own_default = community_option
+                    self.communities.outgoing.bgp_transit_default = community_option
+                # Check if we're adding outgoing large communitiesing to all BGP routes
+                if "bgp" in peer_config["outgoing_communities"]:
+                    community_option = util.sanitize_community_list(peer_config["outgoing_communities"]["bgp"])
+                    self.communities.outgoing.bgp_customer = community_option
+                    self.communities.outgoing.bgp_customer_blackhole = community_option
+                    self.communities.outgoing.bgp_own = community_option
+                    self.communities.outgoing.bgp_own_blackhole = community_option
+                    self.communities.outgoing.bgp_own_default = community_option
+                    self.communities.outgoing.bgp_peering = community_option
+                    self.communities.outgoing.bgp_transit = community_option
+                    self.communities.outgoing.bgp_transit_default = community_option
+                # Check if we're adding outgoing large communities to all BGP blackhole routes
+                if "bgp_blackhole" in peer_config["outgoing_communities"]:
+                    community_option = util.sanitize_community_list(peer_config["outgoing_communities"]["bgp_blackhole"])
+                    self.communities.outgoing.bgp_customer_blackhole = community_option
+                    self.communities.outgoing.bgp_own_blackhole = community_option
+                # Check if we're adding outgoing large communities to all BGP default routes
+                if "bgp_default" in peer_config["outgoing_communities"]:
+                    community_option = util.sanitize_community_list(peer_config["outgoing_communities"]["bgp_default"])
+                    self.communities.outgoing.bgp_own_default = community_option
+                    self.communities.outgoing.bgp_transit_default = community_option
+                # Check if we're adding outgoing large communities to all customer BGP routes
+                if "bgp_customer" in peer_config["outgoing_communities"]:
+                    community_option = util.sanitize_community_list(peer_config["outgoing_communities"]["bgp_customer"])
+                    self.communities.outgoing.bgp_customer_blackhole = community_option
+                # Check if we're adding outgoing large communities to all our own BGP routes
+                if "bgp_own" in peer_config["outgoing_communities"]:
+                    community_option = util.sanitize_community_list(peer_config["outgoing_communities"]["bgp_own"])
+                    self.communities.outgoing.bgp_own_blackhole = community_option
+                    self.communities.outgoing.bgp_own_default = community_option
+                # Check if we're adding outgoing large communities to all transit BGP routes
+                if "bgp_transit" in peer_config["outgoing_communities"]:
+                    community_option = util.sanitize_community_list(peer_config["outgoing_communities"]["bgp_transit"])
+                    self.communities.outgoing.bgp_transit_default = community_option
+                # Check if we're adding outgoing large communities to all kernel routes
+                if "kernel" in peer_config["outgoing_communities"]:
+                    community_option = util.sanitize_community_list(peer_config["outgoing_communities"]["kernel"])
+                    self.communities.outgoing.kernel_blackhole = community_option
+                    self.communities.outgoing.kernel_default = community_option
+                # Check if we're adding outgoing large communities to all originated routes
+                if "originated" in peer_config["outgoing_communities"]:
+                    community_option = util.sanitize_community_list(peer_config["outgoing_communities"]["originated"])
+                    self.communities.outgoing.originated_default = community_option
+                # Check if we're adding outgoing large communities to all static routes
+                if "static" in peer_config["outgoing_communities"]:
+                    community_option = util.sanitize_community_list(peer_config["outgoing_communities"]["static"])
+                    self.communities.outgoing.static_blackhole = community_option
+                    self.communities.outgoing.static_default = community_option
+
+                for community_type, community_config in peer_config["outgoing_communities"].items():
+                    if community_type not in (
+                        "bgp",
+                        "bgp_blackhole",
+                        "bgp_customer_blackhole",
+                        "bgp_customer",
+                        "bgp_default",
+                        "bgp_own_blackhole",
+                        "bgp_own_default",
+                        "bgp_own",
+                        "bgp_peering",
+                        "bgp_transit_default",
+                        "bgp_transit",
+                        "blackhole",
+                        "connected",
+                        "default",
+                        "kernel",
+                        "kernel_blackhole",
+                        "kernel_default",
+                        "originated",
+                        "originated_default",
+                        "static",
+                        "static_blackhole",
+                        "static_default",
+                    ):
+                        raise BirdPlanError(
+                            f"BGP peer 'outgoing_communities' configuration '{community_type}' for peer '{self.name}' with type "
+                            f"'{self.peer_type}' is invalid"
+                        )
+                    # Check that we're not doing something stupid
+                    if self.peer_type in ("peer", "routecollector", "routeserver", "transit"):  # noqa: SIM102
+                        if community_type in (
+                            "bgp_default",
+                            "bgp_own_default",
+                            "bgp_peering",
+                            "bgp_transit",
+                            "bgp_transit_default",
+                            "default",
+                            "kernel_default",
+                            "originated_default",
+                            "static_default",
+                        ):
+                            raise BirdPlanError(
+                                f"Having 'outgoing_communities:{community_type}' specified for peer '{self.name}' "
+                                f"with type '{self.peer_type}' makes no sense"
+                            )
+                    if self.peer_type not in (  # noqa: SIM102
+                        "internal",
+                        "routeserver",
+                        "routecollector",
+                        "rrclient",
+                        "rrserver",
+                        "rrserver-rrserver",
+                        "transit",
+                    ):
+                        if community_type in (
+                            "bgp_blackhole",
+                            "bgp_customer_blackhole",
+                            "bgp_own_blackhole",
+                            "blackhole",
+                            "kernel_blackhole",
+                            "static_blackhole",
+                        ):
+                            raise BirdPlanError(
+                                f"Having 'outgoing_communities:{community_type}' specified for peer '{self.name}' "
+                                f"with type '{self.peer_type}' makes no sense"
+                            )
+                    # Exclude virtual options "bgp" and "default" from being set
+                    if community_type not in ("bgp", "bgp_blackhole", "bgp_default", "blackhole", "default"):
+                        # Set the community list
+                        setattr(self.communities.outgoing, community_type, util.sanitize_community_list(community_config))
+            # If its just a number set the count
+            else:
+                community_option = util.sanitize_community_list(peer_config["outgoing_communities"])
+                self.communities.outgoing.connected = community_option
+                self.communities.outgoing.kernel = community_option
+                self.communities.outgoing.kernel_default = community_option
+                self.communities.outgoing.kernel_blackhole = community_option
+                self.communities.outgoing.originated = community_option
+                self.communities.outgoing.originated_default = community_option
+                self.communities.outgoing.static = community_option
+                self.communities.outgoing.static_blackhole = community_option
+                self.communities.outgoing.static_default = community_option
+                self.communities.outgoing.bgp_customer = community_option
+                self.communities.outgoing.bgp_customer_blackhole = community_option
+                self.communities.outgoing.bgp_own = community_option
+                self.communities.outgoing.bgp_own_blackhole = community_option
+                self.communities.outgoing.bgp_own_default = community_option
+                self.communities.outgoing.bgp_peering = community_option
+                self.communities.outgoing.bgp_transit = community_option
+                self.communities.outgoing.bgp_transit_default = community_option
 
         #
         # bgp:peers:$PEER:outgoing_large_communities
@@ -2186,6 +2351,58 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Check if we're accepting the route...
         self.conf.add("  if (accept_route) then {")
+        # Check if we are adding a community to outgoing routes
+        if self.communities.outgoing.connected:
+            for community in self.communities.outgoing.connected:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_connected(BirdVariable(community))};")
+        if self.communities.outgoing.kernel:
+            for community in self.communities.outgoing.kernel:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_kernel(BirdVariable(community))};")
+        if self.communities.outgoing.kernel_blackhole:
+            for community in self.communities.outgoing.kernel_blackhole:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_kernel_blackhole(BirdVariable(community))};")
+        if self.communities.outgoing.kernel_default:
+            for community in self.communities.outgoing.kernel_default:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_kernel_default(BirdVariable(community))};")
+        if self.communities.outgoing.originated:
+            for community in self.communities.outgoing.originated:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_originated(BirdVariable(community))};")
+        if self.communities.outgoing.originated_default:
+            for community in self.communities.outgoing.originated_default:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_originated_default(BirdVariable(community))};")
+        if self.communities.outgoing.static:
+            for community in self.communities.outgoing.static:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_static(BirdVariable(community))};")
+        if self.communities.outgoing.static_blackhole:
+            for community in self.communities.outgoing.static_blackhole:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_static_blackhole(BirdVariable(community))};")
+        if self.communities.outgoing.static_default:
+            for community in self.communities.outgoing.static_default:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_static_default(BirdVariable(community))};")
+        if self.communities.outgoing.bgp_own:
+            for community in self.communities.outgoing.bgp_own:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_own(BirdVariable(community))};")
+        if self.communities.outgoing.bgp_own_blackhole:
+            for community in self.communities.outgoing.bgp_own_blackhole:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_own_blackhole(BirdVariable(community))};")
+        if self.communities.outgoing.bgp_own_default:
+            for community in self.communities.outgoing.bgp_own_default:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_own_default(BirdVariable(community))};")
+        if self.communities.outgoing.bgp_customer:
+            for community in self.communities.outgoing.bgp_customer:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_customer(BirdVariable(community))};")
+        if self.communities.outgoing.bgp_customer_blackhole:
+            for community in self.communities.outgoing.bgp_customer_blackhole:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_customer_blackhole(BirdVariable(community))};")
+        if self.communities.outgoing.bgp_peering:
+            for community in self.communities.outgoing.bgp_peering:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_peering(BirdVariable(community))};")
+        if self.communities.outgoing.bgp_transit:
+            for community in self.communities.outgoing.bgp_transit:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_transit(BirdVariable(community))};")
+        if self.communities.outgoing.bgp_transit_default:
+            for community in self.communities.outgoing.bgp_transit_default:
+                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_transit_default(BirdVariable(community))};")
         # Check if we are adding a large community to outgoing routes
         if self.large_communities.outgoing.connected:
             for large_community in self.large_communities.outgoing.connected:
@@ -3060,6 +3277,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def graceful_shutdown(self, graceful_shutdown: bool) -> None:
         """Set the graceful_shutdown state of the peer."""
         self.peer_attributes.graceful_shutdown = graceful_shutdown
+
+    @property
+    def communities(self) -> BGPPeerCommunities:
+        """Return our communities."""
+        return self.peer_attributes.communities
 
     @property
     def large_communities(self) -> BGPPeerLargeCommunities:

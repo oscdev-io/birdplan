@@ -453,19 +453,6 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 dest = RTD_BLACKHOLE;
             }}"""
 
-    @BirdFunction("bgp_peer_community_add_blackhole")
-    def peer_community_add_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
-        """BIRD bgp_peer_community_add_blackhole function."""
-
-        return f"""\
-            # Add a community to a blackhole route (the check for a blackhole route needs to be done before calling this function)
-            function bgp_peer_community_add_blackhole(string filter_name; pair community) {{
-                if DEBUG then print filter_name,
-                    " [bgp_peer_community_add_blackhole] Adding community ", community, " for type BLACKHOLE to ",
-                    {self.functions.route_info()};
-                bgp_community.add(community);
-        }}"""
-
     @BirdFunction("bgp_peer_communities_strip_all")
     def peer_communities_strip_all(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_peer_communities_strip_all function."""
@@ -1354,6 +1341,327 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 # Set local preference
                 bgp_local_pref = BGP_PREF_TRANSIT - local_pref_cost;
             }}"""
+
+    #
+    # Communities
+    #
+
+    @BirdFunction("bgp_peer_community_add_connected")
+    def peer_community_add_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_connected function."""
+
+        return f"""\
+            function bgp_peer_community_add_connected(string filter_name; pair community) -> bool {{
+                if !{self.is_connected()} then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_connected] Adding community ", community, " for type CONNECTED to ",
+                    {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_kernel")
+    def peer_community_add_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_kernel function."""
+
+        return f"""\
+            function bgp_peer_community_add_kernel(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.functions.is_kernel()} ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_kernel] Adding community ", community, " for type KERNEL to ",
+                    {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_kernel_blackhole")
+    def peer_community_add_kernel_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_kernel_blackhole function."""
+
+        return f"""\
+            function bgp_peer_community_add_kernel_blackhole(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.functions.is_kernel()} ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_kernel_blackhole] Adding community ", community,
+                    " for type KERNEL BLACKHOLE to ", {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_kernel_default")
+    def peer_community_add_kernel_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_kernel_default function."""
+
+        return f"""\
+            function bgp_peer_community_add_kernel_default(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.functions.is_kernel()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_kernel_default] Adding community ", community,
+                    " for type KERNEL DEFAULT to ", {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_originated")
+    def peer_community_add_originated(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_originated function."""
+
+        return f"""\
+            # BGP originated route community adding
+            function bgp_peer_community_add_originated(string filter_name; pair community) -> bool {{
+                if (!{self.is_originated()} || {self.functions.is_default()}) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_originate] Adding community ", community,
+                    " for type ORIGINATED to ", {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_originated_blackhole")
+    def peer_community_add_originated_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_originated_blackhole function."""
+
+        return f"""\
+            function bgp_peer_community_add_originated_blackhole(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.is_originated()} ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_originated_blackhole] Adding community ", community,
+                    " for type ORIGINATED BLACKHOLE to ", {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_originated_default")
+    def peer_community_add_originated_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_originated_default function."""
+
+        return f"""\
+            function bgp_peer_community_add_originated_default(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.is_originated()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_originated_default] Adding community ", community,
+                    " for type ORIGINATED DEFAULT to ", {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_static")
+    def peer_community_add_static(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_static function."""
+
+        return f"""\
+            function bgp_peer_community_add_static(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.functions.is_static()} ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_static] Adding community ", community, " for type STATIC to ",
+                    {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_static_blackhole")
+    def peer_community_add_static_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_static_blackhole function."""
+
+        return f"""\
+            function bgp_peer_community_add_static_blackhole(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.functions.is_static()} ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_static_blackhole] Adding community ", community,
+                    " for type STATIC BLACKHOLE to ", {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_static_default")
+    def peer_community_add_static_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_static_default function."""
+
+        return f"""\
+            function bgp_peer_community_add_static_default(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.functions.is_static()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_static_default] Adding community ", community,
+                    " for type STATIC DEFAULT to ", {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_bgp_own")
+    def peer_community_add_bgp_own(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_bgp_own function."""
+
+        return f"""\
+            # BGP own route community adding
+            function bgp_peer_community_add_bgp_own(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.is_bgp_own()} ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                )  then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_bgp_own] Adding community ", community, " for type BGP_OWN to ",
+                    {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_bgp_own_blackhole")
+    def peer_community_add_bgp_own_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_bgp_own_blackhole function."""
+
+        return f"""\
+            function bgp_peer_community_add_bgp_own_blackhole(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.is_bgp_own()} ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_bgp_own_blackhole] Adding community ", community,
+                    " for type BGP_OWN BLACKHOLE to ", {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_bgp_own_default")
+    def peer_community_add_bgp_own_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_bgp_own_default function."""
+
+        return f"""\
+            function bgp_peer_community_add_bgp_own_default(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.is_bgp_own()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_bgp_own_default] Adding community ", community,
+                    " for type BGP_OWN DEFAULT to ", {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_bgp_customer")
+    def peer_community_add_bgp_customer(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_bgp_customer function."""
+
+        return f"""\
+            # BGP customer route community adding
+            function bgp_peer_community_add_bgp_customer(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.is_bgp_customer()} ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_bgp_customer] Adding community ", community, " for type BGP_CUSTOMER to ",
+                    {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_bgp_customer_blackhole")
+    def peer_community_add_bgp_customer_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_bgp_customer_blackhole function."""
+
+        return f"""\
+            function bgp_peer_community_add_bgp_customer_blackhole(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.is_bgp_customer()} ||
+                    {self.functions.is_default()} ||
+                    !{self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_bgp_customer_blackhole] Adding community ", community,
+                    " for type BGP_CUSTOMER BLACKHOLE to ", {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_bgp_peering")
+    def peer_community_add_bgp_peering(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_bgp_peering function."""
+
+        return f"""\
+            # BGP peering route community adding
+            function bgp_peer_community_add_bgp_peering(string filter_name; pair community) -> bool {{
+                if (!{self.is_bgp_peer()} && !{self.is_bgp_routeserver()}) then return false;
+                if DEBUG then print filter_name,
+                        " [bgp_peer_community_add_bgp_peer] Adding community ", community, " for type BGP_PEER to ",
+                        {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_bgp_transit")
+    def peer_community_add_bgp_transit(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_bgp_transit function."""
+
+        return f"""\
+            # BGP transit route community adding
+            function bgp_peer_community_add_bgp_transit(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.is_bgp_transit()} ||
+                    {self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_bgp_transit] Adding community ", community, " for type BGP_TRANSIT to ",
+                    {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_bgp_transit_default")
+    def peer_community_add_bgp_transit_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_bgp_transit_default function."""
+
+        return f"""\
+            function bgp_peer_community_add_bgp_transit_default(string filter_name; pair community) -> bool {{
+                if (
+                    !{self.is_bgp_transit()} ||
+                    !{self.functions.is_default()} ||
+                    {self.is_blackhole()}
+                ) then return false;
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_bgp_transit_default] Adding community ", community,
+                    " for type BGP_TRANSIT DEFAULT to ", {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    @BirdFunction("bgp_peer_community_add_blackhole")
+    def peer_community_add_blackhole(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_peer_community_add_blackhole function."""
+
+        return f"""\
+            # Add a community to a blackhole route (the check for a blackhole route needs to be done before calling this
+            # function)
+            function bgp_peer_community_add_blackhole(string filter_name; pair community) {{
+                if DEBUG then print filter_name,
+                    " [bgp_peer_community_add_blackhole] Adding community ", community, " for type BLACKHOLE to ",
+                    {self.functions.route_info()};
+                bgp_community.add(community);
+            }}"""
+
+    #
+    # Large Communities
+    #
 
     @BirdFunction("bgp_peer_lc_add_connected")
     def peer_lc_add_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
