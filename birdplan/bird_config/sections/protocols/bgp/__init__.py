@@ -30,6 +30,7 @@ from ...tables import SectionTables
 from ..base import SectionProtocolBase
 from ..direct import ProtocolDirect
 from ..pipe import ProtocolPipe, ProtocolPipeFilterType
+from ..rpki import ProtocolRPKI, RPKISource
 from .bgp_attributes import BGPAttributes, BGPPeertypeConstraints, BGPRoutePolicyAccept, BGPRoutePolicyImport
 from .bgp_functions import BGPFunctions
 from .bgp_types import BGPPeerConfig
@@ -93,6 +94,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.tables.conf.append("ipv4 table t_bgp4;")
         self.tables.conf.append("ipv6 table t_bgp6;")
         self.tables.conf.append("")
+
+        # Check if we're adding RPKI ROA tables
+        if self.rpki_source:
+            # Configure RPKI protocol
+            rpki_protocol = ProtocolRPKI(self.birdconfig_globals, self.tables, self.rpki_source)
+            self.conf.add(rpki_protocol)
 
         # Setup BGP origination
         self._configure_originated_routes()
@@ -327,6 +334,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_COMMUNITY_BLACKHOLE = (65535, 666);")
         self.constants.conf.append("define BGP_COMMUNITY_NOEXPORT = (65535, 65281);")
         self.constants.conf.append("define BGP_COMMUNITY_NOADVERTISE = (65535, 65282);")
+        self.constants.conf.append("")
+
+        self.constants.conf.append("# Well known extended communities")
+        self.constants.conf.append("define BGP_EXT_COMMUNITY_RPKI_VALID = (unknown 0x4300, 0, 0);")
+        self.constants.conf.append("define BGP_EXT_COMMUNITY_RPKI_NOTFOUND = (unknown 0x4300, 0, 1);")
+        self.constants.conf.append("define BGP_EXT_COMMUNITY_RPKI_INVALID = (unknown 0x4300, 0, 2);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community functions")
@@ -592,6 +605,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     def peertype_constraints(self) -> Dict[str, BGPPeertypeConstraints]:
         """Return our peertype constraints."""
         return self.bgp_attributes.peertype_constraints
+
+    @property
+    def rpki_source(self) -> Optional[RPKISource]:
+        """Return the RPKI source to use for validation."""
+        return self.bgp_attributes.rpki_source
+
+    @rpki_source.setter
+    def rpki_source(self, rpki_source: RPKISource) -> None:
+        """Set the RPKI source to use for validation."""
+        self.bgp_attributes.rpki_source = rpki_source
 
     @property
     def graceful_shutdown(self) -> bool:

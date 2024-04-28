@@ -70,6 +70,7 @@ r2_peer_show_r1:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
   type: customer
+  use_rpki: false
 r2_peer_summary:
   r1:
     asn: 65000

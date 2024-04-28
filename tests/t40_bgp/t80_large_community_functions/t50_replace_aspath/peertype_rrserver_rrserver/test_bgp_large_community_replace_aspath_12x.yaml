@@ -54,6 +54,7 @@ r10_peer_show_r1:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
   type: transit
+  use_rpki: false
 r10_peer_summary:
   r1:
     asn: 65000
@@ -180,6 +181,7 @@ r2_peer_show_r1:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
   type: customer
+  use_rpki: false
 r2_peer_summary:
   r1:
     asn: 65000
@@ -296,6 +298,7 @@ r3_peer_show_r1:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
   type: internal
+  use_rpki: false
 r3_peer_summary:
   r1:
     asn: 65000
@@ -416,6 +419,7 @@ r4_peer_show_r1:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
   type: peer
+  use_rpki: false
 r4_peer_summary:
   r1:
     asn: 65000
@@ -530,6 +534,7 @@ r5_peer_show_r1:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
   type: routecollector
+  use_rpki: false
 r5_peer_summary:
   r1:
     asn: 65000
@@ -638,6 +643,7 @@ r6_peer_show_r1:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
   type: routeserver
+  use_rpki: false
 r6_peer_summary:
   r1:
     asn: 65000
@@ -748,6 +754,7 @@ r7_peer_show_r1:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
   type: rrclient
+  use_rpki: false
 r7_peer_summary:
   r1:
     asn: 65000
@@ -860,6 +867,7 @@ r8_peer_show_r1:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
   type: rrserver
+  use_rpki: false
 r8_peer_summary:
   r1:
     asn: 65000
@@ -972,6 +980,7 @@ r9_peer_show_r1:
     ipv4: t_bgp4_AS65000_r1_peer
     ipv6: t_bgp6_AS65000_r1_peer
   type: rrserver-rrserver
+  use_rpki: false
 r9_peer_summary:
   r1:
     asn: 65000

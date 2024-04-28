@@ -1512,6 +1512,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Make sure we keep our quarantine state
         self.state["quarantine"] = self.quarantine
 
+        # Save the state of RPKI use to validate routes
+        self.state["use_rpki"] = self.use_rpki
+
         self.conf.add("")
         self.conf.add(f"# Peer type: {self.peer_type}")
         self.conf.add("")
@@ -2865,6 +2868,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     )
                     self.conf.add(f"  {import_filter_blackholes_deny};")
 
+        # RPKI validation
+        if self.peer_type in ("customer", "peer", "routerserver", "transit"):
+            if self.use_rpki:
+                self.conf.add(f"  {self.bgp_functions.import_filter_rpki()};")
+
         # Implementation of the denies from import_filter_deny
         # Deny origin AS
         if self.has_import_origin_asn_deny_filter:
@@ -3749,3 +3757,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def has_export_prefix_filter(self) -> BGPPeerFilterItem:
         """Peer has a export prefix filter."""
         return self.export_filter_policy.prefixes
+
+    @property
+    def use_rpki(self) -> bool:
+        """Peer uses RPKI validation."""
+        return self.bgp_attributes.rpki_source is not None and self.peer_attributes.use_rpki and not self.replace_aspath

@@ -34,6 +34,7 @@ import jinja2
 import packaging.version
 
 from .bird_config import BirdConfig
+from .bird_config.sections.protocols.rpki import RPKISource
 from .console.colors import colored
 from .exceptions import BirdPlanError
 from .version import __version__
@@ -1226,11 +1227,6 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         if "bgp" not in self.config:
             return
 
-        # Set our ASN
-        if "asn" not in self.config["bgp"]:
-            raise BirdPlanError('BGP configuration must have an "asn" item defined')
-        self.birdconf.protocols.bgp.asn = self.config["bgp"]["asn"]
-
         # Check configuration options are supported
         for config_item in self.config["bgp"]:
             if config_item not in (
@@ -1243,9 +1239,22 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 "peers",
                 "peertype_constraints",
                 "quarantine",
+                "rpki_source",
                 "rr_cluster_id",
             ):
                 raise BirdPlanError(f"The 'bgp' config item '{config_item}' is not supported")
+
+        # Set our ASN
+        if "asn" not in self.config["bgp"]:
+            raise BirdPlanError('BGP configuration must have an "asn" item defined')
+        self.birdconf.protocols.bgp.asn = self.config["bgp"]["asn"]
+
+        # Setup RPKI server
+        if "rpki_source" in self.config["bgp"]:
+            try:
+                self.birdconf.protocols.bgp.rpki_source = RPKISource(self.config["bgp"]["rpki_source"])
+            except ValueError as e:
+                raise BirdPlanError(f"Invalid 'bgp' config item 'rpki_source': {e}") from None
 
         self._config_bgp_accept()
         self._config_bgp_globals()
@@ -1495,7 +1504,11 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         """Configure bgp:peers single peer."""
 
         # Start with no peer config
-        peer = {}
+        peer: dict[str, Any] = {}
+
+        # Check if we're using RPKI
+        if self.birdconf.protocols.bgp.rpki_source:
+            peer["use_rpki"] = True
 
         # Loop with each config item in the peer
         for config_item, config_value in peer_config.items():
@@ -1523,6 +1536,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 "cost",
                 "graceful_shutdown",
                 "blackhole_community",
+                "use_rpki",
             ):
                 peer[config_item] = config_value
             # Peer add_paths configuration

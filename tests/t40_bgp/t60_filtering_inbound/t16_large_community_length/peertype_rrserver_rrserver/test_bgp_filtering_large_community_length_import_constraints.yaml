@@ -355,6 +355,7 @@ r1_peer_show_e1:
     ipv4: t_bgp4_AS65000_e1_peer
     ipv6: t_bgp6_AS65000_e1_peer
   type: rrserver-rrserver
+  use_rpki: false
 r1_peer_summary:
   e1:
     asn: 65000

@@ -816,6 +816,38 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(BGP_LC_FILTERED_BOGON);
             }}"""
 
+    @BirdFunction("bgp_import_filter_rpki")
+    def import_filter_rpki(self, *args: Any) -> str:  # pylint: disable=unused-argument
+        """BIRD bgp_import_filter_rpki function."""
+
+        return f"""\
+            # Import filter RPKI
+            function bgp_import_filter_rpki(string filter_name) -> bool
+            {{
+                birdplan_rpki_status = -1;
+                case net.type {{
+                    NET_IP4:
+                        birdplan_rpki_status = roa_check(t_roa4);
+                    NET_IP6:
+                        birdplan_rpki_status = roa_check(t_roa6);
+                }}
+                case birdplan_rpki_status {{
+                    RPKI_UNKNOWN:
+                        if DEBUG then print filter_name,
+                            " [bgp_import_filter_rpki] RPKI status UNKNOWN ", {self.functions.route_info()};
+                        bgp_ext_community.add(BGP_EXT_COMMUNITY_RPKI_UNKNOWN);
+                    RPKI_VALID:
+                        if DEBUG then print filter_name,
+                            " [bgp_import_filter_rpki] RPKI status VALID ", {self.functions.route_info()};
+                        bgp_ext_community.add(BGP_EXT_COMMUNITY_RPKI_VALID);
+                    RPKI_INVALID:
+                        if DEBUG then print filter_name,
+                            " [bgp_import_filter_rpki] RPKI status INVALID ", {self.functions.route_info()};
+                        bgp_large_community.add(BGP_LC_FILTERED_RPKI_INVALID);
+                        bgp_ext_community.add(BGP_EXT_COMMUNITY_RPKI_INVALID);
+                }}
+            }}"""
+
     @BirdFunction("bgp_import_filter_community_lengths")
     def import_filter_community_lengths(self, *args: Any) -> str:  # pylint: disable=unused-argument
         """BIRD bgp_import_filter_community_lengths function."""
@@ -944,7 +976,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         return f"""\
             # Import filter origin ASNs (ALLOW list)
             function bgp_import_filter_origin_asns_allow(string filter_name; int set asns) -> bool {{
-                if (bgp_path.last_nonaggregated ~ asns) then return false;
+                if (bgp_path.last ~ asns) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_import_filter_origin_asns_allow] Adding BGP_LC_FILTERED_ORIGIN_AS to ", {self.functions.route_info()};
                 bgp_large_community.add(BGP_LC_FILTERED_ORIGIN_AS);
@@ -957,7 +989,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         return f"""\
             # Export filter origin ASNs
             function bgp_export_filter_origin_asns(string filter_name; int set asns) -> bool {{
-                if (bgp_path.last_nonaggregated !~ asns) then return false;
+                if (bgp_path.last !~ asns) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_export_filter_origin_asns] Dropping origin ASN filtered route ", {self.functions.route_info()};
                 return true;
@@ -970,7 +1002,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         return f"""\
             # Import filter origin ASNs (DENY list)
             function bgp_import_filter_origin_asns_deny(string filter_name; int set asns) -> bool {{
-                if (bgp_path.last_nonaggregated !~ asns) then return false;
+                if (bgp_path.last !~ asns) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_import_filter_origin_asns_deny] Adding BGP_LC_FILTERED_ORIGIN_AS to ", {self.functions.route_info()};
                 bgp_large_community.add(BGP_LC_FILTERED_ORIGIN_AS);
@@ -983,7 +1015,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
         return f"""\
             # Import filter origin ASNs (import_filter_deny)
             function bgp_import_filter_deny_origin_asns(string filter_name; int set asns) -> bool {{
-                if (bgp_path.last_nonaggregated !~ asns) then return false;
+                if (bgp_path.last !~ asns) then return false;
                 if DEBUG then print filter_name,
                     " [bgp_import_filter_deny_origin_asns] Adding BGP_LC_FILTERED_DENY_ORIGIN_AS to ",
                     {self.functions.route_info()};
