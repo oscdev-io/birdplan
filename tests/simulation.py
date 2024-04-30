@@ -194,7 +194,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
             contents = ""
             with open(filename, "r", encoding="UTF-8") as conffile:
                 for lineno, line in enumerate(conffile.readlines()):
-                    contents += f"{lineno}: {line}"
+                    contents += f"{lineno+1}: {line}"
             # Add report
             items.append((name, contents))
 
