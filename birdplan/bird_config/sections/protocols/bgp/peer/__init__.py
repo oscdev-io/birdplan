@@ -31,6 +31,7 @@ from ......exceptions import BirdPlanError
 from ......peeringdb import PeeringDB
 from ..... import util
 from .....globals import BirdConfigGlobals
+from ....bird_attributes import SectionBirdAttributes
 from ....constants import SectionConstants
 from ....functions import BirdVariable, SectionFunctions
 from ....tables import SectionTables
@@ -71,6 +72,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def __init__(  # noqa: CFQ001,CFQ002 # pylint: disable=too-many-branches,too-many-statements,too-many-arguments,too-many-locals
         self,
         birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
         constants: SectionConstants,
         functions: SectionFunctions,
         tables: SectionTables,
@@ -80,7 +82,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         peer_config: BGPPeerConfig,
     ):
         """Initialize the object."""
-        super().__init__(birdconfig_globals, constants, functions, tables)
+        super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
         # Initialize our attributes
         self._bgp_attributes = bgp_attributes

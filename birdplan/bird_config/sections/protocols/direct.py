@@ -21,6 +21,7 @@
 from typing import List, Optional
 
 from ...globals import BirdConfigGlobals
+from ..bird_attributes import SectionBirdAttributes
 from ..constants import SectionConstants
 from ..functions import SectionFunctions
 from ..tables import SectionTables
@@ -38,6 +39,7 @@ class ProtocolDirect(SectionProtocolBase):
     def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
         constants: SectionConstants,
         functions: SectionFunctions,
         tables: SectionTables,
@@ -45,7 +47,7 @@ class ProtocolDirect(SectionProtocolBase):
         interfaces: Optional[List[str]] = None,
     ):
         """Initialize the object."""
-        super().__init__(birdconfig_globals, constants, functions, tables)
+        super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
         # Add a suffix if we have a name
         if name:

@@ -20,6 +20,7 @@
 
 from ...globals import BirdConfigGlobals
 from ..base import SectionBase
+from ..bird_attributes import SectionBirdAttributes
 from ..constants import SectionConstants
 from ..functions import SectionFunctions
 from ..tables import SectionTables
@@ -46,19 +47,24 @@ class SectionProtocols(SectionBase):
     _ospf: ProtocolOSPF
     _bgp: ProtocolBGP
 
-    def __init__(
-        self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
+        constants: SectionConstants,
+        functions: SectionFunctions,
+        tables: SectionTables,
     ):
         """Initialize object."""
         super().__init__(birdconfig_globals)
 
-        self._device = ProtocolDevice(birdconfig_globals, constants, functions, tables)
-        self._direct = ProtocolDirect(birdconfig_globals, constants, functions, tables)
-        self._kernel = ProtocolKernel(birdconfig_globals, constants, functions, tables)
-        self._static = ProtocolStatic(birdconfig_globals, constants, functions, tables)
-        self._rip = ProtocolRIP(birdconfig_globals, constants, functions, tables)
-        self._ospf = ProtocolOSPF(birdconfig_globals, constants, functions, tables)
-        self._bgp = ProtocolBGP(birdconfig_globals, constants, functions, tables)
+        self._device = ProtocolDevice(birdconfig_globals, birdattributes, constants, functions, tables)
+        self._direct = ProtocolDirect(birdconfig_globals, birdattributes, constants, functions, tables)
+        self._kernel = ProtocolKernel(birdconfig_globals, birdattributes, constants, functions, tables)
+        self._static = ProtocolStatic(birdconfig_globals, birdattributes, constants, functions, tables)
+        self._rip = ProtocolRIP(birdconfig_globals, birdattributes, constants, functions, tables)
+        self._ospf = ProtocolOSPF(birdconfig_globals, birdattributes, constants, functions, tables)
+        self._bgp = ProtocolBGP(birdconfig_globals, birdattributes, constants, functions, tables)
 
     def configure(self) -> None:
         """Configure all protocols."""

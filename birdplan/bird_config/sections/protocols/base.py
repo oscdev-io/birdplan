@@ -20,6 +20,7 @@
 
 from ...globals import BirdConfigGlobals
 from ..base import SectionBase
+from ..bird_attributes import SectionBirdAttributes
 from ..constants import SectionConstants
 from ..functions import SectionFunctions
 from ..tables import SectionTables
@@ -31,6 +32,7 @@ class SectionProtocolBase(SectionBase):
     """BIRD protocol base class."""
 
     # Global objects to inject configuration
+    _birdattributes: SectionBirdAttributes
     _constants: SectionConstants
     _functions: SectionFunctions
     _tables: SectionTables
@@ -38,6 +40,7 @@ class SectionProtocolBase(SectionBase):
     def __init__(
         self,
         birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
         constants: SectionConstants,
         functions: SectionFunctions,
         tables: SectionTables,
@@ -45,9 +48,15 @@ class SectionProtocolBase(SectionBase):
         """Initialize the object."""
         super().__init__(birdconfig_globals)
 
+        self._birdattributes = birdattributes
         self._constants = constants
         self._functions = functions
         self._tables = tables
+
+    @property
+    def birdattributes(self) -> SectionBirdAttributes:
+        """Return the global attributes section."""
+        return self._birdattributes
 
     @property
     def constants(self) -> SectionConstants:

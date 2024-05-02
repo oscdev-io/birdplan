@@ -22,6 +22,8 @@
 
 from typing import Any, Dict
 
+from ....bird_attributes import SectionBirdAttributes
+
 from ......exceptions import BirdPlanError
 from .....globals import BirdConfigGlobals
 from ....constants import SectionConstants
@@ -55,6 +57,7 @@ class ProtocolOSPFArea(SectionProtocolBase):  # pylint: disable=too-many-public-
     def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
         constants: SectionConstants,
         functions: SectionFunctions,
         tables: SectionTables,
@@ -63,7 +66,7 @@ class ProtocolOSPFArea(SectionProtocolBase):  # pylint: disable=too-many-public-
         area_config: OSPFAreaConfig,
     ):
         """Initialize the object."""
-        super().__init__(birdconfig_globals, constants, functions, tables)
+        super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
         # Setup OSPF attributes
         self._ospf_attributes = ospf_attributes
@@ -117,6 +120,7 @@ class ProtocolOSPFArea(SectionProtocolBase):  # pylint: disable=too-many-public-
         # Create OSPF area interface object
         interface = ProtocolOSPFAreaInterface(
             self.birdconfig_globals,
+            self.birdattributes,
             self.constants,
             self.functions,
             self.tables,

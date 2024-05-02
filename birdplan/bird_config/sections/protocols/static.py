@@ -22,6 +22,7 @@ from typing import Dict
 
 from ....exceptions import BirdPlanError
 from ...globals import BirdConfigGlobals
+from ..bird_attributes import SectionBirdAttributes
 from ..constants import SectionConstants
 from ..functions import SectionFunctions
 from ..tables import SectionTables
@@ -40,10 +41,15 @@ class ProtocolStatic(SectionProtocolBase):
     _routes: StaticRoutes
 
     def __init__(
-        self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
+        self,
+        birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
+        constants: SectionConstants,
+        functions: SectionFunctions,
+        tables: SectionTables,
     ):
         """Initialize the object."""
-        super().__init__(birdconfig_globals, constants, functions, tables)
+        super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
         # Set section header
         self._section = "Static Protocol"

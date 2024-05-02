@@ -24,6 +24,7 @@ from typing import Dict, List, Optional
 
 from .....exceptions import BirdPlanError
 from ....globals import BirdConfigGlobals
+from ...bird_attributes import SectionBirdAttributes
 from ...constants import SectionConstants
 from ...functions import SectionFunctions
 from ...tables import SectionTables
@@ -59,10 +60,15 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     _originated_routes: BGPOriginatedRoutes
 
     def __init__(
-        self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
+        self,
+        birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
+        constants: SectionConstants,
+        functions: SectionFunctions,
+        tables: SectionTables,
     ):
         """Initialize the object."""
-        super().__init__(birdconfig_globals, constants, functions, tables)
+        super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
         # Set section name
         self._section = "BGP Protocol"
@@ -88,6 +94,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.birdconfig_globals.state["bgp"]["peers"] = {}
 
         self._configure_constants_bgp()
+
+        self._configure_birdattributes_bgp()
+
         self.functions.conf.append(self.bgp_functions, deferred=True)
 
         self.tables.conf.append("# BGP Tables")
@@ -129,6 +138,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             # Add direct protocol for redistribution of connected routes
             bgp_direct_protocol = ProtocolDirect(
                 self.birdconfig_globals,
+                self.birdattributes,
                 self.constants,
                 self.functions,
                 self.tables,
@@ -167,6 +177,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Create BGP peer object
         peer = ProtocolBGPPeer(
             self.birdconfig_globals,
+            self.birdattributes,
             self.constants,
             self.functions,
             self.tables,
@@ -190,6 +201,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         if peer_type not in self.bgp_attributes.peertype_constraints:
             raise BirdPlanError(f"Peer type '{peer_type}' has no implemented global prefix limits")
         return self.bgp_attributes.peertype_constraints[peer_type]
+
+    def _configure_birdattributes_bgp(self) -> None:  # noqa: CFQ001 # pylint: disable=too-many-statements
+        """Configure BGP attributes."""
+        # NK: No attributes for now
+        # self.birdattributes.conf.append_title("BGP Attributes")
 
     def _configure_constants_bgp(self) -> None:  # noqa: CFQ001 # pylint: disable=too-many-statements
         """Configure BGP constants."""
