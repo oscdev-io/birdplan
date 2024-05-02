@@ -30,4 +30,5 @@ if [ -n "$default_args" ]; then
     ARGS+=(--numprocesses="$jobcount" --dist=loadfile)
 fi
 
-nice -n 20 tox run -e runtest --recreate -- "${ARGS[@]}"
+#nice -n 20 tox run -e runtest --recreate -- "${ARGS[@]}"
+nice -n 20 tox run -e runtest -- "${ARGS[@]}"
