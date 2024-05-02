@@ -48,6 +48,59 @@ bgp:
 ```
 
 
+# rpki_source
+
+Supported in version: v0.4.0
+
+Specify RPKI source to use, this will automatically enable RPKI checking for all `customer`, `peer`, `routeserver`, `transit` peer
+types. This can be disabled using `use_rpki: false` per peer. Checking of RPKI is not enabled when using `replace_aspath` in peer
+configuration.
+
+## Using TCP-based RPKI servers
+
+TCP-based RPKI servers can be used with `tcp://SERVER:PORT?refresh=3600&retry=600`. The default port is `323`.
+
+An example of using this is...
+```yaml
+router_id: 0.0.0.1
+
+bgp:
+  asn: 65000
+  rpki_source: tcp://rpki.example.net
+```
+
+## Using SSH-based RPKI servers
+
+SSH-based RPKI servers can be used with
+`ssh://SERVER:PORT?username=rpki&private_key=/etc/birdplan/private_key&known_hosts=/etc/birdplan/rpki_known_hosts&username=rpki`.
+
+When using SSH-based RPKI server, the default for `username`, `private_key` and `known_hosts` will be set to the above defaults. The
+default port is `22` and default username is `rpki`.
+
+One can also specify a `refresh` and `retry` parameters.
+
+An example of using this is...
+```yaml
+router_id: 0.0.0.1
+
+bgp:
+  asn: 65000
+  rpki_source: ssh://rpki.example.net?username=birdrpki
+```
+
+## Loading data from statically defined list
+
+An example of using this is...
+```yaml
+router_id: 0.0.0.1
+
+bgp:
+  asn: 65000
+  rpki_source:
+    - fec0::/32 max 32 as 65000
+    - fec0::/32 max 32 as 65000
+```
+
 
 # accept
 
@@ -343,7 +396,6 @@ bgp:
       type: internal
   ...
 ```
-
 
 
 ## accept
@@ -1323,5 +1375,24 @@ bgp:
       asn: 65000
       description: Some peer
       source_address6: fc00::2
+  ...
+```
+
+
+# use_rpki
+
+Supported in version: v0.4.0
+
+RPKI can be enabled (or, actually disabled) using the following...
+```yaml
+...
+
+bgp:
+  ...
+  peers:
+    peer1:
+      asn: 65000
+      type: transit
+      use_rpki: false
   ...
 ```

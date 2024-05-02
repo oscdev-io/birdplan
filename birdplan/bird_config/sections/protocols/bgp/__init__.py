@@ -95,6 +95,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         self._configure_constants_bgp()
 
+        # Check if we're adding RPKI ROA tables
+        if self.rpki_source:
+            # Configure RPKI protocol
+            rpki_protocol = ProtocolRPKI(self.birdconfig_globals, self.birdattributes, self.tables, self.rpki_source)
+            self.conf.add(rpki_protocol)
+
         self._configure_birdattributes_bgp()
 
         self.functions.conf.append(self.bgp_functions, deferred=True)
@@ -103,12 +109,6 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.tables.conf.append("ipv4 table t_bgp4;")
         self.tables.conf.append("ipv6 table t_bgp6;")
         self.tables.conf.append("")
-
-        # Check if we're adding RPKI ROA tables
-        if self.rpki_source:
-            # Configure RPKI protocol
-            rpki_protocol = ProtocolRPKI(self.birdconfig_globals, self.tables, self.rpki_source)
-            self.conf.add(rpki_protocol)
 
         # Setup BGP origination
         self._configure_originated_routes()

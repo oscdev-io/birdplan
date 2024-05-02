@@ -39,6 +39,7 @@ from nsnetsim.switch_node import SwitchNode
 from birdplan.cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from birdplan.exceptions import BirdPlanError
 
+from .openssh import generate_openssh_keypair
 from .simulation import Simulation
 
 __all__ = ["BirdPlanBaseTestCase"]
@@ -168,6 +169,7 @@ class BirdPlanBaseTestCase:
                 if hasattr(self, switch_attr):
                     switch = getattr(self, switch_attr)
                     sim.node(switch).add_interface(sim.node(router).interface(interface))
+
         # Loop with ExaBGP's
         for exabgp in self.exabgps:
             # Get configuration for this ExaBGP instance
@@ -182,6 +184,7 @@ class BirdPlanBaseTestCase:
                 if hasattr(self, switch_attr):
                     switch = getattr(self, switch_attr)
                     sim.node(switch).add_interface(sim.node(exabgp).interface(interface))
+
         # Loop with StayRTR's
         for stayrtrs in self.stayrtrs:
             # Get configuration for this StayRTR instance
@@ -989,11 +992,10 @@ class BirdPlanBaseTestCase:
         # Run BirdPlan as if it was from the commandline
         result = birdplan_cmdline.run(cmdline_args)
 
-        # Add test report sections
-        sim.add_logfile(f"bird.log.{router}", bird_logfile)
-
         # Add the birdplan configuration object to the simulation
         if args[0] == "configure":
+            # Add test report sections
+            sim.add_logfile(f"bird.log.{router}", bird_logfile)
             sim.add_conffile(f"bird.conf.{router}", bird_conffile)
             sim.add_config(router, birdplan_cmdline.birdplan)
 

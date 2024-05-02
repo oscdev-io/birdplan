@@ -4,6 +4,7 @@ set -eux
 
 pacman -Q bird
 pacman -Q exabgp
+pacman -Q stayrtr
 
 cd /root/birdplan || :
 echo "Excuting in '$(pwd)'..."

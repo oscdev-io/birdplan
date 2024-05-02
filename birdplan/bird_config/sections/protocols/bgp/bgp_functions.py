@@ -822,29 +822,34 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
 
         return f"""\
             # Import filter RPKI
-            function bgp_import_filter_rpki(string filter_name) -> bool
-            {{
-                birdplan_rpki_status = -1;
-                case net.type {{
-                    NET_IP4:
-                        birdplan_rpki_status = roa_check(t_roa4);
-                    NET_IP6:
-                        birdplan_rpki_status = roa_check(t_roa6);
+            function bgp_import_filter_rpki(string filter_name) -> bool {{
+                int rpki_status;
+                if (net.type = NET_IP4) then {{
+                    case roa_check(t_roa4, net, bgp_path.last) {{
+                        ROA_UNKNOWN: rpki_status = 0;
+                        ROA_VALID: rpki_status = 1;
+                        ROA_INVALID: rpki_status = 2;
+                    }}
+                }} else if (net.type = NET_IP6) then {{
+                    case roa_check(t_roa6, net, bgp_path.last) {{
+                        ROA_UNKNOWN: rpki_status = 0;
+                        ROA_VALID: rpki_status = 1;
+                        ROA_INVALID: rpki_status = 2;
+                    }}
                 }}
-                case birdplan_rpki_status {{
-                    RPKI_UNKNOWN:
-                        if DEBUG then print filter_name,
-                            " [bgp_import_filter_rpki] RPKI status UNKNOWN ", {self.functions.route_info()};
-                        bgp_ext_community.add(BGP_EXT_COMMUNITY_RPKI_UNKNOWN);
-                    RPKI_VALID:
-                        if DEBUG then print filter_name,
-                            " [bgp_import_filter_rpki] RPKI status VALID ", {self.functions.route_info()};
-                        bgp_ext_community.add(BGP_EXT_COMMUNITY_RPKI_VALID);
-                    RPKI_INVALID:
-                        if DEBUG then print filter_name,
-                            " [bgp_import_filter_rpki] RPKI status INVALID ", {self.functions.route_info()};
-                        bgp_large_community.add(BGP_LC_FILTERED_RPKI_INVALID);
-                        bgp_ext_community.add(BGP_EXT_COMMUNITY_RPKI_INVALID);
+                if (rpki_status = 0) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_import_filter_rpki] RPKI status NOTFOUND ", {self.functions.route_info()};
+                    bgp_ext_community.add(BGP_EXT_COMMUNITY_RPKI_NOTFOUND);
+                }} else if (rpki_status = 1) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_import_filter_rpki] RPKI status VALID ", {self.functions.route_info()};
+                    bgp_ext_community.add(BGP_EXT_COMMUNITY_RPKI_VALID);
+                }} else if (rpki_status = 2) then {{
+                    if DEBUG then print filter_name,
+                        " [bgp_import_filter_rpki] RPKI status INVALID ", {self.functions.route_info()};
+                    bgp_large_community.add(BGP_LC_FILTERED_RPKI_INVALID);
+                    bgp_ext_community.add(BGP_EXT_COMMUNITY_RPKI_INVALID);
                 }}
             }}"""
 

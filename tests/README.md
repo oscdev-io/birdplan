@@ -99,6 +99,8 @@
 
 [Prepending](t40_bgp/t82_prepending/README.md)
 
+[RPKI](t40_bgp/t88_rpki/README.md)
+
 [Graceful Shutdown](t40_bgp/t90_graceful_shutdown/README.md)
 
 [Commandline Quarantine](t40_bgp/t98_quarantine/README.md)

@@ -1166,6 +1166,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "quarantine" in peer_config:
             self.quarantine = peer_config["quarantine"]
 
+        # If we have RPKI configured, set that up in the peer to, ultimately if we use RPKI or not is determined by self.use_rpki
+        if self.bgp_attributes.rpki_source:
+            self.peer_attributes.use_rpki = True
+
         #
         # NETWORK AND STATE (CACHE) RELATED QUERIES
         #
@@ -1515,7 +1519,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.state["quarantine"] = self.quarantine
 
         # Save the state of RPKI use to validate routes
-        self.state["use_rpki"] = self.use_rpki
+        self.state["use_rpki"] = self.uses_rpki
 
         self.conf.add("")
         self.conf.add(f"# Peer type: {self.peer_type}")
@@ -2872,7 +2876,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # RPKI validation
         if self.peer_type in ("customer", "peer", "routerserver", "transit"):
-            if self.use_rpki:
+            if self.uses_rpki:
                 self.conf.add(f"  {self.bgp_functions.import_filter_rpki()};")
 
         # Implementation of the denies from import_filter_deny
@@ -3761,6 +3765,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.export_filter_policy.prefixes
 
     @property
-    def use_rpki(self) -> bool:
+    def uses_rpki(self) -> bool:
         """Peer uses RPKI validation."""
         return self.bgp_attributes.rpki_source is not None and self.peer_attributes.use_rpki and not self.replace_aspath

@@ -41,6 +41,30 @@ The NO_EXPORT community 65535:65281 is supported for all peer types.
 The NO_ADVERTISE community 65535:65282 is supported for all peer types.
 
 
+# Extended Communities
+
+Some extended communities are also supported and used. Specifically when RPKI has been enabled, the following will be set...
+
+
+## Route Origin Validation
+
+Extended communities used to indicate Route Origin Validation state as per RFC [^rpki_rov].
+
+### RPKI Valid 0x4300:0x0000
+
+Prefix has been validated.
+
+### RPKI Not Found 0x4300:0x0001
+
+Prefix could not be validated as it was not found.
+
+### RPKI Invalid 0x4300:0x0002
+
+Prefix could not be validated as it was not found.
+
+[^rpki_rov]: Route Origin State Validation extended community. ref [RFC 8097](https://tools.ietf.org/html/rfc8097)
+
+
 # Large Communities
 
 Large communities are in the form of (OWN_ASN, FUNCTION, XXX) and are described below.
@@ -184,7 +208,7 @@ Internally set, not allowable from any BGP peer type.
 
 ## Filtered Communities
 
-Internally set, not allowable from any BGP peer type.
+Internally set, not allowable from any BGP peer type. These can only be found in the BGP peer routing table.
 
 | Community | Description |
 | --- | --- |
@@ -199,7 +223,7 @@ Internally set, not allowable from any BGP peer type.
 | (OWN_ASN, 1101, 9) | Prefix filtered |
 | (OWN_ASN, 1101, 10) | Origin AS filtered (not in filter list) |
 | (OWN_ASN, 1101, 12) | Default route not allowed |
-| (OWN_ASN, 1101, 13) | RPKI unknown |
+| (OWN_ASN, 1101, 13) | RPKI unknown (see [^rpki_transitive_community_bad]) |
 | (OWN_ASN, 1101, 14) | RPKI invalid |
 | (OWN_ASN, 1101, 15) | Transit free ASN |
 | (OWN_ASN, 1101, 16) | Too many communities |
@@ -216,6 +240,10 @@ Internally set, not allowable from any BGP peer type.
 | (OWN_ASN, 1101, 27) | Deny origin AS |
 | (OWN_ASN, 1101, 28) | Deny AS in AS path |
 | (OWN_ASN, 1101, 29) | Deny prefix |
+
+[^rpki_transitive_communitY_bad]: Guidance to Avoid Carrying RPKI Validation States in Transitive BGP Path Attributes. ref
+https://www.ietf.org/archive/id/draft-ietf-sidrops-avoid-rpki-state-in-bgp-00.html
+
 
 ## Action Communities
 
