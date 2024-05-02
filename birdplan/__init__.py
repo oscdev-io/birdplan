@@ -54,8 +54,8 @@ BirdPlanOSPFInterfaceStatus = Dict[str, Dict[str, Dict[str, Any]]]
 BirdPlanOSPFSummary = Dict[str, Dict[str, Any]]
 
 # Check we have a sufficiently new version of birdclient
-if packaging.version.parse(birdclient.__version__) < packaging.version.parse("0.0.9"):
-    raise BirdPlanError("birdplan requires birdclient version 0.0.9 or newer")
+if packaging.version.parse(birdclient.__version__) < packaging.version.parse("0.0.11"):
+    raise BirdPlanError("birdplan requires birdclient version 0.0.11 or newer")
 
 
 class BirdPlan:  # pylint: disable=too-many-public-methods
