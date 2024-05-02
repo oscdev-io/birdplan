@@ -33,6 +33,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
 from nsnetsim.exabgp_router_node import ExaBGPRouterNode
+from nsnetsim.stayrtr_server_node import StayRTRServerNode
 from nsnetsim.switch_node import SwitchNode
 
 from birdplan.cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
@@ -56,6 +57,9 @@ class BirdPlanBaseTestCase:
 
     # List of ExaBGP nodes to create, eg. ["e1"]
     exabgps = []
+
+    # List of StayRTR nodes to create, eg. ["a1"]
+    stayrtrs = []
 
     # List of bird routers to configure, eg. ["r1", "r2"]
     routers = ["r1"]
@@ -139,6 +143,16 @@ class BirdPlanBaseTestCase:
             # sim.add_logfile(f"EXABGP_LOGFILE({exabgp}) => {exabgp_logfile}", exabgp_logfile)
             sim.add_logfile(f"EXABGP_LOGFILE({exabgp})", exabgp_logfile)
 
+        # Loop with our StayRTR instances and create the nodes
+        self._configure_stayrtrs(sim, tmpdir)
+        for stayrtr in self.stayrtrs:
+            # Add ExaBGP node
+            sim.add_node(
+                StayRTRServerNode(
+                    name=stayrtr, slurmfile=f"{tmpdir}/stayrtr.slurm.json.{stayrtr}", args=["-loglevel", "debug"]
+                )
+            )
+
         # Loop with routers
         for router in configured_routers:
             # Get configuration for this router
@@ -168,6 +182,20 @@ class BirdPlanBaseTestCase:
                 if hasattr(self, switch_attr):
                     switch = getattr(self, switch_attr)
                     sim.node(switch).add_interface(sim.node(exabgp).interface(interface))
+        # Loop with StayRTR's
+        for stayrtrs in self.stayrtrs:
+            # Get configuration for this StayRTR instance
+            stayrtrs_interfaces = getattr(self, f"{stayrtrs}_interfaces")
+            # Loop with its interfaces
+            for interface in stayrtrs_interfaces:
+                # Grab interface config
+                config = getattr(self, f"{stayrtrs}_interface_{interface}")
+                sim.node(stayrtrs).add_interface(interface, config["mac"], config["ips"])
+                # Check if this interface should be connected to a switch
+                switch_attr = f"{stayrtrs}_switch_{interface}"
+                if hasattr(self, switch_attr):
+                    switch = getattr(self, switch_attr)
+                    sim.node(switch).add_interface(sim.node(stayrtrs).interface(interface))
 
         # Load data we may have
         sim.load_data()
@@ -777,6 +805,73 @@ class BirdPlanBaseTestCase:
 
             # Add config file to our simulation so we get a report for it
             sim.add_conffile(f"exabgp.conf.{exabgp}", exabgp_conffile)
+
+    def _configure_stayrtrs(self, sim: Simulation, tmpdir: str) -> List[str]:  # pylint: disable=too-many-locals,too-many-branches
+        """Create our SLURM files."""
+
+        # Loop with each StayRTR
+        for stayrtr in self.stayrtrs:
+            # Grab the SLURM filename we're going to be using
+            stayrtr_slurmfile = f"{tmpdir}/stayrtr.slurm.json.{stayrtr}"
+
+            # Loop with supported attributes that translate into macros
+            internal_macros = {}
+            for attr in [
+                "asn",
+                "stayrtr_slurm",
+                "template_stayrtr_slurm",
+            ]:
+                # Router specific lookup for an attribute to add a macro for
+                router_attr = f"{stayrtr}_{attr}"
+                if hasattr(self, router_attr):
+                    symbol = getattr(self, router_attr)
+                    if callable(symbol):
+                        symbol_signature = inspect.signature(symbol)
+                        if len(symbol_signature.parameters) == 1:
+                            value = symbol(sim)
+                        else:
+                            value = symbol()
+                    else:
+                        value = symbol
+                else:
+                    value = ""
+                # Add our macro
+                internal_macros[f"@{attr.upper()}@"] = value
+
+            # Grab StayRTR's ASN
+            stayrtr_asn = internal_macros["@ASN@"]
+
+            # Work out SLURM file name, going 2 levels up in the test directory
+            stayrtr_slurm_file = None
+            for slurmfile_path in [
+                # Without ASN appended
+                f"{sim.test_dir}/stayrtr.slurm.json.{stayrtr}",
+                # Parent directory without ASN appended
+                f"{os.path.dirname(sim.test_dir)}/stayrtr.slurm.json.{stayrtr}",
+                # Parent parent directory without ASN appended
+                f"{os.path.dirname(os.path.dirname(sim.test_dir))}/stayrtr.slurm.json.{stayrtr}",
+            ]:
+                if os.path.exists(slurmfile_path):
+                    stayrtr_slurm_file = slurmfile_path
+                    break
+            # If we didn't get a SLURM file that exists, then raise an exception
+            if not stayrtr_slurm_file:
+                raise RuntimeError(f"No StayRTR SLURM file found for StayRTR '{stayrtr}' with ASN '{stayrtr_asn}'")
+
+            # Read in SLURM file
+            with open(stayrtr_slurm_file, "r", encoding="UTF-8") as file:
+                raw_slurm = file.read()
+            # Check if we're replacing macros in our SLURM file
+            for macro, value in internal_macros.items():
+                if isinstance(value, int):
+                    value = f"{value}"
+                raw_slurm = raw_slurm.replace(macro, value)
+            # Write out new BirdPlan file with macros replaced
+            with open(stayrtr_slurmfile, "w", encoding="UTF-8") as file:
+                file.write(raw_slurm)
+
+            # Add SLURM file to our simulation so we get a report for it
+            sim.add_conffile(f"stayrtr.slurm.json.{stayrtr}", stayrtr_slurmfile)
 
     def _birdplan_run(  # noqa: CFQ001 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements
         self, sim: Simulation, tmpdir: str, router: str, args: List[str]
