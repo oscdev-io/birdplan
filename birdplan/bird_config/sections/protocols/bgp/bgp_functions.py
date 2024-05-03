@@ -824,6 +824,7 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             # Import filter RPKI
             function bgp_import_filter_rpki(string filter_name) -> bool {{
                 int rpki_status;
+                if {self.is_blackhole()} then return false;
                 if (net.type = NET_IP4) then {{
                     case roa_check(t_roa4, net, bgp_path.last) {{
                         ROA_UNKNOWN: rpki_status = 0;
