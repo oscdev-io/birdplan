@@ -60,6 +60,8 @@ configuration.
 
 TCP-based RPKI servers can be used with `tcp://SERVER:PORT?refresh=3600&retry=600`. The default port is `323`.
 
+One can also specify a `local_address`, `refresh` and `retry` parameters.
+
 An example of using this is...
 ```yaml
 router_id: 0.0.0.1
@@ -77,7 +79,7 @@ SSH-based RPKI servers can be used with
 When using SSH-based RPKI server, the default for `username`, `private_key` and `known_hosts` will be set to the above defaults. The
 default port is `22` and default username is `rpki`.
 
-One can also specify a `refresh` and `retry` parameters.
+One can also specify a `local_address`, `refresh` and `retry` parameters.
 
 An example of using this is...
 ```yaml

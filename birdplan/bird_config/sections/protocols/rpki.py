@@ -48,6 +48,7 @@ class RPKISource:
     _public_key: Optional[str]
     _username: Optional[str]
 
+    _local_address: Optional[str]
     _refresh: Optional[int]
     _retry: Optional[int]
 
@@ -63,6 +64,7 @@ class RPKISource:
         self._public_key = None
         self._username = None
 
+        self._local_address = None
         self._refresh = None
         self._retry = None
 
@@ -113,7 +115,9 @@ class RPKISource:
                 else:
                     self._username = BIRDPLAN_RPKI_USERNAME
 
-            # Check for refresh interval
+            # Check for additional options
+            if "local_address" in parameters:
+                self._local_address = parameters["local_address"][-1]
             if "refresh" in parameters:
                 self._refresh = int(parameters["refresh"][-1])
             if "retry" in parameters:
@@ -153,6 +157,11 @@ class RPKISource:
     def rpki_data(self) -> Optional[List[str]]:
         """Return the RPKI data."""
         return self._rpki_data
+
+    @property
+    def local_address(self) -> Optional[str]:
+        """Return the local address."""
+        return self._local_address
 
     @property
     def refresh(self) -> Optional[int]:
@@ -258,7 +267,9 @@ class ProtocolRPKI(SectionBase):
         elif self.server.protocol == "tcp":
             self.conf.add(f"  remote {self.server.hostname} port {self.server.port};")
 
-        # Check if we have a refresh or retry intervals, if we do add it
+        # Check if we have additional options
+        if self.server.local_address:
+            self.conf.add(f"  local address {self.server.local_address};")
         if self.server.refresh:
             self.conf.add(f"  refresh {self.server.refresh};")
         if self.server.retry:
