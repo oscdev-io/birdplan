@@ -65,7 +65,7 @@ test_job:
   # Set tox work directory
   - export TOX_WORK_DIR=$(dirname "$PWD")/tox
   # Run tests
-  - contrib/test-environment/runtest $EXTRA_TEST_OPTS
+  - tox -- --numprocesses="$(nproc)" --dist=loadfile $EXTRA_TEST_OPTS
   - tox run -e cov-html
   artifacts:
     paths:
