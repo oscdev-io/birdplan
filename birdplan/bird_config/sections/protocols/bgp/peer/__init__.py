@@ -1166,9 +1166,15 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "quarantine" in peer_config:
             self.quarantine = peer_config["quarantine"]
 
+        # Make sure there is no RPKI configured for peer types where it makes no sense
+        if "use_rpki" in peer_config and self.peer_type not in ("customer", "peer", "routerserver", "transit"):
+            raise BirdPlanError(f"Having 'use_rpki' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
         # If we have RPKI configured, set that up in the peer to, ultimately if we use RPKI or not is determined by self.use_rpki
         if self.bgp_attributes.rpki_source:
             self.peer_attributes.use_rpki = True
+            # Check if we have an override turning RPKI checking off
+            if "use_rpki" in peer_config and not peer_config["use_rpki"]:
+                self.peer_attributes.use_rpki = False
 
         #
         # NETWORK AND STATE (CACHE) RELATED QUERIES
