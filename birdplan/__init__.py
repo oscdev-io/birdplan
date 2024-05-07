@@ -1506,10 +1506,6 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         # Start with no peer config
         peer: dict[str, Any] = {}
 
-        # Check if we're using RPKI
-        if self.birdconf.protocols.bgp.rpki_source:
-            peer["use_rpki"] = True
-
         # Loop with each config item in the peer
         for config_item, config_value in peer_config.items():
             if config_item in (
@@ -1539,6 +1535,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 "use_rpki",
             ):
                 peer[config_item] = config_value
+
             # Peer add_paths configuration
             elif config_item == "add_paths":
                 peer["add_paths"] = None
@@ -1845,6 +1842,15 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         # We must have a source_address6 for neighbor6
         if ("neighbor6" in peer) and ("source_address6" not in peer):
             raise BirdPlanError(f"Configuration for BGP peer '{peer_name}' must have a 'source_address6'")
+
+        # Check if we're using RPKI, if it's a supported peer type, and if we have no explicit setting specified
+        # If all of this is true, we can enable it by default
+        if (
+            self.birdconf.protocols.bgp.rpki_source
+            and peer["type"] in ("customer", "peer", "routerserver", "transit")
+            and "use_rpki" not in peer
+        ):
+            peer["use_rpki"] = True
 
         # Make sure we have items we need
         self.birdconf.protocols.bgp.add_peer(peer_name, peer)
