@@ -1381,11 +1381,11 @@ bgp:
 ```
 
 
-# use_rpki
+## use_rpki
 
 Supported in version: v0.4.0
 
-RPKI can be enabled (or, actually disabled) using the following...
+RPKI can be disabled (when RPKI is in use) using the following...
 ```yaml
 ...
 
