@@ -23,9 +23,8 @@
 import fnmatch
 from typing import Optional
 
-from .....bird_attributes import SectionBirdAttributes
-
 from ......globals import BirdConfigGlobals
+from .....bird_attributes import SectionBirdAttributes
 from .....constants import SectionConstants
 from .....functions import SectionFunctions
 from .....tables import SectionTables

@@ -22,10 +22,9 @@
 
 from typing import Any, Dict
 
-from ....bird_attributes import SectionBirdAttributes
-
 from ......exceptions import BirdPlanError
 from .....globals import BirdConfigGlobals
+from ....bird_attributes import SectionBirdAttributes
 from ....constants import SectionConstants
 from ....functions import SectionFunctions
 from ....tables import SectionTables
