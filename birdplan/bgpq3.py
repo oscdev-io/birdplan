@@ -95,6 +95,8 @@ class BGPQ3:
                     result = self._bgpq3(["-l", "asns", "-t", "-3", obj])
                 except subprocess.CalledProcessError as err:
                     raise BirdPlanError(f"Failed to query IRR ASNs from object '{obj}':\n%s" % err.output.decode("UTF-8")) from None
+                except BirdPlanError as err:
+                    raise BirdPlanError(f"Failed to query IRR ASNs from object '{obj}':\n{err}") from None
                 # Cache the result we got
                 self._cache(f"asns:{obj}", result)
             # Check if this is a birdplan internal object
@@ -207,9 +209,12 @@ class BGPQ3:
 
         # Grab result from process execution
         result = subprocess.check_output(cmd_args, stderr=subprocess.STDOUT)  # nosec
-
+        try:
+            decoded = json.loads(result)
+        except json.JSONDecodeError as err:
+            raise BirdPlanError(f"Failed to decode JSON output from {self._exe()}: {err}") from None
         # Return the decoded json output
-        return json.loads(result)
+        return decoded
 
     def _cache(self, obj: str, value: Optional[Any] = None) -> Optional[Any]:  # noqa: CFQ004
         """Retrieve or store value in cache."""
