@@ -121,18 +121,61 @@ class BirdPlanBaseTestCase:
         # Set test we're currently running
         sim.set_test(testpath)
 
-        # Configure our simulator with the BIRD routers
-        configured_routers = self._configure_bird_routers(sim, tmpdir)
-        for router in configured_routers:
-            sim.add_node(
-                BirdRouterNode(
-                    name=router, configfile=f"{tmpdir}/bird.conf.{router}", controlsocket=f"{tmpdir}/bird.ctl.{router}", debug=False
-                )
-            )
-
         # Loop with switches to create
         for switch in self.switches:
             sim.add_node(SwitchNode(switch))
+
+        # Loop with our StayRTR instances and create the nodes
+        self._configure_stayrtrs(sim, tmpdir)
+        for stayrtr in self.stayrtrs:
+            # Check if we're using SSH between BIRD and StayRTR
+            extra_stayrtr_params = {}
+
+            # Check if we have ${stayrtr}_use_ssh
+            if hasattr(self, f"{stayrtr}_use_ssh"):
+                stayrtr_use_ssh = getattr(self, f"{stayrtr}_use_ssh")
+                if stayrtr_use_ssh:
+                    # Grenerate SSH keys
+                    server_privkey, _ = generate_openssh_keypair()
+                    client_privkey, client_pubkey = generate_openssh_keypair()
+
+                    # Write out server private key and change mode to 0600
+                    server_privkey_file = f"{tmpdir}/stayrtr.privkey.server.{stayrtr}"
+                    with open(server_privkey_file, "w", encoding="UTF-8") as f:
+                        f.write(server_privkey)
+                    os.chmod(server_privkey_file, 0o600)
+                    # Set stayrtr arg for the private key file
+                    extra_stayrtr_params["ssh_key_file"] = server_privkey_file
+
+                    # Write out server authorized keys file
+                    server_authorized_keys_file = f"{tmpdir}/stayrtr.authorized_keys.{stayrtr}"
+                    with open(server_authorized_keys_file, "w", encoding="UTF-8") as f:
+                        f.write(client_pubkey)
+                    # Set stayrtr arg for the authorized keys file
+                    extra_stayrtr_params["ssh_authorized_keys_file"] = server_authorized_keys_file
+
+                    # Write out client private key and change mode to 0600
+                    client_privkey_file = f"{tmpdir}/stayrtr.privkey.client.{stayrtr}"
+                    with open(client_privkey_file, "w", encoding="UTF-8") as f:
+                        f.write(client_privkey)
+                    os.chmod(client_privkey_file, 0o600)
+                    # Set the private key location for this instance
+                    setattr(self, f"{stayrtr}_private_keyfile", client_privkey_file)
+
+            # Set up log file
+            stayrtr_logfile = f"{tmpdir}/stayrtr.log.{stayrtr}"
+            sim.add_logfile(f"STAYRTR_LOGFILE({stayrtr})", stayrtr_logfile)
+
+            # Add StayRTR server node
+            sim.add_node(
+                StayRTRServerNode(
+                    name=stayrtr,
+                    slurmfile=f"{tmpdir}/stayrtr.slurm.json.{stayrtr}",
+                    logfile=stayrtr_logfile,
+                    **extra_stayrtr_params,
+                    args=["-loglevel", "debug"],
+                )
+            )
 
         # Loop with our ExaBGP's and create the nodes
         self._configure_exabgps(sim, tmpdir)
@@ -144,13 +187,13 @@ class BirdPlanBaseTestCase:
             # sim.add_logfile(f"EXABGP_LOGFILE({exabgp}) => {exabgp_logfile}", exabgp_logfile)
             sim.add_logfile(f"EXABGP_LOGFILE({exabgp})", exabgp_logfile)
 
-        # Loop with our StayRTR instances and create the nodes
-        self._configure_stayrtrs(sim, tmpdir)
-        for stayrtr in self.stayrtrs:
-            # Add ExaBGP node
+        # NK: This MUST come at the end as it depends on config added by StayRTR (private key file path)
+        # Configure our simulator with the BIRD routers
+        configured_routers = self._configure_bird_routers(sim, tmpdir)
+        for router in configured_routers:
             sim.add_node(
-                StayRTRServerNode(
-                    name=stayrtr, slurmfile=f"{tmpdir}/stayrtr.slurm.json.{stayrtr}", args=["-loglevel", "debug"]
+                BirdRouterNode(
+                    name=router, configfile=f"{tmpdir}/bird.conf.{router}", controlsocket=f"{tmpdir}/bird.ctl.{router}", debug=False
                 )
             )
 
@@ -888,78 +931,98 @@ class BirdPlanBaseTestCase:
         bird_logfile = f"{tmpdir}/bird.log.{router}"
         bird_socket = f"{tmpdir}/bird.ctl.{router}"
 
-        # Work out what attributes we support for macros
-        attr_list = [
-            "asn",
-            "peer_asn",
-            "peer_type",
-            "extra_config",
-            "global_config",
-            "peer_config",
-            "peer_extra_config",
-            "allpeer_config",
-            "allpeer_extra_config",
-            "template_extra_config",
-            "template_global_config",
-            "template_peer_config",
-            "template_peer_extra_config",
-            "template_allpeer_config",
-        ]
-        extra_attr_list = getattr(self, "template_macros", None)
-        if extra_attr_list:
-            attr_list.extend(extra_attr_list)
-        # Loop with supported attributes that translate into macros
-        internal_macros = {}
-        for attr in attr_list:
-            # Router specific lookup for an attribute to add a macro for
-            router_attr = f"{router}_{attr}"
-            value = ""
-            if hasattr(self, router_attr):
-                symbol = getattr(self, router_attr)
-                if callable(symbol):
-                    value = symbol()
-                else:
-                    value = symbol
-            # Add our macro
-            internal_macros[f"@{attr.upper()}@"] = value
+        # If we're running in configure mode, then create the config file
+        if args[0] == "configure":
+            # Work out what attributes we support for macros
+            attr_list = [
+                "asn",
+                "peer_asn",
+                "peer_type",
+                "extra_config",
+                "global_config",
+                "peer_config",
+                "peer_extra_config",
+                "allpeer_config",
+                "allpeer_extra_config",
+                "template_extra_config",
+                "template_global_config",
+                "template_peer_config",
+                "template_peer_extra_config",
+                "template_allpeer_config",
+            ]
+            extra_attr_list = getattr(self, "template_macros", None)
+            if extra_attr_list:
+                attr_list.extend(extra_attr_list)
+            # Loop with supported attributes that translate into macros
+            internal_macros = {}
+            for attr in attr_list:
+                # Router specific lookup for an attribute to add a macro for
+                router_attr = f"{router}_{attr}"
+                value = ""
+                if hasattr(self, router_attr):
+                    symbol = getattr(self, router_attr)
+                    if callable(symbol):
+                        value = symbol()
+                    else:
+                        value = symbol
+                # Add our macro
+                internal_macros[f"@{attr.upper()}@"] = value
 
-        # Work out the macro's we'll be using
-        macros = {"@LOGFILE@": bird_logfile}
-        if internal_macros:
-            macros.update(internal_macros)
+            # NK: We probably need to add the StayRTR private keys here
+            for stayrtr in self.stayrtrs:
+                # Router specific lookup for an attribute to add a macro for
+                stayrtr_private_keyfile_attr = f"{stayrtr}_private_keyfile"
+                if hasattr(self, stayrtr_private_keyfile_attr):
+                    # Add our macro
+                    internal_macros[f"@{stayrtr_private_keyfile_attr.upper()}@"] = getattr(self, stayrtr_private_keyfile_attr)
 
-        # Work out config file name, going up 2 directory levels
-        router_config_file = None
-        for conffile_path in [
-            f"{sim.test_dir}/{router}.yaml",
-            # Parent directories
-            f"{os.path.dirname(sim.test_dir)}/{router}.yaml",
-            f"{os.path.dirname(os.path.dirname(sim.test_dir))}/{router}.yaml",
-        ]:
-            if os.path.exists(conffile_path):
-                router_config_file = conffile_path
-                break
-        # If we didn't get a configuration file that exists, then raise an exception
-        if not router_config_file:
-            raise RuntimeError("No router configuration file found")
+            # Work out the macro's we'll be using
+            macros = {"@LOGFILE@": bird_logfile}
+            if internal_macros:
+                macros.update(internal_macros)
 
-        # Read in configuration file
-        with open(router_config_file, "r", encoding="UTF-8") as file:
-            raw_config = file.read()
-        # Check if we're replacing macros in our configuration file
-        for macro, value in macros.items():
-            if isinstance(value, int):
-                value = f"{value}"
-            # Check for odd issues...
-            if value is None:
-                raise RuntimeError(f"Macro '{macro}' for router '{router}' has value None")
-            raw_config = raw_config.replace(macro, value)
-        # Write out new BirdPlan file with macros replaced
-        with open(birdplan_file, "w", encoding="UTF-8") as file:
-            file.write(raw_config)
+            # Work out config file name, going up 2 directory levels
+            router_config_file = None
+            for conffile_path in [
+                f"{sim.test_dir}/{router}.yaml",
+                # Parent directories
+                f"{os.path.dirname(sim.test_dir)}/{router}.yaml",
+                f"{os.path.dirname(os.path.dirname(sim.test_dir))}/{router}.yaml",
+            ]:
+                if os.path.exists(conffile_path):
+                    router_config_file = conffile_path
+                    break
+            # If we didn't get a configuration file that exists, then raise an exception
+            if not router_config_file:
+                raise RuntimeError("No router configuration file found")
 
-        # Add YAML file early incase we need to check it when configuration fails
-        sim.add_conffile(f"birdplan.yaml.{router}", birdplan_file)
+            # Read in configuration file
+            with open(router_config_file, "r", encoding="UTF-8") as file:
+                raw_config = file.read()
+            # Check if we're replacing macros in our configuration file
+            while True:
+                changed = False
+                for macro, value in macros.items():
+                    if isinstance(value, int):
+                        value = f"{value}"
+                    # Check for odd issues...
+                    if value is None:
+                        raise RuntimeError(f"Macro '{macro}' for router '{router}' has value None")
+                    new_config = raw_config.replace(macro, value)
+                    # Do recursive replace
+                    if new_config != raw_config:
+                        changed = True
+                        raw_config = new_config
+                # If nothing changed, break, else continue with recursive replacement
+                if not changed:
+                    break
+
+            # Write out new BirdPlan file with macros replaced
+            with open(birdplan_file, "w", encoding="UTF-8") as file:
+                file.write(raw_config)
+
+            # Add YAML file early incase we need to check it when configuration fails
+            sim.add_conffile(f"birdplan.yaml.{router}", birdplan_file)
 
         # Invoke by simulating the commandline...
         birdplan_cmdline = BirdPlanCommandLine(test_mode=True)
