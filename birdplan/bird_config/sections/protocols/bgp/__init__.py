@@ -59,7 +59,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     # Internal config before configuration happens
     _originated_routes: BGPOriginatedRoutes
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,
@@ -202,7 +202,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             raise BirdPlanError(f"Peer type '{peer_type}' has no implemented global prefix limits")
         return self.bgp_attributes.peertype_constraints[peer_type]
 
-    def _configure_birdattributes_bgp(self) -> None:  # noqa: CFQ001 # pylint: disable=too-many-statements
+    def _configure_birdattributes_bgp(self) -> None:
         """Configure BGP attributes."""
         # NK: No attributes for now
         # self.birdattributes.conf.append_title("BGP Attributes")

@@ -240,7 +240,7 @@ class BGPPeertypeConstraints:  # pylint: disable=too-few-public-methods,too-many
             self.import_minlen6 = 32
 
 
-class BGPAttributes:  # pylint: disable=too-few-public-methods
+class BGPAttributes:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """
     BGP attributes.
 

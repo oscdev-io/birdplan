@@ -51,7 +51,7 @@ class ProtocolOSPF(SectionProtocolBase):
     # OSPF functions
     _ospf_functions: OSPFFunctions
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,

@@ -21,6 +21,8 @@
 
 """Base test classes for our tests."""
 
+# pylint: disable=too-many-lines
+
 import copy
 import inspect
 import logging
@@ -115,7 +117,9 @@ class BirdPlanBaseTestCase:
     e2_interface_eth0 = {"mac": "02:e2:00:00:00:01", "ips": ["100.64.0.3/24", "fc00:100::3/64"]}
     e2_switch_eth0 = "s1"
 
-    def _test_setup(self, sim, testpath, tmpdir):  # pylint: disable=too-many-locals
+    def _test_setup(  # noqa: CFQ001 # pylint: disable=too-many-locals, too-many-branches, too-many-statements
+        self, sim, testpath, tmpdir
+    ):
         """Set up a BIRD test scenario using our attributes."""
 
         # Set test we're currently running

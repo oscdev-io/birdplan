@@ -28,6 +28,8 @@ import cryptography.hazmat.primitives.asymmetric.ed25519
 # import cryptography.hazmat.primitives.asymmetric.rsa
 import cryptography.hazmat.primitives.serialization
 
+__all__ = ["generate_openssh_keypair"]
+
 
 def generate_openssh_keypair() -> Tuple[str, str]:
     """Generate a new OpenSSH key pair."""

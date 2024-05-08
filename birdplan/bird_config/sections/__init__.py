@@ -32,7 +32,7 @@ from .tables import SectionTables
 __all__ = ["Sections"]
 
 
-class Sections(SectionBase):
+class Sections(SectionBase):  # pylint: disable=too-many-instance-attributes
     """BIRD configuration sections."""
 
     _logging: SectionLogging

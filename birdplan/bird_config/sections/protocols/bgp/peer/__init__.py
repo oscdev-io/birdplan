@@ -2881,9 +2881,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     self.conf.add(f"  {import_filter_blackholes_deny};")
 
         # RPKI validation
-        if self.peer_type in ("customer", "peer", "routerserver", "transit"):
-            if self.uses_rpki:
-                self.conf.add(f"  {self.bgp_functions.import_filter_rpki()};")
+        if self.uses_rpki and self.peer_type in ("customer", "peer", "routerserver", "transit"):
+            self.conf.add(f"  {self.bgp_functions.import_filter_rpki()};")
 
         # Implementation of the denies from import_filter_deny
         # Deny origin AS

@@ -34,7 +34,7 @@ BIRDPLAN_RPKI_PUBLIC_KEY = "/etc/birdplan/rpki_known_hosts"
 BIRDPLAN_RPKI_USERNAME = "rpki"
 
 
-class RPKISource:
+class RPKISource:  # pylint: disable=too-many-instance-attributes
     """RPKI server configuration."""
 
     # List-based sources
@@ -222,7 +222,7 @@ class ProtocolRPKI(SectionBase):
         self.tables.conf.append("")
 
     def _configure_protocol_rpki_static(self) -> None:
-        """Static protocol configuration."""
+        """Configure RPKI static protocol."""
         # Build the IPv4 static table
         self.conf.add("protocol static rpki4 {")
         self.conf.add("")
