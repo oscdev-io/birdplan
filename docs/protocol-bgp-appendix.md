@@ -215,7 +215,7 @@ Internally set, not allowable from any BGP peer type. These can only be found in
 | (OWN_ASN, 1101, 1) | Prefix length too long |
 | (OWN_ASN, 1101, 2) | Prefix length too short |
 | (OWN_ASN, 1101, 3) | Bogon |
-| (OWN_ASN, 1101, 4) | Bogon ASN |
+| (OWN_ASN, 1101, 4) | Bogon AS |
 | (OWN_ASN, 1101, 5) | AS path too long |
 | (OWN_ASN, 1101, 6) | AS path too short |
 | (OWN_ASN, 1101, 7) | First AS not peer AS |
@@ -225,7 +225,7 @@ Internally set, not allowable from any BGP peer type. These can only be found in
 | (OWN_ASN, 1101, 12) | Default route not allowed |
 | (OWN_ASN, 1101, 13) | RPKI unknown (see [^rpki_transitive_community_bad]) |
 | (OWN_ASN, 1101, 14) | RPKI invalid |
-| (OWN_ASN, 1101, 15) | Transit free ASN |
+| (OWN_ASN, 1101, 15) | Transit free AS |
 | (OWN_ASN, 1101, 16) | Too many communities |
 | (OWN_ASN, 1101, 17) | Route collector |
 | (OWN_ASN, 1101, 18) | Quarantined |
@@ -252,4 +252,4 @@ Internally set, only allowable from `internal`, `rrclient`, `rrserver`, `rrserve
 | Community | Description |
 | --- | --- |
 | (OWN_ASN, 1200, 1) | Replace AS-PATH with our own ASN |
-| (OWN_ASN, 1200, 2) | Blackhole action for originated routes |
+| (OWN_ASN, 1200, 2) | Blackhole/sinkhole action for originated routes |

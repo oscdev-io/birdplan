@@ -147,7 +147,7 @@ We will also ensure that all received routes have a local_pref of 0.
 
 This will result hopefully in traffic being drained from this router.
 
-This is also a peer-specific option (below), which will activate global_shutdown on a single peer.
+There is also a peer-specific option (below), which will activate global_shutdown on a single peer.
 
 An example is however below...
 
@@ -799,7 +799,7 @@ We will also ensure that all received routes have a local_pref of 0.
 
 This will result hopefully in traffic being drained from this peer.
 
-This is also a global option (above), which will activate global_shutdown on all peers.
+There is also a global option (above), which will activate global_shutdown on all peers.
 
 An example is however below...
 
