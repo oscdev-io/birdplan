@@ -63,7 +63,7 @@ test_job:
   # Set tox work directory
   - export TOX_WORK_DIR=/tmp/birdplan.tox
   # Run tests
-  - tox -- --numprocesses="$(nproc)" --dist=loadfile $EXTRA_TEST_OPTS
+  - tox -- --numprocesses=4 --dist=loadfile $EXTRA_TEST_OPTS
   - tox run -e cov-html
   artifacts:
     paths:
