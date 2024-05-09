@@ -21,7 +21,7 @@
 import argparse
 from typing import Any, Dict
 
-from .....exceptions import BirdPlanErrorUsage
+from .....exceptions import BirdPlanUsageError
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
 
 __all__ = ["BirdPlanCmdlineBGPPeer"]
@@ -82,4 +82,4 @@ class BirdPlanCmdlineBGPPeer(BirdPlanCmdlinePluginBase):
         if not self._subparser:
             raise RuntimeError()
 
-        raise BirdPlanErrorUsage("No options specified to 'bgp peer' action", self._subparser)
+        raise BirdPlanUsageError("No options specified to 'bgp peer' action", self._subparser)

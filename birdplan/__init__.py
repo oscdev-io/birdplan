@@ -73,7 +73,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         self._state_file = None
         self._yaml = YAML()
 
-    def load(self, **kwargs: Any) -> None:
+    def load(self, **kwargs: Any) -> None:  # pylint: disable=too-many-locals
         """
         Initialize object.
 

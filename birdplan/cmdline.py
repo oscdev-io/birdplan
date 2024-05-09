@@ -29,7 +29,7 @@ from typing import Any, Callable, Dict, List, Literal, NoReturn, Optional
 
 from . import BirdPlan
 from .console.colors import colored
-from .exceptions import BirdPlanError, BirdPlanErrorUsage
+from .exceptions import BirdPlanError, BirdPlanUsageError
 from .plugin import PluginCollection
 from .version import __version__
 
@@ -145,7 +145,7 @@ class BirdPlanArgumentParser(argparse.ArgumentParser):
             Error message.
 
         """
-        raise BirdPlanErrorUsage(message, self)
+        raise BirdPlanUsageError(message, self)
 
 
 class BirdPlanCommandlineResult:  # pylint: disable=too-few-public-methods
@@ -335,7 +335,7 @@ class BirdPlanCommandLine:
 
         # Make sure we have an action
         if "action" not in self.args:
-            raise BirdPlanErrorUsage("No action specified", self.argparser)
+            raise BirdPlanUsageError("No action specified", self.argparser)
 
         # Generate the command line option method name
         method_name = f"cmd_{self.args.action}"
@@ -494,10 +494,3 @@ def main() -> None:
         else:
             print(f"ERROR: {exception}", file=sys.stderr)
             sys.exit(1)
-
-    except BirdPlanErrorUsage as exception:
-        if birdplan_cmdline.is_json:
-            print(json.dumps({"status": "error", "message": exception.message}))
-        else:
-            print(f"ERROR: {exception}", file=sys.stderr)
-            sys.exit(2)

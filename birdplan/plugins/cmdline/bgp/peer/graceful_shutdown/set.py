@@ -22,7 +22,7 @@ import argparse
 from typing import Any, Dict
 
 from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
-from ......exceptions import BirdPlanErrorUsage
+from ......exceptions import BirdPlanUsageError
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
 
 __all__ = ["BirdPlanCmdlineBGPPeerGracefulShutdownSet"]
@@ -104,7 +104,7 @@ class BirdPlanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
 
         # Check value is valid
         if cmdline.args.value[0] not in ("true", "false"):
-            raise BirdPlanErrorUsage("BGP peer graceful shutdown override flag value must be 'true' or 'false'", self._subparser)
+            raise BirdPlanUsageError("BGP peer graceful shutdown override flag value must be 'true' or 'false'", self._subparser)
         value = cmdline.args.value[0] == "true"
 
         # Suppress info output

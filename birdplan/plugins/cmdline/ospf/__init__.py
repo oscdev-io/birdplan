@@ -21,7 +21,7 @@
 import argparse
 from typing import Any, Dict
 
-from ....exceptions import BirdPlanErrorUsage
+from ....exceptions import BirdPlanUsageError
 from ..cmdline_plugin import BirdPlanCmdlinePluginBase
 
 __all__ = ["BirdPlanCmdlineOSPF"]
@@ -81,4 +81,4 @@ class BirdPlanCmdlineOSPF(BirdPlanCmdlinePluginBase):
         if not self._subparser:
             raise RuntimeError()
 
-        raise BirdPlanErrorUsage("No options specified to 'ospf' action", self._subparser)
+        raise BirdPlanUsageError("No options specified to 'ospf' action", self._subparser)

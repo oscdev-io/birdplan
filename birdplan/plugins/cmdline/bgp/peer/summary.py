@@ -25,7 +25,7 @@ from typing import Any, Dict
 from ..... import BirdPlanBGPPeerSummary
 from .....cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from .....console.colors import colored
-from .....exceptions import BirdPlanErrorUsage
+from .....exceptions import BirdPlanUsageError
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
 
 __all__ = ["BirdPlanCmdlineBGPPeerShow"]
@@ -166,9 +166,9 @@ class BirdPlanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
         arg_only = None
         if cmdline.args.only:
             if cmdline.args.only[0][0:2] != "AS":
-                raise BirdPlanErrorUsage("Invalid value for --only, must be AS<NUMBER>")
+                raise BirdPlanUsageError("Invalid value for --only, must be AS<NUMBER>")
             if int(cmdline.args.only[0]) < 1:
-                raise BirdPlanErrorUsage("Invalid value for --only, must be AS<NUMBER>")
+                raise BirdPlanUsageError("Invalid value for --only, must be AS<NUMBER>")
             # Save the arg for later
             arg_only = cmdline.args.only[0]
 
