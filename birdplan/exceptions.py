@@ -21,14 +21,14 @@
 import argparse
 from typing import Any
 
-__all__ = ["BirdPlanError", "BirdPlanErrorUsage"]
+__all__ = ["BirdPlanError", "BirdPlanErrorUsage", "BirdPlanConfigError"]
 
 
 class BirdPlanError(RuntimeError):
     """BirdPlan runtime error."""
 
 
-class BirdPlanErrorUsage(RuntimeError):
+class BirdPlanErrorUsage(BirdPlanError):
     """BirdPlan runtime error, raised when used incorrectly."""
 
     message: str
@@ -46,3 +46,7 @@ class BirdPlanErrorUsage(RuntimeError):
         """Return string representation of the exception."""
 
         return f"{self.message}\n\n{self.parser.format_help()}"
+
+
+class BirdPlanConfigError(BirdPlanError):
+    """BirdPlan runtime error, raised when configuration is incorrect."""
