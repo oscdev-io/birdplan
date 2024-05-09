@@ -22,6 +22,7 @@ from typing import Dict, List
 
 from .....exceptions import BirdPlanError
 from ....globals import BirdConfigGlobals
+from ...bird_attributes import SectionBirdAttributes
 from ...constants import SectionConstants
 from ...functions import SectionFunctions
 from ...tables import SectionTables
@@ -50,11 +51,16 @@ class ProtocolOSPF(SectionProtocolBase):
     # OSPF functions
     _ospf_functions: OSPFFunctions
 
-    def __init__(
-        self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
+        constants: SectionConstants,
+        functions: SectionFunctions,
+        tables: SectionTables,
     ):
         """Initialize the object."""
-        super().__init__(birdconfig_globals, constants, functions, tables)
+        super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
         # Set section name
         self._section = "OSPF Protocol"
@@ -112,6 +118,7 @@ class ProtocolOSPF(SectionProtocolBase):
             # Add direct protocol for redistribution of connected routes
             ospf_direct_protocol = ProtocolDirect(
                 self.birdconfig_globals,
+                self.birdattributes,
                 self.constants,
                 self.functions,
                 self.tables,
@@ -140,6 +147,7 @@ class ProtocolOSPF(SectionProtocolBase):
         # Create OSPF area object
         area = ProtocolOSPFArea(
             self.birdconfig_globals,
+            self.birdattributes,
             self.constants,
             self.functions,
             self.tables,

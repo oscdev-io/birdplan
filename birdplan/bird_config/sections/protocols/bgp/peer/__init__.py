@@ -31,6 +31,7 @@ from ......exceptions import BirdPlanError
 from ......peeringdb import PeeringDB
 from ..... import util
 from .....globals import BirdConfigGlobals
+from ....bird_attributes import SectionBirdAttributes
 from ....constants import SectionConstants
 from ....functions import BirdVariable, SectionFunctions
 from ....tables import SectionTables
@@ -71,6 +72,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def __init__(  # noqa: CFQ001,CFQ002 # pylint: disable=too-many-branches,too-many-statements,too-many-arguments,too-many-locals
         self,
         birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
         constants: SectionConstants,
         functions: SectionFunctions,
         tables: SectionTables,
@@ -80,7 +82,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         peer_config: BGPPeerConfig,
     ):
         """Initialize the object."""
-        super().__init__(birdconfig_globals, constants, functions, tables)
+        super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
         # Initialize our attributes
         self._bgp_attributes = bgp_attributes
@@ -1164,6 +1166,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "quarantine" in peer_config:
             self.quarantine = peer_config["quarantine"]
 
+        # Make sure there is no RPKI configured for peer types where it makes no sense
+        if "use_rpki" in peer_config and self.peer_type not in ("customer", "peer", "routerserver", "transit"):
+            raise BirdPlanError(f"Having 'use_rpki' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense")
+        # If we have RPKI configured, set that up in the peer to, ultimately if we use RPKI or not is determined by self.use_rpki
+        if self.bgp_attributes.rpki_source:
+            self.peer_attributes.use_rpki = True
+            # Check if we have an override turning RPKI checking off
+            if "use_rpki" in peer_config and not peer_config["use_rpki"]:
+                self.peer_attributes.use_rpki = False
+
         #
         # NETWORK AND STATE (CACHE) RELATED QUERIES
         #
@@ -1511,6 +1523,9 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Make sure we keep our quarantine state
         self.state["quarantine"] = self.quarantine
+
+        # Save the state of RPKI use to validate routes
+        self.state["use_rpki"] = self.uses_rpki
 
         self.conf.add("")
         self.conf.add(f"# Peer type: {self.peer_type}")
@@ -2865,6 +2880,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     )
                     self.conf.add(f"  {import_filter_blackholes_deny};")
 
+        # RPKI validation
+        if self.uses_rpki and self.peer_type in ("customer", "peer", "routerserver", "transit"):
+            self.conf.add(f"  {self.bgp_functions.import_filter_rpki()};")
+
         # Implementation of the denies from import_filter_deny
         # Deny origin AS
         if self.has_import_origin_asn_deny_filter:
@@ -3749,3 +3768,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def has_export_prefix_filter(self) -> BGPPeerFilterItem:
         """Peer has a export prefix filter."""
         return self.export_filter_policy.prefixes
+
+    @property
+    def uses_rpki(self) -> bool:
+        """Peer uses RPKI validation."""
+        return self.bgp_attributes.rpki_source is not None and self.peer_attributes.use_rpki and not self.replace_aspath

@@ -1,0 +1,37 @@
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Copyright (c) 2019-2024, AllWorldIT
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# type: ignore
+# pylint: disable=import-error,too-few-public-methods
+
+"""BGP RPKI functionality test case."""
+
+from ....config.peertype_rrclient.r1_to_r10 import PeerTypeConfig
+from ..template_rpki_tcp_disabled import Template
+
+__all__ = ["Test"]
+
+
+class Test(PeerTypeConfig, Template):
+    """BGP RPKI functionality test case."""
+
+    e1_extra_communities = "65000:3:1"
+
+    routers_config_exception: dict[str, str] = {
+        "r1": r"Having 'use_rpki' specified for peer 'e1' with type 'rrclient' makes no sense"
+    }

@@ -79,6 +79,20 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Test BIRD t_bgp6 table."""
         self._test_bird_routers_table(sim, "t_bgp6")
 
+    def test_bird_tables_roa4(self, sim):
+        """Test BIRD t_roa4 table."""
+        self._test_bird_tables_roa4(sim)
+
+    def test_bird_tables_roa6(self, sim):
+        """Test BIRD t_roa6 table."""
+        self._test_bird_tables_roa6(sim)
+
+    def _test_bird_tables_roa4(self, sim):
+        """Test BIRD t_roa4 table, this is used to customize this test which is not normally used."""
+
+    def _test_bird_tables_roa6(self, sim):
+        """Test BIRD t_roa6 table, this is used to customize this test which is not normally used."""
+
     def test_bird_tables_master4(self, sim):
         """Test BIRD master4 table."""
         self._test_bird_routers_table(sim, "master4")

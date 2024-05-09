@@ -4,6 +4,7 @@ set -eux
 
 pacman -Q bird
 pacman -Q exabgp
+pacman -Q stayrtr
 
 cd /root/birdplan || :
 echo "Excuting in '$(pwd)'..."
@@ -29,6 +30,5 @@ if [ -n "$default_args" ]; then
     ARGS+=(--numprocesses="$jobcount" --dist=loadfile)
 fi
 
-echo "RUNNING: tox -- ${ARGS[*]}"
-nice -n 20 tox -- "${ARGS[@]}"
-nice -n 20 tox -e cov-html
+#nice -n 20 tox run -e runtest --recreate -- "${ARGS[@]}"
+nice -n 20 tox run -e runtest -- "${ARGS[@]}"

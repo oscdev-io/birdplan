@@ -18,7 +18,8 @@ RUN set -ex; \
         bgpq3 \
         bird \
         exabgp \
-        iproute2; \
+        iproute2 \
+        stayrtr; \
     echo "Cleaning up..."; \
     rm -f /var/cache/pacman/pkg/*
     # We don't remove sync for now as it interferes with our -Q query in runtest

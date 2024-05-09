@@ -1,0 +1,31 @@
+{
+    "slurmVersion": 1,
+    "locallyAddedAssertions": {
+        "prefixAssertions": [
+            {
+                "asn": 65100,
+                "prefix": "100.64.101.0/24",
+                "maxPrefixLength": 24,
+                "comment": "Manual add"
+            },
+            {
+                "asn": 65999,
+                "prefix": "100.64.103.0/24",
+                "maxPrefixLength": 24,
+                "comment": "Manual add"
+            },
+            {
+                "asn": 65100,
+                "prefix": "fc00:101::/48",
+                "maxPrefixLength": 48,
+                "comment": "Manual add"
+            },
+            {
+                "asn": 65999,
+                "prefix": "fc00:103::/48",
+                "maxPrefixLength": 48,
+                "comment": "Manual add"
+            }
+        ]
+    }
+}

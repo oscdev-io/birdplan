@@ -821,6 +821,9 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     constraints: BGPPeerConstraints
         BGP peer constraint overrides.
 
+    use_rpki: bool
+        Use RPKI validation for this peer.
+
     """
 
     _name: Optional[str]
@@ -878,6 +881,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     blackhole_community: Optional[Union[List[str], bool]]
 
     constraints: BGPPeerConstraints
+
+    use_rpki: bool
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -938,6 +943,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.blackhole_community = None
 
         self.constraints = BGPPeerConstraints()
+
+        self.use_rpki = False
 
     @property
     def name(self) -> str:

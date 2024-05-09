@@ -20,6 +20,8 @@
 
 from typing import Dict, List, Optional, Union
 
+from ..rpki import RPKISource
+
 __all__ = ["BGPRoutePolicyAccept", "BGPRoutePolicyImport", "BGPPeertypeConstraints", "BGPAttributes"]
 
 
@@ -238,7 +240,7 @@ class BGPPeertypeConstraints:  # pylint: disable=too-few-public-methods,too-many
             self.import_minlen6 = 32
 
 
-class BGPAttributes:  # pylint: disable=too-few-public-methods
+class BGPAttributes:  # pylint: disable=too-few-public-methods,too-many-instance-attributes
     """
     BGP attributes.
 
@@ -258,6 +260,8 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
         Route policy for importing of routes from internal tables into our main BGP table.
     peertype_constraints : BGPPeertypeConstraints
         Prefix limits for each peer type we support.
+    rpki_source: Optional[RPKISource]
+        RPKI source to use for validation.
 
     """
 
@@ -269,6 +273,8 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
     route_policy_import: BGPRoutePolicyImport
 
     peertype_constraints: Dict[str, BGPPeertypeConstraints]
+
+    rpki_source: Optional[RPKISource]
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -298,3 +304,5 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods
             "transit",
         ):
             self.peertype_constraints[peer_type] = BGPPeertypeConstraints(peer_type)
+
+        self.rpki_source = None

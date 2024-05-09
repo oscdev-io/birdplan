@@ -86,6 +86,8 @@ class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
         ob.write(f"AS-SET..........: {as_sets_filter}\n")
         ob.write(f"Origin filters..: {origin_filters}\n")
         ob.write(f"AS-Path filters.: {aspath_filters}\n")
+        if "use_rpki" in self.data and self.data["use_rpki"]:
+            ob.write("RPKI ROV........: enabled\n")
 
         # Loop with protocols and output self.data
         for protocol, protocol_data in self.data["protocols"].items():

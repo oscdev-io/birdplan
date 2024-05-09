@@ -52,19 +52,19 @@ test_job:
   coverage: '/^TOTAL.+?(\d+\%)$/'
   script:
   - pacman -Syu --noconfirm
-  - pacman -S --noconfirm grep python
-  - pacman -S --noconfirm
+      grep
       git
       python-tox
-  - pacman -S --noconfirm
       iproute2
       bird
       exabgp
       bgpq3
+      stayrtr
   # Set tox work directory
-  - export TOX_WORK_DIR=$(dirname "$PWD")/tox
+  - export TOX_WORK_DIR=/tmp/birdplan.tox
   # Run tests
-  - contrib/test-environment/runtest $EXTRA_TEST_OPTS
+  - tox -- --numprocesses=4 --dist=loadfile $EXTRA_TEST_OPTS
+  - tox run -e cov-html
   artifacts:
     paths:
     - htmlcov
@@ -76,8 +76,9 @@ prepare_release:
 #    - if: $CI_COMMIT_TAG
   script:
   - pacman -Syu --noconfirm
-  - pacman -S --noconfirm grep python git
-  - pacman -S --noconfirm python-tox
+      grep
+      git
+      python-tox
   # Set tox work directory
   - export TOX_WORK_DIR=$(dirname "$PWD")/tox
   # Build docs and packages
@@ -118,7 +119,6 @@ release_gitlab:
   - if: $CI_COMMIT_TAG
   script:
   - pacman -Syu --noconfirm
-  - pacman -S --noconfirm
       curl
       release-cli
   # Work out variables
@@ -151,7 +151,6 @@ release_gitlab:
 #   - if: $CI_COMMIT_TAG
 #   script:
 #   - pacman -Syu --noconfirm
-#   - pacman -S --noconfirm
 #       python-tox
 #   # Set tox work directory
 #   - export TOX_WORK_DIR=$(dirname "$PWD")/tox
@@ -168,7 +167,6 @@ release_gitlab:
 #  - if: $CI_COMMIT_TAG
 #  script:
 #  - pacman -Syu --noconfirm
-#  - pacman -S --noconfirm
 #      python-tox
 #  - |
 #    if [ -n "$PYPI_USERNAME" -a -n "$PYPI_TOKEN" ]; then

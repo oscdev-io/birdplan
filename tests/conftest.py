@@ -91,7 +91,7 @@ class CustomPytestRegex:
         return self._regex.pattern
 
 
-@pytest.fixture()
+@pytest.fixture
 def helpers():
     """Return our helpers."""
     return Helpers
@@ -109,7 +109,7 @@ def fixture_testpath(request):
     return str(request.node.fspath)
 
 
-@pytest.fixture()
+@pytest.fixture
 def enable_performance_test(pytestconfig):
     """Get the --enable-performance-test option."""
     return pytestconfig.getoption("--enable-performance-test")
@@ -133,9 +133,8 @@ def sigchld_handler(signum, frame):  # pylint: disable=unused-argument
 def pytest_configure(config):
     """Dynamic pytest configuration."""
     config.addinivalue_line("markers", "incremental: test class is incremental")
-    # Set the signal handler for SIGCHLD when running in docker containers, this is when our PID is 1
-    if os.getpid() == 1:
-        signal.signal(signal.SIGCHLD, sigchld_handler)
+    # Set the signal handler for SIGCHLD so we can reap the zombies (nsnetsim spawns many child processes)
+    signal.signal(signal.SIGCHLD, sigchld_handler)
 
 
 #

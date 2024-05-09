@@ -24,12 +24,14 @@ from typing import Dict, List, Optional
 
 from .....exceptions import BirdPlanError
 from ....globals import BirdConfigGlobals
+from ...bird_attributes import SectionBirdAttributes
 from ...constants import SectionConstants
 from ...functions import SectionFunctions
 from ...tables import SectionTables
 from ..base import SectionProtocolBase
 from ..direct import ProtocolDirect
 from ..pipe import ProtocolPipe, ProtocolPipeFilterType
+from ..rpki import ProtocolRPKI, RPKISource
 from .bgp_attributes import BGPAttributes, BGPPeertypeConstraints, BGPRoutePolicyAccept, BGPRoutePolicyImport
 from .bgp_functions import BGPFunctions
 from .bgp_types import BGPPeerConfig
@@ -57,11 +59,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     # Internal config before configuration happens
     _originated_routes: BGPOriginatedRoutes
 
-    def __init__(
-        self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
+        constants: SectionConstants,
+        functions: SectionFunctions,
+        tables: SectionTables,
     ):
         """Initialize the object."""
-        super().__init__(birdconfig_globals, constants, functions, tables)
+        super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
         # Set section name
         self._section = "BGP Protocol"
@@ -87,6 +94,15 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.birdconfig_globals.state["bgp"]["peers"] = {}
 
         self._configure_constants_bgp()
+
+        # Check if we're adding RPKI ROA tables
+        if self.rpki_source:
+            # Configure RPKI protocol
+            rpki_protocol = ProtocolRPKI(self.birdconfig_globals, self.birdattributes, self.tables, self.rpki_source)
+            self.conf.add(rpki_protocol)
+
+        self._configure_birdattributes_bgp()
+
         self.functions.conf.append(self.bgp_functions, deferred=True)
 
         self.tables.conf.append("# BGP Tables")
@@ -122,6 +138,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             # Add direct protocol for redistribution of connected routes
             bgp_direct_protocol = ProtocolDirect(
                 self.birdconfig_globals,
+                self.birdattributes,
                 self.constants,
                 self.functions,
                 self.tables,
@@ -160,6 +177,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Create BGP peer object
         peer = ProtocolBGPPeer(
             self.birdconfig_globals,
+            self.birdattributes,
             self.constants,
             self.functions,
             self.tables,
@@ -183,6 +201,11 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         if peer_type not in self.bgp_attributes.peertype_constraints:
             raise BirdPlanError(f"Peer type '{peer_type}' has no implemented global prefix limits")
         return self.bgp_attributes.peertype_constraints[peer_type]
+
+    def _configure_birdattributes_bgp(self) -> None:
+        """Configure BGP attributes."""
+        # NK: No attributes for now
+        # self.birdattributes.conf.append_title("BGP Attributes")
 
     def _configure_constants_bgp(self) -> None:  # noqa: CFQ001 # pylint: disable=too-many-statements
         """Configure BGP constants."""
@@ -327,6 +350,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_COMMUNITY_BLACKHOLE = (65535, 666);")
         self.constants.conf.append("define BGP_COMMUNITY_NOEXPORT = (65535, 65281);")
         self.constants.conf.append("define BGP_COMMUNITY_NOADVERTISE = (65535, 65282);")
+        self.constants.conf.append("")
+
+        self.constants.conf.append("# Well known extended communities")
+        self.constants.conf.append("define BGP_EXT_COMMUNITY_RPKI_VALID = (unknown 0x4300, 0, 0);")
+        self.constants.conf.append("define BGP_EXT_COMMUNITY_RPKI_NOTFOUND = (unknown 0x4300, 0, 1);")
+        self.constants.conf.append("define BGP_EXT_COMMUNITY_RPKI_INVALID = (unknown 0x4300, 0, 2);")
         self.constants.conf.append("")
 
         self.constants.conf.append("# Large community functions")
@@ -592,6 +621,16 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     def peertype_constraints(self) -> Dict[str, BGPPeertypeConstraints]:
         """Return our peertype constraints."""
         return self.bgp_attributes.peertype_constraints
+
+    @property
+    def rpki_source(self) -> Optional[RPKISource]:
+        """Return the RPKI source to use for validation."""
+        return self.bgp_attributes.rpki_source
+
+    @rpki_source.setter
+    def rpki_source(self, rpki_source: RPKISource) -> None:
+        """Set the RPKI source to use for validation."""
+        self.bgp_attributes.rpki_source = rpki_source
 
     @property
     def graceful_shutdown(self) -> bool:

@@ -20,6 +20,7 @@
 
 from ..globals import BirdConfigGlobals
 from .base import SectionBase
+from .bird_attributes import SectionBirdAttributes
 from .constants import SectionConstants
 from .functions import SectionFunctions
 from .log import SectionLogging
@@ -31,12 +32,13 @@ from .tables import SectionTables
 __all__ = ["Sections"]
 
 
-class Sections(SectionBase):
+class Sections(SectionBase):  # pylint: disable=too-many-instance-attributes
     """BIRD configuration sections."""
 
     _logging: SectionLogging
     _main: SectionMain
     _router_id: SectionRouterID
+    _birdattributes: SectionBirdAttributes
     _constants: SectionConstants
     _functions: SectionFunctions
     _tables: SectionTables
@@ -49,20 +51,27 @@ class Sections(SectionBase):
         self._logging = SectionLogging(birdconfig_globals)
         self._main = SectionMain(birdconfig_globals)
         self._router_id = SectionRouterID(birdconfig_globals)
+        self._birdattributes = SectionBirdAttributes(birdconfig_globals)
         self._constants = SectionConstants(birdconfig_globals)
         self._functions = SectionFunctions(birdconfig_globals)
         self._tables = SectionTables(birdconfig_globals)
-        self._protocols = SectionProtocols(birdconfig_globals, self.constants, self.functions, self.tables)
+        self._protocols = SectionProtocols(birdconfig_globals, self.birdattributes, self.constants, self.functions, self.tables)
 
     def configure(self) -> None:
         """Configure all sections."""
         self.conf.add(self.logging)
         self.conf.add(self.main)
         self.conf.add(self.router_id)
+        self.conf.add(self.birdattributes, deferred=True)
         self.conf.add(self.constants, deferred=True)
-        self.conf.add(self.functions, deferred=True)
         self.conf.add(self.tables, deferred=True)
+        self.conf.add(self.functions, deferred=True)
         self.conf.add(self.protocols)
+
+    @property
+    def birdattributes(self) -> SectionBirdAttributes:
+        """Return the attributes section."""
+        return self._birdattributes
 
     @property
     def constants(self) -> SectionConstants:

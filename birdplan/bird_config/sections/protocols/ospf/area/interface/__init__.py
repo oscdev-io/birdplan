@@ -24,6 +24,7 @@ import fnmatch
 from typing import Optional
 
 from ......globals import BirdConfigGlobals
+from .....bird_attributes import SectionBirdAttributes
 from .....constants import SectionConstants
 from .....functions import SectionFunctions
 from .....tables import SectionTables
@@ -47,6 +48,7 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
     def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments,too-many-branches
         self,
         birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
         constants: SectionConstants,
         functions: SectionFunctions,
         tables: SectionTables,
@@ -55,7 +57,7 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
         interface_config: OSPFAreaInterfaceConfig,
     ):
         """Initialize the object."""
-        super().__init__(birdconfig_globals, constants, functions, tables)
+        super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
         # Setup the OSPF area attributes
         self._area_attributes = area_attributes

@@ -22,6 +22,7 @@ from typing import Dict, List, Union
 
 from .....exceptions import BirdPlanError
 from ....globals import BirdConfigGlobals
+from ...bird_attributes import SectionBirdAttributes
 from ...constants import SectionConstants
 from ...functions import SectionFunctions
 from ...tables import SectionTables
@@ -47,11 +48,16 @@ class ProtocolRIP(SectionProtocolBase):
     # RIP functions
     _rip_functions: RIPFunctions
 
-    def __init__(
-        self, birdconfig_globals: BirdConfigGlobals, constants: SectionConstants, functions: SectionFunctions, tables: SectionTables
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        birdconfig_globals: BirdConfigGlobals,
+        birdattributes: SectionBirdAttributes,
+        constants: SectionConstants,
+        functions: SectionFunctions,
+        tables: SectionTables,
     ) -> None:
         """Initialize the object."""
-        super().__init__(birdconfig_globals, constants, functions, tables)
+        super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
         # Set section header
         self._section = "RIP Protocol"
@@ -109,6 +115,7 @@ class ProtocolRIP(SectionProtocolBase):
                 functions=self.functions,
                 tables=self.tables,
                 birdconfig_globals=self.birdconfig_globals,
+                birdattributes=self.birdattributes,
                 name="rip",
                 interfaces=interfaces,
             )
