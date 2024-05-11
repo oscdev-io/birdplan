@@ -21,6 +21,8 @@
 import enum
 from typing import Dict, List, Optional, Union
 
+from .actions import BGPPeerActions
+
 from ......exceptions import BirdPlanError
 
 __all__ = [
@@ -882,6 +884,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     constraints: BGPPeerConstraints
 
+    actions: Optional[BGPPeerActions]
+
     use_rpki: bool
 
     def __init__(self) -> None:
@@ -943,6 +947,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
         self.blackhole_community = None
 
         self.constraints = BGPPeerConstraints()
+
+        self.actions = None
 
         self.use_rpki = False
 

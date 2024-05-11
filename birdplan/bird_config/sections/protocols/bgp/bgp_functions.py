@@ -2014,13 +2014,13 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 bgp_large_community.add(large_community);
             }}"""
 
-    @BirdFunction("bgp_peer_peer_prepend")
+    @BirdFunction("bgp_peer_prepend")
     def peer_prepend(self, *args: Any) -> str:  # pylint: disable=unused-argument
-        """BIRD bgp_peer_peer_prepend function."""
+        """BIRD bgp_peer_prepend function."""
 
         return """\
             # BGP prepending
-            function bgp_peer_peer_prepend(string filter_name; int peer_asn; int prepend_count) {
+            function bgp_peer_prepend(string filter_name; int peer_asn; int prepend_count) {
                 if (prepend_count > 0) then bgp_path.prepend(peer_asn);
                 if (prepend_count > 1) then bgp_path.prepend(peer_asn);
                 if (prepend_count > 2) then bgp_path.prepend(peer_asn);
@@ -2033,9 +2033,9 @@ class BGPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
                 if (prepend_count > 9) then bgp_path.prepend(peer_asn);
             }"""
 
-    @BirdFunction("bgp_peer_peer_prepend_default")
+    @BirdFunction("bgp_peer_prepend_default")
     def peer_prepend_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
-        """BIRD bgp_peer_peer_prepend_default function."""
+        """BIRD bgp_peer_prepend_default function."""
 
         return f"""\
             function bgp_peer_prepend_default(string filter_name; int peer_asn; int prepend_count) -> bool {{

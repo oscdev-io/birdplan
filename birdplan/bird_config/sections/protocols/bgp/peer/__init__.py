@@ -40,6 +40,7 @@ from ...pipe import ProtocolPipe, ProtocolPipeFilterType
 from ..bgp_attributes import BGPAttributes, BGPPeertypeConstraints
 from ..bgp_functions import BGPFunctions
 from ..bgp_types import BGPPeerConfig
+from .actions import BGPPeerActions
 from .peer_attributes import (
     BGPPeerAttributes,
     BGPPeerCommunities,
@@ -134,6 +135,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if "asn" not in peer_config:
             raise BirdPlanError(f"BGP peer '{self.name}' need a 'asn' field")
         self.asn = peer_config["asn"]
+
+        # Check if we have actions, if we do we need to parse them
+        if "actions" in peer_config:
+            self.peer_attributes.actions = BGPPeerActions(self.bgp_functions, self.asn, self.name)
+            self.peer_attributes.actions.configure(peer_config["actions"])
 
         # Check if we're replacing the ASN in the AS-PATH
         if "replace_aspath" in peer_config:
@@ -1534,6 +1540,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Setup routing tables
         self._setup_peer_tables()
 
+        # Setup constants
+        self._setup_peer_constants()
+
+        # Setup functions
+        self._setup_peer_functions()
+
         # Setup filters
         self._setup_import_aspath_asns_filter()
         self._setup_import_origin_asns_filter()
@@ -1648,6 +1660,26 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Store our BGP table names
         self.state["tables"] = state_tables
+
+    def _setup_peer_constants(self) -> None:
+        """Setup peer constants."""
+
+        # Generate constants for actions
+        if self.peer_attributes.actions:
+            self.conf.add(f"# BGP Peer Constants: {self.asn} - {self.name}")
+            for line in self.peer_attributes.actions.generate_constants():
+                self.conf.add(line)
+            self.conf.add("")
+
+    def _setup_peer_functions(self) -> None:
+        """Setup peer functions."""
+
+        # Generate functions for actions
+        if self.peer_attributes.actions:
+            self.conf.add(f"# BGP Peer Functions: {self.asn} - {self.name}")
+            for line in self.peer_attributes.actions.generate_functions():
+                self.conf.add(line)
+            self.conf.add("")
 
     def _setup_import_aspath_asns_filter(self) -> None:  # pylint: disable=too-many-branches
         """AS-PATH ASN import list setup."""

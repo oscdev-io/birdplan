@@ -331,28 +331,28 @@ class BGPConfigParser(ConfigParser):
         for config_item, config_value in peer_config.items():
             if config_item in (
                 "asn",
+                "blackhole_community",
+                "connect_delay_time",
+                "connect_retry_time",
+                "cost",
                 "description",
-                "type",
+                "error_wait_time",
+                "graceful_shutdown",
+                "incoming_large_communities",
+                "multihop",
                 "neighbor4",
                 "neighbor6",
-                "source_address4",
-                "source_address6",
-                "connect_retry_time",
-                "connect_delay_time",
-                "error_wait_time",
-                "multihop",
                 "passive",
                 "password",
-                "ttl_security",
                 "prefix_limit_action",
                 "prefix_limit4",
                 "prefix_limit6",
                 "quarantine",
                 "replace_aspath",
-                "incoming_large_communities",
-                "cost",
-                "graceful_shutdown",
-                "blackhole_community",
+                "source_address4",
+                "source_address6",
+                "ttl_security",
+                "type",
                 "use_rpki",
             ):
                 peer[config_item] = config_value
@@ -374,6 +374,93 @@ class BGPConfigParser(ConfigParser):
                     raise BirdPlanConfigError(
                         f"Configuration item has invalid type '{type(config_value)}' in bgp:peers:{peer_name}:add_paths"
                     )
+            # Configure actions
+            elif config_item == "actions":
+                peer["actions"] = []
+                # Check type of data provided
+                if not isinstance(config_value, list):
+                    raise BirdPlanConfigError(
+                        f"Configuration item has invalid type '{type(config_value)}' in bgp:peers:{peer_name}:actions"
+                    )
+                # Loop with actions
+                for action in config_value:
+                    # Make sure each action has a direction, match and action
+                    if "action" not in action or "direction" not in action or "matches" not in action:
+                        raise BirdPlanConfigError(
+                            f"Configuration item '{action}' not understood in bgp:peers:{peer_name}:actions"
+                        )
+                    # Check action options are valid
+                    for action_k, action_v in action.items():
+                        # Check the action specification
+                        if action_k == "action":
+                            # Check for string actions
+                            if isinstance(action_v, str):
+                                # The only string action we support is 'reject'
+                                if action_v != "reject":
+                                    raise BirdPlanConfigError(
+                                        f"Configuration item '{action_v}' not understood in bgp:peers:{peer_name}:actions"
+                                    )
+                            # Make sure that all the actions are supported
+                            elif isinstance(action_v, dict):
+                                for action_vk, action_vv in action_v.items():
+                                    # Check the action values that should be lists or strings
+                                    if action_vk in [
+                                        "add_community",
+                                        "add_extended_community",
+                                        "add_large_community",
+                                        "remove_community",
+                                        "remove_extended_community",
+                                        "remove_large_community",
+                                    ]:
+                                        # Check that the action value is either a list or string
+                                        if not isinstance(action_vv, list) and not isinstance(action_vv, str):
+                                            raise BirdPlanConfigError(
+                                                f"Configuration item '{action_vv}' not understood in bgp:peers:{peer_name}:actions"
+                                            )
+                                    # Make sure prepend is a string
+                                    elif action_vk == "prepend":
+                                        if not isinstance(action_vv, str):
+                                            raise BirdPlanConfigError(
+                                                f"Configuration item '{action_vv}' not understood in bgp:peers:{peer_name}:actions"
+                                            )
+                                    # And throw an error if the action is not understood
+                                    else:
+                                        raise BirdPlanConfigError(
+                                            f"Configuration item '{action_vk}' not understood in bgp:peers:{peer_name}:actions"
+                                        )
+
+                            # The type of the action value is not one that we support
+                            else:
+                                raise BirdPlanConfigError(
+                                    f"Configuration item '{action_v}' not understood in bgp:peers:{peer_name}:actions"
+                                )
+                        # Check the direction of the action
+                        elif action_k == "direction":
+                            if action_v not in ("in", "out"):
+                                raise BirdPlanConfigError(
+                                    f"Configuration item '{action_v}' not understood in bgp:peers:{peer_name}:actions"
+                                )
+                        # Check matchces
+                        elif action_k == "matches":
+                            if not isinstance(action_v, dict):
+                                raise BirdPlanConfigError(
+                                    f"Configuration item '{action_v}' not understood in bgp:peers:{peer_name}:actions"
+                                )
+                            # Loop with matches
+                            for match_k, match_v in action_v.items():
+                                # Check the match items are supported
+                                if match_k not in ("origin_asn", "prefix", "community", "extended_community", "large_community"):
+                                    raise BirdPlanConfigError(
+                                        f"Configuration item '{match_k}' not understood in bgp:peers:{peer_name}:actions"
+                                    )
+                                # Check the match values
+                                if not isinstance(match_v, list) and not isinstance(match_v, str):
+                                    raise BirdPlanConfigError(
+                                        f"Configuration item '{match_v}' not understood in bgp:peers:{peer_name}:actions"
+                                    )
+                        # Add action
+                        peer["actions"].append({action_k: action_v})
+
             # Peer location configuration
             elif config_item == "location":
                 peer["location"] = {}
