@@ -48,7 +48,7 @@ class ProtocolRIP(SectionProtocolBase):
     # RIP functions
     _rip_functions: RIPFunctions
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,
