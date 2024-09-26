@@ -45,7 +45,7 @@ BGPPeers = Dict[str, ProtocolBGPPeer]
 BGPOriginatedRoutes = Dict[str, str]
 
 
-class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-methods
+class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-methods,too-many-positional-arguments
     """BIRD BGP protocol configuration."""
 
     # BGP protocol attributes
@@ -59,7 +59,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     # Internal config before configuration happens
     _originated_routes: BGPOriginatedRoutes
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,

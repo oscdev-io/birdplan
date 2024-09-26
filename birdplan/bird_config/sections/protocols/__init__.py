@@ -47,7 +47,7 @@ class SectionProtocols(SectionBase):
     _ospf: ProtocolOSPF
     _bgp: ProtocolBGP
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,

@@ -69,7 +69,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     _state: Dict[str, Any]
     _prev_state: Optional[Dict[str, Any]]
 
-    def __init__(  # noqa: CFQ001,CFQ002 # pylint: disable=too-many-branches,too-many-statements,too-many-arguments,too-many-locals
+    def __init__(  # noqa: CFQ001,CFQ002,E501 # pylint: disable=too-many-branches,too-many-statements,too-many-arguments,too-many-positional-arguments,too-many-locals
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,

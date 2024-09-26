@@ -207,7 +207,7 @@ class Test:
         # assert False, "OH NO"
         pytest.fail("OH NO")
 
-    def _configure_bird(  # pylint: disable=too-many-arguments
+    def _configure_bird(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self, router_id: str, asn: str, source4: str, source6: str, peers: List[Dict[str, str]]
     ):
         """Configure a BIRD router."""
@@ -248,7 +248,7 @@ bgp:
         # Return BIRD config
         return birdplan_config
 
-    def _configure_exabgp(  # noqa: CFQ002 # pylint: disable=too-many-arguments
+    def _configure_exabgp(  # noqa: CFQ002 # pylint: disable=too-many-arguments,too-many-positional-arguments
         self, sim: Simulation, router_id: str, asn: str, source4: str, source6: str, peer: Dict[str, str]
     ):
         """Configure an ExaBGP."""
