@@ -1101,10 +1101,12 @@ class BirdPlanBaseTestCase:
                     if "router_id" not in dest:
                         raise RuntimeError("OSPF should have a 'router_id', but does not")
                     del dest["router_id"]
-                    # Check if we have attributes and if the router_id is there
-                    if "attributes" in dest and "OSPF.router_id" in dest["attributes"]:
-                        del dest["attributes"]["OSPF.router_id"]
-
+                    # Check if we have attributes and if the OSPF router_id is there, if it is remove it
+                    # NK: The OSPF router_id is dynamic and can change in multipath routes
+                    if "attributes" in dest:
+                        for attr in ("OSPF.router_id", "ospf_router_id"):
+                            if attr in dest["attributes"]:
+                                del dest["attributes"][attr]
         # Return route table
         return route_table
 
