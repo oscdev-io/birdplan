@@ -255,6 +255,10 @@ class BirdPlanBaseTestCase:
     def _test_bird_status(self, sim: Simulation):
         """Test all bird instances are up and responding."""
 
+        # Sleep for sim delay again as routers may of had external changes applied
+        if sim.delay:
+            time.sleep(sim.delay)
+
         # Loop with BIRD routers
         for router in self.routers:
             # If the node does not exist, then go to the next one, this means it was not configured
