@@ -195,11 +195,10 @@ class BirdPlanBaseTestCase:
         # Configure our simulator with the BIRD routers
         configured_routers = self._configure_bird_routers(sim, tmpdir)
         for router in configured_routers:
-            sim.add_node(
-                BirdRouterNode(
-                    name=router, configfile=f"{tmpdir}/bird.conf.{router}", controlsocket=f"{tmpdir}/bird.ctl.{router}", debug=False
-                )
+            bird_router_node = BirdRouterNode(
+                name=router, configfile=f"{tmpdir}/bird.conf.{router}", controlsocket=f"{tmpdir}/bird.ctl.{router}", debug=False
             )
+            sim.add_node(bird_router_node)
 
         # Loop with routers
         for router in configured_routers:
@@ -306,9 +305,9 @@ class BirdPlanBaseTestCase:
                 # Name variables nicely so they look good in our test output
                 received_data, expected_data = data
                 # Make sure table matches
-                assert (
-                    received_data == expected_data
-                ), f"BIRD router '{router}' peer table '{table_name}' does not match what it should be"
+                assert received_data == expected_data, (
+                    f"BIRD router '{router}' peer table '{table_name}' does not match what it should be"
+                )
 
     def _test_bird_routers_table(self, sim: Simulation, table_name: str, routers: Optional[List[str]] = None):
         """Test BIRD routing table for all routers, or those specified."""
@@ -682,9 +681,9 @@ class BirdPlanBaseTestCase:
         # Lets do the asserts next
         for router, peer_shows in router_shows.items():
             for peer, data in peer_shows.items():
-                assert (
-                    data["result"] == data["expected"]
-                ), f"BIRD router '{router}' peer show on '{peer}' does not match what it should be"
+                assert data["result"] == data["expected"], (
+                    f"BIRD router '{router}' peer show on '{peer}' does not match what it should be"
+                )
 
     def _test_os_rib(self, sim: Simulation, table_name: str, routers: Optional[List[str]] = None):
         """Test OS routing table."""
