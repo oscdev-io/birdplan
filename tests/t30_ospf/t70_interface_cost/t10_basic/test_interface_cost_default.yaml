@@ -123,7 +123,9 @@ r1_inet6:
 r1_master4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -149,42 +151,41 @@ r1_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.201.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -193,22 +194,21 @@ r1_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r1_master6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -217,12 +217,11 @@ r1_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -248,30 +247,27 @@ r1_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:201::/48:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
 r1_ospf_summary:
   ospf4:
     channel: ipv4
@@ -300,7 +296,9 @@ r1_ospf_summary:
 r1_t_kernel4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -326,23 +324,22 @@ r1_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -351,13 +348,12 @@ r1_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r1_t_kernel6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -366,12 +362,11 @@ r1_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -397,24 +392,23 @@ r1_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
 r1_t_ospf4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -440,23 +434,22 @@ r1_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -465,13 +458,12 @@ r1_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r1_t_ospf6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -480,12 +472,11 @@ r1_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -511,44 +502,41 @@ r1_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
 r1_t_static4:
   100.131.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
 r1_t_static6:
   fc00:131::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
 r2_inet:
 - dev: eth0
   dst: 100.64.0.0/24
@@ -626,17 +614,19 @@ r2_inet6:
   protocol: kernel
 r2_master4:
   100.102.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -645,15 +635,14 @@ r2_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -665,21 +654,20 @@ r2_master4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -688,22 +676,21 @@ r2_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r2_master6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -712,21 +699,20 @@ r2_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -735,15 +721,14 @@ r2_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -755,9 +740,6 @@ r2_master6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r2_ospf_summary:
   ospf4:
     channel: ipv4
@@ -786,7 +768,9 @@ r2_ospf_summary:
 r2_t_kernel4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -795,15 +779,14 @@ r2_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -815,12 +798,11 @@ r2_t_kernel4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -829,13 +811,12 @@ r2_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r2_t_kernel6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -844,12 +825,11 @@ r2_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -858,15 +838,14 @@ r2_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -878,13 +857,12 @@ r2_t_kernel6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r2_t_ospf4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -893,15 +871,14 @@ r2_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -913,12 +890,11 @@ r2_t_ospf4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -927,13 +903,12 @@ r2_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r2_t_ospf6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -942,12 +917,11 @@ r2_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -956,15 +930,14 @@ r2_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -976,9 +949,6 @@ r2_t_ospf6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r3_inet:
 - dev: eth0
   dst: 100.64.0.0/24
@@ -1056,17 +1026,19 @@ r3_inet6:
   protocol: kernel
 r3_master4:
   100.102.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1075,15 +1047,14 @@ r3_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1095,21 +1066,20 @@ r3_master4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1118,22 +1088,21 @@ r3_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r3_master6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1142,21 +1111,20 @@ r3_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1165,15 +1133,14 @@ r3_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1185,9 +1152,6 @@ r3_master6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r3_ospf_summary:
   ospf4:
     channel: ipv4
@@ -1216,7 +1180,9 @@ r3_ospf_summary:
 r3_t_kernel4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1225,15 +1191,14 @@ r3_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1245,12 +1210,11 @@ r3_t_kernel4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1259,13 +1223,12 @@ r3_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r3_t_kernel6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1274,12 +1237,11 @@ r3_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1288,15 +1250,14 @@ r3_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1308,13 +1269,12 @@ r3_t_kernel6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r3_t_ospf4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1323,15 +1283,14 @@ r3_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1343,12 +1302,11 @@ r3_t_ospf4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1357,13 +1315,12 @@ r3_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r3_t_ospf6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1372,12 +1329,11 @@ r3_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1386,15 +1342,14 @@ r3_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1406,9 +1361,6 @@ r3_t_ospf6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r4_inet:
 - dev: eth0
   dst: 100.64.0.0/24
@@ -1486,17 +1438,19 @@ r4_inet6:
   protocol: kernel
 r4_master4:
   100.102.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1505,15 +1459,14 @@ r4_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1525,21 +1478,20 @@ r4_master4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1548,22 +1500,21 @@ r4_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r4_master6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1572,21 +1523,20 @@ r4_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1595,15 +1545,14 @@ r4_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1615,9 +1564,6 @@ r4_master6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r4_ospf_summary:
   ospf4:
     channel: ipv4
@@ -1646,7 +1592,9 @@ r4_ospf_summary:
 r4_t_kernel4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1655,15 +1603,14 @@ r4_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1675,12 +1622,11 @@ r4_t_kernel4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1689,13 +1635,12 @@ r4_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r4_t_kernel6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1704,12 +1649,11 @@ r4_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1718,15 +1662,14 @@ r4_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1738,13 +1681,12 @@ r4_t_kernel6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r4_t_ospf4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1753,15 +1695,14 @@ r4_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1773,12 +1714,11 @@ r4_t_ospf4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1787,13 +1727,12 @@ r4_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r4_t_ospf6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1802,12 +1741,11 @@ r4_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1816,15 +1754,14 @@ r4_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1836,9 +1773,6 @@ r4_t_ospf6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r5_inet:
 - dev: eth0
   dst: 100.64.0.0/24
@@ -1916,17 +1850,19 @@ r5_inet6:
   protocol: kernel
 r5_master4:
   100.102.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1935,15 +1871,14 @@ r5_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1955,21 +1890,20 @@ r5_master4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1978,22 +1912,21 @@ r5_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r5_master6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -2002,21 +1935,20 @@ r5_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -2025,15 +1957,14 @@ r5_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2045,9 +1976,6 @@ r5_master6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r5_ospf_summary:
   ospf4:
     channel: ipv4
@@ -2076,7 +2004,9 @@ r5_ospf_summary:
 r5_t_kernel4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2085,15 +2015,14 @@ r5_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2105,12 +2034,11 @@ r5_t_kernel4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2119,13 +2047,12 @@ r5_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r5_t_kernel6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2134,12 +2061,11 @@ r5_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2148,15 +2074,14 @@ r5_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2168,13 +2093,12 @@ r5_t_kernel6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r5_t_ospf4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2183,15 +2107,14 @@ r5_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2203,12 +2126,11 @@ r5_t_ospf4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2217,13 +2139,12 @@ r5_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r5_t_ospf6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2232,12 +2153,11 @@ r5_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2246,15 +2166,14 @@ r5_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2266,9 +2185,6 @@ r5_t_ospf6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r6_inet:
 - dev: eth0
   dst: 100.64.0.0/24
@@ -2346,17 +2262,19 @@ r6_inet6:
   protocol: kernel
 r6_master4:
   100.102.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -2365,15 +2283,14 @@ r6_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2385,21 +2302,20 @@ r6_master4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -2408,22 +2324,21 @@ r6_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r6_master6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -2432,21 +2347,20 @@ r6_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -2455,15 +2369,14 @@ r6_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2475,9 +2388,6 @@ r6_master6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r6_ospf_summary:
   ospf4:
     channel: ipv4
@@ -2506,7 +2416,9 @@ r6_ospf_summary:
 r6_t_kernel4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2515,15 +2427,14 @@ r6_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2535,12 +2446,11 @@ r6_t_kernel4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2549,13 +2459,12 @@ r6_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r6_t_kernel6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2564,12 +2473,11 @@ r6_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2578,15 +2486,14 @@ r6_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2598,13 +2505,12 @@ r6_t_kernel6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r6_t_ospf4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2613,15 +2519,14 @@ r6_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2633,12 +2538,11 @@ r6_t_ospf4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2647,13 +2551,12 @@ r6_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r6_t_ospf6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2662,12 +2565,11 @@ r6_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2676,15 +2578,14 @@ r6_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2696,9 +2597,6 @@ r6_t_ospf6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r7_inet:
 - dev: eth0
   dst: 100.64.0.0/24
@@ -2776,17 +2674,19 @@ r7_inet6:
   protocol: kernel
 r7_master4:
   100.102.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -2795,15 +2695,14 @@ r7_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2815,21 +2714,20 @@ r7_master4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -2838,22 +2736,21 @@ r7_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r7_master6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -2862,21 +2759,20 @@ r7_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -2885,15 +2781,14 @@ r7_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2905,9 +2800,6 @@ r7_master6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r7_ospf_summary:
   ospf4:
     channel: ipv4
@@ -2936,7 +2828,9 @@ r7_ospf_summary:
 r7_t_kernel4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2945,15 +2839,14 @@ r7_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -2965,12 +2858,11 @@ r7_t_kernel4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2979,13 +2871,12 @@ r7_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r7_t_kernel6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -2994,12 +2885,11 @@ r7_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -3008,15 +2898,14 @@ r7_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -3028,13 +2917,12 @@ r7_t_kernel6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r7_t_ospf4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -3043,15 +2931,14 @@ r7_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -3063,12 +2950,11 @@ r7_t_ospf4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -3077,13 +2963,12 @@ r7_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r7_t_ospf6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -3092,12 +2977,11 @@ r7_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -3106,15 +2990,14 @@ r7_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -3126,9 +3009,6 @@ r7_t_ospf6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r8_inet:
 - dst: 100.64.0.0/24
   flags: []
@@ -3281,17 +3161,19 @@ r8_inet6:
   protocol: kernel
 r8_master4:
   100.102.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -3300,15 +3182,14 @@ r8_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 20
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 20
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 20
     metric2: 10000
@@ -3336,12 +3217,11 @@ r8_master4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -3367,13 +3247,12 @@ r8_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r8_master6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -3399,21 +3278,20 @@ r8_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -3422,15 +3300,14 @@ r8_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 20
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 20
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 20
     metric2: 10000
@@ -3458,9 +3335,6 @@ r8_master6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r8_ospf_summary:
   ospf4:
     channel: ipv4
@@ -3489,7 +3363,9 @@ r8_ospf_summary:
 r8_t_kernel4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -3498,15 +3374,14 @@ r8_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 20
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 20
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 20
     metric2: 10000
@@ -3534,12 +3409,11 @@ r8_t_kernel4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -3565,13 +3439,12 @@ r8_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r8_t_kernel6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -3597,12 +3470,11 @@ r8_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -3611,15 +3483,14 @@ r8_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 20
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 20
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 20
     metric2: 10000
@@ -3647,13 +3518,12 @@ r8_t_kernel6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r8_t_ospf4:
   100.102.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -3662,15 +3532,14 @@ r8_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
   100.131.0.0/24:
   - attributes:
-      OSPF.metric1: 20
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 20
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 20
     metric2: 10000
@@ -3698,12 +3567,11 @@ r8_t_ospf4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -3729,13 +3597,12 @@ r8_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r8_t_ospf6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 20
+      ospf_metric1: 20
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 20
     nexthops:
@@ -3761,12 +3628,11 @@ r8_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:102::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -3775,15 +3641,14 @@ r8_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:131::/48:
   - attributes:
-      OSPF.metric1: 20
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 20
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 20
     metric2: 10000
@@ -3811,6 +3676,3 @@ r8_t_ospf6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
