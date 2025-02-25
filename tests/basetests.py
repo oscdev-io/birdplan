@@ -534,6 +534,10 @@ class BirdPlanBaseTestCase:
                         # NK: since is dynamic
                         if "since" in protocol_data["status"]:
                             del protocol_data["status"]["since"]
+                        # NK: info can change between active/connect
+                        if "info" in protocol_data["status"]:
+                            if protocol_data["status"]["info"] in ("active", "connect"):
+                                protocol_data["status"]["info"] = "active/connect"
 
                 # If we don't have a content match, we match as we have a sleep() after bird status
                 # The first case is when there is no expected data
@@ -629,6 +633,10 @@ class BirdPlanBaseTestCase:
                             # NK: since is dynamic
                             if "since" in protocol_data["status"]:
                                 del protocol_data["status"]["since"]
+                            # NK: info can change between active/connect
+                            if "info" in protocol_data["status"]:
+                                if protocol_data["status"]["info"] in ("active", "connect"):
+                                    protocol_data["status"]["info"] = "active/connect"
                     # Result used for compare so we can modify it below for data changes when making updates
                     result_compare = copy.deepcopy(result)
 
