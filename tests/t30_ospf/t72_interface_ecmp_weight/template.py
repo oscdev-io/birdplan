@@ -21,6 +21,7 @@
 
 """OSPF test case for interface ECMP weight."""
 
+import time
 from ...basetests import BirdPlanBaseTestCase
 
 __all__ = ["Template"]
@@ -125,6 +126,9 @@ class Template(BirdPlanBaseTestCase):
     def test_interface_attributes(self, sim, tmpdir):
         """OSPF interface ECMP weight test to customize template."""
         self._test_interface_attributes(sim, tmpdir)
+        # NK: Wait again after interface attribute change to wait for settling
+        if sim.delay:
+            time.sleep(sim.delay)
 
     # Here is where the customizations take place per testcase
     def _test_interface_attributes(self, sim, tmpdir):
