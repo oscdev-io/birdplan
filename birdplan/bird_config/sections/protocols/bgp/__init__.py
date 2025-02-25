@@ -483,6 +483,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
             self.conf.add("")
             self.conf.add(f"  ipv{ipv} {{")
             self.conf.add(f"    table t_bgp_originate{ipv};")
+            self.conf.add("    preference 195;")
             self.conf.add("    export none;")
             self.conf.add(f"    import filter {filter_name};")
             self.conf.add("  };")
