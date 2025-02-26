@@ -21,6 +21,8 @@
 
 """BGP quarantine test case template."""
 
+import time
+
 from ...basetests import BirdPlanBaseTestCase
 
 __all__ = ["TemplateBase"]
@@ -57,6 +59,9 @@ class TemplateBase(BirdPlanBaseTestCase):
     def test_quarantine(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
         self._test_quarantine(sim, tmpdir)
+        # NK: Wait for routes to settle
+        if sim.delay:
+            time.sleep(sim.delay)
 
     # Here is where the customizations take place per testcase
     def _test_quarantine(self, sim, tmpdir):
