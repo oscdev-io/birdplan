@@ -51,68 +51,68 @@ r1_inet6:
   protocol: kernel
 r1_master4:
   100.101.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 192.168.1.2
       interface: eth1
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   192.168.1.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
 r1_master6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   fc00:101::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc01::2
       interface: eth1
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc01::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
 r1_peer_show_r2:
   asn: 65000
   description: BGP session to r2
@@ -142,8 +142,6 @@ r1_peer_show_r2:
         output_filter: f_bgp_AS65000_r2_peer_export
         preference: 100
         proto: BGP
-        routes_exported: 1
-        routes_imported: 0
         source_address: 100.64.0.1
         state: up
         table: t_bgp4_AS65000_r2_peer
@@ -166,8 +164,6 @@ r1_peer_show_r2:
         output_filter: f_bgp_AS65000_r2_peer_export
         preference: 100
         proto: BGP
-        routes_exported: 1
-        routes_imported: 0
         source_address: fc00:100::1
         state: up
         table: t_bgp6_AS65000_r2_peer
@@ -204,8 +200,6 @@ r1_peer_summary:
           output_filter: f_bgp_AS65000_r2_peer_export
           preference: 100
           proto: BGP
-          routes_exported: 1
-          routes_imported: 0
           source_address: 100.64.0.1
           state: up
           table: t_bgp4_AS65000_r2_peer
@@ -229,17 +223,17 @@ r1_peer_summary:
           output_filter: f_bgp_AS65000_r2_peer_export
           preference: 100
           proto: BGP
-          routes_exported: 1
-          routes_imported: 0
           source_address: fc00:100::1
           state: up
           table: t_bgp6_AS65000_r2_peer
 r1_t_bgp4:
   100.101.0.0/24:
   - attributes:
-      BGP.large_community:
+      bgp_large_community:
       - !!python/tuple [65000, 3, 1]
-      BGP.local_pref: 940
+      bgp_local_pref: 940
+      preference: 200
+      source: static
     bestpath: true
     nexthops:
     - gateway: 192.168.1.2
@@ -247,15 +241,14 @@ r1_t_bgp4:
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
 r1_t_bgp4_AS65000_r2_peer:
   100.101.0.0/24:
   - attributes:
-      BGP.large_community:
+      bgp_large_community:
       - !!python/tuple [65000, 3, 1]
-      BGP.local_pref: 940
+      bgp_local_pref: 940
+      preference: 200
+      source: static
     bestpath: true
     nexthops:
     - gateway: 192.168.1.2
@@ -263,15 +256,14 @@ r1_t_bgp4_AS65000_r2_peer:
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
 r1_t_bgp6:
   fc00:101::/48:
   - attributes:
-      BGP.large_community:
+      bgp_large_community:
       - !!python/tuple [65000, 3, 1]
-      BGP.local_pref: 940
+      bgp_local_pref: 940
+      preference: 200
+      source: static
     bestpath: true
     nexthops:
     - gateway: fc01::2
@@ -279,15 +271,14 @@ r1_t_bgp6:
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
 r1_t_bgp6_AS65000_r2_peer:
   fc00:101::/48:
   - attributes:
-      BGP.large_community:
+      bgp_large_community:
       - !!python/tuple [65000, 3, 1]
-      BGP.local_pref: 940
+      bgp_local_pref: 940
+      preference: 200
+      source: static
     bestpath: true
     nexthops:
     - gateway: fc01::2
@@ -295,33 +286,30 @@ r1_t_bgp6_AS65000_r2_peer:
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
 r1_t_kernel4:
   100.101.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 192.168.1.2
       interface: eth1
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
 r1_t_kernel6:
   fc00:101::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc01::2
       interface: eth1
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
 r2_inet:
 - dev: eth0
   dst: 100.64.0.0/24
@@ -362,46 +350,46 @@ r2_inet6:
   protocol: kernel
 r2_master4:
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   192.168.2.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
 r2_master6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   fc02::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
 r2_peer_show_r1:
   asn: 65000
   description: BGP session to r1
@@ -431,8 +419,6 @@ r2_peer_show_r1:
         output_filter: f_bgp_AS65000_r1_peer_export
         preference: 100
         proto: BGP
-        routes_exported: 0
-        routes_imported: 1
         source_address: 100.64.0.2
         state: up
         table: t_bgp4_AS65000_r1_peer
@@ -455,8 +441,6 @@ r2_peer_show_r1:
         output_filter: f_bgp_AS65000_r1_peer_export
         preference: 100
         proto: BGP
-        routes_exported: 0
-        routes_imported: 1
         source_address: fc00:100::2
         state: up
         table: t_bgp6_AS65000_r1_peer
@@ -493,8 +477,6 @@ r2_peer_summary:
           output_filter: f_bgp_AS65000_r1_peer_export
           preference: 100
           proto: BGP
-          routes_exported: 0
-          routes_imported: 1
           source_address: 100.64.0.2
           state: up
           table: t_bgp4_AS65000_r1_peer
@@ -518,8 +500,6 @@ r2_peer_summary:
           output_filter: f_bgp_AS65000_r1_peer_export
           preference: 100
           proto: BGP
-          routes_exported: 0
-          routes_imported: 1
           source_address: fc00:100::2
           state: up
           table: t_bgp6_AS65000_r1_peer
