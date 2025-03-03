@@ -246,7 +246,7 @@ class ProtocolRPKI(SectionBase):
 
     def _configure_protocol_rpki_uri(self) -> None:
         """Protocol configuration."""
-        self.conf.add("protocol rpki {")
+        self.conf.add("protocol rpki p_rpki {")
         self.conf.add("")
         self.conf.add("  roa4 { table t_roa4; };")
         self.conf.add("  roa6 { table t_roa6; };")
