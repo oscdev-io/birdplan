@@ -41,9 +41,9 @@ class SectionLogging(SectionBase):
         # Grab logfile if we have one
         log_file = self.birdconfig_globals.log_file
         if log_file:
-            self.conf.add(f'log "{log_file}" all;')
+            self.conf.add(f'log "{log_file}" {{ info, warning, fatal }};')
         else:
-            self.conf.add("log stderr all;")
+            self.conf.add("log stderr { info, warning fatal };")
         # Check if we're in debug mode
         if self.birdconfig_globals.debug:
             self.conf.add("debug protocols { states, routes, filters, interfaces, events };")
