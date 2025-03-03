@@ -240,6 +240,7 @@ Internally set, not allowable from any BGP peer type. These can only be found in
 | (OWN_ASN, 1101, 27) | Deny origin AS |
 | (OWN_ASN, 1101, 28) | Deny AS in AS path |
 | (OWN_ASN, 1101, 29) | Deny prefix |
+| (OWN_ASN, 1101, 30) | Rejected by action |
 
 [^rpki_transitive_communitY_bad]: Guidance to Avoid Carrying RPKI Validation States in Transitive BGP Path Attributes. ref
 https://www.ietf.org/archive/id/draft-ietf-sidrops-avoid-rpki-state-in-bgp-00.html

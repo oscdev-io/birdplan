@@ -381,9 +381,11 @@ class BGPConfigParser(ConfigParser):
                     )
                 # Loop with actions
                 for action in config_value:
-                    # Make sure each action has a direction, match and action
-                    if "action" not in action or "direction" not in action or "matches" not in action:
-                        raise BirdPlanConfigError(f"Configuration item '{action}' not understood in bgp:peers:{peer_name}:actions")
+                    # Make sure each action has a type and action
+                    if "type" not in action:
+                        raise BirdPlanConfigError(f"Configuration item 'actions' has no 'type' in bgp:peers:{peer_name}:actions")
+                    if "action" not in action:
+                        raise BirdPlanConfigError(f"Configuration item 'actions' has no 'action' in bgp:peers:{peer_name}:actions")
                     # Check action options are valid
                     for action_k, action_v in action.items():
                         # Check the action specification
@@ -414,7 +416,7 @@ class BGPConfigParser(ConfigParser):
                                             )
                                     # Make sure prepend is a string
                                     elif action_vk == "prepend":
-                                        if not isinstance(action_vv, str):
+                                        if not isinstance(action_vv, int):
                                             raise BirdPlanConfigError(
                                                 f"Configuration item '{action_vv}' not understood in bgp:peers:{peer_name}:actions"
                                             )
@@ -429,9 +431,9 @@ class BGPConfigParser(ConfigParser):
                                 raise BirdPlanConfigError(
                                     f"Configuration item '{action_v}' not understood in bgp:peers:{peer_name}:actions"
                                 )
-                        # Check the direction of the action
-                        elif action_k == "direction":
-                            if action_v not in ("in", "out"):
+                        # Check the type of the action
+                        elif action_k == "type":
+                            if action_v not in ("import", "export"):
                                 raise BirdPlanConfigError(
                                     f"Configuration item '{action_v}' not understood in bgp:peers:{peer_name}:actions"
                                 )
@@ -453,8 +455,8 @@ class BGPConfigParser(ConfigParser):
                                     raise BirdPlanConfigError(
                                         f"Configuration item '{match_v}' not understood in bgp:peers:{peer_name}:actions"
                                     )
-                        # Add action
-                        peer["actions"].append({action_k: action_v})
+                    # Add action
+                    peer["actions"].append(action)
 
             # Peer location configuration
             elif config_item == "location":

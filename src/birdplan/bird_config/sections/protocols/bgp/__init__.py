@@ -441,6 +441,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_FILTERED_DENY_ORIGIN_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 27);")
         self.constants.conf.append("define BGP_LC_FILTERED_DENY_ASPATH = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 28);")
         self.constants.conf.append("define BGP_LC_FILTERED_DENY_PREFIX = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 29);")
+        self.constants.conf.append("define BGP_LC_FILTERED_ACTION = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 30);")
         self.constants.conf.append("")
         self.constants.conf.append("# Large community actions")
         self.constants.conf.append("define BGP_LC_ACTION_REPLACE_ASPATH = (BGP_ASN, BGP_LC_FUNCTION_ACTION, 1);")

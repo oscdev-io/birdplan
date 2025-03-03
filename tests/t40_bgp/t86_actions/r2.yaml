@@ -1,0 +1,19 @@
+router_id: 0.0.0.2
+log_file: "@LOGFILE@"
+
+bgp:
+  asn: @ASN@
+@GLOBAL_CONFIG@
+  peers:
+    r1:
+      asn: @PEER_ASN@
+      type: @PEER_TYPE@
+      description: BGP session to r1
+      source_address4: 100.64.0.2
+      source_address6: fc00:100::2
+      neighbor4: 100.64.0.1
+      neighbor6: fc00:100::1
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+@PEER_CONFIG@

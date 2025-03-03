@@ -823,6 +823,8 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     constraints: BGPPeerConstraints
         BGP peer constraint overrides.
 
+    actions: Optional[BGPPeerActions]
+
     use_rpki: bool
         Use RPKI validation for this peer.
 

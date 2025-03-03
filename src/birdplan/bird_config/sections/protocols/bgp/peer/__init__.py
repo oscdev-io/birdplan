@@ -40,7 +40,7 @@ from ...pipe import ProtocolPipe, ProtocolPipeFilterType
 from ..bgp_attributes import BGPAttributes, BGPPeertypeConstraints
 from ..bgp_functions import BGPFunctions
 from ..bgp_types import BGPPeerConfig
-from .actions import BGPPeerActions
+from .actions import BGPPeerActions, BGPPeerActionType
 from .peer_attributes import (
     BGPPeerAttributes,
     BGPPeerCommunities,
@@ -138,7 +138,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Check if we have actions, if we do we need to parse them
         if "actions" in peer_config:
-            self.peer_attributes.actions = BGPPeerActions(self.bgp_functions, self.asn, self.name)
+            self.peer_attributes.actions = BGPPeerActions(self.functions, self.bgp_functions, self.asn, self.name)
             self.peer_attributes.actions.configure(peer_config["actions"])
 
         # Check if we're replacing the ASN in the AS-PATH
@@ -2382,7 +2382,6 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("    } else {")
         self.conf.add(f"      {self._peer_reject_non_exportable()};")
         self.conf.add("    }")
-
         # Filter BGP routes we don't want
         # Check if we're filtering allowed origin ASNs
         if self.has_export_origin_asn_filter:
@@ -2399,130 +2398,130 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 BirdVariable(self.export_prefix_list_name("4")), BirdVariable(self.export_prefix_list_name("6"))
             )
             self.conf.add(f"  if {export_filter_prefixes} then accept_route = false;")
-
-        # End of BGP type tests
+        # End of BGP exportable checks
         self.conf.add("  }")
 
-        # Check if we're accepting the route...
-        self.conf.add("  if (accept_route) then {")
+        # Check if we're accepting the route to add communities...
+        conf: list[str] = []
+        conf.append("  if (accept_route) then {")
         # Check if we are adding a community to outgoing routes
         if self.communities.outgoing.connected:
             for community in self.communities.outgoing.connected:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_connected(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_connected(BirdVariable(community))};")
         if self.communities.outgoing.kernel:
             for community in self.communities.outgoing.kernel:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_kernel(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_kernel(BirdVariable(community))};")
         if self.communities.outgoing.kernel_blackhole:
             for community in self.communities.outgoing.kernel_blackhole:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_kernel_blackhole(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_kernel_blackhole(BirdVariable(community))};")
         if self.communities.outgoing.kernel_default:
             for community in self.communities.outgoing.kernel_default:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_kernel_default(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_kernel_default(BirdVariable(community))};")
         if self.communities.outgoing.originated:
             for community in self.communities.outgoing.originated:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_originated(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_originated(BirdVariable(community))};")
         if self.communities.outgoing.originated_default:
             for community in self.communities.outgoing.originated_default:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_originated_default(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_originated_default(BirdVariable(community))};")
         if self.communities.outgoing.static:
             for community in self.communities.outgoing.static:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_static(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_static(BirdVariable(community))};")
         if self.communities.outgoing.static_blackhole:
             for community in self.communities.outgoing.static_blackhole:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_static_blackhole(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_static_blackhole(BirdVariable(community))};")
         if self.communities.outgoing.static_default:
             for community in self.communities.outgoing.static_default:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_static_default(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_static_default(BirdVariable(community))};")
         if self.communities.outgoing.bgp_own:
             for community in self.communities.outgoing.bgp_own:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_own(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_own(BirdVariable(community))};")
         if self.communities.outgoing.bgp_own_blackhole:
             for community in self.communities.outgoing.bgp_own_blackhole:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_own_blackhole(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_own_blackhole(BirdVariable(community))};")
         if self.communities.outgoing.bgp_own_default:
             for community in self.communities.outgoing.bgp_own_default:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_own_default(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_own_default(BirdVariable(community))};")
         if self.communities.outgoing.bgp_customer:
             for community in self.communities.outgoing.bgp_customer:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_customer(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_customer(BirdVariable(community))};")
         if self.communities.outgoing.bgp_customer_blackhole:
             for community in self.communities.outgoing.bgp_customer_blackhole:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_customer_blackhole(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_customer_blackhole(BirdVariable(community))};")
         if self.communities.outgoing.bgp_peering:
             for community in self.communities.outgoing.bgp_peering:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_peering(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_peering(BirdVariable(community))};")
         if self.communities.outgoing.bgp_transit:
             for community in self.communities.outgoing.bgp_transit:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_transit(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_transit(BirdVariable(community))};")
         if self.communities.outgoing.bgp_transit_default:
             for community in self.communities.outgoing.bgp_transit_default:
-                self.conf.add(f"    {self.bgp_functions.peer_community_add_bgp_transit_default(BirdVariable(community))};")
+                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_transit_default(BirdVariable(community))};")
         # Check if we are adding a large community to outgoing routes
         if self.large_communities.outgoing.connected:
             for large_community in self.large_communities.outgoing.connected:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_connected(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_connected(BirdVariable(large_community))};")
         if self.large_communities.outgoing.kernel:
             for large_community in self.large_communities.outgoing.kernel:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_kernel(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_kernel(BirdVariable(large_community))};")
         if self.large_communities.outgoing.kernel_blackhole:
             for large_community in self.large_communities.outgoing.kernel_blackhole:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_kernel_blackhole(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_kernel_blackhole(BirdVariable(large_community))};")
         if self.large_communities.outgoing.kernel_default:
             for large_community in self.large_communities.outgoing.kernel_default:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_kernel_default(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_kernel_default(BirdVariable(large_community))};")
         if self.large_communities.outgoing.originated:
             for large_community in self.large_communities.outgoing.originated:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_originated(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_originated(BirdVariable(large_community))};")
         if self.large_communities.outgoing.originated_default:
             for large_community in self.large_communities.outgoing.originated_default:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_originated_default(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_originated_default(BirdVariable(large_community))};")
         if self.large_communities.outgoing.static:
             for large_community in self.large_communities.outgoing.static:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_static(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_static(BirdVariable(large_community))};")
         if self.large_communities.outgoing.static_blackhole:
             for large_community in self.large_communities.outgoing.static_blackhole:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_static_blackhole(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_static_blackhole(BirdVariable(large_community))};")
         if self.large_communities.outgoing.static_default:
             for large_community in self.large_communities.outgoing.static_default:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_static_default(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_static_default(BirdVariable(large_community))};")
         if self.large_communities.outgoing.bgp_own:
             for large_community in self.large_communities.outgoing.bgp_own:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_bgp_own(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_own(BirdVariable(large_community))};")
         if self.large_communities.outgoing.bgp_own_blackhole:
             for large_community in self.large_communities.outgoing.bgp_own_blackhole:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_bgp_own_blackhole(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_own_blackhole(BirdVariable(large_community))};")
         if self.large_communities.outgoing.bgp_own_default:
             for large_community in self.large_communities.outgoing.bgp_own_default:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_bgp_own_default(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_own_default(BirdVariable(large_community))};")
         if self.large_communities.outgoing.bgp_customer:
             for large_community in self.large_communities.outgoing.bgp_customer:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_bgp_customer(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_customer(BirdVariable(large_community))};")
         if self.large_communities.outgoing.bgp_customer_blackhole:
             for large_community in self.large_communities.outgoing.bgp_customer_blackhole:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_bgp_customer_blackhole(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_customer_blackhole(BirdVariable(large_community))};")
         if self.large_communities.outgoing.bgp_peering:
             for large_community in self.large_communities.outgoing.bgp_peering:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_bgp_peering(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_peering(BirdVariable(large_community))};")
         if self.large_communities.outgoing.bgp_transit:
             for large_community in self.large_communities.outgoing.bgp_transit:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_bgp_transit(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_transit(BirdVariable(large_community))};")
         if self.large_communities.outgoing.bgp_transit_default:
             for large_community in self.large_communities.outgoing.bgp_transit_default:
-                self.conf.add(f"    {self.bgp_functions.peer_lc_add_bgp_transit_default(BirdVariable(large_community))};")
+                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_transit_default(BirdVariable(large_community))};")
 
         # For eBGP peer types, make sure we replace AS-PATHs with the LC action set
         if self.peer_type in ("customer", "peer", "routecollector", "routeserver", "transit"):
-            self.conf.add(f"    {self.bgp_functions.peer_replace_aspath()};")
-            self.conf.add(f"    {self.bgp_functions.peer_remove_lc_private()};")
+            conf.append(f"    {self.bgp_functions.peer_replace_aspath()};")
+            conf.append(f"    {self.bgp_functions.peer_remove_lc_private()};")
 
         # Check if we're doing AS-PATH prepending...
         if self.prepend.connected.own_asn:
-            self.conf.add(
+            conf.append(
                 f"    {self.bgp_functions.peer_prepend_connected(BirdVariable('BGP_ASN'), self.prepend.connected.own_asn)};"
             )
 
         if self.prepend.kernel.own_asn:
-            self.conf.add(f"    {self.bgp_functions.peer_prepend_kernel(BirdVariable('BGP_ASN'), self.prepend.kernel.own_asn)};")
+            conf.append(f"    {self.bgp_functions.peer_prepend_kernel(BirdVariable('BGP_ASN'), self.prepend.kernel.own_asn)};")
 
         if self.peer_type in (  # noqa: SIM102
             "internal",
@@ -2537,17 +2536,17 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 peer_prepend_kernel_blackhole = self.bgp_functions.peer_prepend_kernel_blackhole(
                     BirdVariable("BGP_ASN"), self.prepend.kernel_blackhole.own_asn
                 )
-                self.conf.add(f"    {peer_prepend_kernel_blackhole};")
+                conf.append(f"    {peer_prepend_kernel_blackhole};")
 
         if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.kernel_default.own_asn:
                 peer_prepend_kernel_default = self.bgp_functions.peer_prepend_kernel_default(
                     BirdVariable("BGP_ASN"), self.prepend.kernel_default.own_asn
                 )
-                self.conf.add(f"    {peer_prepend_kernel_default};")
+                conf.append(f"    {peer_prepend_kernel_default};")
 
         if self.prepend.originated.own_asn:
-            self.conf.add(
+            conf.append(
                 f"    {self.bgp_functions.peer_prepend_originated(BirdVariable('BGP_ASN'), self.prepend.originated.own_asn)};"
             )
 
@@ -2556,10 +2555,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 peer_prepend_originated_default = self.bgp_functions.peer_prepend_originated_default(
                     BirdVariable("BGP_ASN"), self.prepend.originated_default.own_asn
                 )
-                self.conf.add(f"    {peer_prepend_originated_default};")
+                conf.append(f"    {peer_prepend_originated_default};")
 
         if self.prepend.static.own_asn:
-            self.conf.add(f"    {self.bgp_functions.peer_prepend_static(BirdVariable('BGP_ASN'), self.prepend.static.own_asn)};")
+            conf.append(f"    {self.bgp_functions.peer_prepend_static(BirdVariable('BGP_ASN'), self.prepend.static.own_asn)};")
 
         if self.peer_type in (  # noqa: SIM102
             "internal",
@@ -2574,17 +2573,17 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 peer_prepend_static_blackhole = self.bgp_functions.peer_prepend_static_blackhole(
                     BirdVariable("BGP_ASN"), self.prepend.static_blackhole.own_asn
                 )
-                self.conf.add(f"    {peer_prepend_static_blackhole};")
+                conf.append(f"    {peer_prepend_static_blackhole};")
 
         if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.static_default.own_asn:
                 peer_prepend_static_default = self.bgp_functions.peer_prepend_static_default(
                     BirdVariable("BGP_ASN"), self.prepend.static_default.own_asn
                 )
-                self.conf.add(f"    {peer_prepend_static_default};")
+                conf.append(f"    {peer_prepend_static_default};")
 
         if self.prepend.bgp_own.own_asn:
-            self.conf.add(f"    {self.bgp_functions.peer_prepend_bgp_own(BirdVariable('BGP_ASN'), self.prepend.bgp_own.own_asn)};")
+            conf.append(f"    {self.bgp_functions.peer_prepend_bgp_own(BirdVariable('BGP_ASN'), self.prepend.bgp_own.own_asn)};")
 
         if self.peer_type in (  # noqa: SIM102
             "internal",
@@ -2599,17 +2598,17 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 peer_prepend_bgp_own_blackhole = self.bgp_functions.peer_prepend_bgp_own_blackhole(
                     BirdVariable("BGP_ASN"), self.prepend.bgp_own_blackhole.own_asn
                 )
-                self.conf.add(f"    {peer_prepend_bgp_own_blackhole};")
+                conf.append(f"    {peer_prepend_bgp_own_blackhole};")
 
         if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.bgp_own_default.own_asn:
                 peer_prepend_bgp_own_default = self.bgp_functions.peer_prepend_bgp_own_default(
                     BirdVariable("BGP_ASN"), self.prepend.bgp_own_default.own_asn
                 )
-                self.conf.add(f"    {peer_prepend_bgp_own_default};")
+                conf.append(f"    {peer_prepend_bgp_own_default};")
 
         if self.prepend.bgp_customer.own_asn:
-            self.conf.add(
+            conf.append(
                 f"    {self.bgp_functions.peer_prepend_bgp_customer(BirdVariable('BGP_ASN'), self.prepend.bgp_customer.own_asn)};"
             )
 
@@ -2626,17 +2625,17 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 peer_prepend_bgp_customer_blackhole = self.bgp_functions.peer_prepend_bgp_customer_blackhole(
                     BirdVariable("BGP_ASN"), self.prepend.bgp_customer_blackhole.own_asn
                 )
-                self.conf.add(f"    {peer_prepend_bgp_customer_blackhole};")
+                conf.append(f"    {peer_prepend_bgp_customer_blackhole};")
 
         if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.bgp_peering.own_asn:
-                self.conf.add(
+                conf.append(
                     f"    {self.bgp_functions.peer_prepend_bgp_peering(BirdVariable('BGP_ASN'), self.prepend.bgp_peering.own_asn)};"
                 )
 
         if self.peer_type in ("customer", "internal", "rrclient", "rrserver", "rrserver-rrserver"):  # noqa: SIM102
             if self.prepend.bgp_transit.own_asn:
-                self.conf.add(
+                conf.append(
                     f"    {self.bgp_functions.peer_prepend_bgp_transit(BirdVariable('BGP_ASN'), self.prepend.bgp_transit.own_asn)};"
                 )
 
@@ -2645,35 +2644,60 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 peer_prepend_bgp_transit_default = self.bgp_functions.peer_prepend_bgp_transit_default(
                     BirdVariable("BGP_ASN"), self.prepend.bgp_transit_default.own_asn
                 )
-                self.conf.add(f"    {peer_prepend_bgp_transit_default};")
+                conf.append(f"    {peer_prepend_bgp_transit_default};")
 
         # Do large community prepending if the peer is a customer, peer, routeserver or transit
         if self.peer_type in ("customer", "peer", "routeserver", "routecollector", "transit"):
             # Check if we're doing prepending
-            self.conf.add("    # Do large community based prepending")
-            self.conf.add(f"    {self.bgp_functions.peer_prepend_lc(self.asn)};")
+            conf.append("    # Do large community based prepending")
+            conf.append(f"    {self.bgp_functions.peer_prepend_lc(self.asn)};")
             # Check if we have a ISO-3166 country code
             if self.location.iso3166:
-                self.conf.add("    # Do prepending based on ISO-3166 location;")
-                self.conf.add(f"    {self.bgp_functions.peer_prepend_lc_location(self.location.iso3166)};")
+                conf.append("    # Do prepending based on ISO-3166 location;")
+                conf.append(f"    {self.bgp_functions.peer_prepend_lc_location(self.location.iso3166)};")
         # If we have graceful_shutdown set, add the community
         if self.graceful_shutdown:
-            self.conf.add(f"    {self.bgp_functions.peer_graceful_shutdown()};")
+            conf.append(f"    {self.bgp_functions.peer_graceful_shutdown()};")
         # Check if we need to do any blackhole manipulation
         if self.blackhole_community and isinstance(self.blackhole_community, list):
-            self.conf.add("    # If this is a blackhole route, then add the communities")
-            self.conf.add(f"    if {self.bgp_functions.is_blackhole()} then {{")
-            self.conf.add("      bgp_community.delete([BGP_COMMUNITY_BLACKHOLE]);")
+            conf.append("    # If this is a blackhole route, then add the communities")
+            conf.append(f"    if {self.bgp_functions.is_blackhole()} then {{")
+            conf.append("      bgp_community.delete([BGP_COMMUNITY_BLACKHOLE]);")
             # Loop with the communities we have to add
             for community in self.blackhole_community:
                 # Get community component count so we can see if its a normal or large community
                 component_count = community.count(",")
                 if component_count == 1:
-                    self.conf.add(f"      {self.bgp_functions.peer_community_add_blackhole(BirdVariable(community))};")
+                    conf.append(f"      {self.bgp_functions.peer_community_add_blackhole(BirdVariable(community))};")
                 elif component_count == 2:
-                    self.conf.add(f"      {self.bgp_functions.peer_lc_add_blackhole(BirdVariable(community))};")
-            self.conf.add("    }")
+                    conf.append(f"      {self.bgp_functions.peer_lc_add_blackhole(BirdVariable(community))};")
+            conf.append("    }")
 
+        # Lastly do actions within the same "if accept_route" block
+        # NK: we do this here so we can also match on the communities added above
+        if self.actions:
+            # Grab export actions
+            actions_out = [action for action in self.actions.actions if action.action_type == BGPPeerActionType.EXPORT]
+            # Make sure we have some
+            if actions_out:
+                conf.append("    # Apply export actions")
+                # Loop with all actions and look for the action type we need
+                for action in self.actions.actions:
+                    # Skip anything not OUT
+                    if action.action_type != BGPPeerActionType.EXPORT:
+                        continue
+                    # Call BIRD function and reject route if we need to
+                    conf.append(f"    if ! {action.function_name}() then accept_route = false;")
+
+        conf.append("  }")
+
+        # Check if the above conf block has more than 2 lines (the if and the closing brace), if it does add it
+        if len(conf) > 2:
+            self.conf.add(conf)
+
+        # Check if we're STILL accepting the route even after the actions being applied
+        self.conf.add("  # Check if we're still accepting the route after actions")
+        self.conf.add("  if (accept_route) then {")
         # Finally accept
         self.conf.add("    # Finally accept")
         self.conf.add("    if DEBUG then")
@@ -2975,6 +2999,22 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Support for changing incoming local_pref
         if self.peer_type == "customer":
             self.conf.add(f"  {self.bgp_functions.peer_import_localpref()};")
+
+        # Lastly do actions within the same "if accept_route" block
+        # NK: we do this here so we can also match on the communities added above
+        if self.actions:
+            # Grab import actions
+            actions_in = [action for action in self.actions.actions if action.action_type == BGPPeerActionType.IMPORT]
+            # Make sure we have some
+            if actions_in:
+                self.conf.add("  # Apply actions")
+                # Loop with all actions and look for the action type we need
+                for action in actions_in:
+                    # Skip anything not IN
+                    if action.action_type != BGPPeerActionType.IMPORT:
+                        continue
+                    # Call BIRD function and reject route if we need to
+                    self.conf.add(f"  {action.function_name}();")
 
         # Enable graceful_shutdown for this prefix
         if self.graceful_shutdown:
@@ -3807,6 +3847,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     def has_export_prefix_filter(self) -> BGPPeerFilterItem:
         """Peer has a export prefix filter."""
         return self.export_filter_policy.prefixes
+
+    @property
+    def actions(self) -> BGPPeerActions | None:
+        """Return our actions."""
+        return self.peer_attributes.actions
 
     @property
     def uses_rpki(self) -> bool:

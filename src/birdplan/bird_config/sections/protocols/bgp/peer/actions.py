@@ -18,26 +18,35 @@
 
 """BIRD BGP peer action support."""
 
+from enum import Enum
 from typing import Any
 
 from ......exceptions import BirdPlanConfigError
 from ..... import util
-from ....functions import BirdVariable
+from ....functions import BirdVariable, SectionFunctions
 from ..bgp_functions import BGPFunctions
 
 __all__ = ["BGPPeerActions"]
 
 
+class BGPPeerActionType(Enum):
+    """BGP peer action type enum."""
+
+    IMPORT = "import"
+    EXPORT = "export"
+
+
 class BGPPeerAction:
     """BGP peer action."""
 
+    _global_functions: SectionFunctions
     _bgp_functions: BGPFunctions
 
     _asn: int
     _peer_name: str
 
     _action_id: int
-    _direction: str
+    _action_type: BGPPeerActionType
 
     _match_origin_asn: list[str]
     _match_prefix: list[str]
@@ -54,17 +63,26 @@ class BGPPeerAction:
     _action_remove_large_community: list[str]
     _action_prepend: int
 
-    def __init__(self, bgp_functions: BGPFunctions, asn: int, peer_name: str, action_id: int, action: dict[str, Any]) -> None:
+    def __init__(
+        self,
+        global_functions: SectionFunctions,
+        bgp_functions: BGPFunctions,
+        asn: int,
+        peer_name: str,
+        action_id: int,
+        action: dict[str, Any],
+    ) -> None:
         """Initialize BGP peer action."""
 
+        self._global_functions = global_functions
         self._bgp_functions = bgp_functions
 
         self._asn = asn
         self._peer_name = peer_name
         self._action_id = action_id
 
-        # Grab direction
-        self._direction = action["direction"]
+        # Grab action type
+        self._action_type = BGPPeerActionType(action["type"])
 
         # Initialize matches and actions
         self._match_origin_asn = []
@@ -83,7 +101,8 @@ class BGPPeerAction:
         self._action_prepend = 0
 
         # Parse action data
-        self._parse_matches(action["matches"])
+        if "matches" in action:
+            self._parse_matches(action["matches"])
         self._parse_actions(action["action"])
 
     def _parse_matches(self, matches: dict[str, Any]) -> None:
@@ -106,23 +125,31 @@ class BGPPeerAction:
             else:
                 raise BirdPlanConfigError(f"Action match type '{match_k}' is not valid")
 
-    def _parse_actions(self, action: dict[str, Any]) -> None:
+    def _parse_actions(self, action: str | dict[str, Any]) -> None:
         """Parse the actions."""
+        # Check if this is a simple string action
+        if isinstance(action, str):
+            # Check if its a reject action
+            if action == "reject":
+                self._action_reject = True
+            # And if its not known, raise an error
+            else:
+                raise BirdPlanConfigError(f"Action value '{action}' is not valid")
+            return
         # Check what actions we have
         for action_k, action_v in action.items():
             # Make sure we only have lists or strings
-            if not isinstance(action_v, list) and not isinstance(action_v, str):
+            if not isinstance(action_v, list) and not isinstance(action_v, str) and not isinstance(action_v, int):
                 raise BirdPlanConfigError("Action value for 'action' is not valid")
             # If we have a string, convert it to a list
-            action_v_list: list[str] = []
-            if isinstance(action_v, str):
-                action_v_list.append(action_v)
-            else:
+            action_v_list: list[str | int] = []
+            if isinstance(action_v, list):
                 action_v_list.extend(action_v)
+            else:
+                action_v_list.append(action_v)
+
             # Process each type of action
-            if action_k == "reject":
-                self._action_reject = True
-            elif action_k in (
+            if action_k in (
                 "add_community",
                 "add_extended_community",
                 "add_large_community",
@@ -133,10 +160,12 @@ class BGPPeerAction:
                 setattr(self, f"_action_{action_k}", action_v_list)
             elif action_k == "prepend":
                 # Make sure prepend can only be a string
-                if not isinstance(action_v, str):
+                if isinstance(action_v, str):
+                    prepend = int(action_v)
+                elif isinstance(action_v, int):
+                    prepend = action_v
+                else:
                     raise BirdPlanConfigError(f"Action prepend value '{action_v}' is not valid")
-                # Convert to integer
-                prepend = int(action_v)
                 # Make sure prepend value is valid
                 if 10 > prepend < 1:
                     raise BirdPlanConfigError(f"Action prepend value '{action_v}' is not valid")
@@ -218,7 +247,10 @@ class BGPPeerAction:
         """Generate the function for the action."""
         function = []
         # Generate function header
-        function.append(f"function {self.function_name}() {{")
+        function.append(f"function {self.function_name}() -> bool")
+        function.append("string filter_name;")
+        function.append("{")
+        function.append(f'  filter_name = "{self.function_name}";')
 
         # Generate match statements
         # NK: We use the for loop because we have duplicate code between the various match types
@@ -289,45 +321,97 @@ class BGPPeerAction:
         # Generate action statements
         #
 
+        fallthrough_value = "true"
+
         # Handle reject action
         if self._action_reject:
-            function.append("  return false;")
+            if self.action_type == BGPPeerActionType.IMPORT:
+                function.append(
+                    f"  if DEBUG then print\n"
+                    f"""    "{self.function_name} [action:{self.action_id}] Filtering ","""
+                    f" {self.global_functions.route_info()};"
+                )
+                function.append("  bgp_large_community.add(BGP_LC_FILTERED_ACTION);")
+            elif self.action_type == BGPPeerActionType.EXPORT:
+                function.append(
+                    f"  if DEBUG then print\n"
+                    f"""    "{self.function_name} [action:{self.action_id}] Rejecting ","""
+                    f" {self.global_functions.route_info()};"
+                )
+            # Set fallthrough value to false as we're rejecting
+            fallthrough_value = "false"
 
         # Handle add_community action
         if self._action_add_community:
-            for community in self._action_add_community:
+            function.append(
+                f"  if DEBUG then print\n"
+                f"""    "{self.function_name} [action:{self.action_id}] Adding communities """
+                f"""{", ".join(self._action_add_community)} to ","""
+                f" {self.global_functions.route_info()};"
+            )
+            for community in util.sanitize_community_list(self._action_add_community):
                 function.append(f"  bgp_community.add({community});")
 
         # Handle add_extended_community action
         if self._action_add_extended_community:
-            for community in self._action_add_extended_community:
-                function.append(f"  bgp_extended_community.add({community});")
+            function.append(
+                f"  if DEBUG then print\n"
+                f"""    "{self.function_name} [action:{self.action_id}] Adding extended communities """
+                f"""{", ".join(self._action_add_extended_community)} to ","""
+                f" {self.global_functions.route_info()};"
+            )
+            for community in util.sanitize_community_list(self._action_add_extended_community):
+                function.append(f"  bgp_ext_community.add({community});")
 
         # Handle add_large_community action
         if self._action_add_large_community:
-            for community in self._action_add_large_community:
+            function.append(
+                f"  if DEBUG then print\n"
+                f"""    "{self.function_name} [action:{self.action_id}] Adding large communities """
+                f"""{", ".join(self._action_add_large_community)} to ","""
+                f" {self.global_functions.route_info()};"
+            )
+            for community in util.sanitize_community_list(self._action_add_large_community):
                 function.append(f"  bgp_large_community.add({community});")
 
         # Handle remove_community action
         if self._action_remove_community:
+            function.append(
+                f"  if DEBUG then print\n"
+                f"""    "{self.function_name} [action:{self.action_id}] Removing communities """
+                f"""{", ".join(self._action_remove_community)} from ","""
+                f" {self.global_functions.route_info()};"
+            )
             for community in self._action_remove_community:
                 function.append(f"  bgp_community.remove({community});")
 
         # Handle remove_extended_community action
         if self._action_remove_extended_community:
+            function.append(
+                f"  if DEBUG then print\n"
+                f"""    "{self.function_name} [action:{self.action_id}] Removing extended communities """
+                f"""{", ".join(self._action_remove_extended_community)} from ","""
+                f" {self.global_functions.route_info()};"
+            )
             for community in self._action_remove_extended_community:
                 function.append(f"  bgp_extended_community.remove({community});")
 
         # Handle remove_large_community action
         if self._action_remove_large_community:
+            function.append(
+                f"  if DEBUG then print\n"
+                f"""    "{self.function_name} [action:{self.action_id}] Removing large communities """
+                f"""{", ".join(self._action_remove_large_community)} from ","""
+                f" {self.global_functions.route_info()};"
+            )
             for community in self._action_remove_large_community:
                 function.append(f"  bgp_large_community.remove({community});")
 
         # Handle prepend action
         if self._action_prepend:
-            function.append(f"  {self.bgp_functions.peer_prepend(BirdVariable(self._action_prepend))};")
+            function.append(f"  {self.bgp_functions.peer_prepend(BirdVariable('BGP_ASN'), self._action_prepend)};")
         # Generate function footer
-        function.append("  return true;")
+        function.append(f"  return {fallthrough_value};")
         function.append("}")
 
         # Return list of function lines
@@ -342,6 +426,11 @@ class BGPPeerAction:
         return match_list_v4, match_list_not_v4, match_list_v6, match_list_not_v6
 
     @property
+    def global_functions(self) -> SectionFunctions:
+        """Return the global functions."""
+        return self._global_functions
+
+    @property
     def bgp_functions(self) -> BGPFunctions:
         """Return the BGP functions."""
         return self._bgp_functions
@@ -349,7 +438,7 @@ class BGPPeerAction:
     @property
     def function_name(self) -> str:
         """Return our origin ASN deny list name."""
-        return f"bgp_AS{self.asn}_{self.peer_name}_action{self.action_id}_{self.direction}"
+        return f"bgp_AS{self.asn}_{self.peer_name}_action{self.action_id}_{self.action_type.value}"
 
     @property
     def match_list_name_origin_asn(self) -> str:
@@ -392,31 +481,34 @@ class BGPPeerAction:
         return self._action_id
 
     @property
-    def direction(self) -> str:
-        """Return the direction."""
-        return self._direction
+    def action_type(self) -> BGPPeerActionType:
+        """Return the action type"""
+        return self._action_type
 
 
 class BGPPeerActions:
     """BGP peer actions."""
 
+    _global_functions: SectionFunctions
     _bgp_functions: BGPFunctions
 
     _asn: int
     _peer_name: str
     _actions: list[BGPPeerAction]
 
-    def __init__(self, bgp_functions: BGPFunctions, asn: int, peer_name: str) -> None:
+    def __init__(self, global_functions: SectionFunctions, bgp_functions: BGPFunctions, asn: int, peer_name: str) -> None:
         """Initialize BGP peer actions."""
+
+        self._global_functions = global_functions
+        self._bgp_functions = bgp_functions
 
         self._asn = asn
         self._peer_name = peer_name
 
-        self._bgp_functions = bgp_functions
+        self._actions = []
 
     def configure(self, actions: list[dict[str, Any]]) -> None:
         """Configure BGP peer actions."""
-
         # Check type of data provided
         if not isinstance(actions, list):
             raise BirdPlanConfigError(
@@ -425,7 +517,9 @@ class BGPPeerActions:
         # Loop with actions
         action_id = 1
         for action in actions:
-            self.actions.append(BGPPeerAction(self.bgp_functions, self.asn, self.peer_name, action_id, action))
+            self.actions.append(
+                BGPPeerAction(self.global_functions, self.bgp_functions, self.asn, self.peer_name, action_id, action)
+            )
             action_id += 1
 
     def generate_constants(self) -> list[str]:
@@ -443,6 +537,16 @@ class BGPPeerActions:
         return functions
 
     @property
+    def global_functions(self) -> SectionFunctions:
+        """Return the global functions."""
+        return self._global_functions
+
+    @property
+    def bgp_functions(self) -> BGPFunctions:
+        """Return the BGP functions."""
+        return self._bgp_functions
+
+    @property
     def asn(self) -> int:
         """Return the ASN."""
         return self._asn
@@ -456,8 +560,3 @@ class BGPPeerActions:
     def actions(self) -> list[BGPPeerAction]:
         """Return the actions."""
         return self._actions
-
-    @property
-    def bgp_functions(self) -> BGPFunctions:
-        """Return the BGP functions."""
-        return self._bgp_functions
