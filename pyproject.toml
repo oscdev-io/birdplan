@@ -1,18 +1,16 @@
 [build-system]
-#build-backend = "poetry.core.masonry.api"
-#requires = ["poetry-core", "setuptools"]
-requires = ["flit_core"]
-build-backend = "flit_core.buildapi"
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
 
 
 [project]
 name = "birdplan"
 description = "BirdPlan configuration file generator."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 license = { file = "LICENSE" }
 authors = [
-    { name = "Nigel Kukard", email = "nkukard@LBSD.net" }
+	{ name = "Nigel Kukard", email = "nkukard@LBSD.net" }
 ]
 keywords = ["routing", "networking", "BGP", "RIP", "RIPv2", "RIPv3", "OSPF", "OSPFv3"]
 classifiers=[
@@ -74,60 +72,27 @@ profile = "black"
 ignore_missing_imports = true
 strict = true
 
+[tool.ruff]
+line-length = 132
+show-fixes = true
 
-[tool.pylint]
-load-plugins = [
-    "pylint.extensions.broad_try_clause",
-    "pylint.extensions.code_style",
-    "pylint.extensions.emptystring",
-    "pylint.extensions.comparetozero",
-    "pylint.extensions.comparison_placement",
-    "pylint.extensions.confusing_elif",
-    "pylint.extensions.for_any_all",
-    "pylint.extensions.bad_builtin",
-    "pylint.extensions.mccabe",
-    "pylint.extensions.docstyle",
-    "pylint.extensions.check_elif",
-    "pylint.extensions.eq_without_hash",
-    "pylint.extensions.private_import",
-    "pylint.extensions.redefined_variable_type",
-    "pylint.extensions.no_self_use",
-    "pylint.extensions.overlapping_exceptions",
-    "pylint.extensions.docparams",
-    "pylint.extensions.redefined_loop_name",
-    "pylint.extensions.set_membership",
-    "pylint.extensions.typing",
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["COM812", "D202", "D203", "D211", "D212", "EM101", "EM102", "ISC001", "TID252", "TRY003"]
+fixable = ["ALL"]
+unfixable = []
+exclude = [
+    ".git",
+    ".idea",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".tox",
+    ".venv"
 ]
 
-
-[tool.pylint.broad_try_clause]
-max-try-statements = 5
-
-
-[tool.pylint.message_control]
-max-line-length = 132
-# C0199: First line empty in method docstring (docstring-first-line-empty)
-# R0801: Similar lines in X files
-# R6103: Use '....' instead (assignment on IF line)
-disable = "C0199,R0801,R6103"
-
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:$",
-    "if TYPE_CHECKING:$",
-]
-
-omit = [
-    "birdplan/__main__.py",
-    "birdplan/monitor.py",
-    "tests/**",
-]
+[tool.ruff.format]
+# Enable reformatting of code snippets in docstrings
+docstring-code-format = true
 
 [tool.coverage.run]
 source_pkgs = ["birdplan"]
