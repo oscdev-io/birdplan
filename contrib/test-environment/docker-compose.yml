@@ -8,7 +8,7 @@ services:
       context: .
     # Set the paths for python so we don't download from pypi
     environment:
-      PYTHONPATH: /root/birdplan:/root/python-nsnetsim:/root/python-birdclient
+      PYTHONPATH: /root/birdplan/src:/root/python-nsnetsim:/root/python-birdclient
     # This may need some modification, we map birdplan, nsnetsim and birdclient to /root in the container
     volumes:
       - ../..:/root/birdplan
