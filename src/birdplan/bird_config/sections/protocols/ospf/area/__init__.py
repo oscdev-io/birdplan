@@ -20,7 +20,7 @@
 
 # pylint: disable=too-many-lines
 
-from typing import Any, Dict
+from typing import Any
 
 from ......exceptions import BirdPlanError
 from .....globals import BirdConfigGlobals
@@ -53,7 +53,7 @@ class ProtocolOSPFArea(SectionProtocolBase):  # pylint: disable=too-many-public-
     # OSPF interfaces belonging to this area
     _interfaces: OSPFAreaInterfaces
 
-    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def __init__(  # noqa: PLR0913
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,
@@ -63,7 +63,7 @@ class ProtocolOSPFArea(SectionProtocolBase):  # pylint: disable=too-many-public-
         ospf_attributes: OSPFAttributes,
         area_name: str,
         area_config: OSPFAreaConfig,
-    ):
+    ) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 

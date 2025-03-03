@@ -42,7 +42,7 @@ class SectionBaseConfig:  # pylint: disable=too-few-public-methods
         self._birdconfig_globals = birdconfig_globals
         self._items = {}
 
-    def add(self, item: SectionConfigItem, order: int = 10, deferred: bool = False, debug: bool = False) -> None:
+    def add(self, item: SectionConfigItem, order: int = 10, deferred: bool = False, debug: bool = False) -> None:  # noqa: FBT001,FBT002
         """
         Add configuration to the output we're going to generate.
 
@@ -90,7 +90,7 @@ class SectionBaseConfig:  # pylint: disable=too-few-public-methods
         else:
             items.append(item)
 
-    def append(self, item: SectionConfigItem, deferred: bool = False, debug: bool = False) -> None:
+    def append(self, item: SectionConfigItem, deferred: bool = False, debug: bool = False) -> None:  # noqa: FBT001,FBT002
         """
         Add configuration to the output we're going to generate.
 
@@ -162,7 +162,7 @@ class SectionBaseConfig:  # pylint: disable=too-few-public-methods
                     lines.append(item)
                 # Or something really weird happened
                 else:
-                    raise RuntimeError("We should only have 'str' and 'SectionBase' items")
+                    raise TypeError("We should only have 'str' and 'SectionBase' items")
         # Finally return
         return lines
 

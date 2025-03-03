@@ -23,7 +23,7 @@
 import fnmatch
 import logging
 import re
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from ......bgpq3 import BGPQ3
 from ......console.colors import colored
@@ -70,7 +70,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     _state: dict[str, Any]
     _prev_state: dict[str, Any] | None
 
-    def __init__(  # pylint: disable=too-many-branches,too-many-statements,too-many-arguments,too-many-positional-arguments,too-many-locals
+    def __init__(  # noqa: C901,PLR0912,PLR0913,PLR0915
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,
@@ -81,7 +81,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         bgp_functions: BGPFunctions,
         peer_name: str,
         peer_config: BGPPeerConfig,
-    ):
+    ) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
@@ -150,14 +150,14 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 )
             # Make sure the ASN is private and not public
             if self.birdconfig_globals.test_mode:
-                # In test mode the only private ASN range is 4294900001 to 4294967294
-                if not (self.asn >= 4200000000 and self.asn <= 4294900000):
+                # In test mode the only private ASN range is 4200000000 to 4294900000
+                if not (self.asn >= 4200000000 and self.asn <= 4294900000):  # noqa: PLR2004
                     raise BirdPlanError(
                         f"Having 'replace_aspath' set for peer '{self.name}' with a non-private ASN {self.asn} makes no sense"
                     )
             # We're not in test mode...
             # Make sure we're within the full set of private ASN ranges
-            elif not ((self.asn >= 64512 and self.asn <= 65534) or (self.asn >= 4200000000 and self.asn <= 4294967294)):
+            elif not ((self.asn >= 64512 and self.asn <= 65534) or (self.asn >= 4200000000 and self.asn <= 4294967294)):  # noqa: PLR2004
                 raise BirdPlanError(
                     f"Having 'replace_aspath' set for peer '{self.name}' with a non-private ASN {self.asn} makes no sense"
                 )
@@ -1071,7 +1071,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 for community in communities:
                     # Check how many :'s we have
                     component_count = community.count(":")
-                    if component_count < 1 or component_count > 2:
+                    if component_count < 1 or component_count > 2:  # noqa: PLR2004
                         raise BirdPlanError(
                             f"Option 'blackhole_community' specified for peer '{self.name}' with type '{self.peer_type}' "
                             f"has an invalid value '{community}'"
@@ -1464,7 +1464,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     if fnmatch.fnmatch(self.name, item):
                         self.quarantine = self.birdconfig_globals.state["bgp"]["+quarantine"][item]
 
-    def configure(self) -> None:  # pylint: disable=too-many-branches,too-many-statements
+    def configure(self) -> None:  # noqa: C901,PLR0912,PLR0915
         """Configure BGP peer."""
 
         if not self.birdconfig_globals.suppress_info:
@@ -1661,7 +1661,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.state["tables"] = state_tables
 
     def _setup_peer_constants(self) -> None:
-        """Setup peer constants."""
+        """Peer constant setup."""
 
         # Generate constants for actions
         if self.peer_attributes.actions:
@@ -1675,7 +1675,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.conf.add("")
 
     def _setup_peer_functions(self) -> None:
-        """Setup peer functions."""
+        """Peer function setup."""
 
         # Generate functions for actions
         if self.peer_attributes.actions:
@@ -1688,7 +1688,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     self.conf.add(line)
                 self.conf.add("")
 
-    def _setup_import_aspath_asns_filter(self) -> None:  # pylint: disable=too-many-branches
+    def _setup_import_aspath_asns_filter(self) -> None:  # noqa: C901,PLR0912
         """AS-PATH ASN import list setup."""
 
         # Short circuit and exit if we have none
@@ -1768,7 +1768,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.state["import_filter"] = {}
         self.state["import_filter"]["aspath_asns"] = state
 
-    def _setup_import_origin_asns_filter(self) -> None:
+    def _setup_import_origin_asns_filter(self) -> None:  # noqa: C901
         """Origin ASN import list setup."""
 
         # Short circuit and exit if we have none
@@ -1948,8 +1948,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Save our peer ASN list in our state
             state["static"] = self.import_filter_policy.peer_asns
             peer_asns.append(f"# Explicitly defined {len(self.import_filter_policy.peer_asns)} items (import_filter:peer_asns)")
-            for asn in self.import_filter_policy.peer_asns:
-                peer_asns.append(f"{asn}")
+            peer_asns.extend([f"{asn}" for asn in self.import_filter_policy.peer_asns])
 
         self.conf.add(f"define {self.import_peer_asn_list_name} = [")
         # Loop with each line and add commas where needed
@@ -1966,7 +1965,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.state["import_filter"] = {}
         self.state["import_filter"]["peer_asns"] = state
 
-    def _setup_peer_import_prefix_filter(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+    def _setup_peer_import_prefix_filter(  # noqa: C901,PLR0912,PLR0915
         self,
     ) -> None:
         """Prefix import filter setup."""
@@ -2104,8 +2103,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Add statically defined prefix list
             if import_prefix_list:
                 state[f"ipv{ipv}"] = import_prefix_list
-                for prefix in import_prefix_list:
-                    import_prefixes.append(prefix)
+                import_prefixes.extend(import_prefix_list)
 
             # Sort and unique our results
             import_prefixes = sorted(set(import_prefixes))
@@ -2157,8 +2155,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     state["static"] = {}
                 state["static"][f"ipv{ipv}"] = export_prefix_list
 
-                for prefix in export_prefix_list:
-                    export_prefixes.append(prefix)
+                export_prefixes.extend(export_prefix_list)
 
             # Sort and unique our results
             export_prefixes = sorted(set(export_prefixes))
@@ -2206,7 +2203,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _peer_to_bgp_import_filter(  # pylint: disable=too-many-branches,too-many-statements,too-many-locals
+    def _peer_to_bgp_import_filter(  # noqa: C901,PLR0912,PLR0915
         self,
     ) -> None:
         """Import filter FROM the main BGP table to the BGP peer table."""
@@ -2243,7 +2240,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.conf.add("  # Peer is blackhole community capable")
                 # Grab BIRD function to reject non targetted blackhole routes
                 peer_reject_non_targetted_blackhole = self.bgp_functions.peer_reject_non_targetted_blackhole(
-                    True,
+                    True,  # noqa: FBT003
                     self.route_policy_redistribute.kernel_blackhole,
                     self.route_policy_redistribute.static_blackhole,
                     self.asn,
@@ -2254,7 +2251,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 self.conf.add("  # Peer is not blackhole community capable")
                 # Grab BIRD function to reject non targetted blackhole routes
                 peer_reject_non_targetted_blackhole = self.bgp_functions.peer_reject_non_targetted_blackhole(
-                    False, False, False, self.asn, blackhole_function_arg
+                    False,  # noqa: FBT003
+                    False,  # noqa: FBT003
+                    False,  # noqa: FBT003
+                    self.asn,
+                    blackhole_function_arg,
                 )
                 self.conf.add(f"  {peer_reject_non_targetted_blackhole};")
 
@@ -2282,94 +2283,94 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Check for connected route redistribution
         if self.route_policy_redistribute.connected:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_connected(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_connected(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_connected(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_connected(False)};")  # noqa: FBT003
         # Check for kernel route redistribution
         if self.route_policy_redistribute.kernel:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_kernel(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_kernel(False)};")  # noqa: FBT003
         # Check for kernel blackhole route redistribution
         if self.route_policy_redistribute.kernel_blackhole:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel_blackhole(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel_blackhole(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_kernel_blackhole(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_kernel_blackhole(False)};")  # noqa: FBT003
         # Check for kernel default route redistribution
         if self.route_policy_redistribute.kernel_default:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel_default(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_kernel_default(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_kernel_default(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_kernel_default(False)};")  # noqa: FBT003
         # Check for static route redistribution
         if self.route_policy_redistribute.static:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_static(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_static(False)};")  # noqa: FBT003
         # Check for static blackhole route redistribution
         if self.route_policy_redistribute.static_blackhole:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static_blackhole(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static_blackhole(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_static_blackhole(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_static_blackhole(False)};")  # noqa: FBT003
         # Check for static default route redistribution
         if self.route_policy_redistribute.static_default:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static_default(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_static_default(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_static_default(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_static_default(False)};")  # noqa: FBT003
         # Check for originated route redistribution
         if self.route_policy_redistribute.originated:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_originated(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_originated(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_originated(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_originated(False)};")  # noqa: FBT003
         # Check for originated default route redistribution
         if self.route_policy_redistribute.originated_default:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_originated_default(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_originated_default(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_originated_default(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_originated_default(False)};")  # noqa: FBT003
 
         # Check redistribution BGP routes originating from the different peer types
         # BGP routes originating from customers
         if self.route_policy_redistribute.bgp_customer:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_customer(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_customer(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_customer(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_customer(False)};")  # noqa: FBT003
 
         if self.route_policy_redistribute.bgp_customer_blackhole:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_customer_blackhole(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_customer_blackhole(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_customer_blackhole(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_customer_blackhole(False)};")  # noqa: FBT003
 
         # BGP routes originating from within our federation
         if self.route_policy_redistribute.bgp_own:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_own(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_own(False)};")  # noqa: FBT003
 
         if self.route_policy_redistribute.bgp_own_blackhole:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own_blackhole(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own_blackhole(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_own_blackhole(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_own_blackhole(False)};")  # noqa: FBT003
 
         if self.route_policy_redistribute.bgp_own_default:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own_default(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_own_default(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_own_default(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_own_default(False)};")  # noqa: FBT003
 
         # BGP routes originating from peering
         if self.route_policy_redistribute.bgp_peering:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_peering(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_peering(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_peering(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_peering(False)};")  # noqa: FBT003
 
         # BGP routes originating from transit
         if self.route_policy_redistribute.bgp_transit:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_transit(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_transit(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_transit(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_transit(False)};")  # noqa: FBT003
 
         if self.route_policy_redistribute.bgp_transit_default:
-            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_transit_default(True)} then accept_route = true;")
+            self.conf.add(f"  if {self.bgp_functions.peer_redistribute_bgp_transit_default(True)} then accept_route = true;")  # noqa: FBT003
         else:
-            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_transit_default(False)};")
+            self.conf.add(f"  {self.bgp_functions.peer_redistribute_bgp_transit_default(False)};")  # noqa: FBT003
 
         # Check if the route is exportable
         self.conf.add("  # BGP exportable checks")
@@ -2406,108 +2407,244 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         conf.append("  if (accept_route) then {")
         # Check if we are adding a community to outgoing routes
         if self.communities.outgoing.connected:
-            for community in self.communities.outgoing.connected:
-                conf.append(f"    {self.bgp_functions.peer_community_add_connected(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_connected(BirdVariable(community))};"
+                    for community in self.communities.outgoing.connected
+                ]
+            )
         if self.communities.outgoing.kernel:
-            for community in self.communities.outgoing.kernel:
-                conf.append(f"    {self.bgp_functions.peer_community_add_kernel(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_kernel(BirdVariable(community))};"
+                    for community in self.communities.outgoing.kernel
+                ]
+            )
         if self.communities.outgoing.kernel_blackhole:
-            for community in self.communities.outgoing.kernel_blackhole:
-                conf.append(f"    {self.bgp_functions.peer_community_add_kernel_blackhole(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_kernel_blackhole(BirdVariable(community))};"
+                    for community in self.communities.outgoing.kernel_blackhole
+                ]
+            )
         if self.communities.outgoing.kernel_default:
-            for community in self.communities.outgoing.kernel_default:
-                conf.append(f"    {self.bgp_functions.peer_community_add_kernel_default(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_kernel_default(BirdVariable(community))};"
+                    for community in self.communities.outgoing.kernel_default
+                ]
+            )
         if self.communities.outgoing.originated:
-            for community in self.communities.outgoing.originated:
-                conf.append(f"    {self.bgp_functions.peer_community_add_originated(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_originated(BirdVariable(community))};"
+                    for community in self.communities.outgoing.originated
+                ]
+            )
         if self.communities.outgoing.originated_default:
-            for community in self.communities.outgoing.originated_default:
-                conf.append(f"    {self.bgp_functions.peer_community_add_originated_default(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_originated_default(BirdVariable(community))};"
+                    for community in self.communities.outgoing.originated_default
+                ]
+            )
         if self.communities.outgoing.static:
-            for community in self.communities.outgoing.static:
-                conf.append(f"    {self.bgp_functions.peer_community_add_static(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_static(BirdVariable(community))};"
+                    for community in self.communities.outgoing.static
+                ]
+            )
         if self.communities.outgoing.static_blackhole:
-            for community in self.communities.outgoing.static_blackhole:
-                conf.append(f"    {self.bgp_functions.peer_community_add_static_blackhole(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_static_blackhole(BirdVariable(community))};"
+                    for community in self.communities.outgoing.static_blackhole
+                ]
+            )
         if self.communities.outgoing.static_default:
-            for community in self.communities.outgoing.static_default:
-                conf.append(f"    {self.bgp_functions.peer_community_add_static_default(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_static_default(BirdVariable(community))};"
+                    for community in self.communities.outgoing.static_default
+                ]
+            )
         if self.communities.outgoing.bgp_own:
-            for community in self.communities.outgoing.bgp_own:
-                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_own(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_bgp_own(BirdVariable(community))};"
+                    for community in self.communities.outgoing.bgp_own
+                ]
+            )
         if self.communities.outgoing.bgp_own_blackhole:
-            for community in self.communities.outgoing.bgp_own_blackhole:
-                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_own_blackhole(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_bgp_own_blackhole(BirdVariable(community))};"
+                    for community in self.communities.outgoing.bgp_own_blackhole
+                ]
+            )
         if self.communities.outgoing.bgp_own_default:
-            for community in self.communities.outgoing.bgp_own_default:
-                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_own_default(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_bgp_own_default(BirdVariable(community))};"
+                    for community in self.communities.outgoing.bgp_own_default
+                ]
+            )
         if self.communities.outgoing.bgp_customer:
-            for community in self.communities.outgoing.bgp_customer:
-                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_customer(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_bgp_customer(BirdVariable(community))};"
+                    for community in self.communities.outgoing.bgp_customer
+                ]
+            )
         if self.communities.outgoing.bgp_customer_blackhole:
-            for community in self.communities.outgoing.bgp_customer_blackhole:
-                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_customer_blackhole(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_bgp_customer_blackhole(BirdVariable(community))};"
+                    for community in self.communities.outgoing.bgp_customer_blackhole
+                ]
+            )
         if self.communities.outgoing.bgp_peering:
-            for community in self.communities.outgoing.bgp_peering:
-                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_peering(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_bgp_peering(BirdVariable(community))};"
+                    for community in self.communities.outgoing.bgp_peering
+                ]
+            )
         if self.communities.outgoing.bgp_transit:
-            for community in self.communities.outgoing.bgp_transit:
-                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_transit(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_bgp_transit(BirdVariable(community))};"
+                    for community in self.communities.outgoing.bgp_transit
+                ]
+            )
         if self.communities.outgoing.bgp_transit_default:
-            for community in self.communities.outgoing.bgp_transit_default:
-                conf.append(f"    {self.bgp_functions.peer_community_add_bgp_transit_default(BirdVariable(community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_community_add_bgp_transit_default(BirdVariable(community))};"
+                    for community in self.communities.outgoing.bgp_transit_default
+                ]
+            )
         # Check if we are adding a large community to outgoing routes
         if self.large_communities.outgoing.connected:
-            for large_community in self.large_communities.outgoing.connected:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_connected(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_connected(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.connected
+                ]
+            )
         if self.large_communities.outgoing.kernel:
-            for large_community in self.large_communities.outgoing.kernel:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_kernel(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_kernel(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.kernel
+                ]
+            )
         if self.large_communities.outgoing.kernel_blackhole:
-            for large_community in self.large_communities.outgoing.kernel_blackhole:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_kernel_blackhole(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_kernel_blackhole(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.kernel_blackhole
+                ]
+            )
         if self.large_communities.outgoing.kernel_default:
-            for large_community in self.large_communities.outgoing.kernel_default:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_kernel_default(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_kernel_default(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.kernel_default
+                ]
+            )
         if self.large_communities.outgoing.originated:
-            for large_community in self.large_communities.outgoing.originated:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_originated(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_originated(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.originated
+                ]
+            )
         if self.large_communities.outgoing.originated_default:
-            for large_community in self.large_communities.outgoing.originated_default:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_originated_default(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_originated_default(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.originated_default
+                ]
+            )
         if self.large_communities.outgoing.static:
-            for large_community in self.large_communities.outgoing.static:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_static(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_static(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.static
+                ]
+            )
         if self.large_communities.outgoing.static_blackhole:
-            for large_community in self.large_communities.outgoing.static_blackhole:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_static_blackhole(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_static_blackhole(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.static_blackhole
+                ]
+            )
         if self.large_communities.outgoing.static_default:
-            for large_community in self.large_communities.outgoing.static_default:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_static_default(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_static_default(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.static_default
+                ]
+            )
         if self.large_communities.outgoing.bgp_own:
-            for large_community in self.large_communities.outgoing.bgp_own:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_own(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_bgp_own(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.bgp_own
+                ]
+            )
         if self.large_communities.outgoing.bgp_own_blackhole:
-            for large_community in self.large_communities.outgoing.bgp_own_blackhole:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_own_blackhole(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_bgp_own_blackhole(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.bgp_own_blackhole
+                ]
+            )
         if self.large_communities.outgoing.bgp_own_default:
-            for large_community in self.large_communities.outgoing.bgp_own_default:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_own_default(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_bgp_own_default(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.bgp_own_default
+                ]
+            )
         if self.large_communities.outgoing.bgp_customer:
-            for large_community in self.large_communities.outgoing.bgp_customer:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_customer(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_bgp_customer(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.bgp_customer
+                ]
+            )
         if self.large_communities.outgoing.bgp_customer_blackhole:
-            for large_community in self.large_communities.outgoing.bgp_customer_blackhole:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_customer_blackhole(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_bgp_customer_blackhole(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.bgp_customer_blackhole
+                ]
+            )
         if self.large_communities.outgoing.bgp_peering:
-            for large_community in self.large_communities.outgoing.bgp_peering:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_peering(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_bgp_peering(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.bgp_peering
+                ]
+            )
         if self.large_communities.outgoing.bgp_transit:
-            for large_community in self.large_communities.outgoing.bgp_transit:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_transit(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_bgp_transit(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.bgp_transit
+                ]
+            )
         if self.large_communities.outgoing.bgp_transit_default:
-            for large_community in self.large_communities.outgoing.bgp_transit_default:
-                conf.append(f"    {self.bgp_functions.peer_lc_add_bgp_transit_default(BirdVariable(large_community))};")
+            conf.extend(
+                [
+                    f"    {self.bgp_functions.peer_lc_add_bgp_transit_default(BirdVariable(large_community))};"
+                    for large_community in self.large_communities.outgoing.bgp_transit_default
+                ]
+            )
 
         # For eBGP peer types, make sure we replace AS-PATHs with the LC action set
         if self.peer_type in ("customer", "peer", "routecollector", "routeserver", "transit"):
@@ -2669,7 +2806,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                 component_count = community.count(",")
                 if component_count == 1:
                     conf.append(f"      {self.bgp_functions.peer_community_add_blackhole(BirdVariable(community))};")
-                elif component_count == 2:
+                elif component_count == 2:  # noqa: PLR2004
                     conf.append(f"      {self.bgp_functions.peer_lc_add_blackhole(BirdVariable(community))};")
             conf.append("    }")
 
@@ -2692,7 +2829,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         conf.append("  }")
 
         # Check if the above conf block has more than 2 lines (the if and the closing brace), if it does add it
-        if len(conf) > 2:
+        if len(conf) > 2:  # noqa: PLR2004
             self.conf.add(conf)
 
         # Check if we're STILL accepting the route even after the actions being applied
@@ -2740,7 +2877,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _peer_import_filter(self) -> None:  # pylint: disable=too-many-branches,too-many-statements
+    def _peer_import_filter(self) -> None:  # noqa: C901,PLR0912,PLR0915
         """Peer import filter setup from peer to peer table."""
 
         # Set our filter name
@@ -3026,7 +3163,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _setup_peer_protocol(self, ipv: str) -> None:  # pylint: disable=too-many-statements,too-many-branches
+    def _setup_peer_protocol(self, ipv: str) -> None:  # noqa: C901,PLR0912,PLR0915
         """Peer protocol setup for a single protocol."""
 
         protocol_state = {

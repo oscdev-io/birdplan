@@ -87,7 +87,7 @@ class BirdPlanCmdlineOSPFInterfaceECMPWeightSet(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_ospf_interface_ecmp_weight_set(self, args: Any) -> Any:
+    def cmd_ospf_interface_ecmp_weight_set(self, args: dict[str, Any]) -> BirdPlanCommandlineResult:
         """
         Commandline handler for "ospf interface ecmp-weight set" action.
 

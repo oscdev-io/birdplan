@@ -53,11 +53,11 @@ class YAML(YAMLBase):
             tuple, lambda dumper, data: dumper.represent_sequence("tag:yaml.org,2002:python/tuple", data, flow_style=True)
         )
 
-    def load(self, yaml: str | pathlib.Path | io.IOBase) -> Any:
+    def load(self, yaml: str | pathlib.Path | io.IOBase) -> Any:  # noqa: ANN401
         """Load YAML string."""
         return self._yaml.load(yaml)
 
-    def dump(self, data: Any, stream: pathlib.Path | io.IOBase | None = None) -> Any:
+    def dump(self, data: Any, stream: pathlib.Path | io.IOBase | None = None) -> Any:  # noqa: ANN401
         """Dump to YAML."""
         if stream:
             return self._yaml.dump(

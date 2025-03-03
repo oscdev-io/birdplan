@@ -18,8 +18,6 @@
 
 """BIRD RIP protocol configuration."""
 
-from typing import Dict, List, Union
-
 from .....exceptions import BirdPlanError
 from ....globals import BirdConfigGlobals
 from ...bird_attributes import SectionBirdAttributes
@@ -35,7 +33,7 @@ from .rip_functions import RIPFunctions
 __all__ = ["ProtocolRIP"]
 
 
-RIPInterfaceConfig = Union[bool, dict[str, str]]
+RIPInterfaceConfig = bool | dict[str, str]
 RIPInterfaces = dict[str, RIPInterfaceConfig]
 
 

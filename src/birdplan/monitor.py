@@ -18,6 +18,7 @@
 
 """BirdPlan monitor interface."""
 
+import contextlib
 import sys
 import time
 
@@ -31,10 +32,8 @@ def _run_monitor() -> None:
     """Run the birdplan monitor."""
     birdplan_cmdline = BirdPlanCommandLine(is_console=False)
 
-    try:
+    with contextlib.suppress(BirdPlanError):
         birdplan_cmdline.run(["monitor"])
-    except BirdPlanError as exception:
-        print(f"ERROR: {exception}", file=sys.stderr)
 
 
 # Main entry point from the birdplan monitor
@@ -45,10 +44,9 @@ def main() -> None:
         try:
             _run_monitor()
         except KeyboardInterrupt:
-            print("INFO: Interrupted by user, exiting...", file=sys.stderr)
             sys.exit(0)
-        except BirdPlanError as exception:
-            print(f"ERROR: {exception}", file=sys.stderr)
+        except BirdPlanError:
+            pass
         # Sleep 2 minutes before trying again
         time.sleep(120)
 

@@ -20,12 +20,14 @@
 
 import argparse
 import io
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from ...... import BirdPlanBGPPeerQuarantineStatus
 from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ......console.colors import colored
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
+
+if TYPE_CHECKING:
+    from ...... import BirdPlanBGPPeerQuarantineStatus
 
 __all__ = ["BirdPlanCmdlineBGPPeerQuarantineShow"]
 
@@ -33,7 +35,7 @@ __all__ = ["BirdPlanCmdlineBGPPeerQuarantineShow"]
 class BirdPlanCmdlineBGPPeerQuarantineShowResult(BirdPlanCommandlineResult):
     """BirdPlan BGP peer quarantine show result."""
 
-    def as_text(self) -> str:
+    def as_text(self) -> str:  # noqa: C901
         """
         Return data in text format.
 
@@ -142,7 +144,7 @@ class BirdPlanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_peer_quarantine_show(self, args: Any) -> Any:
+    def cmd_bgp_peer_quarantine_show(self, args: dict[str, Any]) -> BirdPlanCmdlineBGPPeerQuarantineShowResult:
         """
         Commandline handler for "bgp peer quarantine show" action.
 

@@ -30,11 +30,11 @@ class YAMLBase(abc.ABC):
     """YAML class."""
 
     @abc.abstractmethod
-    def load(self, yaml: str | pathlib.Path | io.IOBase) -> Any:
+    def load(self, yaml: str | pathlib.Path | io.IOBase) -> Any:  # noqa: ANN401
         """Load YAML string."""
         raise NotImplementedError
 
     @abc.abstractmethod
-    def dump(self, data: Any, stream: pathlib.Path | io.IOBase | None = None) -> Any:
+    def dump(self, data: Any, stream: pathlib.Path | io.IOBase | None = None) -> Any:  # noqa: ANN401
         """Dump to YAML."""
         raise NotImplementedError

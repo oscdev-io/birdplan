@@ -18,7 +18,7 @@
 
 """Bird configuration package."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .globals import BirdConfigGlobals
 from .sections import Sections
@@ -36,7 +36,7 @@ class BirdConfig:
 
     _sections: Sections
 
-    def __init__(self, test_mode: bool = False) -> None:
+    def __init__(self, test_mode: bool = False) -> None:  # noqa: FBT001,FBT002
         """Initialize the object."""
         self._birdconfig_globals = BirdConfigGlobals(test_mode=test_mode)
         self._sections = Sections(self.birdconfig_globals)

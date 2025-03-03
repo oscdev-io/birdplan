@@ -27,7 +27,7 @@ __all__ = ["SectionMain"]
 class SectionMain(SectionBase):
     """BIRD main configuration section."""
 
-    def __init__(self, birdconfig_globals: BirdConfigGlobals):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals)
 

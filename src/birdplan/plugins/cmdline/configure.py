@@ -61,7 +61,6 @@ class BirdPlanCmdlineConfigure(BirdPlanCmdlinePluginBase):
 
         root_parser = args["root_parser"]
 
-        # CMD: configure
         subparser = root_parser.add_parser("configure", help="Create BIRD configuration")
 
         subparser.add_argument(
@@ -107,7 +106,7 @@ class BirdPlanCmdlineConfigure(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_configure(self, args: Any) -> Any:
+    def cmd_configure(self, args: dict[str, Any]) -> BirdPlanCommandlineResult:
         """
         Commandline handler for "configure" action.
 
@@ -142,7 +141,7 @@ class BirdPlanCmdlineConfigure(BirdPlanCmdlinePluginBase):
 
         return BirdPlanCommandlineResult(bird_config)
 
-    def _write_config_file(self, data: Any) -> None:
+    def _write_config_file(self, data: str) -> None:
         """
         Write out configuration file with data.
 

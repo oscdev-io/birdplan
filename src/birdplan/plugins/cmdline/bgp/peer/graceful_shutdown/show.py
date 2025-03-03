@@ -20,13 +20,14 @@
 
 import argparse
 import io
-from typing import Any
-
-from birdplan import BirdPlanBGPPeerGracefulShutdownStatus
+from typing import TYPE_CHECKING, Any
 
 from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ......console.colors import colored
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
+
+if TYPE_CHECKING:
+    from birdplan import BirdPlanBGPPeerGracefulShutdownStatus
 
 __all__ = ["BirdPlanCmdlineBGPPeerGracefulShutdownShow"]
 
@@ -34,7 +35,7 @@ __all__ = ["BirdPlanCmdlineBGPPeerGracefulShutdownShow"]
 class BirdPlanCmdlineBGPPeerGracefulShutdownShowResult(BirdPlanCommandlineResult):
     """BirdPlan BGP peer graceful shutdown show result."""
 
-    def as_text(self) -> str:  # pylint: disable= too-many-branches
+    def as_text(self) -> str:  # noqa: C901
         """
         Return data in text format.
 
@@ -143,7 +144,7 @@ class BirdPlanCmdlineBGPPeerGracefulShutdownShow(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_peer_graceful_shutdown_show(self, args: Any) -> Any:
+    def cmd_bgp_peer_graceful_shutdown_show(self, args: dict[str, Any]) -> BirdPlanCmdlineBGPPeerGracefulShutdownShowResult:
         """
         Commandline handler for "bgp peer graceful-shutdown show" action.
 

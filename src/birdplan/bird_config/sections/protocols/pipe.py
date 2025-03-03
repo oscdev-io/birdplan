@@ -20,7 +20,6 @@
 
 from collections.abc import Callable
 from enum import Enum
-from typing import Union
 
 from ...globals import BirdConfigGlobals
 from ..base import SectionBase
@@ -28,7 +27,7 @@ from ..base import SectionBase
 __all__ = ["ProtocolPipe", "ProtocolPipeFilterType"]
 
 
-PipeTableNameType = Union[str, Callable[[str], str]]
+PipeTableNameType = str | Callable[[str], str]
 
 
 class ProtocolPipeFilterType(Enum):
@@ -62,7 +61,7 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
     # IP versions we're creating a pipe for
     _ipversions: list[str]
 
-    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def __init__(  # noqa: PLR0913
         self,
         birdconfig_globals: BirdConfigGlobals,
         table_from: PipeTableNameType,
@@ -72,9 +71,9 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
         table_import: str = "none",
         export_filter_type: ProtocolPipeFilterType = ProtocolPipeFilterType.NO_FILTER,
         import_filter_type: ProtocolPipeFilterType = ProtocolPipeFilterType.NO_FILTER,
-        has_ipv4: bool = True,
-        has_ipv6: bool = True,
-    ):
+        has_ipv4: bool = True,  # noqa: FBT001,FBT002
+        has_ipv6: bool = True,  # noqa: FBT001,FBT002
+    ) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals)
 
@@ -137,31 +136,19 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
         """Return table_from with IP version included."""
 
         # If the table is callable, call it and get the name
-        if callable(self._table_from):
-            table_from = self._table_from(ipv)
-        # Else just use it as a string
-        else:
-            table_from = f"{self._table_from}{ipv}"
+        table_from = self._table_from(ipv) if callable(self._table_from) else f"{self._table_from}{ipv}"
 
         # If it starts with t_, we need to remove t_ for now
-        table_from = table_from.removeprefix("t_")
-
-        return table_from
+        return table_from.removeprefix("t_")
 
     def table_to(self, ipv: str = "") -> str:
         """Return table_to with IP version included."""
 
         # If the table is callable, call it and get the name
-        if callable(self._table_to):
-            table_to = self._table_to(ipv)
-        # Else just use it as a string
-        else:
-            table_to = f"{self._table_to}{ipv}"
+        table_to = self._table_to(ipv) if callable(self._table_to) else f"{self._table_to}{ipv}"
 
         # If it starts with t_, we need to remove t_ for now
-        table_to = table_to.removeprefix("t_")
-
-        return table_to
+        return table_to.removeprefix("t_")
 
     def t_table_from(self, ipv: str) -> str:
         r"""Return table_from, some tables don't have t\_ prefixes."""

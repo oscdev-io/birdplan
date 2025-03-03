@@ -123,7 +123,7 @@ class BGPConfigParser(ConfigParser):
         if "rr_cluster_id" in config["bgp"]:
             self.birdconf.protocols.bgp.rr_cluster_id = config["bgp"]["rr_cluster_id"]
 
-    def _config_bgp_peertype_constraints(self, config: dict[str, Any]) -> None:
+    def _config_bgp_peertype_constraints(self, config: dict[str, Any]) -> None:  # noqa: C901
         """Configure bgp:peertype_constraints section."""
 
         # If we don't have a peertype_constraints section, just return
@@ -234,7 +234,7 @@ class BGPConfigParser(ConfigParser):
         for route in config["bgp"]["originate"]:
             self.birdconf.protocols.bgp.add_originated_route(route)
 
-    def _config_bgp_import(self, config: dict[str, Any]) -> None:  # pylint: disable=too-many-branches
+    def _config_bgp_import(self, config: dict[str, Any]) -> None:  # noqa: C901,PLR0912
         """Configure bgp:import section."""
 
         # If we don't have the option then just return
@@ -316,7 +316,7 @@ class BGPConfigParser(ConfigParser):
             # Bump current peer
             peer_cur += 1
 
-    def _config_bgp_peers_peer(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
+    def _config_bgp_peers_peer(  # noqa: C901,PLR0912,PLR0915
         self, config: dict[str, Any], peer_name: str, peer_config: dict[str, Any]
     ) -> None:
         """Configure bgp:peers single peer."""

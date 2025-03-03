@@ -18,10 +18,6 @@
 
 """BIRD BGP protocol configuration."""
 
-# pylint: disable=too-many-lines
-
-from typing import Dict, List, Optional
-
 from .....exceptions import BirdPlanError
 from ....globals import BirdConfigGlobals
 from ...bird_attributes import SectionBirdAttributes
@@ -66,7 +62,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         constants: SectionConstants,
         functions: SectionFunctions,
         tables: SectionTables,
-    ):
+    ) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
@@ -160,7 +156,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
         # Loop with BGP peers and configure them
         self.conf.add("")
-        for _, peer in self.peers.items():
+        for peer in self.peers.values():
             self.conf.add(peer)
 
     def add_originated_route(self, route: str) -> None:
@@ -205,9 +201,9 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
     def _configure_birdattributes_bgp(self) -> None:
         """Configure BGP attributes."""
         # NK: No attributes for now
-        # self.birdattributes.conf.append_title("BGP Attributes")
+        # self.birdattributes.conf.append_title("BGP Attributes")  # noqa: ERA001
 
-    def _configure_constants_bgp(self) -> None:  # pylint: disable=too-many-statements
+    def _configure_constants_bgp(self) -> None:  # noqa: PLR0915
         """Configure BGP constants."""
         self.constants.conf.append_title("BGP Constants")
 
@@ -303,7 +299,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Strip communities mostly for peers and transit providers
         self.constants.conf.append("define BGP_COMMUNITY_STRIP_ALL = [")
         # This is first because of the , we need
-        if self.asn and self.asn < 65535:
+        if self.asn and self.asn < 65535:  # noqa: PLR2004
             self.constants.conf.append("  (BGP_ASN, *),")
         else:
             self.constants.conf.append("  # (BGP_ASN, *),  # Not stripping due to 4-byte ASN")
@@ -420,7 +416,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.conf.append("define BGP_LC_FILTERED_NEXT_HOP_NOT_PEER_IP = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 8);")
         self.constants.conf.append("define BGP_LC_FILTERED_PREFIX_FILTERED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 9);")
         self.constants.conf.append("define BGP_LC_FILTERED_ORIGIN_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 10);")
-        # self.constants.conf.append('define BGP_LC_FILTERED_PREFIX_NOT_IN_ORIGIN_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 11);')
+        # self.constants.conf.append('define BGP_LC_FILTERED_PREFIX_NOT_IN_ORIGIN_AS = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 11);')  # noqa: E501,ERA001
         self.constants.conf.append("define BGP_LC_FILTERED_DEFAULT_NOT_ALLOWED = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 12);")
         self.constants.conf.append("define BGP_LC_FILTERED_RPKI_UNKNOWN = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 13);")
         self.constants.conf.append("define BGP_LC_FILTERED_RPKI_INVALID = (BGP_ASN, BGP_LC_FUNCTION_FILTERED, 14);")

@@ -19,7 +19,7 @@
 """BirdPlan commandline options for OSPF interface ecmp-weight."""
 
 import argparse
-from typing import Any, Dict
+from typing import Any
 
 from ......exceptions import BirdPlanUsageError
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
@@ -68,7 +68,7 @@ class BirdPlanCmdlineOSPFInterfaceECMPWeight(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = subparser.add_subparsers()
 
-    def cmd_ospf_interface_ecmp_weight(self, args: Any) -> Any:  # pylint: disable=unused-argument
+    def cmd_ospf_interface_ecmp_weight(self, args: dict[str, Any]) -> None:  # noqa: ARG002
         """
         Commandline handler for "ospf interface ecmp-weight" action.
 

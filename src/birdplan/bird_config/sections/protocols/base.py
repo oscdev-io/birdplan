@@ -44,7 +44,7 @@ class SectionProtocolBase(SectionBase):
         constants: SectionConstants,
         functions: SectionFunctions,
         tables: SectionTables,
-    ):
+    ) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals)
 

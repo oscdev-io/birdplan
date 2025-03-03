@@ -31,7 +31,7 @@ class TableMaster(SectionBase):
 
     _master_attributes: MasterTableAttributes
 
-    def __init__(self, birdconfig_globals: BirdConfigGlobals):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals)
 

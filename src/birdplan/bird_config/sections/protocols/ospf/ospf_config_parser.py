@@ -51,7 +51,7 @@ class OSPFConfigParser(ConfigParser):
 
         # Check what version of OSPF we're using for IPv4
         if "v4version" in config["ospf"]:
-            if isinstance(config["ospf"]["v4version"], (int, str)):
+            if isinstance(config["ospf"]["v4version"], int | str):
                 v4version = f"{config['ospf']['v4version']}"
                 if v4version in ("2", "3"):
                     self.birdconf.protocols.ospf.v4version = v4version
@@ -80,7 +80,7 @@ class OSPFConfigParser(ConfigParser):
             else:
                 raise BirdPlanConfigError(f"Configuration item '{accept}' not understood in ospf:accept")
 
-    def _config_ospf_redistribute(self, config: dict[str, Any]) -> None:  # pylint: disable=too-many-branches
+    def _config_ospf_redistribute(self, config: dict[str, Any]) -> None:  # noqa: C901,PLR0912
         """Configure ospf:redistribute section."""
 
         # If we don't have a redistribute section just return
@@ -133,7 +133,7 @@ class OSPFConfigParser(ConfigParser):
             else:
                 raise BirdPlanConfigError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")
 
-    def _config_ospf_areas(self, config: dict[str, Any]) -> None:  # pylint: disable=too-many-branches
+    def _config_ospf_areas(self, config: dict[str, Any]) -> None:  # noqa: C901,PLR0912
         """Configure ospf:interfaces section."""
 
         # If we don't have areas in our ospf section, just return

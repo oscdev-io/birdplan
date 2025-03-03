@@ -19,7 +19,7 @@
 """BirdPlan commandline options for BGP peer."""
 
 import argparse
-from typing import Any, Dict
+from typing import Any
 
 from .....exceptions import BirdPlanUsageError
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
@@ -68,7 +68,7 @@ class BirdPlanCmdlineBGPPeer(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = subparser.add_subparsers()
 
-    def cmd_bgp_peer(self, args: Any) -> Any:  # pylint: disable=unused-argument
+    def cmd_bgp_peer(self, args: dict[str, Any]) -> None:  # noqa: ARG002
         """
         Commandline handler for "bgp peer" action.
 

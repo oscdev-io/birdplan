@@ -34,14 +34,14 @@ PeeringDBInfo = dict[str, Any]
 # Keep a cache for results returned while loaded into memory
 #
 # Example:
-#  peeringdb_cache = {
-#    'objects': {
-#        'asn:174': {  # ASN
-#            '_timestamp': 0000000000,
-#            'value': xxxxxx,
-#        }
-#    }
-#  }
+#  > peeringdb_cache = {
+#  >  'objects': {
+#  >      'asn:174': {  # ASN
+#  >          '_timestamp': 0000000000,
+#  >          'value': xxxxxx,
+#  >      }
+#  >  }
+#  > }
 peeringdb_cache: dict[str, dict[str, Any]] = {}
 
 # Keep track of the timestamp of our last request
@@ -62,7 +62,7 @@ class PeeringDB:  # pylint: disable=too-few-public-methods
 
     def get_prefix_limits(self, asn: int) -> PeeringDBInfo:
         """Return our peeringdb info entry, if there is one."""
-        global peeringdb_last_request  # pylint: disable=global-statement
+        global peeringdb_last_request  # noqa: PLW0603
 
         # We cannot do lookups on private ASN's
         if (PEERINGDB_16BIT_LOWER <= asn <= PEERINGDB_16BIT_UPPER) or (PEERINGDB_32BIT_LOWER <= asn <= PEERINGDB_32BIT_UPPER):
@@ -103,7 +103,7 @@ class PeeringDB:  # pylint: disable=too-few-public-methods
         # Lastly return it
         return peeringdb_info
 
-    def _cache(self, obj: str, value: PeeringDBInfo | None = None) -> Any | None:
+    def _cache(self, obj: str, value: PeeringDBInfo | None = None) -> dict[str, Any] | None:
         """Retrieve or store value in cache."""
 
         if "objects" not in peeringdb_cache:

@@ -28,18 +28,12 @@ def sanitize_community(community: str) -> str:
     # Split on :
     community_components = community.split(":")
     # Re-join using , and add brackets
-    community_str = f"({','.join(community_components)})"
-    return community_str
+    return f"({','.join(community_components)})"
 
 
 def sanitize_community_list(communities: list[str]) -> list[str]:
     """Sanitize a list of communities."""
-
-    result = []
-    for community in sorted(communities):
-        result.append(sanitize_community(community))
-
-    return result
+    return [sanitize_community(community) for community in sorted(communities)]
 
 
 def network_count(ip_networks: list[str]) -> int:
@@ -53,7 +47,7 @@ def network_count(ip_networks: list[str]) -> int:
         # Grab network object
         ipnetwork = ipaddress.ip_network(prefix)
         # Check which IP version this is
-        if ipnetwork.version == 4:
+        if ipnetwork.version == 4:  # noqa: SIM108,PLR2004
             # Count how many /24's there are in the ipnetwork
             prefix_count = ipnetwork.num_addresses >> 8
         else:

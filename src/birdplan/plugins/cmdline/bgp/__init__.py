@@ -19,7 +19,7 @@
 """BirdPlan commandline options for BGP."""
 
 import argparse
-from typing import Any, Dict
+from typing import Any
 
 from ....exceptions import BirdPlanUsageError
 from ..cmdline_plugin import BirdPlanCmdlinePluginBase
@@ -52,7 +52,6 @@ class BirdPlanCmdlineBGP(BirdPlanCmdlinePluginBase):
 
         root_parser = args["root_parser"]
 
-        # CMD: bgp
         subparser = root_parser.add_parser("bgp", help="BGP commands")
 
         subparser.add_argument(
@@ -67,7 +66,7 @@ class BirdPlanCmdlineBGP(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = subparser.add_subparsers()
 
-    def cmd_bgp(self, args: Any) -> Any:  # pylint: disable=unused-argument
+    def cmd_bgp(self, args: dict[str, Any]) -> None:  # noqa: ARG002
         """
         Commandline handler for "bgp" action.
 

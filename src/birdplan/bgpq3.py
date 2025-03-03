@@ -34,16 +34,16 @@ __all__ = ["BGPQ3"]
 # Keep a cache for results returned while loaded into memory
 #
 # Example:
-# bgpq3_cache = {
-#     'whois.radb.net:43': {
-#         'objects': {
-#             'AS174': {
-#               '_timestamp': 0000000000,
-#               'value': xxxxxx,
-#             }
-#         }
-#     }
-# }
+# > bgpq3_cache = {
+# >    'whois.radb.net:43': {
+# >        'objects': {
+# >            'AS174': {
+# >              '_timestamp': 0000000000,
+# >              'value': xxxxxx,
+# >            }
+# >        }
+# >    }
+# > }
 bgpq3_cache: dict[str, dict[str, Any]] = {}
 
 
@@ -54,7 +54,7 @@ class BGPQ3:
     _port: int
     _sources: str
 
-    def __init__(self, host: str = "whois.radb.net", port: int = 43, sources: str = "RADB"):
+    def __init__(self, host: str = "whois.radb.net", port: int = 43, sources: str = "RADB") -> None:
         """Initialize object."""
 
         # Grab items we can set and associated defaults
@@ -72,7 +72,7 @@ class BGPQ3:
 
         raise BirdPlanError("bgpq3/bgpq4 executable not found in PATH")
 
-    def get_asns(self, as_sets: str | list[str]) -> list[str]:  # pylint: disable=too-many-branches
+    def get_asns(self, as_sets: str | list[str]) -> list[str]:  # noqa: C901,PLR0912
         """Get prefixes."""
 
         # Build an object list depending on the type of "objects" above
@@ -127,17 +127,17 @@ class BGPQ3:
             #
 
             # 64496-64511	For documentation and sample code; reserved by [RFC5398]	[RFC5398]
-            if (64496 <= asn_i <= 64511) and not is_birdplan_internal:
+            if (64496 <= asn_i <= 64511) and not is_birdplan_internal:  # noqa: PLR2004
                 continue
             # 64512-65534	For private use; reserved by [RFC6996]	[RFC6996]
-            if (64512 <= asn_i <= 65534) and not is_birdplan_internal:
+            if (64512 <= asn_i <= 65534) and not is_birdplan_internal:  # noqa: PLR2004
                 continue
             # 65536-65551	For documentation and sample code; reserved by [RFC5398]	[RFC5398]
-            if (65536 <= asn_i <= 65551) and not is_birdplan_internal:
+            if (65536 <= asn_i <= 65551) and not is_birdplan_internal:  # noqa: PLR2004
                 continue
 
             # 4200000000-4294967294	For private use; reserved by [RFC6996]	[RFC6996]
-            if 4200000000 <= asn_i <= 4294967294:
+            if 4200000000 <= asn_i <= 4294967294:  # noqa: PLR2004
                 continue
             # We passed all the checks, lets add to the filtered list
             filtered_asns.append(asn)
@@ -199,7 +199,7 @@ class BGPQ3:
 
         return prefixes
 
-    def _bgpq3(self, args: list[str]) -> Any:
+    def _bgpq3(self, args: list[str]) -> Any:  # noqa: ANN401
         """Run bgpq3."""
 
         # Run the IP tool with JSON output
@@ -208,7 +208,7 @@ class BGPQ3:
         cmd_args.extend(args)
 
         # Grab result from process execution
-        result = subprocess.check_output(cmd_args, stderr=subprocess.STDOUT)  # nosec
+        result = subprocess.check_output(cmd_args, stderr=subprocess.STDOUT)  # noqa: S603
         try:
             decoded = json.loads(result)
         except json.JSONDecodeError as err:
@@ -216,7 +216,7 @@ class BGPQ3:
         # Return the decoded json output
         return decoded
 
-    def _cache(self, obj: str, value: Any | None = None) -> Any | None:
+    def _cache(self, obj: str, value: Any | None = None) -> Any | None:  # noqa: ANN401
         """Retrieve or store value in cache."""
 
         if self.server not in bgpq3_cache:

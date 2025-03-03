@@ -44,7 +44,7 @@ class Sections(SectionBase):  # pylint: disable=too-many-instance-attributes
     _tables: SectionTables
     _protocols: SectionProtocols
 
-    def __init__(self, birdconfig_globals: BirdConfigGlobals):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals) -> None:
         """Initialize object."""
         super().__init__(birdconfig_globals)
 

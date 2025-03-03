@@ -18,8 +18,6 @@
 
 """BIRD OSPF protocol configuration."""
 
-from typing import Dict, List
-
 from .....exceptions import BirdPlanError
 from ....globals import BirdConfigGlobals
 from ...bird_attributes import SectionBirdAttributes
@@ -58,7 +56,7 @@ class ProtocolOSPF(SectionProtocolBase):
         constants: SectionConstants,
         functions: SectionFunctions,
         tables: SectionTables,
-    ):
+    ) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
@@ -207,9 +205,6 @@ class ProtocolOSPF(SectionProtocolBase):
         # Redistribute kernel routes
         if self.route_policy_redistribute.kernel_default:
             self.conf.add(f"  {self.functions.redistribute_kernel_default()};")
-        # NK: May affect inter-area routes???? removed for now
-        # # Redistribute OSPF routes
-        # self.conf.add(f"  {self.functions.redistribute_ospf()};")
         # Redistribute static routes
         if self.route_policy_redistribute.static:
             self.conf.add(f"  {self.functions.redistribute_static()};")

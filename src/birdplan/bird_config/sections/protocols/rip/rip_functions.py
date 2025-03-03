@@ -18,10 +18,8 @@
 
 """RIP protocol specific functions class."""
 
-from typing import Any
-
 from ....globals import BirdConfigGlobals
-from ...functions import BirdFunction, SectionFunctions
+from ...functions import BirdFunction, BirdFunctionArg, SectionFunctions
 from ..base_protocol_functions import ProtocolFunctionsBase
 
 __all__ = ["RIPFunctions"]
@@ -30,14 +28,14 @@ __all__ = ["RIPFunctions"]
 class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods
     """RIP protocol specific functions class."""
 
-    def __init__(self, birdconfig_globals: BirdConfigGlobals, functions: SectionFunctions):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals, functions: SectionFunctions) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals, functions)
 
         self._section = "RIP Functions"
 
     @BirdFunction("rip_accept_connected")
-    def accept_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def accept_connected(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD rip_accept_connected function."""
 
         return f"""\
@@ -51,7 +49,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             }}"""
 
     @BirdFunction("rip_accept_rip_default")
-    def accept_rip_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def accept_rip_default(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD rip_accept_rip_default function."""
 
         return f"""\
@@ -65,7 +63,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             }}"""
 
     @BirdFunction("rip_accept_rip")
-    def accept_rip(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def accept_rip(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD rip_accept_rip function."""
 
         return f"""\
@@ -78,7 +76,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             }}"""
 
     @BirdFunction("rip_redistribute_connected")
-    def redistribute_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def redistribute_connected(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD rip_redistribute_connected function."""
 
         return f"""\
@@ -92,7 +90,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             }}"""
 
     @BirdFunction("rip_redistribute_rip_default")
-    def redistribute_rip_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def redistribute_rip_default(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD rip_redistribute_rip_default function."""
 
         return f"""\
@@ -106,7 +104,7 @@ class RIPFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-me
             }}"""
 
     @BirdFunction("rip_redistribute_rip")
-    def redistribute_rip(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def redistribute_rip(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD rip_redistribute_rip function."""
 
         return f"""\

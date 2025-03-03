@@ -83,7 +83,7 @@ class BirdPlanCmdlineBGPPeerGracefulShutdownSet(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_peer_graceful_shutdown_set(self, args: Any) -> Any:
+    def cmd_bgp_peer_graceful_shutdown_set(self, args: dict[str, Any]) -> BirdPlanCommandlineResult:
         """
         Commandline handler for "bgp peer graceful-shutdown set" action.
 

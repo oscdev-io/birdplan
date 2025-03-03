@@ -25,7 +25,7 @@ import json
 import os
 import pathlib
 import pwd
-from typing import Any, Dict, Optional
+from typing import Any
 
 import birdclient
 import jinja2
@@ -65,7 +65,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
     _state_file: str | None
     _yaml: YAML
 
-    def __init__(self, test_mode: bool = False) -> None:
+    def __init__(self, test_mode: bool = False) -> None:  # noqa: FBT001,FBT002
         """Initialize object."""
 
         self._birdconf = BirdConfig(test_mode=test_mode)
@@ -73,7 +73,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         self._state_file = None
         self._yaml = YAML()
 
-    def load(self, **kwargs: Any) -> None:  # pylint: disable=too-many-locals
+    def load(self, **kwargs: Any) -> None:  # noqa: ANN401,D417
         """
         Initialize object.
 
@@ -107,13 +107,15 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         if not plan_file:
             raise BirdPlanError("Required parameter 'plan_file' not found")
 
+        plan_file_path = pathlib.Path(plan_file)
+
         # Create search paths for Jinja2
-        search_paths = [os.path.dirname(plan_file)]
+        search_paths = [plan_file_path.parent]
         # We need to pass Jinja2 our filename, as it is in the search path
-        plan_file_fname = os.path.basename(plan_file)
+        plan_file_fname = plan_file_path.name
 
         # Render first with jinja
-        template_env = jinja2.Environment(  # nosec
+        template_env = jinja2.Environment(  # noqa: S701
             loader=jinja2.FileSystemLoader(searchpath=search_paths),
             trim_blocks=True,
             lstrip_blocks=True,
@@ -215,15 +217,16 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
             return
 
         # Check if the state file exists...
-        if os.path.isfile(self.state_file):
+        state_file = pathlib.Path(self.state_file)
+        if state_file.is_file():
             # Read in state file
             try:
-                self.state = json.loads(pathlib.Path(self.state_file).read_text(encoding="UTF-8"))
+                self.state = json.loads(state_file.read_text(encoding="UTF-8"))
             except OSError as err:
-                raise BirdPlanError(f"Failed to read BirdPlan state file '{self.state_file}': {err}") from None
+                raise BirdPlanError(f"Failed to read BirdPlan state file '{state_file}': {err}") from None
             except json.JSONDecodeError as err:  # pragma: no cover
                 # We use the state_file here because the size of raw_state may be larger than 100MiB
-                raise BirdPlanError(f" Failed to parse BirdPlan state file '{self.state_file}': {err}") from None
+                raise BirdPlanError(f" Failed to parse BirdPlan state file '{state_file}': {err}") from None
 
     def state_ospf_summary(self, bird_socket: str | None = None) -> BirdPlanOSPFSummary:
         """
@@ -403,7 +406,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
 
         return ret
 
-    def state_bgp_peer_graceful_shutdown_set(self, peer: str, value: bool) -> None:
+    def state_bgp_peer_graceful_shutdown_set(self, peer: str, value: bool) -> None:  # noqa: FBT001
         """
         Set the BGP graceful shutdown override state for a peer.
 
@@ -519,7 +522,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
 
         return ret
 
-    def state_bgp_peer_quarantine_set(self, peer: str, value: bool) -> None:
+    def state_bgp_peer_quarantine_set(self, peer: str, value: bool) -> None:  # noqa: FBT001
         """
         Set the BGP quarantine override state for a peer.
 
@@ -780,7 +783,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         if not self.state["ospf"]["areas"][area]["+interfaces"]:
             del self.state["ospf"]["areas"][area]["+interfaces"]
 
-    def state_ospf_interface_status(self) -> BirdPlanOSPFInterfaceStatus:  # pylint: disable=too-many-branches
+    def state_ospf_interface_status(self) -> BirdPlanOSPFInterfaceStatus:  # noqa: C901,PLR0912
         """
         Return the status of OSPF interfaces.
 

@@ -80,7 +80,7 @@ class BirdPlanCmdlineOSPFInterfaceECMPWeightRemove(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_ospf_interface_ecmp_weight_remove(self, args: Any) -> Any:
+    def cmd_ospf_interface_ecmp_weight_remove(self, args: dict[str, Any]) -> BirdPlanCommandlineResult:
         """
         Commandline handler for "ospf interface ecmp-weight remove" action.
 

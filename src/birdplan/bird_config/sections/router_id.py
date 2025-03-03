@@ -29,14 +29,14 @@ class SectionRouterID(SectionBase):
 
     _router_id: str
 
-    def __init__(self, birdconfig_globals: BirdConfigGlobals):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals) -> None:
         """Initialize object."""
         super().__init__(birdconfig_globals)
 
         # Set section header
         self._section = "Router ID"
 
-        self._router_id = "0.0.0.0"  # nosec
+        self._router_id = "0.0.0.0"  # noqa: S104
 
     def configure(self) -> None:
         """Configure routing id."""

@@ -22,7 +22,6 @@ import argparse
 import io
 from typing import Any
 
-from .... import BirdPlanOSPFSummary
 from ....cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ....console.colors import colored
 from ..cmdline_plugin import BirdPlanCmdlinePluginBase
@@ -134,7 +133,7 @@ class BirdPlanCmdlineOSPFShow(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_ospf_summary(self, args: Any) -> Any:  # pylint: disable=unused-argument
+    def cmd_ospf_summary(self, args: dict[str, Any]) -> BirdPlanCmdlineOSPFShowResult:  # pylint: disable=unused-argument
         """
         Commandline handler for "ospf summary" action.
 
@@ -159,6 +158,6 @@ class BirdPlanCmdlineOSPFShow(BirdPlanCmdlinePluginBase):
         # Load BirdPlan configuration using the cache
         cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
-        res: BirdPlanOSPFSummary = cmdline.birdplan.state_ospf_summary(bird_socket=bird_socket)
+        res = cmdline.birdplan.state_ospf_summary(bird_socket=bird_socket)
 
         return BirdPlanCmdlineOSPFShowResult(res)

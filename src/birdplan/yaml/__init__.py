@@ -30,6 +30,6 @@ try:
     else:
         logging.debug("YAML: Using ruamel.yaml without libyaml")
 except ImportError:
-    from .pyaml import YAML, YAMLError  # type: ignore
+    from .pyaml import YAML, YAMLError
 
     logging.debug("YAML: Using pyyaml")

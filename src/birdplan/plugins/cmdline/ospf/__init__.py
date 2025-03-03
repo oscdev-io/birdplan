@@ -19,7 +19,7 @@
 """BirdPlan commandline options for OSPF."""
 
 import argparse
-from typing import Any, Dict
+from typing import Any
 
 from ....exceptions import BirdPlanUsageError
 from ..cmdline_plugin import BirdPlanCmdlinePluginBase
@@ -52,7 +52,6 @@ class BirdPlanCmdlineOSPF(BirdPlanCmdlinePluginBase):
 
         root_parser = args["root_parser"]
 
-        # CMD: ospf
         subparser = root_parser.add_parser("ospf", help="OSPF commands")
 
         subparser.add_argument(
@@ -67,7 +66,7 @@ class BirdPlanCmdlineOSPF(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = subparser.add_subparsers()
 
-    def cmd_ospf(self, args: Any) -> Any:  # pylint: disable=unused-argument
+    def cmd_ospf(self, args: dict[str, Any]) -> None:  # noqa: ARG002
         """
         Commandline handler for "ospf" action.
 

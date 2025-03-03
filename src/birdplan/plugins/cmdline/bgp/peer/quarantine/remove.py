@@ -76,7 +76,7 @@ class BirdPlanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_peer_quarantine_remove(self, args: Any) -> Any:
+    def cmd_bgp_peer_quarantine_remove(self, args: dict[str, Any]) -> BirdPlanCommandlineResult:
         """
         Commandline handler for "bgp peer quarantine remove" action.
 

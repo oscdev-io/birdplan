@@ -19,7 +19,6 @@
 """BirdPlan exceptions."""
 
 import argparse
-from typing import Any
 
 __all__ = ["BirdPlanConfigError", "BirdPlanError", "BirdPlanUsageError"]
 
@@ -34,13 +33,13 @@ class BirdPlanUsageError(BirdPlanError):
     message: str
     parser: argparse.ArgumentParser
 
-    def __init__(self, *args: Any):
+    def __init__(self, message: str, parser: argparse.ArgumentParser) -> None:
         """Initialize object."""
 
-        super().__init__(*args)
+        super().__init__(message, parser)
 
-        self.message = args[0]
-        self.parser = args[1]
+        self.message = message
+        self.parser = parser
 
     def __str__(self) -> str:
         """Return string representation of the exception."""

@@ -35,7 +35,7 @@ class ProtocolFunctionsBase(SectionBase):  # pylint: disable=too-many-public-met
 
     bird_functions: dict[str, str]
 
-    def __init__(self, birdconfig_globals: BirdConfigGlobals, functions: SectionFunctions):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals, functions: SectionFunctions) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals)
 
@@ -47,7 +47,7 @@ class ProtocolFunctionsBase(SectionBase):  # pylint: disable=too-many-public-met
         super().configure()
 
         # Check if we're adding functions
-        for _, content in self.bird_functions.items():
+        for content in self.bird_functions.values():
             self.conf.add(textwrap.dedent(content))
             self.conf.add("")
 

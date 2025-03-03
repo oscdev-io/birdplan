@@ -21,17 +21,18 @@
 import inspect
 import logging
 import os
+import pathlib
 import pkgutil
 from typing import Any
 
-__all__ = ["Plugin", "PluginCollection", "PluginMethodException", "PluginNotFoundException"]
+__all__ = ["Plugin", "PluginCollection", "PluginMethodExceptionError", "PluginNotFoundExceptionError"]
 
 
-class PluginMethodException(RuntimeError):
+class PluginMethodExceptionError(RuntimeError):
     """Plugin method exception raised when a method is called that does not exist."""
 
 
-class PluginNotFoundException(RuntimeError):
+class PluginNotFoundExceptionError(RuntimeError):
     """Plugin not found exception raised when a plugin is referenced by name and not found."""
 
 
@@ -71,7 +72,7 @@ class PluginCollection:
     # Plugin statuses
     _plugin_status: dict[str, str]
 
-    def __init__(self, plugin_packages: list[str]):
+    def __init__(self, plugin_packages: list[str]) -> None:
         """
         Initialize Plugincollection using a plugin base package.
 
@@ -93,7 +94,7 @@ class PluginCollection:
         # Load plugins
         self._load_plugins()
 
-    def call_if_exists(self, method_name: str, args: Any = None) -> dict[str, Any]:
+    def call_if_exists(self, method_name: str, args: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Call a plugin method, but do not raise an exception if it does not exist.
 
@@ -102,7 +103,7 @@ class PluginCollection:
         method_name : str
             Method name to call.
 
-        args : Any
+        args : dict[str, Any]
             Method argument(s).
 
         Returns
@@ -115,7 +116,7 @@ class PluginCollection:
 
         return self.call(method_name, args, skip_not_found=True)
 
-    def call(self, method_name: str, args: Any = None, skip_not_found: bool = False) -> dict[str, Any]:
+    def call(self, method_name: str, args: dict[str, Any] | None = None, skip_not_found: bool = False) -> dict[str, Any]:  # noqa: FBT001,FBT002
         """
         Call a plugin method.
 
@@ -124,10 +125,7 @@ class PluginCollection:
         method_name : str
             Method name to call.
 
-        kwargs : Any
-            Method arguments.
-
-        args : Any
+        args : dict[str, Any]
             Method argument(s).
 
         skip_not_found :
@@ -148,7 +146,7 @@ class PluginCollection:
                 if skip_not_found:
                     logging.debug("Method '%s' does not exist in plugin '%s'", method_name, plugin_name)
                     continue
-                raise PluginMethodException(f'Plugin "{plugin_name}" has no method "{method_name}"')
+                raise PluginMethodExceptionError(f'Plugin "{plugin_name}" has no method "{method_name}"')
             # Save the result
             results[plugin_name] = self.call_plugin(plugin_name, method_name, args)
 
@@ -179,7 +177,7 @@ class PluginCollection:
 
         return None
 
-    def call_first(self, method_name: str, args: Any = None) -> Any:
+    def call_first(self, method_name: str, args: dict[str, Any] | None = None) -> Any:  # noqa: ANN401
         """
         Call the first plugin method found.
 
@@ -188,10 +186,7 @@ class PluginCollection:
         method_name : str
             Method name to call.
 
-        kwargs : Any
-            Method arguments.
-
-        args : Any
+        args : dict[str, Any]
             Method argument(s).
 
         Returns
@@ -205,12 +200,12 @@ class PluginCollection:
 
         # Make sure we got a plugin back
         if not plugin_name:
-            raise PluginNotFoundException(f"No plugin found for method name '{method_name}'")
+            raise PluginNotFoundExceptionError(f"No plugin found for method name '{method_name}'")
 
         # Return the result of the method call on the first plugin
         return self.call_plugin(plugin_name, method_name, args)
 
-    def call_plugin(self, plugin_name: str, method_name: str, args: Any = None) -> Any:
+    def call_plugin(self, plugin_name: str, method_name: str, args: dict[str, Any] | None = None) -> Any:  # noqa: ANN401
         """
         Call a specific plugin and its method.
 
@@ -222,7 +217,7 @@ class PluginCollection:
         method_name : str
             Method name to call.
 
-        args : Any
+        args : dict[str, Any]
             Method argument(s).
 
         Returns
@@ -233,13 +228,13 @@ class PluginCollection:
 
         # Check if plugin exists
         if plugin_name not in self.plugins:
-            raise PluginNotFoundException(f'Plugin "{plugin_name}"" not found')
+            raise PluginNotFoundExceptionError(f'Plugin "{plugin_name}"" not found')
         # If it does then grab it
         plugin = self.plugins[plugin_name]
 
         # Check if we're going to raise an exception or just skip
         if not hasattr(plugin, method_name):
-            raise PluginMethodException(f'Plugin "{plugin_name}" has no method "{method_name}"')
+            raise PluginMethodExceptionError(f'Plugin "{plugin_name}" has no method "{method_name}"')
 
         # Grab the method
         method = getattr(plugin, method_name)
@@ -264,7 +259,7 @@ class PluginCollection:
         """
 
         if plugin_name not in self.plugins:
-            raise PluginNotFoundException(f'Plugin "{plugin_name}" not found')
+            raise PluginNotFoundExceptionError(f'Plugin "{plugin_name}" not found')
 
         return self.plugins[plugin_name]
 
@@ -279,7 +274,7 @@ class PluginCollection:
         for plugin_package in self._plugin_packages:
             self._find_plugins(plugin_package)
 
-    def _find_plugins(self, package_name: str) -> None:  # pylint: disable=too-many-branches
+    def _find_plugins(self, package_name: str) -> None:  # noqa: C901,PLR0912
         """
         Recursively search the plugin_package and retrieve all plugins.
 
@@ -342,7 +337,7 @@ class PluginCollection:
                 if sub_dir == "__pycache__":
                     continue
                 # If this is not a sub dir, then move onto the next one
-                if not os.path.isdir(os.path.join(pkg_path, sub_dir)):
+                if not pathlib.Path(pkg_path, sub_dir).is_dir():
                     continue
                 # Add sub-directory
                 sub_dirs.append(sub_dir)

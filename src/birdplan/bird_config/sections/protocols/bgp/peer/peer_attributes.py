@@ -19,7 +19,6 @@
 """BIRD BGP protocol attributes."""
 
 import enum
-from typing import Optional, Union
 
 from ......exceptions import BirdPlanError
 from .actions import BGPPeerActions
@@ -38,9 +37,9 @@ __all__ = [
 ]
 
 # This type is a string as we can have it set to "peeringdb"
-BGPPeerPrefixLimit = Optional[str]
+BGPPeerPrefixLimit = str | None
 
-BGPPeerFilterItem = Union[str, list[str]]
+BGPPeerFilterItem = str | list[str]
 BGPPeerFilter = dict[str, BGPPeerFilterItem]
 
 
@@ -278,13 +277,10 @@ class BGPPeerPrependItem:  # pylint: disable=too-few-public-methods
     """
 
     own_asn: int
-    # first_asn: int
 
     def __init__(self) -> None:
         """Initialize object."""
         self.own_asn = 0
-
-    #    self.first_asn = 0
 
 
 class BGPPeerPrepend:  # pylint: disable=too-few-public-methods,too-many-instance-attributes

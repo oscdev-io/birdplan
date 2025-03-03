@@ -69,7 +69,7 @@ class RIPConfigParser(ConfigParser):
             else:
                 raise BirdPlanConfigError(f"Configuration item '{accept}' not understood in RIP accept")
 
-    def _config_rip_redistribute(self, config: dict[str, Any]) -> None:  # pylint: disable=too-many-branches
+    def _config_rip_redistribute(self, config: dict[str, Any]) -> None:  # noqa: C901,PLR0912
         """Configure rip:redistribute section."""
 
         # If we don't have a redistribute section just return

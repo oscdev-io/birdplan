@@ -20,13 +20,15 @@
 
 import argparse
 import io
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from ..... import BirdPlanBGPPeerSummary
 from .....cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from .....console.colors import colored
 from .....exceptions import BirdPlanUsageError
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
+
+if TYPE_CHECKING:
+    from ..... import BirdPlanBGPPeerSummary
 
 __all__ = ["BirdPlanCmdlineBGPPeerShow"]
 
@@ -146,7 +148,7 @@ class BirdPlanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_bgp_peer_summary(self, args: Any) -> Any:  # pylint: disable=unused-argument
+    def cmd_bgp_peer_summary(self, args: dict[str, Any]) -> BirdPlanCmdlineBGPPeerShowResult:  # pylint: disable=unused-argument
         """
         Commandline handler for "bgp peer summary" action.
 

@@ -26,11 +26,17 @@ from typing import Any
 from ...bird_config.globals import BirdConfigGlobals
 from .base import SectionBase
 
-__all__ = ["BirdFunction", "BirdVariable", "SectionFunctions"]
+__all__ = ["BirdFunction", "BirdFunctionArg", "BirdVariable", "SectionFunctions"]
 
 
 class BirdVariable(str):
     """BIRD constant class."""
+
+    __slots__ = ()
+
+
+# Bird function argument type
+BirdFunctionArg = BirdVariable | str | int | bool
 
 
 class BirdFunction:  # pylint: disable=invalid-name,too-few-public-methods
@@ -70,7 +76,7 @@ class BirdFunction:  # pylint: disable=invalid-name,too-few-public-methods
 
     bird_func_name: str
 
-    def __init__(self, bird_func_name: str):
+    def __init__(self, bird_func_name: str) -> None:
         """Initialize object."""
         # Lets keep track of our BIRD function name
         self.bird_func_name = bird_func_name
@@ -78,16 +84,17 @@ class BirdFunction:  # pylint: disable=invalid-name,too-few-public-methods
     def __call__(self, func: Callable[..., str]) -> Callable[..., str]:
         """Return the wrapper."""
 
-        def wrapped_function(*args: Any, **kwargs: Any) -> str:
+        def wrapped_function(*args: BirdFunctionArg, **kwargs: Any) -> str:  # noqa: ANN401
             """My decorator."""
             # Grab the parent object
             parent_object = args[0]
             # Make sure it has a bird_functions attribute
             if hasattr(parent_object, "bird_functions"):
                 # Check if this function exists...
-                if self.bird_func_name not in parent_object.bird_functions:
+                bird_function_list = getattr(parent_object, "bird_functions")  # noqa: B009
+                if self.bird_func_name not in bird_function_list:
                     # If not add it to the function list
-                    parent_object.bird_functions[self.bird_func_name] = func(*args)
+                    bird_function_list[self.bird_func_name] = func(*args)
             else:
                 raise RuntimeError("Decorator 'bird_function' used on a class method without a 'bird_functions' attribute")
 
@@ -104,10 +111,7 @@ class BirdFunction:  # pylint: disable=invalid-name,too-few-public-methods
                     value = arg
                 # Check for a boolean
                 elif isinstance(arg, bool):
-                    if arg:
-                        value = "true"
-                    else:
-                        value = "false"
+                    value = "true" if arg else "false"
                 # Check for a number
                 elif isinstance(arg, int):
                     value = f"{arg}"
@@ -134,7 +138,7 @@ class SectionFunctions(SectionBase):
 
     bird_functions: dict[str, str]
 
-    def __init__(self, birdconfig_globals: BirdConfigGlobals):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals)
 
@@ -147,12 +151,12 @@ class SectionFunctions(SectionBase):
         super().configure()
 
         # Check if we're adding functions
-        for _, content in self.bird_functions.items():
+        for content in self.bird_functions.values():
             self.conf.add(textwrap.dedent(content))
             self.conf.add("")
 
     @BirdFunction("prefix_is_longer")
-    def prefix_is_longer(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def prefix_is_longer(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD prefix_is_longer function."""
 
         return """\
@@ -168,7 +172,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @BirdFunction("prefix_is_shorter")
-    def prefix_is_shorter(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def prefix_is_shorter(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD prefix_is_shorter function."""
 
         return """\
@@ -183,7 +187,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @BirdFunction("accept_kernel")
-    def accept_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def accept_kernel(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD accept_kernel function."""
 
         return f"""\
@@ -196,7 +200,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @BirdFunction("accept_kernel_default")
-    def accept_kernel_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def accept_kernel_default(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD accept_kernel_default function."""
 
         return f"""\
@@ -209,7 +213,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @BirdFunction("accept_static")
-    def accept_static(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def accept_static(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD accept_static function."""
 
         return f"""\
@@ -222,7 +226,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @BirdFunction("accept_static_default")
-    def accept_static_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def accept_static_default(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD accept_static_default function."""
 
         return f"""\
@@ -235,7 +239,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @BirdFunction("is_bgp")
-    def is_bgp(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def is_bgp(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD is_bgp function."""
 
         return """\
@@ -246,7 +250,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @BirdFunction("is_bogon")
-    def is_bogon(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def is_bogon(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD is_bogon function."""
 
         return f"""\
@@ -261,7 +265,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @BirdFunction("is_connected")
-    def is_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def is_connected(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD is_connected function."""
 
         return """\
@@ -272,7 +276,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @BirdFunction("is_default")
-    def is_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def is_default(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD is_default function."""
 
         return """\
@@ -284,7 +288,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @BirdFunction("is_kernel")
-    def is_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def is_kernel(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD is_kernel function."""
 
         # NK: Below we explicitly exclude krt_source = 186 as we seem to import IPv6 routes into Bird for some reason
@@ -296,7 +300,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @BirdFunction("is_static")
-    def is_static(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def is_static(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD is_static function."""
 
         return """\
@@ -307,7 +311,7 @@ class SectionFunctions(SectionBase):
             }"""
 
     @BirdFunction("redistribute_kernel")
-    def redistribute_kernel(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def redistribute_kernel(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD redistribute_kernel function."""
 
         return f"""\
@@ -320,7 +324,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @BirdFunction("redistribute_kernel_default")
-    def redistribute_kernel_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def redistribute_kernel_default(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD redistribute_kernel_default function."""
 
         return f"""\
@@ -333,7 +337,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @BirdFunction("redistribute_static")
-    def redistribute_static(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def redistribute_static(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD redistribute_static function."""
 
         return f"""\
@@ -346,7 +350,7 @@ class SectionFunctions(SectionBase):
             }}"""
 
     @BirdFunction("redistribute_static_default")
-    def redistribute_static_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def redistribute_static_default(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD redistribute_static_default function."""
 
         return f"""\

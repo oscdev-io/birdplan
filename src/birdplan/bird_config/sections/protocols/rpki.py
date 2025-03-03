@@ -51,7 +51,7 @@ class RPKISource:  # pylint: disable=too-many-instance-attributes
     _refresh: int | None
     _retry: int | None
 
-    def __init__(self, rpki_source: str | list[str]) -> None:  # pylint: disable=too-many-branches
+    def __init__(self, rpki_source: str | list[str]) -> None:  # noqa: C901,PLR0912
         """Initialize object."""
 
         self._rpki_data = None

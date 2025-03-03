@@ -40,7 +40,7 @@ class BirdPlanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-metho
         # Initialize our internals
         self._subparser = None
 
-    def get_subparser(self, args: Any) -> argparse.ArgumentParser:  # pylint: disable=unused-argument
+    def get_subparser(self, args: dict[str, Any]) -> argparse.ArgumentParser:  # noqa: ARG002
         """
         Return the plugin subparser.
 
@@ -61,7 +61,7 @@ class BirdPlanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-metho
             raise RuntimeError
         return self._subparser
 
-    def get_subparsers(self, args: Any) -> argparse.ArgumentParser:  # pylint: disable=unused-argument
+    def get_subparsers(self, args: dict[str, Any]) -> argparse.ArgumentParser:  # noqa: ARG002
         """
         Return the plugin subparsers.
 

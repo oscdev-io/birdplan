@@ -22,7 +22,6 @@ import argparse
 import io
 from typing import Any
 
-from ..... import BirdPlanOSPFInterfaceStatus
 from .....cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from .....console.colors import colored
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
@@ -33,7 +32,7 @@ __all__ = ["BirdPlanCmdlineOSPFInterfaceShow"]
 class BirdPlanCmdlineOSPFInterfaceShowResult(BirdPlanCommandlineResult):
     """BirdPlan OSPF interface show result class."""
 
-    def as_text(self) -> str:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+    def as_text(self) -> str:  # noqa: C901,PLR0915, PLR0912
         """
         Return data in text format.
 
@@ -221,7 +220,7 @@ class BirdPlanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_ospf_interface_show(self, args: Any) -> Any:
+    def cmd_ospf_interface_show(self, args: dict[str, Any]) -> BirdPlanCmdlineOSPFInterfaceShowResult:
         """
         Commandline handler for "ospf interface show" action.
 
@@ -244,6 +243,6 @@ class BirdPlanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
         cmdline.birdplan_load_config(ignore_irr_changes=True, ignore_peeringdb_changes=True, use_cached=True)
 
         # Grab peer list
-        res: BirdPlanOSPFInterfaceStatus = cmdline.birdplan.state_ospf_interface_status()
+        res = cmdline.birdplan.state_ospf_interface_status()
 
         return BirdPlanCmdlineOSPFInterfaceShowResult(res)

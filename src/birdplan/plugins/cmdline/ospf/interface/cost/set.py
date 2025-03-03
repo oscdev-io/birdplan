@@ -87,7 +87,7 @@ class BirdPlanCmdlineOSPFInterfaceCostSet(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_ospf_interface_cost_set(self, args: Any) -> Any:
+    def cmd_ospf_interface_cost_set(self, args: dict[str, Any]) -> BirdPlanCommandlineResult:
         """
         Commandline handler for "ospf interface cost set" action.
 

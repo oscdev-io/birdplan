@@ -21,7 +21,6 @@
 # pylint: disable=too-many-lines
 
 import fnmatch
-from typing import Optional
 
 from ......globals import BirdConfigGlobals
 from .....bird_attributes import SectionBirdAttributes
@@ -45,7 +44,7 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
     # OSPF area interface attributes
     _interface_attributes: OSPFAreaInterfaceAttributes
 
-    def __init__(  # pylint: disable=too-many-arguments,too-many-branches,too-many-positional-arguments
+    def __init__(  # noqa: C901,PLR0912,PLR0913
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,
@@ -55,7 +54,7 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
         area_attributes: OSPFAreaAttributes,
         interface_name: str,
         interface_config: OSPFAreaInterfaceConfig,
-    ):
+    ) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 

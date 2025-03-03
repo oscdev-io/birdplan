@@ -20,13 +20,14 @@
 
 import argparse
 import io
-from typing import Any
-
-from birdplan import BirdPlanBGPPeerShow
+from typing import TYPE_CHECKING, Any
 
 from .....cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from .....console.colors import colored
 from ...cmdline_plugin import BirdPlanCmdlinePluginBase
+
+if TYPE_CHECKING:
+    from birdplan import BirdPlanBGPPeerShow
 
 __all__ = ["BirdPlanCmdlineBGPPeerShowPeerArg"]
 
@@ -34,7 +35,7 @@ __all__ = ["BirdPlanCmdlineBGPPeerShowPeerArg"]
 class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
     """BirdPlan BGP peer show peer result."""
 
-    def as_text(self) -> str:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+    def as_text(self) -> str:  # noqa: C901, PLR0915, PLR0912
         """
         Return data in text format.
 
@@ -242,9 +243,8 @@ class BirdPlanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
         # Set our internal subparser property
         self._subparser = subparser
         self._subparsers = None
-        # self._subparsers = subparser.add_subparsers()
 
-    def cmd_bgp_peer_show(self, args: Any) -> Any:
+    def cmd_bgp_peer_show(self, args: dict[str, Any]) -> BirdPlanCmdlineBGPPeerShowPeerArgResult:
         """
         Commandline handler for "bgp peer show <peer>" action.
 

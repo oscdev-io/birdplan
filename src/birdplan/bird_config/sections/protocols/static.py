@@ -45,7 +45,7 @@ class ProtocolStatic(SectionProtocolBase):
         constants: SectionConstants,
         functions: SectionFunctions,
         tables: SectionTables,
-    ):
+    ) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
@@ -83,9 +83,6 @@ class ProtocolStatic(SectionProtocolBase):
 
         self.conf.add("protocol static static4 {")
         self.conf.add('  description "Static protocol for IPv4";')
-        self.conf.add("")
-        # FIXME - remove at some stage # pylint:disable=fixme
-        self.conf.add("debug all;")
         self.conf.add("")
         self.conf.add("  ipv4 {")
         self.conf.add("    table t_static4;")

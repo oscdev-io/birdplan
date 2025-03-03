@@ -18,10 +18,8 @@
 
 """OSPF protocol specific functions class."""
 
-from typing import Any
-
 from ....globals import BirdConfigGlobals
-from ...functions import BirdFunction, SectionFunctions
+from ...functions import BirdFunction, BirdFunctionArg, SectionFunctions
 from ..base_protocol_functions import ProtocolFunctionsBase
 
 __all__ = ["OSPFFunctions"]
@@ -30,14 +28,14 @@ __all__ = ["OSPFFunctions"]
 class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-methods
     """OSPF protocol specific functions class."""
 
-    def __init__(self, birdconfig_globals: BirdConfigGlobals, functions: SectionFunctions):
+    def __init__(self, birdconfig_globals: BirdConfigGlobals, functions: SectionFunctions) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals, functions)
 
         self._section = "OSPF Functions"
 
     @BirdFunction("ospf_accept_connected")
-    def accept_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def accept_connected(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD ospf_accept_connected function."""
 
         return f"""\
@@ -51,7 +49,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
             }}"""
 
     @BirdFunction("ospf_accept_ospf")
-    def accept_ospf(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def accept_ospf(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD ospf_accept_ospf function."""
 
         return f"""\
@@ -65,7 +63,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
             }}"""
 
     @BirdFunction("ospf_accept_ospf_default")
-    def accept_ospf_default(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def accept_ospf_default(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD ospf_accept_ospf_default function."""
 
         return f"""\
@@ -80,7 +78,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
             }}"""
 
     @BirdFunction("ospf_is_connected")
-    def is_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def is_connected(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD ospf_is_connected function."""
 
         return """\
@@ -91,7 +89,7 @@ class OSPFFunctions(ProtocolFunctionsBase):  # pylint: disable=too-many-public-m
             }"""
 
     @BirdFunction("ospf_redistribute_connected")
-    def redistribute_connected(self, *args: Any) -> str:  # pylint: disable=unused-argument
+    def redistribute_connected(self, *args: BirdFunctionArg) -> str:  # noqa: ARG002
         """BIRD ospf_redistribute_connected function."""
 
         return f"""\

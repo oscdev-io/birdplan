@@ -21,6 +21,7 @@
 import argparse
 import json
 import logging
+import pathlib
 from typing import Any
 
 from ...cmdline import BIRDPLAN_MONITOR_FILE, BirdPlanCommandLine, BirdPlanCommandlineResult
@@ -34,7 +35,7 @@ class BirdPlanCmdlineMonitor(BirdPlanCmdlinePluginBase):
     """BirdPlan "configure" command."""
 
     # Output filename
-    _output_filename: str | None
+    _output_filename: pathlib.Path | None
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -60,7 +61,6 @@ class BirdPlanCmdlineMonitor(BirdPlanCmdlinePluginBase):
 
         root_parser = args["root_parser"]
 
-        # CMD: configure
         subparser = root_parser.add_parser("monitor", help="Monitor BIRD status")
 
         subparser.add_argument(
@@ -85,7 +85,7 @@ class BirdPlanCmdlineMonitor(BirdPlanCmdlinePluginBase):
         self._subparser = subparser
         self._subparsers = None
 
-    def cmd_monitor(self, args: Any) -> Any:
+    def cmd_monitor(self, args: dict[str, Any]) -> BirdPlanCommandlineResult:
         """
         Commandline handler for "monitor" action.
 
@@ -127,7 +127,7 @@ class BirdPlanCmdlineMonitor(BirdPlanCmdlinePluginBase):
 
         return BirdPlanCommandlineResult(monitor_status)
 
-    def _write_monitor_file(self, data: Any) -> None:
+    def _write_monitor_file(self, data: dict[str, Any]) -> None:
         """
         Write out monitor file with data.
 
@@ -143,7 +143,7 @@ class BirdPlanCmdlineMonitor(BirdPlanCmdlinePluginBase):
 
         # Write out config file
         try:
-            with open(self.output_filename, "w", encoding="UTF-8") as config_file:
+            with self.output_filename.open("w", encoding="UTF-8") as config_file:
                 # Write out data json
                 logging.debug("Writing monitor file '%s'", self.output_filename)
                 config_file.write(json.dumps(data, indent=4, sort_keys=True))
@@ -151,11 +151,11 @@ class BirdPlanCmdlineMonitor(BirdPlanCmdlinePluginBase):
             raise BirdPlanError(f"Failed to open '{self.output_filename}' for writing: {err}") from None
 
     @property
-    def output_filename(self) -> str | None:
+    def output_filename(self) -> pathlib.Path | None:
         """Config file name to write out."""
         return self._output_filename
 
     @output_filename.setter
-    def output_filename(self, output_filename: str) -> None:
+    def output_filename(self, output_filename: pathlib.Path) -> None:
         """Config file name to write out."""
         self._output_filename = output_filename

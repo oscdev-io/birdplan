@@ -24,9 +24,10 @@ import json
 import logging
 import logging.handlers
 import os
+import pathlib
 import sys
 from collections.abc import Callable
-from typing import Any, Literal, NoReturn
+from typing import Any, ClassVar, Literal, NoReturn
 
 from . import BirdPlan
 from .console.colors import colored
@@ -38,10 +39,7 @@ __all__ = ["BirdPlanArgumentParser", "BirdPlanCommandLine", "ColorFormatter"]
 
 
 # Defaults
-if os.path.exists("/etc/bird/bird.conf"):
-    BIRD_CONFIG_FILE = "/etc/bird/bird.conf"
-else:
-    BIRD_CONFIG_FILE = "/etc/bird.conf"
+BIRD_CONFIG_FILE = "/etc/bird/bird.conf" if pathlib.Path("/etc/bird/bird.conf").exists() else "/etc/bird.conf"
 BIRD_SOCKET = "/run/bird/bird.ctl"
 BIRDPLAN_FILE = "/etc/birdplan/birdplan.yaml"
 BIRDPLAN_STATE_FILE = "/var/lib/birdplan/birdplan.state"
@@ -61,7 +59,7 @@ class ColorFormatter(logging.Formatter):
     text message.
     """
 
-    level_name_colors: dict[int, Callable[[str], str]] = {
+    level_name_colors: ClassVar[dict[int, Callable[[str], str]]] = {
         TRACE_LOG_LEVEL: lambda level_name: colored(str(level_name), "blue"),
         logging.DEBUG: lambda level_name: colored(str(level_name), "cyan"),
         logging.INFO: lambda level_name: colored(str(level_name), "green"),
@@ -76,7 +74,7 @@ class ColorFormatter(logging.Formatter):
         datefmt: str | None = None,
         style: Literal["%", "{", "$"] = "%",
         use_colors: bool | None = None,
-    ):
+    ) -> None:
         """
         Color log formatter class.
 
@@ -156,7 +154,7 @@ class BirdPlanCommandlineResult:  # pylint: disable=too-few-public-methods
     _data: Any
     _has_console_output: bool
 
-    def __init__(self, data: Any, has_console_output: bool = True) -> None:
+    def __init__(self, data: Any, has_console_output: bool = True) -> None:  # noqa: ANN401,FBT001,FBT002
         """Initialize object."""
 
         self._data = data
@@ -207,7 +205,7 @@ class BirdPlanCommandlineResult:  # pylint: disable=too-few-public-methods
         return json.dumps({"status": "success", "data": self.data})
 
     @property
-    def data(self) -> Any:
+    def data(self) -> Any:  # noqa: ANN401
         """
         Return raw data.
 
@@ -243,7 +241,7 @@ class BirdPlanCommandLine:
     _argparser: BirdPlanArgumentParser
     _birdplan: BirdPlan
 
-    def __init__(self, test_mode: bool = False, is_console: bool = False) -> None:
+    def __init__(self, test_mode: bool = False, is_console: bool = False) -> None:  # noqa: FBT001,FBT002
         """Instantiate object."""
 
         prog: str | None = None
@@ -263,20 +261,12 @@ class BirdPlanCommandLine:
         # Check if we have one commandline argument, if we do and if it is --version, return our version
         if raw_args and len(raw_args) == 1 and raw_args[0] == "--version":
             result: BirdPlanCommandlineResult = BirdPlanCommandlineResult(__version__)
-            # Check if we're on a console
-            if self.is_console:
-                # Check if we should output json
-                if self.is_json:
-                    print(result.as_json())
-                # Else if we have console output, then output that
-                elif result.has_console_output:
-                    print(result.as_console())
 
             return result
 
         # If this is the console, display our version
         if self.is_console:
-            print(f"BirdPlan v{__version__} - Copyright © 2019-2024, AllWorldIT.\n", file=sys.stderr)
+            pass
 
         # Add main commandline arguments
         optional_group = self.argparser.add_argument_group("Optional arguments")
@@ -353,20 +343,11 @@ class BirdPlanCommandLine:
             raise BirdPlanError("Failed to find plugin to handle command line options")
 
         # Grab the result from the command
-        result = plugins.call_plugin(plugin_name, method_name, {"cmdline": self})
-
-        # Check if we're on a console
-        if self.is_console:
-            # Check if we should output json
-            if self.is_json:
-                print(result.as_json())
-            # Else if we have console output, then output that
-            elif result.has_console_output:
-                print(result.as_console())
+        result: BirdPlanCommandlineResult = plugins.call_plugin(plugin_name, method_name, {"cmdline": self})
 
         return result
 
-    def birdplan_load_config(self, **kwargs: Any) -> None:
+    def birdplan_load_config(self, **kwargs: dict[str, Any]) -> None:  # noqa: D417
         """
         Load BirdPlan configuration.
 
@@ -385,10 +366,7 @@ class BirdPlanCommandLine:
 
         # Set the state file
         state_file: str | None = None
-        if self.args.birdplan_state_file[0]:
-            state_file = self.args.birdplan_state_file[0]
-        else:
-            state_file = BIRDPLAN_STATE_FILE
+        state_file = self.args.birdplan_state_file[0] if self.args.birdplan_state_file[0] else BIRDPLAN_STATE_FILE
 
         # Try load configuration
         self.birdplan.load(
@@ -483,9 +461,7 @@ class BirdPlanCommandLine:
 
         """
 
-        if ("--json" in sys.argv) or ("-j" in sys.argv):
-            return True
-        return False
+        return bool("--json" in sys.argv or "-j" in sys.argv)
 
 
 # Main entry point from the commandline
@@ -495,9 +471,8 @@ def main() -> None:
 
     try:
         birdplan_cmdline.run(sys.argv[1:])
-    except BirdPlanError as exception:
+    except BirdPlanError:
         if birdplan_cmdline.is_json:
-            print(json.dumps({"status": "error", "message": str(exception)}))
+            pass
         else:
-            print(f"ERROR: {exception}", file=sys.stderr)
             sys.exit(1)

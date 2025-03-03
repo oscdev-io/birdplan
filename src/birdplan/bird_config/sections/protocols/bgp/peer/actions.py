@@ -63,7 +63,7 @@ class BGPPeerAction:
     _action_remove_large_community: list[str]
     _action_prepend: int
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         global_functions: SectionFunctions,
         bgp_functions: BGPFunctions,
@@ -125,7 +125,7 @@ class BGPPeerAction:
             else:
                 raise BirdPlanConfigError(f"Action match type '{match_k}' is not valid")
 
-    def _parse_actions(self, action: str | dict[str, Any]) -> None:
+    def _parse_actions(self, action: str | dict[str, Any]) -> None:  # noqa: C901,PLR0912
         """Parse the actions."""
         # Check if this is a simple string action
         if isinstance(action, str):
@@ -167,13 +167,13 @@ class BGPPeerAction:
                 else:
                     raise BirdPlanConfigError(f"Action prepend value '{action_v}' is not valid")
                 # Make sure prepend value is valid
-                if 10 > prepend < 1:
+                if 10 > prepend < 1:  # noqa: PLR2004
                     raise BirdPlanConfigError(f"Action prepend value '{action_v}' is not valid")
                 self._action_prepend = prepend
             else:
                 raise BirdPlanConfigError(f"Action type '{action_k}' is not valid")
 
-    def generate_constants(self) -> list[str]:  # pylint: disable=too-many-branches
+    def generate_constants(self) -> list[str]:  # noqa: C901
         """Generate the constants for the action."""
         constants = []
         # Loop with basic match types
@@ -190,13 +190,11 @@ class BGPPeerAction:
             if match_type == "origin_asn":
                 if match_list:
                     constants.append(f"define {match_list_name} = [")
-                    for line in ", ".join(match_list).split(" "):
-                        constants.append(f"  {line}")
+                    constants.extend([f"  {line}" for line in ", ".join(match_list).split(" ")])
                     constants.append("];")
                 if match_list_not:
                     constants.append(f"define {match_list_name}_not = [")
-                    for line in ", ".join(match_list_not).split(" "):
-                        constants.append(f"  {line}")
+                    constants.extend([f"  {line}" for line in ", ".join(match_list_not).split(" ")])
                     constants.append("];")
             # Generate prefix match lists
             elif match_type == "prefix":
@@ -205,24 +203,24 @@ class BGPPeerAction:
                 # Generate IPv4 prefix match lists
                 if match_list_v4:
                     constants.append(f"define {match_list_name}_v4 = [")
-                    for line in ", ".join([x.replace(" ", "") for x in match_list_v4]).split(" "):
-                        constants.append(f"  {line}")
+                    constants.extend([f"  {line}" for line in ", ".join([x.replace(" ", "") for x in match_list_v4]).split(" ")])
                     constants.append("];")
                 if match_list_not_v4:
                     constants.append(f"define {match_list_name}_not_v4 = [")
-                    for line in ", ".join([x.replace(" ", "") for x in match_list_not_v4]).split(" "):
-                        constants.append(f"  {line}")
+                    constants.extend(
+                        [f"  {line}" for line in ", ".join([x.replace(" ", "") for x in match_list_not_v4]).split(" ")]
+                    )
                     constants.append("];")
                 # Generate IPv6 prefix match lists
                 if match_list_v6:
                     constants.append(f"define {match_list_name}_v6 = [")
-                    for line in ", ".join([x.replace(" ", "") for x in match_list_v6]).split(" "):
-                        constants.append(f"  {line}")
+                    constants.extend([f"  {line}" for line in ", ".join([x.replace(" ", "") for x in match_list_v6]).split(" ")])
                     constants.append("];")
                 if match_list_not_v6:
                     constants.append(f"define {match_list_name}_not_v6 = [")
-                    for line in ", ".join([x.replace(" ", "") for x in match_list_not_v6]).split(" "):
-                        constants.append(f"  {line}")
+                    constants.extend(
+                        [f"  {line}" for line in ", ".join([x.replace(" ", "") for x in match_list_not_v6]).split(" ")]
+                    )
                     constants.append("];")
 
         # Loop with community match types
@@ -237,13 +235,12 @@ class BGPPeerAction:
             match_list = util.sanitize_community_list(match_list)
             if match_list:
                 constants.append(f"define {match_list_name} = [")
-                for line in ", ".join(match_list).split(" "):
-                    constants.append(f"  {line}")
+                constants.extend([f"  {line}" for line in ", ".join(match_list).split(" ")])
                 constants.append("];")
         # Return list of constants for this peer
         return constants
 
-    def generate_function(self) -> list[str]:  # pylint: disable=too-many-branches,too-many-statements
+    def generate_function(self) -> list[str]:  # noqa: C901,PLR0912,PLR0915
         """Generate the function for the action."""
         function = []
         # Generate function header
@@ -349,8 +346,9 @@ class BGPPeerAction:
                 f"""{", ".join(self._action_add_community)} to ","""
                 f" {self.global_functions.route_info()};"
             )
-            for community in util.sanitize_community_list(self._action_add_community):
-                function.append(f"  bgp_community.add({community});")
+            function.extend(
+                [f"  bgp_community.add({community});" for community in util.sanitize_community_list(self._action_add_community)]
+            )
 
         # Handle add_extended_community action
         if self._action_add_extended_community:
@@ -360,8 +358,12 @@ class BGPPeerAction:
                 f"""{", ".join(self._action_add_extended_community)} to ","""
                 f" {self.global_functions.route_info()};"
             )
-            for community in util.sanitize_community_list(self._action_add_extended_community):
-                function.append(f"  bgp_ext_community.add({community});")
+            function.extend(
+                [
+                    f"  bgp_ext_community.add({community});"
+                    for community in util.sanitize_community_list(self._action_add_extended_community)
+                ]
+            )
 
         # Handle add_large_community action
         if self._action_add_large_community:
@@ -371,8 +373,12 @@ class BGPPeerAction:
                 f"""{", ".join(self._action_add_large_community)} to ","""
                 f" {self.global_functions.route_info()};"
             )
-            for community in util.sanitize_community_list(self._action_add_large_community):
-                function.append(f"  bgp_large_community.add({community});")
+            function.extend(
+                [
+                    f"  bgp_large_community.add({community});"
+                    for community in util.sanitize_community_list(self._action_add_large_community)
+                ]
+            )
 
         # Handle remove_community action
         if self._action_remove_community:
@@ -382,8 +388,7 @@ class BGPPeerAction:
                 f"""{", ".join(self._action_remove_community)} from ","""
                 f" {self.global_functions.route_info()};"
             )
-            for community in self._action_remove_community:
-                function.append(f"  bgp_community.remove({community});")
+            function.extend([f"  bgp_community.remove({community});" for community in self._action_remove_community])
 
         # Handle remove_extended_community action
         if self._action_remove_extended_community:
@@ -393,8 +398,9 @@ class BGPPeerAction:
                 f"""{", ".join(self._action_remove_extended_community)} from ","""
                 f" {self.global_functions.route_info()};"
             )
-            for community in self._action_remove_extended_community:
-                function.append(f"  bgp_extended_community.remove({community});")
+            function.extend(
+                [f"  bgp_extended_community.remove({community});" for community in self._action_remove_extended_community]
+            )
 
         # Handle remove_large_community action
         if self._action_remove_large_community:
@@ -404,8 +410,7 @@ class BGPPeerAction:
                 f"""{", ".join(self._action_remove_large_community)} from ","""
                 f" {self.global_functions.route_info()};"
             )
-            for community in self._action_remove_large_community:
-                function.append(f"  bgp_large_community.remove({community});")
+            function.extend([f"  bgp_large_community.remove({community});" for community in self._action_remove_large_community])
 
         # Handle prepend action
         if self._action_prepend:
@@ -482,7 +487,7 @@ class BGPPeerAction:
 
     @property
     def action_type(self) -> BGPPeerActionType:
-        """Return the action type"""
+        """Return the action type."""
         return self._action_type
 
 

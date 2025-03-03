@@ -57,7 +57,7 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods,too-many-inst
     vrf: str
     routing_table: int | None
 
-    def __init__(self, test_mode: bool = False) -> None:
+    def __init__(self, test_mode: bool = False) -> None:  # noqa: FBT001,FBT002
         """Initialize object."""
 
         self.log_file = None

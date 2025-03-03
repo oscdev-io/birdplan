@@ -34,7 +34,7 @@ class ProtocolDirect(SectionProtocolBase):
     _name_suffix: str
     _interfaces: list[str]
 
-    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def __init__(  # noqa: PLR0913
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,
@@ -43,7 +43,7 @@ class ProtocolDirect(SectionProtocolBase):
         tables: SectionTables,
         name: str = "",
         interfaces: list[str] | None = None,
-    ):
+    ) -> None:
         """Initialize the object."""
         super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
 
@@ -68,9 +68,7 @@ class ProtocolDirect(SectionProtocolBase):
         interface_lines = []
         if self.interfaces:
             # Create list of quoted interfaces
-            interface_list = []
-            for interface in self.interfaces:
-                interface_list.append(f'"{interface}"')
+            interface_list = [f'"{interface}"' for interface in self.interfaces]
             # Drop in a comma between them
             interface_str = ", ".join(interface_list)
             interface_lines.append("")

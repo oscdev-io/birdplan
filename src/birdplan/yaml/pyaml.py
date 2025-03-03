@@ -33,7 +33,7 @@ __all__ = ["YAML", "YAMLError"]
 class BirdPlanSafeLoader(pyaml.SafeLoader):  # pylint: disable=too-many-ancestors
     """Safe YAML loader wtih some specific datatypes."""
 
-    def construct_python_tuple(self, node: Any) -> tuple[Any, ...]:
+    def construct_python_tuple(self, node: Any) -> tuple[Any, ...]:  # noqa: ANN401
         """Tuple constructor."""
         return tuple(self.construct_sequence(node))
 
@@ -56,7 +56,7 @@ class YAML(YAMLBase):
     def __init__(self) -> None:
         """Initialize our parser YAML."""
 
-    def load(self, yaml: str | pathlib.Path | io.IOBase) -> Any:
+    def load(self, yaml: str | pathlib.Path | io.IOBase) -> Any:  # noqa: ANN401
         """Load YAML string."""
 
         yaml_data: str = ""
@@ -65,21 +65,21 @@ class YAML(YAMLBase):
             yaml_data = yaml
         # Handle path objects
         elif isinstance(yaml, pathlib.Path):
-            with open(yaml, encoding="UTF-8") as yaml_file:
+            with yaml.open(encoding="UTF-8") as yaml_file:
                 yaml_data = yaml_file.read()
         # Whats left over is file objects
         elif isinstance(yaml, io.IOBase):
             yaml_data = yaml.read()
 
-        return pyaml.load(yaml_data, BirdPlanSafeLoader)  # nosec
+        return pyaml.load(yaml_data, BirdPlanSafeLoader)  # noqa: S506
 
-    def dump(self, data: Any, stream: pathlib.Path | io.IOBase | None = None) -> Any:
+    def dump(self, data: Any, stream: pathlib.Path | io.IOBase | None = None) -> Any:  # noqa: ANN401
         """Dump to YAML."""
 
         if stream:
             # Handle path objects
             if isinstance(stream, pathlib.Path):
-                with open(stream, "w", encoding="UTF-8") as dump_file:
+                with stream.open("w", encoding="UTF-8") as dump_file:
                     return pyaml.dump(data, stream=dump_file, encoding="UTF-8", Dumper=BirdPlanSafeDumper)
             # Whats left over is file objects
             return pyaml.dump(
