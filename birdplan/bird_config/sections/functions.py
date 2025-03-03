@@ -156,10 +156,10 @@ class SectionFunctions(SectionBase):
 
         return """\
             # Match a prefix longer than "size"
-            function prefix_is_longer(string filter_name; int size) -> bool {
-                if (net.len > size) then {
+            function prefix_is_longer(string filter_name; int prefix_len) -> bool {
+                if (net.len > prefix_len) then {
                     if DEBUG then print filter_name,
-                        " [prefix_is_longer] Matched ", net, " from ", proto, " against size ", size;
+                        " [prefix_is_longer] Matched ", net, " from ", proto, " against length ", prefix_len;
                     return true;
                 } else {
                     return false;
@@ -172,10 +172,10 @@ class SectionFunctions(SectionBase):
 
         return """\
             # Match a prefix shorter than "size"
-            function prefix_is_shorter(string filter_name; int size) -> bool {
-                if (net.len < size) then {
+            function prefix_is_shorter(string filter_name; int prefix_len) -> bool {
+                if (net.len < prefix_len) then {
                     if DEBUG then print filter_name,
-                        " [prefix_is_shorter] Matched ", net, " from ", proto, " against size ", size;
+                        " [prefix_is_shorter] Matched ", net, " from ", proto, " against length ", prefix_len;
                     return true;
                 }
                 return false;
