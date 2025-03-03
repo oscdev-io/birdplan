@@ -1666,20 +1666,28 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
 
         # Generate constants for actions
         if self.peer_attributes.actions:
-            self.conf.add(f"# BGP Peer Constants: {self.asn} - {self.name}")
-            for line in self.peer_attributes.actions.generate_constants():
-                self.conf.add(line)
-            self.conf.add("")
+            # Grab constants section
+            constants = self.peer_attributes.actions.generate_constants()
+            # If we have something, add it to our configuration
+            if constants:
+                self.conf.add(f"# BGP Peer Constants: {self.asn} - {self.name}")
+                for line in constants:
+                    self.conf.add(line)
+                self.conf.add("")
 
     def _setup_peer_functions(self) -> None:
         """Setup peer functions."""
 
         # Generate functions for actions
         if self.peer_attributes.actions:
-            self.conf.add(f"# BGP Peer Functions: {self.asn} - {self.name}")
-            for line in self.peer_attributes.actions.generate_functions():
-                self.conf.add(line)
-            self.conf.add("")
+            # Grab functions section
+            functions = self.peer_attributes.actions.generate_functions()
+            # If we have something, add it to our configuration
+            if functions:
+                self.conf.add(f"# BGP Peer Functions: {self.asn} - {self.name}")
+                for line in self.peer_attributes.actions.generate_functions():
+                    self.conf.add(line)
+                self.conf.add("")
 
     def _setup_import_aspath_asns_filter(self) -> None:  # pylint: disable=too-many-branches
         """AS-PATH ASN import list setup."""
