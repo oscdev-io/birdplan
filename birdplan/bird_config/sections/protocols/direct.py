@@ -18,7 +18,6 @@
 
 """BIRD direct protocol configuration."""
 
-
 from ...globals import BirdConfigGlobals
 from ..bird_attributes import SectionBirdAttributes
 from ..constants import SectionConstants

@@ -195,7 +195,7 @@ class BGPQ3:
                     else:
                         greater_equal = ipaddress.ip_network(prefix["prefix"]).prefixlen
                     # Add prefix, format is %s{%s,%s}
-                    prefixes[family].append(f'{prefix["prefix"]}{{{greater_equal},{prefix["less-equal"]}}}')
+                    prefixes[family].append(f"{prefix['prefix']}{{{greater_equal},{prefix['less-equal']}}}")
 
         return prefixes
 

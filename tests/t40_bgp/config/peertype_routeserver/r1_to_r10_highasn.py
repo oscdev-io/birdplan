@@ -20,6 +20,7 @@
 # pylint: disable=import-error,too-few-public-methods
 
 """BGP configuration for a setup with r1, r2, r3, r4, r5, r6, r7, r8, r9 and r10 using a high private ASN."""
+
 __all__ = ["PeerTypeConfig"]
 
 

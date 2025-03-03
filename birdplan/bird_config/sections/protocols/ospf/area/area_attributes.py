@@ -18,7 +18,6 @@
 
 """BIRD OSPF area attributes."""
 
-
 from ......exceptions import BirdPlanError
 
 __all__ = ["OSPFAreaAttributes"]

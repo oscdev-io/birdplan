@@ -18,7 +18,6 @@
 
 """Commandline entrypoint."""
 
-
 import sys
 
 from .cmdline import main

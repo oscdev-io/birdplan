@@ -18,7 +18,6 @@
 
 """BirdPlan commandline options for "birdplan monitor"."""
 
-
 import argparse
 import json
 import logging

@@ -18,7 +18,6 @@
 
 """BIRD RIP protocol attributes."""
 
-
 __all__ = ["RIPAttributes", "RIPRoutePolicyAccept", "RIPRoutePolicyRedistribute"]
 
 

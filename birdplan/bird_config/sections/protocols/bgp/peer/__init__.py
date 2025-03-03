@@ -234,7 +234,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             # Raise an exception if add paths does not make sense for a specific peer type
             if self.peer_type not in ("internal", "rrclient", "rrserver", "rrserver-rrserver"):
                 raise BirdPlanError(
-                    f"Having 'add_paths' specified for peer '{self.name}' with type '{self.peer_type}' makes no" " sense"
+                    f"Having 'add_paths' specified for peer '{self.name}' with type '{self.peer_type}' makes no sense"
                 )
             self.add_paths = peer_config["add_paths"]
 
@@ -1317,7 +1317,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     and "irr" in self.prev_state["import_filter"]["origin_asns"]
                 ):
                     raise BirdPlanError(
-                        f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR origin ASNs"
+                        f"No IRR information in cache for peer '{self.name}' with type '{self.peer_type}' for IRR origin ASNs"
                     )
                 # Populate irr_asns
                 irr_asns = self.prev_state["import_filter"]["origin_asns"]["irr"]
@@ -1331,7 +1331,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     and "ipv4" in self.prev_state["import_filter"]["prefixes"]["irr"]
                 ):
                     raise BirdPlanError(
-                        f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR IPv4 prefixes"
+                        f"No IRR information in cache for peer '{self.name}' with type '{self.peer_type}' for IRR IPv4 prefixes"
                     )
                 # Populate IRR IPv4 prefixes
                 irr_prefixes["ipv4"] = self.prev_state["import_filter"]["prefixes"]["irr"]["ipv4"]
@@ -1345,7 +1345,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     and "ipv6" in self.prev_state["import_filter"]["prefixes"]["irr"]
                 ):
                     raise BirdPlanError(
-                        f"No IRR information in cache for peer '{self.name}' " f"with type '{self.peer_type}' for IRR IPv6 prefixes"
+                        f"No IRR information in cache for peer '{self.name}' with type '{self.peer_type}' for IRR IPv6 prefixes"
                     )
                 # Populate IRR IPv6 prefixes
                 irr_prefixes["ipv6"] = self.prev_state["import_filter"]["prefixes"]["irr"]["ipv6"]

@@ -18,7 +18,6 @@
 
 """BirdPlan commandline plugin base class."""
 
-
 import argparse
 from typing import Any
 

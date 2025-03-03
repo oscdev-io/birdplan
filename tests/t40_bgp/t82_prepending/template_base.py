@@ -150,11 +150,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         self._exabgpcli(
             sim,
             "e2",
-            [
-                "neighbor 100.64.0.1 announce route 0.0.0.0/0 next-hop 100.64.0.4 "
-                "large-community [ 65000:3:4 ] "
-                "as-path [ 65003 ]"
-            ],
+            ["neighbor 100.64.0.1 announce route 0.0.0.0/0 next-hop 100.64.0.4 large-community [ 65000:3:4 ] as-path [ 65003 ]"],
         )
         # Route server route
         self._exabgpcli(

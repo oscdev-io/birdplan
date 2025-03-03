@@ -18,7 +18,6 @@
 
 """BIRD static protocol configuration."""
 
-
 from ....exceptions import BirdPlanError
 from ...globals import BirdConfigGlobals
 from ..bird_attributes import SectionBirdAttributes

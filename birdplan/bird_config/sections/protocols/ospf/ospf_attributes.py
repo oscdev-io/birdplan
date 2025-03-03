@@ -18,7 +18,6 @@
 
 """BIRD OSPF protocol attributes."""
 
-
 __all__ = ["OSPFAttributes", "OSPFRoutePolicyAccept", "OSPFRoutePolicyRedistribute"]
 
 

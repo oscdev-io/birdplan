@@ -47,17 +47,13 @@ class BirdPlanCmdlineOSPFShowResult(BirdPlanCommandlineResult):
         ob = io.StringIO()
 
         # Write out header
-        ob.write(f"+{'='*130}+\n")
+        ob.write(f"+{'=' * 130}+\n")
         ob.write(f"| {'OSPF Summary'.center(128)} |\n")
-        ob.write(f"+{'-'*34}+{'-'*10}+{'-'*10}+{'-'*21}+{'-'*51}+\n")
+        ob.write(f"+{'-' * 34}+{'-' * 10}+{'-' * 10}+{'-' * 21}+{'-' * 51}+\n")
         ob.write(
-            f"| {'Name'.center(32)} "
-            f"| {'Proto'.center(8)} "
-            f"| {'Status'.center(8)} "
-            f"| {'Since'.center(19)} "
-            f"| {'Info'.center(49)} |\n"
+            f"| {'Name'.center(32)} | {'Proto'.center(8)} | {'Status'.center(8)} | {'Since'.center(19)} | {'Info'.center(49)} |\n"
         )
-        ob.write(f"+{'-'*34}+{'-'*10}+{'-'*10}+{'-'*21}+{'-'*51}+\n")
+        ob.write(f"+{'-' * 34}+{'-' * 10}+{'-' * 10}+{'-' * 21}+{'-' * 51}+\n")
 
         # Loop with each protocol
         for name, protocol_status in self.data.items():
@@ -92,7 +88,7 @@ class BirdPlanCmdlineOSPFShowResult(BirdPlanCommandlineResult):
             ob.write(f"| {name[:32]:<32} | {ipv_out} | {state_out} | {since[:19]:<19} | {info_out} |\n")
 
         # Write out footer
-        ob.write(f"+{'='*130}+\n")
+        ob.write(f"+{'=' * 130}+\n")
 
         return ob.getvalue()
 

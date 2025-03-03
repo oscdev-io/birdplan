@@ -18,7 +18,6 @@
 
 """BIRD BGP protocol attributes."""
 
-
 from ..rpki import RPKISource
 
 __all__ = ["BGPAttributes", "BGPPeertypeConstraints", "BGPRoutePolicyAccept", "BGPRoutePolicyImport"]

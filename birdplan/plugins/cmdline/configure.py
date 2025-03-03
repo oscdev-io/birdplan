@@ -18,7 +18,6 @@
 
 """BirdPlan commandline options for "birdplan configure"."""
 
-
 import argparse
 import grp
 import os

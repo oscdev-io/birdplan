@@ -20,7 +20,6 @@
 
 """OpenSSH support functions."""
 
-
 import cryptography.hazmat.primitives
 import cryptography.hazmat.primitives.asymmetric.ed25519
 

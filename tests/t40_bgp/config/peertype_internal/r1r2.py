@@ -20,6 +20,7 @@
 # pylint: disable=import-error,too-few-public-methods
 
 """BGP configuration for basic setup between r1 and r2."""
+
 __all__ = ["PeerTypeConfig"]
 
 

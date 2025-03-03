@@ -20,7 +20,6 @@
 
 # pylint: disable=redefined-outer-name
 
-
 import birdplan.cmdline
 
 __all__: list[str] = []

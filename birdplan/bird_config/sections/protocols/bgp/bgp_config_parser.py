@@ -184,8 +184,7 @@ class BGPConfigParser(ConfigParser):
                         "rrserver-rrserver",
                     ):
                         raise BirdPlanConfigError(
-                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' "
-                            "makes no sense"
+                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' makes no sense"
                         )
                 # Make sure this peer accepts blackhole exports
                 if constraint_name.startswith("blackhole_export_"):  # noqa: SIM102
@@ -199,8 +198,7 @@ class BGPConfigParser(ConfigParser):
                         "transit",
                     ):
                         raise BirdPlanConfigError(
-                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' "
-                            "makes no sense"
+                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' makes no sense"
                         )
                 # Make sure this peer supports imports
                 if "import" in constraint_name:  # noqa: SIM102
@@ -216,8 +214,7 @@ class BGPConfigParser(ConfigParser):
                         "transit",
                     ):
                         raise BirdPlanConfigError(
-                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' "
-                            "makes no sense"
+                            f"Having 'peertype_constraints:{constraint_name}' specified for peer type '{peer_type}' makes no sense"
                         )
                 # Finally set the constraint item
                 setattr(
@@ -386,9 +383,7 @@ class BGPConfigParser(ConfigParser):
                 for action in config_value:
                     # Make sure each action has a direction, match and action
                     if "action" not in action or "direction" not in action or "matches" not in action:
-                        raise BirdPlanConfigError(
-                            f"Configuration item '{action}' not understood in bgp:peers:{peer_name}:actions"
-                        )
+                        raise BirdPlanConfigError(f"Configuration item '{action}' not understood in bgp:peers:{peer_name}:actions")
                     # Check action options are valid
                     for action_k, action_v in action.items():
                         # Check the action specification
