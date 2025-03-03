@@ -20,12 +20,13 @@
 
 import textwrap
 from collections import OrderedDict
-from typing import Any, Callable, Dict, List
+from collections.abc import Callable
+from typing import Any
 
 from ...bird_config.globals import BirdConfigGlobals
 from .base import SectionBase
 
-__all__ = ["BirdVariable", "BirdFunction", "SectionFunctions"]
+__all__ = ["BirdFunction", "BirdVariable", "SectionFunctions"]
 
 
 class BirdVariable(str):
@@ -65,7 +66,7 @@ class BirdFunction:  # pylint: disable=invalid-name,too-few-public-methods
     bird_func_name : str
         BIRD function name.
 
-    '''  # noqa: RST201,RST203,RST215,RST214,RST301
+    '''
 
     bird_func_name: str
 
@@ -90,7 +91,7 @@ class BirdFunction:  # pylint: disable=invalid-name,too-few-public-methods
             else:
                 raise RuntimeError("Decorator 'bird_function' used on a class method without a 'bird_functions' attribute")
 
-            bird_args: List[str] = []
+            bird_args: list[str] = []
             # Check if we're not outputting the filter_name
             needs_filter_name = not kwargs.get("no_filter_name", False)
             if needs_filter_name:
@@ -131,7 +132,7 @@ class BirdFunction:  # pylint: disable=invalid-name,too-few-public-methods
 class SectionFunctions(SectionBase):
     """BIRD functions configuration."""
 
-    bird_functions: Dict[str, str]
+    bird_functions: dict[str, str]
 
     def __init__(self, birdconfig_globals: BirdConfigGlobals):
         """Initialize the object."""

@@ -19,7 +19,7 @@
 """BirdPlan commandline options for BGP peer quarantine remove."""
 
 import argparse
-from typing import Any, Dict
+from typing import Any
 
 from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
@@ -39,7 +39,7 @@ class BirdPlanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
         self.plugin_description = "birdplan bgp peer quarantine remove"
         self.plugin_order = 30
 
-    def register_parsers(self, args: Dict[str, Any]) -> None:
+    def register_parsers(self, args: dict[str, Any]) -> None:
         """
         Register commandline parsers.
 
@@ -88,7 +88,7 @@ class BirdPlanCmdlineBGPPeerQuarantineRemove(BirdPlanCmdlinePluginBase):
         """
 
         if not self._subparser:
-            raise RuntimeError()
+            raise RuntimeError
 
         cmdline: BirdPlanCommandLine = args["cmdline"]
 

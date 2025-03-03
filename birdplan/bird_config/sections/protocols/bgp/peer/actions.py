@@ -18,7 +18,7 @@
 
 """BIRD BGP peer action support."""
 
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from ......exceptions import BirdPlanConfigError
 from ..... import util
@@ -39,22 +39,22 @@ class BGPPeerAction:
     _action_id: int
     _direction: str
 
-    _match_origin_asn: List[str]
-    _match_prefix: List[str]
-    _match_community: List[str]
-    _match_extended_community: List[str]
-    _match_large_community: List[str]
+    _match_origin_asn: list[str]
+    _match_prefix: list[str]
+    _match_community: list[str]
+    _match_extended_community: list[str]
+    _match_large_community: list[str]
 
     _action_reject: bool
-    _action_add_community: List[str]
-    _action_add_extended_community: List[str]
-    _action_add_large_community: List[str]
-    _action_remove_community: List[str]
-    _action_remove_extended_community: List[str]
-    _action_remove_large_community: List[str]
+    _action_add_community: list[str]
+    _action_add_extended_community: list[str]
+    _action_add_large_community: list[str]
+    _action_remove_community: list[str]
+    _action_remove_extended_community: list[str]
+    _action_remove_large_community: list[str]
     _action_prepend: int
 
-    def __init__(self, bgp_functions: BGPFunctions, asn: int, peer_name: str, action_id: int, action: Dict[str, Any]) -> None:
+    def __init__(self, bgp_functions: BGPFunctions, asn: int, peer_name: str, action_id: int, action: dict[str, Any]) -> None:
         """Initialize BGP peer action."""
 
         self._bgp_functions = bgp_functions
@@ -86,7 +86,7 @@ class BGPPeerAction:
         self._parse_matches(action["matches"])
         self._parse_actions(action["action"])
 
-    def _parse_matches(self, matches: Dict[str, Any]) -> None:
+    def _parse_matches(self, matches: dict[str, Any]) -> None:
         """Parse the matches."""
 
         # Check what matches we have
@@ -106,7 +106,7 @@ class BGPPeerAction:
             else:
                 raise BirdPlanConfigError(f"Action match type '{match_k}' is not valid")
 
-    def _parse_actions(self, action: Dict[str, Any]) -> None:
+    def _parse_actions(self, action: dict[str, Any]) -> None:
         """Parse the actions."""
         # Check what actions we have
         for action_k, action_v in action.items():
@@ -144,7 +144,7 @@ class BGPPeerAction:
             else:
                 raise BirdPlanConfigError(f"Action type '{action_k}' is not valid")
 
-    def generate_constants(self) -> List[str]:  # pylint: disable=too-many-branches
+    def generate_constants(self) -> list[str]:  # pylint: disable=too-many-branches
         """Generate the constants for the action."""
         constants = []
         # Loop with basic match types
@@ -214,7 +214,7 @@ class BGPPeerAction:
         # Return list of constants for this peer
         return constants
 
-    def generate_function(self) -> List[str]:  # pylint: disable=too-many-branches,too-many-statements
+    def generate_function(self) -> list[str]:  # pylint: disable=too-many-branches,too-many-statements
         """Generate the function for the action."""
         function = []
         # Generate function header
@@ -333,7 +333,7 @@ class BGPPeerAction:
         # Return list of function lines
         return function
 
-    def _get_match_prefix_lists(self) -> Tuple[List[str], List[str], List[str], List[str]]:
+    def _get_match_prefix_lists(self) -> tuple[list[str], list[str], list[str], list[str]]:
         """Get the match prefix lists for IPv4 an IPv6."""
         match_list_v4 = [x for x in self._match_prefix if ":" not in x]
         match_list_not_v4 = [x for x in self._match_prefix if ":" not in x]
@@ -404,7 +404,7 @@ class BGPPeerActions:
 
     _asn: int
     _peer_name: str
-    _actions: List[BGPPeerAction]
+    _actions: list[BGPPeerAction]
 
     def __init__(self, bgp_functions: BGPFunctions, asn: int, peer_name: str) -> None:
         """Initialize BGP peer actions."""
@@ -414,7 +414,7 @@ class BGPPeerActions:
 
         self._bgp_functions = bgp_functions
 
-    def configure(self, actions: List[Dict[str, Any]]) -> None:
+    def configure(self, actions: list[dict[str, Any]]) -> None:
         """Configure BGP peer actions."""
 
         # Check type of data provided
@@ -428,14 +428,14 @@ class BGPPeerActions:
             self.actions.append(BGPPeerAction(self.bgp_functions, self.asn, self.peer_name, action_id, action))
             action_id += 1
 
-    def generate_constants(self) -> List[str]:
+    def generate_constants(self) -> list[str]:
         """Generate the constants for the actions."""
         constants = []
         for action in self.actions:
             constants.extend(action.generate_constants())
         return constants
 
-    def generate_functions(self) -> List[str]:
+    def generate_functions(self) -> list[str]:
         """Generate the functions for the actions."""
         functions = []
         for action in self.actions:
@@ -453,7 +453,7 @@ class BGPPeerActions:
         return self._peer_name
 
     @property
-    def actions(self) -> List[BGPPeerAction]:
+    def actions(self) -> list[BGPPeerAction]:
         """Return the actions."""
         return self._actions
 

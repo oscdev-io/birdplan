@@ -19,7 +19,7 @@
 """BirdPlan commandline options for "ospf interface cost remove"."""
 
 import argparse
-from typing import Any, Dict
+from typing import Any
 
 from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
 from ....cmdline_plugin import BirdPlanCmdlinePluginBase
@@ -39,7 +39,7 @@ class BirdPlanCmdlineOSPFInterfaceCostRemove(BirdPlanCmdlinePluginBase):
         self.plugin_description = "birdplan ospf interface cost remove"
         self.plugin_order = 40
 
-    def register_parsers(self, args: Dict[str, Any]) -> None:
+    def register_parsers(self, args: dict[str, Any]) -> None:
         """
         Register commandline parsers.
 
@@ -92,7 +92,7 @@ class BirdPlanCmdlineOSPFInterfaceCostRemove(BirdPlanCmdlinePluginBase):
         """
 
         if not self._subparser:
-            raise RuntimeError()
+            raise RuntimeError
 
         cmdline: BirdPlanCommandLine = args["cmdline"]
 

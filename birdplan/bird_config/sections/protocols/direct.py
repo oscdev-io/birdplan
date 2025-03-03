@@ -18,7 +18,6 @@
 
 """BIRD direct protocol configuration."""
 
-from typing import List, Optional
 
 from ...globals import BirdConfigGlobals
 from ..bird_attributes import SectionBirdAttributes
@@ -34,9 +33,9 @@ class ProtocolDirect(SectionProtocolBase):
     """BIRD direct protocol configuration."""
 
     _name_suffix: str
-    _interfaces: List[str]
+    _interfaces: list[str]
 
-    def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,
@@ -44,7 +43,7 @@ class ProtocolDirect(SectionProtocolBase):
         functions: SectionFunctions,
         tables: SectionTables,
         name: str = "",
-        interfaces: Optional[List[str]] = None,
+        interfaces: list[str] | None = None,
     ):
         """Initialize the object."""
         super().__init__(birdconfig_globals, birdattributes, constants, functions, tables)
@@ -86,7 +85,7 @@ class ProtocolDirect(SectionProtocolBase):
         self._setup_protocol("4", interface_lines)
         self._setup_protocol("6", interface_lines)
 
-    def _setup_protocol(self, ipv: str, lines: List[str]) -> None:
+    def _setup_protocol(self, ipv: str, lines: list[str]) -> None:
         protocol_name = f"direct{ipv}{self.name_suffix}"
 
         self.conf.add(f"protocol direct {protocol_name} {{")
@@ -110,6 +109,6 @@ class ProtocolDirect(SectionProtocolBase):
         return self._name_suffix
 
     @property
-    def interfaces(self) -> List[str]:
+    def interfaces(self) -> list[str]:
         """Return our interfaces."""
         return self._interfaces

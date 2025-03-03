@@ -18,13 +18,14 @@
 
 """BIRD pipe protocol configuration."""
 
+from collections.abc import Callable
 from enum import Enum
-from typing import Callable, List, Union
+from typing import Union
 
 from ...globals import BirdConfigGlobals
 from ..base import SectionBase
 
-__all__ = ["ProtocolPipeFilterType", "ProtocolPipe"]
+__all__ = ["ProtocolPipe", "ProtocolPipeFilterType"]
 
 
 PipeTableNameType = Union[str, Callable[[str], str]]
@@ -59,9 +60,9 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
     _import_filter_type: ProtocolPipeFilterType
 
     # IP versions we're creating a pipe for
-    _ipversions: List[str]
+    _ipversions: list[str]
 
-    def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         table_from: PipeTableNameType,
@@ -143,8 +144,7 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
             table_from = f"{self._table_from}{ipv}"
 
         # If it starts with t_, we need to remove t_ for now
-        if table_from.startswith("t_"):
-            table_from = table_from[2:]
+        table_from = table_from.removeprefix("t_")
 
         return table_from
 
@@ -159,8 +159,7 @@ class ProtocolPipe(SectionBase):  # pylint: disable=too-many-instance-attributes
             table_to = f"{self._table_to}{ipv}"
 
         # If it starts with t_, we need to remove t_ for now
-        if table_to.startswith("t_"):
-            table_to = table_to[2:]
+        table_to = table_to.removeprefix("t_")
 
         return table_to
 

@@ -20,7 +20,7 @@
 
 import argparse
 import io
-from typing import Any, Dict, List
+from typing import Any
 
 from ..... import BirdPlanOSPFInterfaceStatus
 from .....cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
@@ -33,7 +33,7 @@ __all__ = ["BirdPlanCmdlineOSPFInterfaceShow"]
 class BirdPlanCmdlineOSPFInterfaceShowResult(BirdPlanCommandlineResult):
     """BirdPlan OSPF interface show result class."""
 
-    def as_text(self) -> str:  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+    def as_text(self) -> str:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         """
         Return data in text format.
 
@@ -75,7 +75,7 @@ class BirdPlanCmdlineOSPFInterfaceShowResult(BirdPlanCommandlineResult):
         areas_all = sorted(set(areas_all))
 
         # Work out the lists of unique interfaces per area
-        interfaces_all: Dict[str, List[str]] = {}
+        interfaces_all: dict[str, list[str]] = {}
         for area_name in areas_all:
             # Initailize this areas interface list
             interfaces_all[area_name] = []
@@ -129,9 +129,9 @@ class BirdPlanCmdlineOSPFInterfaceShowResult(BirdPlanCommandlineResult):
                     # Make things easier below
                     current_interface = self.data["current"]["areas"][area_name]["interfaces"][interface]
                     # Check if we have a current cost and ECMP weight
-                    if "cost" in current_interface:  # noqa: SIM908
+                    if "cost" in current_interface:
                         current_cost = current_interface["cost"]
-                    if "ecmp_weight" in current_interface:  # noqa: SIM908
+                    if "ecmp_weight" in current_interface:
                         current_ecmp_weight = current_interface["ecmp_weight"]
 
                 # Work out the cost string
@@ -180,7 +180,7 @@ class BirdPlanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
         self.plugin_description = "birdplan ospf interface show"
         self.plugin_order = 30
 
-    def register_parsers(self, args: Dict[str, Any]) -> None:
+    def register_parsers(self, args: dict[str, Any]) -> None:
         """
         Register commandline parsers.
 
@@ -233,7 +233,7 @@ class BirdPlanCmdlineOSPFInterfaceShow(BirdPlanCmdlinePluginBase):
         """
 
         if not self._subparser:  # pragma: no cover
-            raise RuntimeError()
+            raise RuntimeError
 
         cmdline: BirdPlanCommandLine = args["cmdline"]
 

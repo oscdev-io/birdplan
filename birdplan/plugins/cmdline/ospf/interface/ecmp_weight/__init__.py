@@ -39,7 +39,7 @@ class BirdPlanCmdlineOSPFInterfaceECMPWeight(BirdPlanCmdlinePluginBase):
         self.plugin_description = "birdplan ospf interface ecmp-weight"
         self.plugin_order = 30
 
-    def register_parsers(self, args: Dict[str, Any]) -> None:
+    def register_parsers(self, args: dict[str, Any]) -> None:
         """
         Register commandline parsers.
 
@@ -80,6 +80,6 @@ class BirdPlanCmdlineOSPFInterfaceECMPWeight(BirdPlanCmdlinePluginBase):
         """
 
         if not self._subparser:
-            raise RuntimeError()
+            raise RuntimeError
 
         raise BirdPlanUsageError("No options specified to 'ospf interface ecmp-weight' action", self._subparser)

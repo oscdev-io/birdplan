@@ -40,9 +40,9 @@ from .peer import ProtocolBGPPeer
 __all__ = ["ProtocolBGP"]
 
 
-BGPPeersConfig = Dict[str, BGPPeerConfig]
-BGPPeers = Dict[str, ProtocolBGPPeer]
-BGPOriginatedRoutes = Dict[str, str]
+BGPPeersConfig = dict[str, BGPPeerConfig]
+BGPPeers = dict[str, ProtocolBGPPeer]
+BGPOriginatedRoutes = dict[str, str]
 
 
 class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-methods,too-many-positional-arguments
@@ -132,7 +132,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # Check if we're importing connected routes, if we are, create the protocol and pipe
         if self.route_policy_import.connected:
             # Create an interface list to feed to our routing table
-            interfaces: List[str] = []
+            interfaces: list[str] = []
             if isinstance(self.route_policy_import.connected, list):
                 interfaces = self.route_policy_import.connected
             # Add direct protocol for redistribution of connected routes
@@ -207,7 +207,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         # NK: No attributes for now
         # self.birdattributes.conf.append_title("BGP Attributes")
 
-    def _configure_constants_bgp(self) -> None:  # noqa: CFQ001 # pylint: disable=too-many-statements
+    def _configure_constants_bgp(self) -> None:  # pylint: disable=too-many-statements
         """Configure BGP constants."""
         self.constants.conf.append_title("BGP Constants")
 
@@ -449,7 +449,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
 
     def _configure_originated_routes(self) -> None:
         # Work out static v4 and v6 routes
-        routes: Dict[str, List[str]] = {"4": [], "6": []}
+        routes: dict[str, list[str]] = {"4": [], "6": []}
         for prefix in sorted(self.originated_routes.keys()):
             info = self.originated_routes[prefix]
             if "." in prefix:
@@ -607,7 +607,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         return self._bgp_functions
 
     @property
-    def asn(self) -> Optional[int]:
+    def asn(self) -> int | None:
         """Return our ASN."""
         return self.bgp_attributes.asn
 
@@ -619,12 +619,12 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.constants.need_bogons = True
 
     @property
-    def peertype_constraints(self) -> Dict[str, BGPPeertypeConstraints]:
+    def peertype_constraints(self) -> dict[str, BGPPeertypeConstraints]:
         """Return our peertype constraints."""
         return self.bgp_attributes.peertype_constraints
 
     @property
-    def rpki_source(self) -> Optional[RPKISource]:
+    def rpki_source(self) -> RPKISource | None:
         """Return the RPKI source to use for validation."""
         return self.bgp_attributes.rpki_source
 
@@ -654,7 +654,7 @@ class ProtocolBGP(SectionProtocolBase):  # pylint: disable=too-many-public-metho
         self.bgp_attributes.quarantine = quarantine
 
     @property
-    def rr_cluster_id(self) -> Optional[str]:
+    def rr_cluster_id(self) -> str | None:
         """Return route reflector cluster ID."""
         return self.bgp_attributes.rr_cluster_id
 

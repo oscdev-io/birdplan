@@ -18,7 +18,7 @@
 
 """BIRD configuration parser base class."""
 
-from typing import Any, Dict
+from typing import Any
 
 from . import BirdConfig
 
@@ -34,7 +34,7 @@ class ConfigParser:
         """Initialize configuration parser."""
         self._birdconf = birdconf
 
-    def parse(self, config: Dict[str, Any]) -> None:
+    def parse(self, config: dict[str, Any]) -> None:
         """Configure BGP protocol."""
         raise NotImplementedError("This method must be implemented in a subclass")
 

@@ -18,11 +18,10 @@
 
 """BIRD BGP protocol attributes."""
 
-from typing import Dict, List, Optional, Union
 
 from ..rpki import RPKISource
 
-__all__ = ["BGPRoutePolicyAccept", "BGPRoutePolicyImport", "BGPPeertypeConstraints", "BGPAttributes"]
+__all__ = ["BGPAttributes", "BGPPeertypeConstraints", "BGPRoutePolicyAccept", "BGPRoutePolicyImport"]
 
 
 class BGPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
@@ -87,7 +86,7 @@ class BGPRoutePolicyImport:  # pylint: disable=too-few-public-methods
 
     """
 
-    connected: Union[bool, List[str]]
+    connected: bool | list[str]
     kernel: bool
     kernel_blackhole: bool
     kernel_default: bool
@@ -188,7 +187,7 @@ class BGPPeertypeConstraints:  # pylint: disable=too-few-public-methods,too-many
     extended_community_import_maxlen: int
     large_community_import_maxlen: int
 
-    def __init__(self, peer_type: Optional[str]) -> None:
+    def __init__(self, peer_type: str | None) -> None:
         """Initialize object."""
 
         # Set defaults
@@ -265,16 +264,16 @@ class BGPAttributes:  # pylint: disable=too-few-public-methods,too-many-instance
 
     """
 
-    asn: Optional[int]
+    asn: int | None
     graceful_shutdown: bool
     quarantine: bool
-    rr_cluster_id: Optional[str]
+    rr_cluster_id: str | None
     route_policy_accept: BGPRoutePolicyAccept
     route_policy_import: BGPRoutePolicyImport
 
-    peertype_constraints: Dict[str, BGPPeertypeConstraints]
+    peertype_constraints: dict[str, BGPPeertypeConstraints]
 
-    rpki_source: Optional[RPKISource]
+    rpki_source: RPKISource | None
 
     def __init__(self) -> None:
         """Initialize object."""

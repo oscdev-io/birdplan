@@ -20,11 +20,10 @@
 
 # pylint: disable=redefined-outer-name
 
-from typing import List
 
 import birdplan.cmdline
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 def test_load_from_string() -> None:

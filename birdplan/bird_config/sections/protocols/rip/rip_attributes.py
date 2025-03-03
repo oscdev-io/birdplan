@@ -18,9 +18,8 @@
 
 """BIRD RIP protocol attributes."""
 
-from typing import List, Union
 
-__all__ = ["RIPRoutePolicyAccept", "RIPRoutePolicyRedistribute", "RIPAttributes"]
+__all__ = ["RIPAttributes", "RIPRoutePolicyAccept", "RIPRoutePolicyRedistribute"]
 
 
 class RIPRoutePolicyAccept:  # pylint: disable=too-few-public-methods
@@ -65,7 +64,7 @@ class RIPRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
 
     """
 
-    connected: Union[bool, List[str]]
+    connected: bool | list[str]
     kernel: bool
     kernel_default: bool
     rip: bool

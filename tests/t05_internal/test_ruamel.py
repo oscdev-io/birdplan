@@ -22,13 +22,13 @@
 
 import io
 import pathlib
-from typing import Any, List, Tuple
+from typing import Any
 
 import pytest
 
 from birdplan.yaml.ruamel import YAML
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 @pytest.fixture
@@ -38,7 +38,7 @@ def yaml() -> YAML:
 
 
 @pytest.fixture
-def test_data() -> dict[str, Tuple[int, int, int]]:
+def test_data() -> dict[str, tuple[int, int, int]]:
     """Test data."""
     return {"key": (1, 2, 3)}
 

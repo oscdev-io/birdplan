@@ -20,7 +20,7 @@
 
 
 import argparse
-from typing import Any, Optional
+from typing import Any
 
 from ...plugin import Plugin
 
@@ -30,8 +30,8 @@ __all__ = ["BirdPlanCmdlinePluginBase"]
 class BirdPlanCmdlinePluginBase(Plugin):  # pylint: disable=too-few-public-methods
     """BirdPlan commandline plugin base class."""
 
-    _subparser: Optional[argparse.ArgumentParser]
-    _subparsers: Optional[argparse.ArgumentParser]
+    _subparser: argparse.ArgumentParser | None
+    _subparsers: argparse.ArgumentParser | None
 
     def __init__(self) -> None:
         """Initialize object."""

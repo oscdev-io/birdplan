@@ -22,9 +22,9 @@ import inspect
 import logging
 import os
 import pkgutil
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-__all__ = ["PluginMethodException", "PluginNotFoundException", "Plugin", "PluginCollection"]
+__all__ = ["Plugin", "PluginCollection", "PluginMethodException", "PluginNotFoundException"]
 
 
 class PluginMethodException(RuntimeError):
@@ -63,15 +63,15 @@ class PluginCollection:
     """
 
     # The package name we will be loading plugins from
-    _plugin_packages: List[str]
+    _plugin_packages: list[str]
     # List of plugins we've loaded
-    _plugins: Dict[str, Plugin]
+    _plugins: dict[str, Plugin]
     # List of paths we've seen during processing
-    _seen_paths: List[str]
+    _seen_paths: list[str]
     # Plugin statuses
-    _plugin_status: Dict[str, str]
+    _plugin_status: dict[str, str]
 
-    def __init__(self, plugin_packages: List[str]):
+    def __init__(self, plugin_packages: list[str]):
         """
         Initialize Plugincollection using a plugin base package.
 
@@ -93,7 +93,7 @@ class PluginCollection:
         # Load plugins
         self._load_plugins()
 
-    def call_if_exists(self, method_name: str, args: Any = None) -> Dict[str, Any]:
+    def call_if_exists(self, method_name: str, args: Any = None) -> dict[str, Any]:
         """
         Call a plugin method, but do not raise an exception if it does not exist.
 
@@ -115,7 +115,7 @@ class PluginCollection:
 
         return self.call(method_name, args, skip_not_found=True)
 
-    def call(self, method_name: str, args: Any = None, skip_not_found: bool = False) -> Dict[str, Any]:
+    def call(self, method_name: str, args: Any = None, skip_not_found: bool = False) -> dict[str, Any]:
         """
         Call a plugin method.
 
@@ -154,7 +154,7 @@ class PluginCollection:
 
         return results
 
-    def get_first(self, method_name: str) -> Optional[str]:
+    def get_first(self, method_name: str) -> str | None:
         """
         Get the first plugin method found that matches a specific method name.
 
@@ -317,7 +317,7 @@ class PluginCollection:
                 logging.debug("Plugin loaded '%s' [class=%s]", plugin_name, class_name)
 
         # Look for modules in sub packages
-        all_current_paths: List[str] = []
+        all_current_paths: list[str] = []
 
         if isinstance(imported_package.__path__, str):
             all_current_paths.append(imported_package.__path__)
@@ -353,7 +353,7 @@ class PluginCollection:
                 self._find_plugins(module)
 
     @property
-    def plugins(self) -> Dict[str, Plugin]:
+    def plugins(self) -> dict[str, Plugin]:
         """
         Property containing the dictionary of plugins loaded.
 
@@ -366,7 +366,7 @@ class PluginCollection:
         return self._plugins
 
     @property
-    def plugin_status(self) -> Dict[str, str]:
+    def plugin_status(self) -> dict[str, str]:
         """
         Property containing the plugin load status.
 

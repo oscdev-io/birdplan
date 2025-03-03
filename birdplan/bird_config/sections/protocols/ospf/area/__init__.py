@@ -37,8 +37,8 @@ from .ospf_area_types import OSPFAreaConfig
 __all__ = ["ProtocolOSPFArea"]
 
 
-OSPFAreaInterfaceConfig = Dict[str, Any]
-OSPFAreaInterfaces = Dict[str, ProtocolOSPFAreaInterface]
+OSPFAreaInterfaceConfig = dict[str, Any]
+OSPFAreaInterfaces = dict[str, ProtocolOSPFAreaInterface]
 
 
 class ProtocolOSPFArea(SectionProtocolBase):  # pylint: disable=too-many-public-methods
@@ -53,7 +53,7 @@ class ProtocolOSPFArea(SectionProtocolBase):  # pylint: disable=too-many-public-
     # OSPF interfaces belonging to this area
     _interfaces: OSPFAreaInterfaces
 
-    def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,

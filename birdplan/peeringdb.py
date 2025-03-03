@@ -19,7 +19,7 @@
 """PeeringDB support class."""
 
 import time
-from typing import Any, Dict, Optional
+from typing import Any
 
 import requests
 
@@ -28,7 +28,7 @@ from .exceptions import BirdPlanError
 __all__ = ["PeeringDB"]
 
 
-PeeringDBInfo = Dict[str, Any]
+PeeringDBInfo = dict[str, Any]
 
 
 # Keep a cache for results returned while loaded into memory
@@ -42,7 +42,7 @@ PeeringDBInfo = Dict[str, Any]
 #        }
 #    }
 #  }
-peeringdb_cache: Dict[str, Dict[str, Any]] = {}
+peeringdb_cache: dict[str, dict[str, Any]] = {}
 
 # Keep track of the timestamp of our last request
 peeringdb_last_request: float = 0
@@ -103,7 +103,7 @@ class PeeringDB:  # pylint: disable=too-few-public-methods
         # Lastly return it
         return peeringdb_info
 
-    def _cache(self, obj: str, value: Optional[PeeringDBInfo] = None) -> Optional[Any]:  # noqa: CFQ004
+    def _cache(self, obj: str, value: PeeringDBInfo | None = None) -> Any | None:
         """Retrieve or store value in cache."""
 
         if "objects" not in peeringdb_cache:

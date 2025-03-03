@@ -21,7 +21,7 @@
 import abc
 import io
 import pathlib
-from typing import Any, Optional, Union
+from typing import Any
 
 __all__ = ["YAMLBase"]
 
@@ -30,11 +30,11 @@ class YAMLBase(abc.ABC):
     """YAML class."""
 
     @abc.abstractmethod
-    def load(self, yaml: Union[str, pathlib.Path, io.IOBase]) -> Any:
+    def load(self, yaml: str | pathlib.Path | io.IOBase) -> Any:
         """Load YAML string."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @abc.abstractmethod
-    def dump(self, data: Any, stream: Optional[Union[pathlib.Path, io.IOBase]] = None) -> Any:
+    def dump(self, data: Any, stream: pathlib.Path | io.IOBase | None = None) -> Any:
         """Dump to YAML."""
-        raise NotImplementedError()
+        raise NotImplementedError

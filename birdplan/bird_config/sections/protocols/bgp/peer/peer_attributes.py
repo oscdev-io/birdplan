@@ -19,30 +19,29 @@
 """BIRD BGP protocol attributes."""
 
 import enum
-from typing import Dict, List, Optional, Union
-
-from .actions import BGPPeerActions
+from typing import Optional, Union
 
 from ......exceptions import BirdPlanError
+from .actions import BGPPeerActions
 
 __all__ = [
-    "BGPPeerLargeCommunitiesOutgoing",
-    "BGPPeerLargeCommunities",
-    "BGPPeerPrependItem",
-    "BGPPeerPrepend",
-    "BGPPeerRoutePolicyAccept",
-    "BGPPeerImportFilterPolicy",
-    "BGPPeerLocation",
-    "BGPPeerRoutePolicyRedistribute",
-    "BGPPeerConstraints",
     "BGPPeerAttributes",
+    "BGPPeerConstraints",
+    "BGPPeerImportFilterPolicy",
+    "BGPPeerLargeCommunities",
+    "BGPPeerLargeCommunitiesOutgoing",
+    "BGPPeerLocation",
+    "BGPPeerPrepend",
+    "BGPPeerPrependItem",
+    "BGPPeerRoutePolicyAccept",
+    "BGPPeerRoutePolicyRedistribute",
 ]
 
 # This type is a string as we can have it set to "peeringdb"
 BGPPeerPrefixLimit = Optional[str]
 
-BGPPeerFilterItem = Union[str, List[str]]
-BGPPeerFilter = Dict[str, BGPPeerFilterItem]
+BGPPeerFilterItem = Union[str, list[str]]
+BGPPeerFilter = dict[str, BGPPeerFilterItem]
 
 
 # Define BGP prefix limit action enum
@@ -96,24 +95,24 @@ class BGPPeerCommunitiesOutgoing:  # pylint: disable=too-few-public-methods,too-
 
     """
 
-    connected: List[str]
-    kernel: List[str]
-    kernel_blackhole: List[str]
-    kernel_default: List[str]
-    originated: List[str]
-    originated_default: List[str]
-    static: List[str]
-    static_blackhole: List[str]
-    static_default: List[str]
-    bgp: List[str]
-    bgp_own: List[str]
-    bgp_own_blackhole: List[str]
-    bgp_own_default: List[str]
-    bgp_customer: List[str]
-    bgp_customer_blackhole: List[str]
-    bgp_peering: List[str]
-    bgp_transit: List[str]
-    bgp_transit_default: List[str]
+    connected: list[str]
+    kernel: list[str]
+    kernel_blackhole: list[str]
+    kernel_default: list[str]
+    originated: list[str]
+    originated_default: list[str]
+    static: list[str]
+    static_blackhole: list[str]
+    static_default: list[str]
+    bgp: list[str]
+    bgp_own: list[str]
+    bgp_own_blackhole: list[str]
+    bgp_own_default: list[str]
+    bgp_customer: list[str]
+    bgp_customer_blackhole: list[str]
+    bgp_peering: list[str]
+    bgp_transit: list[str]
+    bgp_transit_default: list[str]
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -149,7 +148,7 @@ class BGPPeerCommunities:  # pylint: disable=too-few-public-methods
 
     """
 
-    incoming: List[str]
+    incoming: list[str]
 
     outgoing: BGPPeerCommunitiesOutgoing
 
@@ -202,24 +201,24 @@ class BGPPeerLargeCommunitiesOutgoing:  # pylint: disable=too-few-public-methods
 
     """
 
-    connected: List[str]
-    kernel: List[str]
-    kernel_blackhole: List[str]
-    kernel_default: List[str]
-    originated: List[str]
-    originated_default: List[str]
-    static: List[str]
-    static_blackhole: List[str]
-    static_default: List[str]
-    bgp: List[str]
-    bgp_own: List[str]
-    bgp_own_blackhole: List[str]
-    bgp_own_default: List[str]
-    bgp_customer: List[str]
-    bgp_customer_blackhole: List[str]
-    bgp_peering: List[str]
-    bgp_transit: List[str]
-    bgp_transit_default: List[str]
+    connected: list[str]
+    kernel: list[str]
+    kernel_blackhole: list[str]
+    kernel_default: list[str]
+    originated: list[str]
+    originated_default: list[str]
+    static: list[str]
+    static_blackhole: list[str]
+    static_default: list[str]
+    bgp: list[str]
+    bgp_own: list[str]
+    bgp_own_blackhole: list[str]
+    bgp_own_default: list[str]
+    bgp_customer: list[str]
+    bgp_customer_blackhole: list[str]
+    bgp_peering: list[str]
+    bgp_transit: list[str]
+    bgp_transit_default: list[str]
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -255,7 +254,7 @@ class BGPPeerLargeCommunities:  # pylint: disable=too-few-public-methods
 
     """
 
-    incoming: List[str]
+    incoming: list[str]
 
     outgoing: BGPPeerLargeCommunitiesOutgoing
 
@@ -455,8 +454,8 @@ class BGPPeerImportFilterPolicy:  # pylint: disable=too-few-public-methods
     origin_asns: BGPPeerFilterItem
     peer_asns: BGPPeerFilterItem
     prefixes: BGPPeerFilterItem
-    origin_asns_irr: List[str]
-    prefixes_irr: List[str]
+    origin_asns_irr: list[str]
+    prefixes_irr: list[str]
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -480,6 +479,7 @@ class BGPPeerExportFilterPolicy:  # pylint: disable=too-few-public-methods
         List of origin ASNs to filter on.
     prefixes : BGPPeerFilterItem
         List of prefixes to filter on.
+
     """
 
     origin_asns: BGPPeerFilterItem
@@ -504,8 +504,8 @@ class BGPPeerLocation:  # pylint: disable=too-few-public-methods
 
     """
 
-    unm49: Optional[int]
-    iso3166: Optional[int]
+    unm49: int | None
+    iso3166: int | None
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -646,36 +646,36 @@ class BGPPeerConstraints:  # pylint: disable=too-few-public-methods,too-many-ins
 
     """
 
-    import_maxlen4: Optional[int]
-    import_minlen4: Optional[int]
+    import_maxlen4: int | None
+    import_minlen4: int | None
 
-    export_maxlen4: Optional[int]
-    export_minlen4: Optional[int]
+    export_maxlen4: int | None
+    export_minlen4: int | None
 
-    import_maxlen6: Optional[int]
-    import_minlen6: Optional[int]
+    import_maxlen6: int | None
+    import_minlen6: int | None
 
-    export_maxlen6: Optional[int]
-    export_minlen6: Optional[int]
+    export_maxlen6: int | None
+    export_minlen6: int | None
 
-    blackhole_import_maxlen4: Optional[int]
-    blackhole_import_minlen4: Optional[int]
+    blackhole_import_maxlen4: int | None
+    blackhole_import_minlen4: int | None
 
-    blackhole_export_maxlen4: Optional[int]
-    blackhole_export_minlen4: Optional[int]
+    blackhole_export_maxlen4: int | None
+    blackhole_export_minlen4: int | None
 
-    blackhole_import_maxlen6: Optional[int]
-    blackhole_import_minlen6: Optional[int]
+    blackhole_import_maxlen6: int | None
+    blackhole_import_minlen6: int | None
 
-    blackhole_export_maxlen6: Optional[int]
-    blackhole_export_minlen6: Optional[int]
+    blackhole_export_maxlen6: int | None
+    blackhole_export_minlen6: int | None
 
-    aspath_import_maxlen: Optional[int]
-    aspath_import_minlen: Optional[int]
+    aspath_import_maxlen: int | None
+    aspath_import_minlen: int | None
 
-    community_import_maxlen: Optional[int]
-    extended_community_import_maxlen: Optional[int]
-    large_community_import_maxlen: Optional[int]
+    community_import_maxlen: int | None
+    extended_community_import_maxlen: int | None
+    large_community_import_maxlen: int | None
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -828,28 +828,28 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
 
     """
 
-    _name: Optional[str]
-    _description: Optional[str]
+    _name: str | None
+    _description: str | None
     location: BGPPeerLocation
 
-    _peer_type: Optional[str]
-    _asn: Optional[int]
+    _peer_type: str | None
+    _asn: int | None
 
-    neighbor4: Optional[str]
-    neighbor6: Optional[str]
-    source_address4: Optional[str]
-    source_address6: Optional[str]
+    neighbor4: str | None
+    neighbor6: str | None
+    source_address4: str | None
+    source_address6: str | None
 
-    connect_delay_time: Optional[str]
-    connect_retry_time: Optional[str]
-    error_wait_time: Optional[str]
-    multihop: Optional[str]
-    password: Optional[str]
+    connect_delay_time: str | None
+    connect_retry_time: str | None
+    error_wait_time: str | None
+    multihop: str | None
+    password: str | None
     ttl_security: bool
 
     cost: int
 
-    add_paths: Optional[str]
+    add_paths: str | None
 
     graceful_shutdown: bool
 
@@ -880,11 +880,11 @@ class BGPPeerAttributes:  # pylint: disable=too-few-public-methods,too-many-inst
     import_filter_deny_policy: BGPPeerImportFilterDenyPolicy
     export_filter_policy: BGPPeerExportFilterPolicy
 
-    blackhole_community: Optional[Union[List[str], bool]]
+    blackhole_community: list[str] | bool | None
 
     constraints: BGPPeerConstraints
 
-    actions: Optional[BGPPeerActions]
+    actions: BGPPeerActions | None
 
     use_rpki: bool
 

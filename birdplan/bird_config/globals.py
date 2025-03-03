@@ -18,7 +18,7 @@
 
 """BirdConfig configuration globals."""
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 __all__ = ["BirdConfigGlobals"]
 
@@ -43,15 +43,16 @@ class BirdConfigGlobals:  # pylint: disable=too-few-public-methods,too-many-inst
         VRF to use for BIRD.
     routing_table: int
         Kernel routing table to add the routes to.
+
     """
 
-    log_file: Optional[str]
+    log_file: str | None
     debug: bool
     _suppress_info: bool
     ignore_irr_changes: bool
     ignore_peeringdb_changes: bool
     use_cached: bool
-    state: Dict[str, Any]
+    state: dict[str, Any]
     test_mode: bool
     vrf: str
     routing_table: int | None

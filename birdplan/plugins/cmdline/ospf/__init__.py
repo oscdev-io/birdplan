@@ -39,7 +39,7 @@ class BirdPlanCmdlineOSPF(BirdPlanCmdlinePluginBase):
         self.plugin_description = "birdplan ospf"
         self.plugin_order = 10
 
-    def register_parsers(self, args: Dict[str, Any]) -> None:
+    def register_parsers(self, args: dict[str, Any]) -> None:
         """
         Register commandline parsers.
 
@@ -79,6 +79,6 @@ class BirdPlanCmdlineOSPF(BirdPlanCmdlinePluginBase):
         """
 
         if not self._subparser:
-            raise RuntimeError()
+            raise RuntimeError
 
         raise BirdPlanUsageError("No options specified to 'ospf' action", self._subparser)

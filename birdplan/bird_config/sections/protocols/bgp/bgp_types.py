@@ -18,8 +18,8 @@
 
 """BIRD BGP protocol typing."""
 
-from typing import Any, Dict
+from typing import Any
 
 _all__ = ["BGPPeerConfig"]
 
-BGPPeerConfig = Dict[str, Any]
+BGPPeerConfig = dict[str, Any]

@@ -71,7 +71,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         """Set up our test."""
         self._test_setup(sim, testpath, tmpdir)
 
-    def test_announce_routes(self, sim):  # noqa: CFQ001
+    def test_announce_routes(self, sim):
         """Hook to add in routes if we need to."""
 
         # Own route

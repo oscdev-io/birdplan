@@ -20,11 +20,10 @@
 
 
 import sys
-from typing import List
 
 from .cmdline import main
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 if __name__ == "__main__":

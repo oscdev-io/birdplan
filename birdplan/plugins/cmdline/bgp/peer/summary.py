@@ -20,7 +20,7 @@
 
 import argparse
 import io
-from typing import Any, Dict
+from typing import Any
 
 from ..... import BirdPlanBGPPeerSummary
 from .....cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
@@ -80,7 +80,7 @@ class BirdPlanCmdlineBGPPeerShowResult(BirdPlanCommandlineResult):
                     if "info_extra" in protocol_status:
                         info += " - " + protocol_status["info_extra"]
                         info_out = colored(f"{info[:49]}".center(49), "red")
-                elif protocol_status["state"] == "up":  # noqa: SIM102
+                elif protocol_status["state"] == "up":
                     if protocol_status["info"] == "established":
                         state_out = colored(f"{state[:8]}".center(8), "green")
                         info_out = colored(f"{info[:49]}".center(49), "green")
@@ -109,7 +109,7 @@ class BirdPlanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
         self.plugin_description = "birdplan bgp peer summary"
         self.plugin_order = 20
 
-    def register_parsers(self, args: Dict[str, Any]) -> None:
+    def register_parsers(self, args: dict[str, Any]) -> None:
         """
         Register commandline parsers.
 
@@ -158,7 +158,7 @@ class BirdPlanCmdlineBGPPeerShow(BirdPlanCmdlinePluginBase):
         """
 
         if not self._subparser:  # pragma: no cover
-            raise RuntimeError()
+            raise RuntimeError
 
         cmdline: BirdPlanCommandLine = args["cmdline"]
 

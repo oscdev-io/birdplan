@@ -30,7 +30,7 @@ import os
 import pprint
 import re
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
@@ -47,7 +47,7 @@ from .simulation import Simulation
 __all__ = ["BirdPlanBaseTestCase"]
 
 
-BirdConfigMacros = Optional[Dict[str, Dict[str, str]]]
+BirdConfigMacros = Optional[dict[str, dict[str, str]]]
 
 #
 # Test case base classes
@@ -117,7 +117,7 @@ class BirdPlanBaseTestCase:
     e2_interface_eth0 = {"mac": "02:e2:00:00:00:01", "ips": ["100.64.0.3/24", "fc00:100::3/64"]}
     e2_switch_eth0 = "s1"
 
-    def _test_setup(  # noqa: CFQ001 # pylint: disable=too-many-locals, too-many-branches, too-many-statements
+    def _test_setup(  # pylint: disable=too-many-locals, too-many-branches, too-many-statements
         self, sim, testpath, tmpdir
     ):
         """Set up a BIRD test scenario using our attributes."""
@@ -278,7 +278,7 @@ class BirdPlanBaseTestCase:
             assert "router_id" in status_output, f"The status output should have 'router_id' for BIRD router '{router}'"
             assert status_output["router_id"] == f"0.0.0.{router_id}", f"The router ID should be '0.0.0.{router_id}'"
 
-    def _test_bird_routers_table_bgp_peers(self, sim: Simulation, ipv: int, routers: Optional[List[str]] = None):
+    def _test_bird_routers_table_bgp_peers(self, sim: Simulation, ipv: int, routers: list[str] | None = None):
         """Test BIRD BGP peer routing table."""
 
         # Check if we didn't get a router list override, if we didn't, then use all routers
@@ -313,7 +313,7 @@ class BirdPlanBaseTestCase:
                     f"BIRD router '{router}' peer table '{table_name}' does not match what it should be"
                 )
 
-    def _test_bird_routers_table(self, sim: Simulation, table_name: str, routers: Optional[List[str]] = None):
+    def _test_bird_routers_table(self, sim: Simulation, table_name: str, routers: list[str] | None = None):
         """Test BIRD routing table for all routers, or those specified."""
 
         # Check if we didn't get a router list override, if we didn't, then use all routers
@@ -338,7 +338,7 @@ class BirdPlanBaseTestCase:
             # Make sure table matches
             assert received_data == expected_data, f"BIRD router '{router}' table '{table_name}' does not match what it should be"
 
-    def _get_bird_table_data(self, sim: Simulation, router: str, table_name: str) -> Tuple[Any, Any]:
+    def _get_bird_table_data(self, sim: Simulation, router: str, table_name: str) -> tuple[Any, Any]:
         """Get the bird table received data and expected data."""
 
         # Work out variable names
@@ -395,7 +395,7 @@ class BirdPlanBaseTestCase:
         return (result, result_expected)
 
     def _test_bird_cmdline_ospf_summary(  # pylint: disable=too-many-locals,too-many-branches
-        self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None
+        self, sim: Simulation, tmpdir: str, routers: list[str] | None = None
     ):
         """Test showing OSPF summary."""
 
@@ -481,7 +481,7 @@ class BirdPlanBaseTestCase:
             assert data["result"] == data["expected"], f"BIRD router '{router}' OSPF summary does not match what it should be"
 
     def _test_bird_cmdline_bgp_peer_summary(  # pylint: disable=too-many-locals,too-many-branches
-        self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None
+        self, sim: Simulation, tmpdir: str, routers: list[str] | None = None
     ):
         """Test showing BGP peer summary."""
 
@@ -575,8 +575,8 @@ class BirdPlanBaseTestCase:
         for router, data in router_summaries.items():
             assert data["result"] == data["expected"], f"BIRD router '{router}' peer summary does not match what it should be"
 
-    def _test_bird_cmdline_bgp_peer_show(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches
-        self, sim: Simulation, tmpdir: str, routers: Optional[List[str]] = None
+    def _test_bird_cmdline_bgp_peer_show(  # pylint: disable=too-many-locals,too-many-branches
+        self, sim: Simulation, tmpdir: str, routers: list[str] | None = None
     ):
         """Test showing BGP peer show."""
 
@@ -697,7 +697,7 @@ class BirdPlanBaseTestCase:
                     f"BIRD router '{router}' peer show on '{peer}' does not match what it should be"
                 )
 
-    def _test_os_rib(self, sim: Simulation, table_name: str, routers: Optional[List[str]] = None):
+    def _test_os_rib(self, sim: Simulation, table_name: str, routers: list[str] | None = None):
         """Test OS routing table."""
 
         # Check if we didn't get a router list override, if we didn't, then use all routers
@@ -722,7 +722,7 @@ class BirdPlanBaseTestCase:
             # Make sure table matches
             assert received_data == expected_data, f"BIRD router '{router}' RIB '{table_name}' does not match what it should be"
 
-    def _get_os_rib_data(self, sim: Simulation, router: str, table_name: str) -> Tuple[Any, Any]:
+    def _get_os_rib_data(self, sim: Simulation, router: str, table_name: str) -> tuple[Any, Any]:
         """Get the OS RIB received data and expected data."""
 
         # Work out variable names
@@ -772,7 +772,7 @@ class BirdPlanBaseTestCase:
         # Return the two chunks of data for later assertion
         return (result, result_expected)
 
-    def _configure_bird_routers(self, sim: Simulation, tmpdir: str) -> List[str]:
+    def _configure_bird_routers(self, sim: Simulation, tmpdir: str) -> list[str]:
         """Create our configuration files."""
         # Generate config files and keep track of what we configured in the case of exceptions
         configured_routers = []
@@ -790,7 +790,7 @@ class BirdPlanBaseTestCase:
 
         return configured_routers
 
-    def _configure_exabgps(self, sim: Simulation, tmpdir: str) -> List[str]:  # pylint: disable=too-many-locals,too-many-branches
+    def _configure_exabgps(self, sim: Simulation, tmpdir: str) -> list[str]:  # pylint: disable=too-many-locals,too-many-branches
         """Create our configuration files."""
 
         # Loop with each ExaBGP
@@ -853,7 +853,7 @@ class BirdPlanBaseTestCase:
                 raise RuntimeError(f"No ExaBGP configuration file found for ExaBGP '{exabgp}' with ASN '{exabgp_asn}'")
 
             # Read in configuration file
-            with open(exabgp_config_file, "r", encoding="UTF-8") as file:
+            with open(exabgp_config_file, encoding="UTF-8") as file:
                 raw_config = file.read()
             # Check if we're replacing macros in our configuration file
             for macro, value in internal_macros.items():
@@ -867,7 +867,7 @@ class BirdPlanBaseTestCase:
             # Add config file to our simulation so we get a report for it
             sim.add_conffile(f"exabgp.conf.{exabgp}", exabgp_conffile)
 
-    def _configure_stayrtrs(self, sim: Simulation, tmpdir: str) -> List[str]:  # pylint: disable=too-many-locals,too-many-branches
+    def _configure_stayrtrs(self, sim: Simulation, tmpdir: str) -> list[str]:  # pylint: disable=too-many-locals,too-many-branches
         """Create our SLURM files."""
 
         # Loop with each StayRTR
@@ -920,7 +920,7 @@ class BirdPlanBaseTestCase:
                 raise RuntimeError(f"No StayRTR SLURM file found for StayRTR '{stayrtr}' with ASN '{stayrtr_asn}'")
 
             # Read in SLURM file
-            with open(stayrtr_slurm_file, "r", encoding="UTF-8") as file:
+            with open(stayrtr_slurm_file, encoding="UTF-8") as file:
                 raw_slurm = file.read()
             # Check if we're replacing macros in our SLURM file
             for macro, value in internal_macros.items():
@@ -934,9 +934,9 @@ class BirdPlanBaseTestCase:
             # Add SLURM file to our simulation so we get a report for it
             sim.add_conffile(f"stayrtr.slurm.json.{stayrtr}", stayrtr_slurmfile)
 
-    def _birdplan_run(  # noqa: CFQ001 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements
-        self, sim: Simulation, tmpdir: str, router: str, args: List[str]
-    ) -> Optional[BirdPlanCommandlineResult]:
+    def _birdplan_run(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements
+        self, sim: Simulation, tmpdir: str, router: str, args: list[str]
+    ) -> BirdPlanCommandlineResult | None:
         """Run BirdPlan for a given router."""
 
         # Work out file names
@@ -1012,7 +1012,7 @@ class BirdPlanBaseTestCase:
                 raise RuntimeError("No router configuration file found")
 
             # Read in configuration file
-            with open(router_config_file, "r", encoding="UTF-8") as file:
+            with open(router_config_file, encoding="UTF-8") as file:
                 raw_config = file.read()
             # Check if we're replacing macros in our configuration file
             while True:
@@ -1136,7 +1136,7 @@ class BirdPlanBaseTestCase:
             if tries > 10:
                 return False
             # Open log file and read in the log
-            with open(sim.logfiles[logname], "r", encoding="UTF-8") as logfile:
+            with open(sim.logfiles[logname], encoding="UTF-8") as logfile:
                 log_str = logfile.read()
             # Check if the log contains what we're looking for
             if re.search(matches, log_str):
@@ -1145,7 +1145,7 @@ class BirdPlanBaseTestCase:
             tries += 1
             time.sleep(1)
 
-    def _exabgpcli(self, sim: Simulation, exabgp_name: str, args: List[str], report_title: str = "") -> List[str]:
+    def _exabgpcli(self, sim: Simulation, exabgp_name: str, args: list[str], report_title: str = "") -> list[str]:
         """Run the ExaBGP cli."""
         # Grab the route table
         output = sim.node(exabgp_name).exabgpcli(args)

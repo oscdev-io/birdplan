@@ -39,7 +39,7 @@ class BirdPlanCmdlineBGP(BirdPlanCmdlinePluginBase):
         self.plugin_description = "birdplan bgp"
         self.plugin_order = 10
 
-    def register_parsers(self, args: Dict[str, Any]) -> None:
+    def register_parsers(self, args: dict[str, Any]) -> None:
         """
         Register commandline parsers.
 
@@ -79,6 +79,6 @@ class BirdPlanCmdlineBGP(BirdPlanCmdlinePluginBase):
         """
 
         if not self._subparser:
-            raise RuntimeError()
+            raise RuntimeError
 
         raise BirdPlanUsageError("No options specified to 'bgp' action", self._subparser)

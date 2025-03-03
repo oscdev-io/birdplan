@@ -24,7 +24,7 @@ import json
 import shutil
 import subprocess  # nosec
 import time
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from .exceptions import BirdPlanError
 
@@ -44,7 +44,7 @@ __all__ = ["BGPQ3"]
 #         }
 #     }
 # }
-bgpq3_cache: Dict[str, Dict[str, Any]] = {}
+bgpq3_cache: dict[str, dict[str, Any]] = {}
 
 
 class BGPQ3:
@@ -72,11 +72,11 @@ class BGPQ3:
 
         raise BirdPlanError("bgpq3/bgpq4 executable not found in PATH")
 
-    def get_asns(self, as_sets: Union[str, List[str]]) -> List[str]:  # pylint: disable=too-many-branches
+    def get_asns(self, as_sets: str | list[str]) -> list[str]:  # pylint: disable=too-many-branches
         """Get prefixes."""
 
         # Build an object list depending on the type of "objects" above
-        objects: List[str] = []
+        objects: list[str] = []
         if isinstance(as_sets, str):
             objects.append(as_sets)
         else:
@@ -84,7 +84,7 @@ class BGPQ3:
 
         # Grab ASNs
         is_birdplan_internal = False
-        asns_bgpq3: Dict[str, List[str]] = {}
+        asns_bgpq3: dict[str, list[str]] = {}
         for obj in objects:
             # Try pull result from our cache
             result: Any = self._cache(f"asns:{obj}")
@@ -144,18 +144,18 @@ class BGPQ3:
 
         return filtered_asns
 
-    def get_prefixes(self, as_sets: Union[str, List[str]]) -> Dict[str, List[str]]:
+    def get_prefixes(self, as_sets: str | list[str]) -> dict[str, list[str]]:
         """Get prefixes."""
 
         # Build an object list depending on the type of "objects" above
-        objects: List[str] = []
+        objects: list[str] = []
         if isinstance(as_sets, str):
             objects.append(as_sets)
         else:
             objects.extend(as_sets)
 
         # Grab IPv4 and IPv6 prefixes
-        prefixes_bgpq3: Dict[str, List[Dict[str, Any]]] = {}
+        prefixes_bgpq3: dict[str, list[dict[str, Any]]] = {}
         for obj in objects:
             # Try pull result from our cache
             result: Any = self._cache(f"prefixes:{obj}")
@@ -181,7 +181,7 @@ class BGPQ3:
             prefixes_bgpq3.update(result)
 
         # Start out with no prefixes
-        prefixes: Dict[str, List[str]] = {"ipv4": [], "ipv6": []}
+        prefixes: dict[str, list[str]] = {"ipv4": [], "ipv6": []}
 
         for family in ("ipv4", "ipv6"):
             for prefix in prefixes_bgpq3[family]:
@@ -190,7 +190,7 @@ class BGPQ3:
                     prefixes[family].append(prefix["prefix"])
                 else:
                     # Work out greater_equal component
-                    if "greater-equal" in prefix:  # noqa: SIM401
+                    if "greater-equal" in prefix:
                         greater_equal = prefix["greater-equal"]
                     else:
                         greater_equal = ipaddress.ip_network(prefix["prefix"]).prefixlen
@@ -199,7 +199,7 @@ class BGPQ3:
 
         return prefixes
 
-    def _bgpq3(self, args: List[str]) -> Any:
+    def _bgpq3(self, args: list[str]) -> Any:
         """Run bgpq3."""
 
         # Run the IP tool with JSON output
@@ -216,7 +216,7 @@ class BGPQ3:
         # Return the decoded json output
         return decoded
 
-    def _cache(self, obj: str, value: Optional[Any] = None) -> Optional[Any]:  # noqa: CFQ004
+    def _cache(self, obj: str, value: Any | None = None) -> Any | None:
         """Retrieve or store value in cache."""
 
         if self.server not in bgpq3_cache:

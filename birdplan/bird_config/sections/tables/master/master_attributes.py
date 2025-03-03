@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """BIRD master table attributes."""
-__all__ = ["MasterTableRoutePolicyExportKernel", "MasterTableRoutePolicyExport", "MasterTableAttributes"]
+__all__ = ["MasterTableAttributes", "MasterTableRoutePolicyExport", "MasterTableRoutePolicyExportKernel"]
 
 
 class MasterTableRoutePolicyExportKernel:  # pylint: disable=too-few-public-methods

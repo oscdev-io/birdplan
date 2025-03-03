@@ -20,7 +20,7 @@
 
 import logging
 import re
-from typing import Any, Dict, List, Union
+from typing import Any
 
 from .....console.colors import colored
 from .....exceptions import BirdPlanConfigError
@@ -36,12 +36,12 @@ class BGPConfigParser(ConfigParser):
 
     _birdconf: BirdConfig
 
-    def parse(self, config: Dict[str, Any]) -> None:
+    def parse(self, config: dict[str, Any]) -> None:
         """Configure BGP protocol."""
 
         self._config_bgp(config)
 
-    def _config_bgp(self, config: Dict[str, Any]) -> None:
+    def _config_bgp(self, config: dict[str, Any]) -> None:
         """Configure bgp section."""
 
         # If we have no rip section, just return
@@ -85,7 +85,7 @@ class BGPConfigParser(ConfigParser):
         self._config_bgp_import(config)
         self._config_bgp_peers(config)
 
-    def _config_bgp_accept(self, config: Dict[str, Any]) -> None:
+    def _config_bgp_accept(self, config: dict[str, Any]) -> None:
         """Configure bgp:accept section."""
 
         # If we don't have an accept section, just return
@@ -108,7 +108,7 @@ class BGPConfigParser(ConfigParser):
             else:
                 raise BirdPlanConfigError(f"Configuration item '{accept}' not understood in bgp:accept")
 
-    def _config_bgp_globals(self, config: Dict[str, Any]) -> None:
+    def _config_bgp_globals(self, config: dict[str, Any]) -> None:
         """Configure bgp globals."""
 
         # Setup graceful shutdown if specified
@@ -123,7 +123,7 @@ class BGPConfigParser(ConfigParser):
         if "rr_cluster_id" in config["bgp"]:
             self.birdconf.protocols.bgp.rr_cluster_id = config["bgp"]["rr_cluster_id"]
 
-    def _config_bgp_peertype_constraints(self, config: Dict[str, Any]) -> None:
+    def _config_bgp_peertype_constraints(self, config: dict[str, Any]) -> None:
         """Configure bgp:peertype_constraints section."""
 
         # If we don't have a peertype_constraints section, just return
@@ -226,7 +226,7 @@ class BGPConfigParser(ConfigParser):
                     config["bgp"]["peertype_constraints"][peer_type][constraint_name],
                 )
 
-    def _config_bgp_originate(self, config: Dict[str, Any]) -> None:
+    def _config_bgp_originate(self, config: dict[str, Any]) -> None:
         """Configure bgp:originate section."""
 
         # If we don't have an accept section, just return
@@ -237,7 +237,7 @@ class BGPConfigParser(ConfigParser):
         for route in config["bgp"]["originate"]:
             self.birdconf.protocols.bgp.add_originated_route(route)
 
-    def _config_bgp_import(self, config: Dict[str, Any]) -> None:  # pylint: disable=too-many-branches
+    def _config_bgp_import(self, config: dict[str, Any]) -> None:  # pylint: disable=too-many-branches
         """Configure bgp:import section."""
 
         # If we don't have the option then just return
@@ -249,7 +249,7 @@ class BGPConfigParser(ConfigParser):
             # Import connected routes into the main BGP table
             if import_type == "connected":
                 # Set type
-                import_connected: Union[bool, List[str]]
+                import_connected: bool | list[str]
                 # Check what kind of config we go...
                 if isinstance(import_config, bool):
                     import_connected = import_config
@@ -292,7 +292,7 @@ class BGPConfigParser(ConfigParser):
             else:
                 raise BirdPlanConfigError(f"Configuration item '{import_type}' not understood in bgp:import")
 
-    def _config_bgp_peers(self, config: Dict[str, Any]) -> None:
+    def _config_bgp_peers(self, config: dict[str, Any]) -> None:
         """Configure bgp:peers section."""
 
         if "peers" not in config["bgp"]:
@@ -319,8 +319,8 @@ class BGPConfigParser(ConfigParser):
             # Bump current peer
             peer_cur += 1
 
-    def _config_bgp_peers_peer(  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-locals,too-many-statements
-        self, config: Dict[str, Any], peer_name: str, peer_config: Dict[str, Any]
+    def _config_bgp_peers_peer(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
+        self, config: dict[str, Any], peer_name: str, peer_config: dict[str, Any]
     ) -> None:
         """Configure bgp:peers single peer."""
 

@@ -18,8 +18,8 @@
 
 """BIRD OSPF area interface typing."""
 
-from typing import Any, Dict
+from typing import Any
 
 __all__ = ["OSPFAreaInterfaceConfig"]
 
-OSPFAreaInterfaceConfig = Dict[str, Any]
+OSPFAreaInterfaceConfig = dict[str, Any]

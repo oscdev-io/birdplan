@@ -18,7 +18,7 @@
 
 """BIRD OSPF configuration parser."""
 
-from typing import Any, Dict, List, Union
+from typing import Any
 
 from .....exceptions import BirdPlanConfigError
 from .... import BirdConfig
@@ -32,12 +32,12 @@ class OSPFConfigParser(ConfigParser):
 
     _birdconf: BirdConfig
 
-    def parse(self, config: Dict[str, Any]) -> None:
+    def parse(self, config: dict[str, Any]) -> None:
         """Configure OSPF protocol."""
 
         self._config_ospf(config)
 
-    def _config_ospf(self, config: Dict[str, Any]) -> None:
+    def _config_ospf(self, config: dict[str, Any]) -> None:
         """Configure OSPF section."""
 
         # If we have no ospf section, just return
@@ -64,7 +64,7 @@ class OSPFConfigParser(ConfigParser):
         self._config_ospf_redistribute(config)
         self._config_ospf_areas(config)
 
-    def _config_ospf_accept(self, config: Dict[str, Any]) -> None:
+    def _config_ospf_accept(self, config: dict[str, Any]) -> None:
         """Configure ospf:accept section."""
 
         # If we don't have an accept section, just return
@@ -80,7 +80,7 @@ class OSPFConfigParser(ConfigParser):
             else:
                 raise BirdPlanConfigError(f"Configuration item '{accept}' not understood in ospf:accept")
 
-    def _config_ospf_redistribute(self, config: Dict[str, Any]) -> None:  # pylint: disable=too-many-branches
+    def _config_ospf_redistribute(self, config: dict[str, Any]) -> None:  # pylint: disable=too-many-branches
         """Configure ospf:redistribute section."""
 
         # If we don't have a redistribute section just return
@@ -95,7 +95,7 @@ class OSPFConfigParser(ConfigParser):
             # Add connected route redistribution
             elif redistribute == "connected":
                 # Set type
-                redistribute_connected: Union[bool, List[str]]
+                redistribute_connected: bool | list[str]
                 # Check what kind of config we go...
                 if isinstance(redistribute_config, bool):
                     redistribute_connected = redistribute_config
@@ -133,7 +133,7 @@ class OSPFConfigParser(ConfigParser):
             else:
                 raise BirdPlanConfigError(f"Configuration item '{redistribute}' not understood in ospf:redistribute")
 
-    def _config_ospf_areas(self, config: Dict[str, Any]) -> None:  # pylint: disable=too-many-branches
+    def _config_ospf_areas(self, config: dict[str, Any]) -> None:  # pylint: disable=too-many-branches
         """Configure ospf:interfaces section."""
 
         # If we don't have areas in our ospf section, just return
@@ -169,7 +169,7 @@ class OSPFConfigParser(ConfigParser):
             # Loop with interfaces in area
             for interface_name, raw_config in raw_area_config["interfaces"].items():
                 # Start with no special interface configuration
-                interface_config: Dict[str, Any] = {}
+                interface_config: dict[str, Any] = {}
                 # Check what kind of config we've got...
                 add_ospf_interface = False
                 if isinstance(raw_config, bool):

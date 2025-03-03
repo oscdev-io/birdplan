@@ -45,12 +45,12 @@ __all__ = [
 ]
 
 # Some types we need
-BirdPlanBGPPeerSummary = Dict[str, Dict[str, Any]]
-BirdPlanBGPPeerShow = Dict[str, Any]
-BirdPlanBGPPeerGracefulShutdownStatus = Dict[str, Dict[str, bool]]
-BirdPlanBGPPeerQuarantineStatus = Dict[str, Dict[str, bool]]
-BirdPlanOSPFInterfaceStatus = Dict[str, Dict[str, Dict[str, Any]]]
-BirdPlanOSPFSummary = Dict[str, Dict[str, Any]]
+BirdPlanBGPPeerSummary = dict[str, dict[str, Any]]
+BirdPlanBGPPeerShow = dict[str, Any]
+BirdPlanBGPPeerGracefulShutdownStatus = dict[str, dict[str, bool]]
+BirdPlanBGPPeerQuarantineStatus = dict[str, dict[str, bool]]
+BirdPlanOSPFInterfaceStatus = dict[str, dict[str, dict[str, Any]]]
+BirdPlanOSPFSummary = dict[str, dict[str, Any]]
 
 # Check we have a sufficiently new version of birdclient
 if packaging.version.parse(birdclient.__version__) < packaging.version.parse("0.0.11"):
@@ -61,8 +61,8 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
     """Main BirdPlan class."""
 
     _birdconf: BirdConfig
-    _config: Dict[str, Any]
-    _state_file: Optional[str]
+    _config: dict[str, Any]
+    _state_file: str | None
     _yaml: YAML
 
     def __init__(self, test_mode: bool = False) -> None:
@@ -97,8 +97,8 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         """
 
         # Grab parameters
-        plan_file: Optional[str] = kwargs.get("plan_file")
-        state_file: Optional[str] = kwargs.get("state_file")
+        plan_file: str | None = kwargs.get("plan_file")
+        state_file: str | None = kwargs.get("state_file")
         ignore_irr_changes: bool = kwargs.get("ignore_irr_changes", False)
         ignore_peeringdb_changes: bool = kwargs.get("ignore_peeringdb_changes", False)
         use_cached: bool = kwargs.get("use_cached", False)
@@ -225,7 +225,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 # We use the state_file here because the size of raw_state may be larger than 100MiB
                 raise BirdPlanError(f" Failed to parse BirdPlan state file '{self.state_file}': {err}") from None
 
-    def state_ospf_summary(self, bird_socket: Optional[str] = None) -> BirdPlanOSPFSummary:
+    def state_ospf_summary(self, bird_socket: str | None = None) -> BirdPlanOSPFSummary:
         """
         Return OSPF summary.
 
@@ -255,7 +255,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 }
             }
 
-        """  # noqa: RST201,RST203,RST301
+        """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
@@ -279,7 +279,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
 
         return ret
 
-    def state_bgp_peer_summary(self, bird_socket: Optional[str] = None) -> BirdPlanBGPPeerSummary:
+    def state_bgp_peer_summary(self, bird_socket: str | None = None) -> BirdPlanBGPPeerSummary:
         """
         Return BGP peer summary.
 
@@ -304,7 +304,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 }
             }
 
-        """  # noqa: RST201,RST203,RST301
+        """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
@@ -345,7 +345,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
 
         return ret
 
-    def state_bgp_peer_show(self, peer: str, bird_socket: Optional[str] = None) -> BirdPlanBGPPeerShow:
+    def state_bgp_peer_show(self, peer: str, bird_socket: str | None = None) -> BirdPlanBGPPeerShow:
         """
         Return the status of a specific BGP peer.
 
@@ -367,7 +367,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 },
             }
 
-        """  # noqa: RST201,RST203,RST301
+        """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
@@ -485,7 +485,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 }
             }
 
-        """  # noqa: RST201,RST203,RST301
+        """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
@@ -600,7 +600,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 }
             }
 
-        """  # noqa: RST201,RST203,RST301
+        """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
@@ -829,7 +829,7 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
                 }
             }
 
-        """  # noqa: RST201,RST203,RST301
+        """
 
         # Raise an exception if we don't have a state file loaded
         if self.state_file is None:
@@ -972,32 +972,32 @@ class BirdPlan:  # pylint: disable=too-many-public-methods
         return self._birdconf
 
     @property
-    def config(self) -> Dict[str, Any]:
+    def config(self) -> dict[str, Any]:
         """Return our config."""
         return self._config
 
     @config.setter
-    def config(self, config: Dict[str, Any]) -> None:
+    def config(self, config: dict[str, Any]) -> None:
         """Set our configuration."""
         self._config = config
 
     @property
-    def state(self) -> Dict[str, Any]:
+    def state(self) -> dict[str, Any]:
         """Return our state."""
         return self.birdconf.state
 
     @state.setter
-    def state(self, state: Dict[str, Any]) -> None:
+    def state(self, state: dict[str, Any]) -> None:
         """Set our state."""
         self.birdconf.state = state
 
     @property
-    def state_file(self) -> Optional[str]:
+    def state_file(self) -> str | None:
         """State file we're using."""
         return self._state_file
 
     @state_file.setter
-    def state_file(self, state_file: Optional[str]) -> None:
+    def state_file(self, state_file: str | None) -> None:
         """Set our state file."""
         self._state_file = state_file
 

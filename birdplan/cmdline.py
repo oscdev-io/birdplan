@@ -25,7 +25,8 @@ import logging
 import logging.handlers
 import os
 import sys
-from typing import Any, Callable, Dict, List, Literal, NoReturn, Optional
+from collections.abc import Callable
+from typing import Any, Literal, NoReturn
 
 from . import BirdPlan
 from .console.colors import colored
@@ -33,7 +34,7 @@ from .exceptions import BirdPlanError, BirdPlanUsageError
 from .plugin import PluginCollection
 from .version import __version__
 
-__all__ = ["ColorFormatter", "BirdPlanArgumentParser", "BirdPlanCommandLine"]
+__all__ = ["BirdPlanArgumentParser", "BirdPlanCommandLine", "ColorFormatter"]
 
 
 # Defaults
@@ -60,7 +61,7 @@ class ColorFormatter(logging.Formatter):
     text message.
     """
 
-    level_name_colors: Dict[int, Callable[[str], str]] = {
+    level_name_colors: dict[int, Callable[[str], str]] = {
         TRACE_LOG_LEVEL: lambda level_name: colored(str(level_name), "blue"),
         logging.DEBUG: lambda level_name: colored(str(level_name), "cyan"),
         logging.INFO: lambda level_name: colored(str(level_name), "green"),
@@ -79,7 +80,7 @@ class ColorFormatter(logging.Formatter):
         """
         Color log formatter class.
 
-        Arguments
+        Arguments:
         ---------
         fmt : str
             Format string.
@@ -89,6 +90,7 @@ class ColorFormatter(logging.Formatter):
             Format style.
         use_colors : bool
             Use colors or not.
+
         """
 
         if isinstance(use_colors, bool):
@@ -168,6 +170,7 @@ class BirdPlanCommandlineResult:  # pylint: disable=too-few-public-methods
         -------
         str
             Data as console output.
+
         """
 
         return self.as_text()
@@ -180,6 +183,7 @@ class BirdPlanCommandlineResult:  # pylint: disable=too-few-public-methods
         -------
         str
             Data as text.
+
         """
 
         return f"{self.data}"
@@ -197,6 +201,7 @@ class BirdPlanCommandlineResult:  # pylint: disable=too-few-public-methods
         -------
         str
             Return data as JSON.
+
         """
 
         return json.dumps({"status": "success", "data": self.data})
@@ -210,6 +215,7 @@ class BirdPlanCommandlineResult:  # pylint: disable=too-few-public-methods
         -------
         Any
             Return data in its raw form.
+
         """
 
         return self._data
@@ -223,6 +229,7 @@ class BirdPlanCommandlineResult:  # pylint: disable=too-few-public-methods
         -------
         bool
             Return whether or not data has console output.
+
         """
 
         return self._has_console_output
@@ -239,7 +246,7 @@ class BirdPlanCommandLine:
     def __init__(self, test_mode: bool = False, is_console: bool = False) -> None:
         """Instantiate object."""
 
-        prog: Optional[str] = None
+        prog: str | None = None
         if sys.argv[0].endswith("__main__.py"):
             prog = "python -m birdplan"
 
@@ -248,8 +255,8 @@ class BirdPlanCommandLine:
         self._argparser = BirdPlanArgumentParser(add_help=False, prog=prog)
         self._birdplan = BirdPlan(test_mode=test_mode)
 
-    def run(  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-locals,too-many-statements
-        self, raw_args: Optional[List[str]] = None
+    def run(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
+        self, raw_args: list[str] | None = None
     ) -> BirdPlanCommandlineResult:
         """Run BirdPlan from command line."""
 
@@ -377,7 +384,7 @@ class BirdPlanCommandLine:
         """
 
         # Set the state file
-        state_file: Optional[str] = None
+        state_file: str | None = None
         if self.args.birdplan_state_file[0]:
             state_file = self.args.birdplan_state_file[0]
         else:

@@ -35,8 +35,8 @@ from .rip_functions import RIPFunctions
 __all__ = ["ProtocolRIP"]
 
 
-RIPInterfaceConfig = Union[bool, Dict[str, str]]
-RIPInterfaces = Dict[str, RIPInterfaceConfig]
+RIPInterfaceConfig = Union[bool, dict[str, str]]
+RIPInterfaces = dict[str, RIPInterfaceConfig]
 
 
 class ProtocolRIP(SectionProtocolBase):
@@ -106,7 +106,7 @@ class ProtocolRIP(SectionProtocolBase):
         # Check if we're redistributing connected routes, if we are, create the protocol and pipe
         if self.route_policy_redistribute.connected:
             # Create an interface list to feed to our routing table
-            interfaces: List[str] = []
+            interfaces: list[str] = []
             if isinstance(self.route_policy_redistribute.connected, list):
                 interfaces = self.route_policy_redistribute.connected
             # Add direct protocol for redistribution of connected routes
@@ -152,7 +152,7 @@ class ProtocolRIP(SectionProtocolBase):
             # Set the config item
             config[key] = value
 
-    def _interface_config(self) -> List[str]:
+    def _interface_config(self) -> list[str]:
         """Generate interface configuration."""
 
         interface_lines = []

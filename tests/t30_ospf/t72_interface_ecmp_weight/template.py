@@ -22,6 +22,7 @@
 """OSPF test case for interface ECMP weight."""
 
 import time
+
 from ...basetests import BirdPlanBaseTestCase
 
 __all__ = ["Template"]

@@ -67,10 +67,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
     _bgp_attributes: BGPAttributes
     _bgp_functions: BGPFunctions
     _peer_attributes: BGPPeerAttributes
-    _state: Dict[str, Any]
-    _prev_state: Optional[Dict[str, Any]]
+    _state: dict[str, Any]
+    _prev_state: dict[str, Any] | None
 
-    def __init__(  # noqa: CFQ001,CFQ002,E501 # pylint: disable=too-many-branches,too-many-statements,too-many-arguments,too-many-positional-arguments,too-many-locals
+    def __init__(  # pylint: disable=too-many-branches,too-many-statements,too-many-arguments,too-many-positional-arguments,too-many-locals
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,
@@ -156,12 +156,11 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                         f"Having 'replace_aspath' set for peer '{self.name}' with a non-private ASN {self.asn} makes no sense"
                     )
             # We're not in test mode...
-            else:
-                # Make sure we're within the full set of private ASN ranges
-                if not ((self.asn >= 64512 and self.asn <= 65534) or (self.asn >= 4200000000 and self.asn <= 4294967294)):
-                    raise BirdPlanError(
-                        f"Having 'replace_aspath' set for peer '{self.name}' with a non-private ASN {self.asn} makes no sense"
-                    )
+            # Make sure we're within the full set of private ASN ranges
+            elif not ((self.asn >= 64512 and self.asn <= 65534) or (self.asn >= 4200000000 and self.asn <= 4294967294)):
+                raise BirdPlanError(
+                    f"Having 'replace_aspath' set for peer '{self.name}' with a non-private ASN {self.asn} makes no sense"
+                )
             # Check if we're actually replacing it?
             if peer_config["replace_aspath"]:
                 self.replace_aspath = True
@@ -1189,7 +1188,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Work out the prefix limits...
         if self.prefix_limit4 == "peeringdb" or self.prefix_limit6 == "peeringdb":
             # Setup our peeringdb info
-            peeringdb_info: Dict[str, Any] = {}
+            peeringdb_info: dict[str, Any] = {}
 
             # Check if we're using cached values or not
             if self.birdconfig_globals.use_cached:
@@ -1302,8 +1301,8 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         # Check if we're going to be pulling in AS-SET information
         if self.import_filter_policy.as_sets:
             # Setup our IRR info
-            irr_asns: List[str] = []
-            irr_prefixes: Dict[str, Any] = {"ipv4": [], "ipv6": []}
+            irr_asns: list[str] = []
+            irr_prefixes: dict[str, Any] = {"ipv4": [], "ipv6": []}
 
             # Check if we're using cached values or not
             if self.birdconfig_globals.use_cached:
@@ -1465,7 +1464,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
                     if fnmatch.fnmatch(self.name, item):
                         self.quarantine = self.birdconfig_globals.state["bgp"]["+quarantine"][item]
 
-    def configure(self) -> None:  # noqa: CFQ001  # pylint: disable=too-many-branches,too-many-statements
+    def configure(self) -> None:  # pylint: disable=too-many-branches,too-many-statements
         """Configure BGP peer."""
 
         if not self.birdconfig_globals.suppress_info:
@@ -1831,7 +1830,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if not self.has_import_aspath_asn_deny_filter:
             return
 
-        aspath_asns: List[str] = []
+        aspath_asns: list[str] = []
 
         # Populate AS-PATH ASN list
         if self.import_filter_deny_policy.aspath_asns:
@@ -1967,7 +1966,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
             self.state["import_filter"] = {}
         self.state["import_filter"]["peer_asns"] = state
 
-    def _setup_peer_import_prefix_filter(  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+    def _setup_peer_import_prefix_filter(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         self,
     ) -> None:
         """Prefix import filter setup."""
@@ -1976,16 +1975,16 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if not self.has_import_prefix_filter:
             return
 
-        state: Dict[str, Dict[str, Any]] = {}
+        state: dict[str, dict[str, Any]] = {}
 
         # Work out prefixes
-        import_prefix_lists: Dict[str, List[str]] = {"4": [], "6": []}
+        import_prefix_lists: dict[str, list[str]] = {"4": [], "6": []}
         for prefix in sorted(self.import_filter_policy.prefixes):
             if ":" in prefix:
                 import_prefix_lists["6"].append(prefix)
             else:
                 import_prefix_lists["4"].append(prefix)
-        import_prefix_lists_irr: Dict[str, List[str]] = {"4": [], "6": []}
+        import_prefix_lists_irr: dict[str, list[str]] = {"4": [], "6": []}
         for prefix in sorted(self.import_filter_policy.prefixes_irr):
             if ":" in prefix:
                 import_prefix_lists_irr["6"].append(prefix)
@@ -2086,10 +2085,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if not self.has_import_prefix_deny_filter:
             return
 
-        state: Dict[str, List[str]] = {}
+        state: dict[str, list[str]] = {}
 
         # Work out prefixes
-        import_prefix_lists: Dict[str, List[str]] = {"4": [], "6": []}
+        import_prefix_lists: dict[str, list[str]] = {"4": [], "6": []}
         for prefix in sorted(self.import_filter_deny_policy.prefixes):
             if ":" in prefix:
                 import_prefix_lists["6"].append(prefix)
@@ -2135,10 +2134,10 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         if not self.has_export_prefix_filter:
             return
 
-        state: Dict[str, Dict[str, Any]] = {}
+        state: dict[str, dict[str, Any]] = {}
 
         # Work out prefixes
-        export_prefix_lists: Dict[str, List[str]] = {"4": [], "6": []}
+        export_prefix_lists: dict[str, list[str]] = {"4": [], "6": []}
         for prefix in sorted(self.export_filter_policy.prefixes):
             if ":" in prefix:
                 export_prefix_lists["6"].append(prefix)
@@ -2207,7 +2206,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _peer_to_bgp_import_filter(  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-statements,too-many-locals
+    def _peer_to_bgp_import_filter(  # pylint: disable=too-many-branches,too-many-statements,too-many-locals
         self,
     ) -> None:
         """Import filter FROM the main BGP table to the BGP peer table."""
@@ -2717,7 +2716,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.conf.add("};")
         self.conf.add("")
 
-    def _peer_import_filter(self) -> None:  # noqa: CFQ001 # pylint: disable=too-many-branches,too-many-statements
+    def _peer_import_filter(self) -> None:  # pylint: disable=too-many-branches,too-many-statements
         """Peer import filter setup from peer to peer table."""
 
         # Set our filter name
@@ -3143,22 +3142,22 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self._peer_attributes
 
     @property
-    def state(self) -> Dict[str, Any]:
+    def state(self) -> dict[str, Any]:
         """Return our state info."""
         return self._state
 
     @state.setter
-    def state(self, state: Dict[str, Any]) -> None:
+    def state(self, state: dict[str, Any]) -> None:
         """Set our state."""
         self.state = state
 
     @property
-    def prev_state(self) -> Optional[Dict[str, Any]]:
+    def prev_state(self) -> dict[str, Any] | None:
         """Previous state info."""
         return self._prev_state
 
     @prev_state.setter
-    def prev_state(self, prev_state: Dict[str, Any]) -> None:
+    def prev_state(self, prev_state: dict[str, Any]) -> None:
         """Set previous state info."""
         self.prev_state = prev_state
 
@@ -3208,7 +3207,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.asn = asn
 
     @property
-    def neighbor4(self) -> Optional[str]:
+    def neighbor4(self) -> str | None:
         """Return our IPv4 neighbor address."""
         return self.peer_attributes.neighbor4
 
@@ -3218,7 +3217,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.neighbor4 = neighbor4
 
     @property
-    def neighbor6(self) -> Optional[str]:
+    def neighbor6(self) -> str | None:
         """Return our IPv4 neighbor address."""
         return self.peer_attributes.neighbor6
 
@@ -3228,7 +3227,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.neighbor6 = neighbor6
 
     @property
-    def source_address4(self) -> Optional[str]:
+    def source_address4(self) -> str | None:
         """Return our IPv4 source_address4 address."""
         return self.peer_attributes.source_address4
 
@@ -3238,7 +3237,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.source_address4 = source_address4
 
     @property
-    def source_address6(self) -> Optional[str]:
+    def source_address6(self) -> str | None:
         """Return our IPv4 source_address6 address."""
         return self.peer_attributes.source_address6
 
@@ -3248,7 +3247,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.source_address6 = source_address6
 
     @property
-    def connect_delay_time(self) -> Optional[str]:
+    def connect_delay_time(self) -> str | None:
         """Return the value of our connect_delay_time option."""
         return self.peer_attributes.connect_delay_time
 
@@ -3258,7 +3257,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.connect_delay_time = connect_delay_time
 
     @property
-    def connect_retry_time(self) -> Optional[str]:
+    def connect_retry_time(self) -> str | None:
         """Return the value of our connect_retry_time option."""
         return self.peer_attributes.connect_retry_time
 
@@ -3268,7 +3267,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.connect_retry_time = connect_retry_time
 
     @property
-    def error_wait_time(self) -> Optional[str]:
+    def error_wait_time(self) -> str | None:
         """Return the value of our error_wait_time option."""
         return self.peer_attributes.error_wait_time
 
@@ -3278,7 +3277,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.error_wait_time = error_wait_time
 
     @property
-    def multihop(self) -> Optional[str]:
+    def multihop(self) -> str | None:
         """Return the value of our multihop option."""
         return self.peer_attributes.multihop
 
@@ -3288,7 +3287,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.multihop = multihop
 
     @property
-    def password(self) -> Optional[str]:
+    def password(self) -> str | None:
         """Return the value of our password option."""
         return self.peer_attributes.password
 
@@ -3318,7 +3317,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.cost = cost
 
     @property
-    def add_paths(self) -> Optional[str]:
+    def add_paths(self) -> str | None:
         """Return the setting for adding all BGP paths."""
         return self.peer_attributes.add_paths
 
@@ -3403,7 +3402,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.prefix_limit4 or self.peer_attributes.prefix_limit4_peeringdb
 
     @prefix_limit4.setter
-    def prefix_limit4(self, prefix_limit4: Optional[str]) -> None:
+    def prefix_limit4(self, prefix_limit4: str | None) -> None:
         """Set our IPv4 prefix limit."""
         self.peer_attributes.prefix_limit4 = prefix_limit4
 
@@ -3413,7 +3412,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.prefix_limit6 or self.peer_attributes.prefix_limit6_peeringdb
 
     @prefix_limit6.setter
-    def prefix_limit6(self, prefix_limit6: Optional[str]) -> None:
+    def prefix_limit6(self, prefix_limit6: str | None) -> None:
         """Set our IPv6 prefix limit."""
         self.peer_attributes.prefix_limit6 = prefix_limit6
 
@@ -3423,7 +3422,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.prefix_limit4_peeringdb
 
     @prefix_limit4_peeringdb.setter
-    def prefix_limit4_peeringdb(self, prefix_limit4: Optional[str]) -> None:
+    def prefix_limit4_peeringdb(self, prefix_limit4: str | None) -> None:
         """Set our IPv4 prefix limit from PeeringDB."""
         self.peer_attributes.prefix_limit4_peeringdb = prefix_limit4
 
@@ -3433,7 +3432,7 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         return self.peer_attributes.prefix_limit6_peeringdb
 
     @prefix_limit6_peeringdb.setter
-    def prefix_limit6_peeringdb(self, prefix_limit6: Optional[str]) -> None:
+    def prefix_limit6_peeringdb(self, prefix_limit6: str | None) -> None:
         """Set our IPv6 prefix limit from PeeringDB."""
         self.peer_attributes.prefix_limit6_peeringdb = prefix_limit6
 
@@ -3458,12 +3457,12 @@ class ProtocolBGPPeer(SectionProtocolBase):  # pylint: disable=too-many-instance
         self.peer_attributes.replace_aspath = replace_aspath
 
     @property
-    def blackhole_community(self) -> Optional[Union[bool, List[str]]]:
+    def blackhole_community(self) -> bool | list[str] | None:
         """Return the current value of blackhole_community."""
         return self.peer_attributes.blackhole_community
 
     @blackhole_community.setter
-    def blackhole_community(self, blackhole_community: Union[List[str], bool]) -> None:
+    def blackhole_community(self, blackhole_community: list[str] | bool) -> None:
         """Set the blackhole community."""
         self.peer_attributes.blackhole_community = blackhole_community
 

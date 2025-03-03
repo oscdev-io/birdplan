@@ -18,7 +18,6 @@
 
 """BIRD OSPF area interface attributes."""
 
-from typing import Optional
 
 from .......exceptions import BirdPlanError
 
@@ -51,13 +50,13 @@ class OSPFAreaInterfaceAttributes:  # pylint: disable=too-few-public-methods
 
     """
 
-    _name: Optional[str]
+    _name: str | None
 
     cost: int
     ecmp_weight: int
 
-    hello: Optional[int]
-    wait: Optional[int]
+    hello: int | None
+    wait: int | None
 
     stub: bool
 

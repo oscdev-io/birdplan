@@ -19,7 +19,6 @@
 """BIRD RPKI protocol configuration."""
 
 import urllib.parse
-from typing import List, Optional, Union
 
 from ...globals import BirdConfigGlobals
 from ..base import SectionBase
@@ -38,21 +37,21 @@ class RPKISource:  # pylint: disable=too-many-instance-attributes
     """RPKI server configuration."""
 
     # List-based sources
-    _rpki_data: Optional[List[str]]
+    _rpki_data: list[str] | None
     # String-based sources, aka a URI
-    _protocol: Optional[str]
-    _hostname: Optional[str]
-    _port: Optional[int]
+    _protocol: str | None
+    _hostname: str | None
+    _port: int | None
 
-    _private_key: Optional[str]
-    _public_key: Optional[str]
-    _username: Optional[str]
+    _private_key: str | None
+    _public_key: str | None
+    _username: str | None
 
-    _local_address: Optional[str]
-    _refresh: Optional[int]
-    _retry: Optional[int]
+    _local_address: str | None
+    _refresh: int | None
+    _retry: int | None
 
-    def __init__(self, rpki_source: Union[str, List[str]]) -> None:  # pylint: disable=too-many-branches
+    def __init__(self, rpki_source: str | list[str]) -> None:  # pylint: disable=too-many-branches
         """Initialize object."""
 
         self._rpki_data = None
@@ -90,11 +89,10 @@ class RPKISource:  # pylint: disable=too-many-instance-attributes
             # Work out which port we're using
             if parsed_uri.port:
                 self._port = parsed_uri.port
-            else:
-                if self._protocol == "ssh":
-                    self._port = 22
-                elif self._protocol == "tcp":
-                    self._port = 323
+            elif self._protocol == "ssh":
+                self._port = 22
+            elif self._protocol == "tcp":
+                self._port = 323
 
             # Grab parameters
             parameters = urllib.parse.parse_qs(parsed_uri.query)
@@ -124,52 +122,52 @@ class RPKISource:  # pylint: disable=too-many-instance-attributes
                 self._retry = int(parameters["retry"][-1])
 
     @property
-    def protocol(self) -> Optional[str]:
+    def protocol(self) -> str | None:
         """Return the protocol."""
         return self._protocol
 
     @property
-    def hostname(self) -> Optional[str]:
+    def hostname(self) -> str | None:
         """Return the hostname."""
         return self._hostname
 
     @property
-    def port(self) -> Optional[int]:
+    def port(self) -> int | None:
         """Return the port."""
         return self._port
 
     @property
-    def private_key(self) -> Optional[str]:
+    def private_key(self) -> str | None:
         """Return the private key."""
         return self._private_key
 
     @property
-    def public_key(self) -> Optional[str]:
+    def public_key(self) -> str | None:
         """Return the public key."""
         return self._public_key
 
     @property
-    def username(self) -> Optional[str]:
+    def username(self) -> str | None:
         """Return the username."""
         return self._username
 
     @property
-    def rpki_data(self) -> Optional[List[str]]:
+    def rpki_data(self) -> list[str] | None:
         """Return the RPKI data."""
         return self._rpki_data
 
     @property
-    def local_address(self) -> Optional[str]:
+    def local_address(self) -> str | None:
         """Return the local address."""
         return self._local_address
 
     @property
-    def refresh(self) -> Optional[int]:
+    def refresh(self) -> int | None:
         """Return the refresh interval."""
         return self._refresh
 
     @property
-    def retry(self) -> Optional[int]:
+    def retry(self) -> int | None:
         """Return the retry interval."""
         return self._retry
 

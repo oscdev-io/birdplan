@@ -45,7 +45,7 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
     # OSPF area interface attributes
     _interface_attributes: OSPFAreaInterfaceAttributes
 
-    def __init__(  # noqa: CFQ002 # pylint: disable=too-many-arguments,too-many-branches,too-many-positional-arguments
+    def __init__(  # pylint: disable=too-many-arguments,too-many-branches,too-many-positional-arguments
         self,
         birdconfig_globals: BirdConfigGlobals,
         birdattributes: SectionBirdAttributes,
@@ -194,7 +194,7 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
         self.interface_attributes.cost = cost
 
     @property
-    def ecmp_weight(self) -> Optional[int]:
+    def ecmp_weight(self) -> int | None:
         """Interface ECMP weight."""
         return self.interface_attributes.ecmp_weight
 
@@ -204,7 +204,7 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
         self.interface_attributes.ecmp_weight = ecmp_weight
 
     @property
-    def hello(self) -> Optional[int]:
+    def hello(self) -> int | None:
         """Interface hello."""
         return self.interface_attributes.hello
 
@@ -214,7 +214,7 @@ class ProtocolOSPFAreaInterface(SectionProtocolBase):  # pylint: disable=too-man
         self.interface_attributes.hello = hello
 
     @property
-    def wait(self) -> Optional[int]:
+    def wait(self) -> int | None:
         """Interface wait."""
         return self.interface_attributes.wait
 

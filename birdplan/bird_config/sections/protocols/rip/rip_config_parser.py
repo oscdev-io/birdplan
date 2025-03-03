@@ -18,7 +18,7 @@
 
 """BIRD RIP configuration parser."""
 
-from typing import Any, Dict, List, Union
+from typing import Any
 
 from .....exceptions import BirdPlanConfigError
 from .... import BirdConfig
@@ -32,12 +32,12 @@ class RIPConfigParser(ConfigParser):
 
     _birdconf: BirdConfig
 
-    def parse(self, config: Dict[str, Any]) -> None:
+    def parse(self, config: dict[str, Any]) -> None:
         """Configure RIP protocol."""
 
         self._config_rip(config)
 
-    def _config_rip(self, config: Dict[str, Any]) -> None:
+    def _config_rip(self, config: dict[str, Any]) -> None:
         """Configure rip section."""
 
         # If we have no rip section, just return
@@ -53,7 +53,7 @@ class RIPConfigParser(ConfigParser):
         self._config_rip_redistribute(config)
         self._config_rip_interfaces(config)
 
-    def _config_rip_accept(self, config: Dict[str, Any]) -> None:
+    def _config_rip_accept(self, config: dict[str, Any]) -> None:
         """Configure rip:accept section."""
 
         # If we don't have an accept section, just return
@@ -69,7 +69,7 @@ class RIPConfigParser(ConfigParser):
             else:
                 raise BirdPlanConfigError(f"Configuration item '{accept}' not understood in RIP accept")
 
-    def _config_rip_redistribute(self, config: Dict[str, Any]) -> None:  # pylint: disable=too-many-branches
+    def _config_rip_redistribute(self, config: dict[str, Any]) -> None:  # pylint: disable=too-many-branches
         """Configure rip:redistribute section."""
 
         # If we don't have a redistribute section just return
@@ -81,7 +81,7 @@ class RIPConfigParser(ConfigParser):
             # Add connected route redistribution
             if redistribute == "connected":
                 # Set type
-                redistribute_connected: Union[bool, List[str]]
+                redistribute_connected: bool | list[str]
                 # Check what kind of config we go...
                 if isinstance(redistribute_config, bool):
                     redistribute_connected = redistribute_config
@@ -125,7 +125,7 @@ class RIPConfigParser(ConfigParser):
             else:
                 raise BirdPlanConfigError(f"Configuration item '{redistribute}' not understood in rip:redistribute")
 
-    def _config_rip_interfaces(self, config: Dict[str, Any]) -> None:
+    def _config_rip_interfaces(self, config: dict[str, Any]) -> None:
         """Configure rip:interfaces section."""
 
         # If we don't have interfaces in our rip section, just return

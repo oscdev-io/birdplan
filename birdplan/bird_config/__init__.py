@@ -41,7 +41,7 @@ class BirdConfig:
         self._birdconfig_globals = BirdConfigGlobals(test_mode=test_mode)
         self._sections = Sections(self.birdconfig_globals)
 
-    def get_config(self) -> List[str]:
+    def get_config(self) -> list[str]:
         """Return the Bird configuration."""
 
         self.sections.configure()
@@ -56,7 +56,7 @@ class BirdConfig:
     # HELPERS
 
     @property
-    def log_file(self) -> Optional[str]:
+    def log_file(self) -> str | None:
         """Return the log file to use."""
         return self.birdconfig_globals.log_file
 
@@ -76,12 +76,12 @@ class BirdConfig:
         self.birdconfig_globals.debug = debug
 
     @property
-    def state(self) -> Dict[str, Any]:
+    def state(self) -> dict[str, Any]:
         """Return the state to use."""
         return self.birdconfig_globals.state
 
     @state.setter
-    def state(self, state: Dict[str, Any]) -> None:
+    def state(self, state: dict[str, Any]) -> None:
         """Set the log file to use."""
         self.birdconfig_globals.state = state
 

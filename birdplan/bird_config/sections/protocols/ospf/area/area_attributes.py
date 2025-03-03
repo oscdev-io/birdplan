@@ -18,7 +18,6 @@
 
 """BIRD OSPF area attributes."""
 
-from typing import Optional
 
 from ......exceptions import BirdPlanError
 
@@ -36,7 +35,7 @@ class OSPFAreaAttributes:  # pylint: disable=too-few-public-methods
 
     """
 
-    _name: Optional[str]
+    _name: str | None
 
     def __init__(self) -> None:
         """Initialize object."""

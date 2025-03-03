@@ -23,7 +23,7 @@ import argparse
 import grp
 import os
 import pwd
-from typing import Any, Dict, Optional
+from typing import Any
 
 from ...cmdline import BIRD_CONFIG_FILE, BirdPlanCommandLine, BirdPlanCommandlineResult
 from ...exceptions import BirdPlanError
@@ -36,7 +36,7 @@ class BirdPlanCmdlineConfigure(BirdPlanCmdlinePluginBase):
     """BirdPlan "configure" command."""
 
     # Output config file
-    _config_filename: Optional[str]
+    _config_filename: str | None
 
     def __init__(self) -> None:
         """Initialize object."""
@@ -49,7 +49,7 @@ class BirdPlanCmdlineConfigure(BirdPlanCmdlinePluginBase):
 
         self._config_filename = None
 
-    def register_parsers(self, args: Dict[str, Any]) -> None:
+    def register_parsers(self, args: dict[str, Any]) -> None:
         """
         Register commandline parsers.
 
@@ -182,7 +182,7 @@ class BirdPlanCmdlineConfigure(BirdPlanCmdlinePluginBase):
             raise BirdPlanError(f"Failed to open '{self.config_filename}' for writing: {err}") from None
 
     @property
-    def config_filename(self) -> Optional[str]:
+    def config_filename(self) -> str | None:
         """Config file name to write out."""
         return self._config_filename
 

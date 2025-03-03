@@ -20,7 +20,7 @@
 
 import argparse
 import io
-from typing import Any, Dict
+from typing import Any
 
 from ...... import BirdPlanBGPPeerQuarantineStatus
 from ......cmdline import BirdPlanCommandLine, BirdPlanCommandlineResult
@@ -71,29 +71,28 @@ class BirdPlanCmdlineBGPPeerQuarantineShowResult(BirdPlanCommandlineResult):
         for peer in peers_all:
             # Grab pending status
             pending_status = None
-            if peer in self.data["pending"]:  # noqa: SIM908
+            if peer in self.data["pending"]:
                 pending_status = self.data["pending"][peer]
 
             # Grab current status
             current_status = None
-            if peer in self.data["current"]:  # noqa: SIM908
+            if peer in self.data["current"]:
                 current_status = self.data["current"][peer]
 
             # Work out our status string
             status_str = ""
             if pending_status is None:
                 status_str = colored("REMOVED", "magenta")
+            elif current_status and not pending_status:
+                status_str = colored("PENDING-QUARANTINE-ENTER", "blue")
+            elif not current_status and pending_status:
+                status_str = colored("PENDING-QUARANTINE-EXIT", "yellow")
+            elif current_status is None:
+                status_str = colored("NEW", "green")
+            elif pending_status:
+                status_str = colored("QUARANTINED", "red")
             else:
-                if current_status and not pending_status:
-                    status_str = colored("PENDING-QUARANTINE-ENTER", "blue")
-                elif not current_status and pending_status:
-                    status_str = colored("PENDING-QUARANTINE-EXIT", "yellow")
-                elif current_status is None:
-                    status_str = colored("NEW", "green")
-                elif pending_status:
-                    status_str = colored("QUARANTINED", "red")
-                else:
-                    status_str = "OK"
+                status_str = "OK"
 
             ob.write("  Peer: " + colored(peer, "cyan") + "\n")
             ob.write(f"    State: {status_str}\n")
@@ -114,7 +113,7 @@ class BirdPlanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
         self.plugin_description = "birdplan bgp peer quarantine show"
         self.plugin_order = 30
 
-    def register_parsers(self, args: Dict[str, Any]) -> None:
+    def register_parsers(self, args: dict[str, Any]) -> None:
         """
         Register commandline parsers.
 
@@ -155,7 +154,7 @@ class BirdPlanCmdlineBGPPeerQuarantineShow(BirdPlanCmdlinePluginBase):
         """
 
         if not self._subparser:  # pragma: no cover
-            raise RuntimeError()
+            raise RuntimeError
 
         cmdline: BirdPlanCommandLine = args["cmdline"]
 

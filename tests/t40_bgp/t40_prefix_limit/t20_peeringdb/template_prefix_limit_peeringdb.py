@@ -22,7 +22,7 @@
 """BGP prefix limit test template."""
 
 import time
-from typing import Any, List
+from typing import Any
 
 from birdplan import peeringdb
 
@@ -43,7 +43,7 @@ class Template(BirdPlanBaseTestCase):
 """
 
     def _birdplan_run(  # pylint: disable=too-many-arguments,too-many-locals
-        self, sim: Simulation, tmpdir: str, router: str, args: List[str]
+        self, sim: Simulation, tmpdir: str, router: str, args: list[str]
     ) -> Any:
         """Run BirdPlan for a given router."""
 

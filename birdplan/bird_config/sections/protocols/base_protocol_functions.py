@@ -20,7 +20,6 @@
 
 import textwrap
 from collections import OrderedDict
-from typing import Dict
 
 from ....bird_config.globals import BirdConfigGlobals
 from ..base import SectionBase
@@ -34,7 +33,7 @@ class ProtocolFunctionsBase(SectionBase):  # pylint: disable=too-many-public-met
 
     _functions: SectionFunctions
 
-    bird_functions: Dict[str, str]
+    bird_functions: dict[str, str]
 
     def __init__(self, birdconfig_globals: BirdConfigGlobals, functions: SectionFunctions):
         """Initialize the object."""

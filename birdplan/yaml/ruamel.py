@@ -20,7 +20,7 @@
 
 import io
 import pathlib
-from typing import Any, Optional, Union
+from typing import Any
 
 import ruamel.yaml as ryaml
 from ruamel.yaml import __with_libyaml__
@@ -53,11 +53,11 @@ class YAML(YAMLBase):
             tuple, lambda dumper, data: dumper.represent_sequence("tag:yaml.org,2002:python/tuple", data, flow_style=True)
         )
 
-    def load(self, yaml: Union[str, pathlib.Path, io.IOBase]) -> Any:
+    def load(self, yaml: str | pathlib.Path | io.IOBase) -> Any:
         """Load YAML string."""
         return self._yaml.load(yaml)
 
-    def dump(self, data: Any, stream: Optional[Union[pathlib.Path, io.IOBase]] = None) -> Any:
+    def dump(self, data: Any, stream: pathlib.Path | io.IOBase | None = None) -> Any:
         """Dump to YAML."""
         if stream:
             return self._yaml.dump(

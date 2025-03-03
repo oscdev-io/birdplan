@@ -29,7 +29,7 @@ import pytest
 
 from .simulation import Simulation
 
-__all__ = ["Helpers", "CustomPytestRegex"]
+__all__ = ["CustomPytestRegex", "Helpers"]
 
 
 # Make sure basetests has its asserts rewritten
@@ -172,11 +172,10 @@ def pytest_runtest_makereport(item, call):
                     setattr(item.parent, "_previousfailed", item)  # noqa: B010
 
         # If the test passed, clear the report data
-        else:
-            # Grab sim and clear the report
-            if hasattr(item, "fixturenames") and "sim" in item.fixturenames:
-                sim = item.funcargs["sim"]
-                sim.clear_report()
+        # Grab sim and clear the report
+        elif hasattr(item, "fixturenames") and "sim" in item.fixturenames:
+            sim = item.funcargs["sim"]
+            sim.clear_report()
 
 
 def pytest_runtest_setup(item):

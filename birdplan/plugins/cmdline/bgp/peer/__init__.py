@@ -39,7 +39,7 @@ class BirdPlanCmdlineBGPPeer(BirdPlanCmdlinePluginBase):
         self.plugin_description = "birdplan bgp peer"
         self.plugin_order = 20
 
-    def register_parsers(self, args: Dict[str, Any]) -> None:
+    def register_parsers(self, args: dict[str, Any]) -> None:
         """
         Register commandline parsers.
 
@@ -80,6 +80,6 @@ class BirdPlanCmdlineBGPPeer(BirdPlanCmdlinePluginBase):
         """
 
         if not self._subparser:
-            raise RuntimeError()
+            raise RuntimeError
 
         raise BirdPlanUsageError("No options specified to 'bgp peer' action", self._subparser)

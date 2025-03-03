@@ -20,7 +20,7 @@
 
 import argparse
 import io
-from typing import Any, Dict
+from typing import Any
 
 from birdplan import BirdPlanBGPPeerShow
 
@@ -34,7 +34,7 @@ __all__ = ["BirdPlanCmdlineBGPPeerShowPeerArg"]
 class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
     """BirdPlan BGP peer show peer result."""
 
-    def as_text(self) -> str:  # noqa: CFQ001 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+    def as_text(self) -> str:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         """
         Return data in text format.
 
@@ -86,7 +86,7 @@ class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
         ob.write(f"AS-SET..........: {as_sets_filter}\n")
         ob.write(f"Origin filters..: {origin_filters}\n")
         ob.write(f"AS-Path filters.: {aspath_filters}\n")
-        if "use_rpki" in self.data and self.data["use_rpki"]:
+        if self.data.get("use_rpki"):
             ob.write("RPKI ROV........: enabled\n")
 
         # Loop with protocols and output self.data
@@ -127,19 +127,19 @@ class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
                 state = colored(protocol_status["state"], "red")
                 if "last_error" in protocol_status:
                     info += " - " + colored(protocol_status["last_error"], "red")
-            elif protocol_status["state"] == "up":  # noqa: SIM102
+            elif protocol_status["state"] == "up":
                 if protocol_status["info"] == "established":
                     state = colored(protocol_status["state"], "green")
                     info = colored(protocol_status["info"], "green")
 
             # Check for quarantine flag
             quarantined = "no"
-            if "quarantine" in self.data and self.data["quarantine"]:
+            if self.data.get("quarantine"):
                 quarantined = colored("yes", "red")
 
             # Check for graceful shutdown flag
             graceful_shutdown = "no"
-            if "graceful_shutdown" in self.data and self.data["graceful_shutdown"]:
+            if self.data.get("graceful_shutdown"):
                 graceful_shutdown = colored("yes", "red")
 
             prefix_limit_str = ""
@@ -181,7 +181,7 @@ class BirdPlanCmdlineBGPPeerShowPeerArgResult(BirdPlanCommandlineResult):
                 routes_exported = protocol_status["routes_exported"]
                 ob.write(f"    Prefixes..........: {routes_imported} imported, {routes_exported} exported\n")
 
-            if "security" in self.data and self.data["security"]:
+            if self.data.get("security"):
                 ob.write(f"    BGP security......: {', '.join(sorted(self.data['security']))}\n")
 
             ob.write(f"    Quarantined.......: {quarantined}\n")
@@ -206,7 +206,7 @@ class BirdPlanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
         self.plugin_description = "birdplan bgp peer show <peer>"
         self.plugin_order = 30
 
-    def register_parsers(self, args: Dict[str, Any]) -> None:
+    def register_parsers(self, args: dict[str, Any]) -> None:
         """
         Register commandline parsers.
 
@@ -256,7 +256,7 @@ class BirdPlanCmdlineBGPPeerShowPeerArg(BirdPlanCmdlinePluginBase):
         """
 
         if not self._subparser:  # pragma: no cover
-            raise RuntimeError()
+            raise RuntimeError
 
         cmdline: BirdPlanCommandLine = args["cmdline"]
 

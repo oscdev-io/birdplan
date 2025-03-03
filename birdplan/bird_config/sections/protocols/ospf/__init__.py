@@ -37,7 +37,7 @@ from .ospf_functions import OSPFFunctions
 __all__ = ["ProtocolOSPF"]
 
 
-OSPFAreas = Dict[str, ProtocolOSPFArea]
+OSPFAreas = dict[str, ProtocolOSPFArea]
 
 
 class ProtocolOSPF(SectionProtocolBase):
@@ -112,7 +112,7 @@ class ProtocolOSPF(SectionProtocolBase):
         # Check if we're redistributing connected routes, if we are, create the protocol and pipe
         if self.route_policy_redistribute.connected:
             # Create an interface list to feed to our routing table
-            interfaces: List[str] = []
+            interfaces: list[str] = []
             if isinstance(self.route_policy_redistribute.connected, list):
                 interfaces = self.route_policy_redistribute.connected
             # Add direct protocol for redistribution of connected routes

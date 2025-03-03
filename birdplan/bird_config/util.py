@@ -19,9 +19,8 @@
 """Bird configuration utility functions."""
 
 import ipaddress
-from typing import List
 
-__all__ = ["sanitize_community", "sanitize_community_list", "network_count"]
+__all__ = ["network_count", "sanitize_community", "sanitize_community_list"]
 
 
 def sanitize_community(community: str) -> str:
@@ -33,7 +32,7 @@ def sanitize_community(community: str) -> str:
     return community_str
 
 
-def sanitize_community_list(communities: List[str]) -> List[str]:
+def sanitize_community_list(communities: list[str]) -> list[str]:
     """Sanitize a list of communities."""
 
     result = []
@@ -43,7 +42,7 @@ def sanitize_community_list(communities: List[str]) -> List[str]:
     return result
 
 
-def network_count(ip_networks: List[str]) -> int:
+def network_count(ip_networks: list[str]) -> int:
     """Get the number of ISP networks within a list of IP networks."""
 
     # Loop with the networks we got

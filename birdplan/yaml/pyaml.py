@@ -20,7 +20,7 @@
 
 import io
 import pathlib
-from typing import Any, Optional, Tuple, Union
+from typing import Any
 
 import yaml as pyaml
 from yaml import YAMLError
@@ -33,7 +33,7 @@ __all__ = ["YAML", "YAMLError"]
 class BirdPlanSafeLoader(pyaml.SafeLoader):  # pylint: disable=too-many-ancestors
     """Safe YAML loader wtih some specific datatypes."""
 
-    def construct_python_tuple(self, node: Any) -> Tuple[Any, ...]:
+    def construct_python_tuple(self, node: Any) -> tuple[Any, ...]:
         """Tuple constructor."""
         return tuple(self.construct_sequence(node))
 
@@ -41,7 +41,7 @@ class BirdPlanSafeLoader(pyaml.SafeLoader):  # pylint: disable=too-many-ancestor
 class BirdPlanSafeDumper(pyaml.SafeDumper):
     """Safe YAML dumper with some specific datatypes."""
 
-    def represent_tuple(self, data: Tuple[Any, ...]) -> pyaml.nodes.SequenceNode:
+    def represent_tuple(self, data: tuple[Any, ...]) -> pyaml.nodes.SequenceNode:
         """Tuple representer."""
         return self.represent_sequence("tag:yaml.org,2002:python/tuple", data, flow_style=True)
 
@@ -56,7 +56,7 @@ class YAML(YAMLBase):
     def __init__(self) -> None:
         """Initialize our parser YAML."""
 
-    def load(self, yaml: Union[str, pathlib.Path, io.IOBase]) -> Any:
+    def load(self, yaml: str | pathlib.Path | io.IOBase) -> Any:
         """Load YAML string."""
 
         yaml_data: str = ""
@@ -65,7 +65,7 @@ class YAML(YAMLBase):
             yaml_data = yaml
         # Handle path objects
         elif isinstance(yaml, pathlib.Path):
-            with open(yaml, "r", encoding="UTF-8") as yaml_file:
+            with open(yaml, encoding="UTF-8") as yaml_file:
                 yaml_data = yaml_file.read()
         # Whats left over is file objects
         elif isinstance(yaml, io.IOBase):
@@ -73,7 +73,7 @@ class YAML(YAMLBase):
 
         return pyaml.load(yaml_data, BirdPlanSafeLoader)  # nosec
 
-    def dump(self, data: Any, stream: Optional[Union[pathlib.Path, io.IOBase]] = None) -> Any:
+    def dump(self, data: Any, stream: pathlib.Path | io.IOBase | None = None) -> Any:
         """Dump to YAML."""
 
         if stream:

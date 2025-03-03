@@ -18,7 +18,6 @@
 
 """BIRD static protocol configuration."""
 
-from typing import Dict
 
 from ....exceptions import BirdPlanError
 from ...globals import BirdConfigGlobals
@@ -32,7 +31,7 @@ from .pipe import ProtocolPipe
 __all__ = ["ProtocolStatic"]
 
 
-StaticRoutes = Dict[str, str]
+StaticRoutes = dict[str, str]
 
 
 class ProtocolStatic(SectionProtocolBase):

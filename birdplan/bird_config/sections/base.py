@@ -18,17 +18,17 @@
 
 """BIRD configuration section base class."""
 
-from typing import Dict, List, Union
+from typing import Union
 
 from ..globals import BirdConfigGlobals
 
-__all__ = ["SectionBaseConfig", "SectionBase"]
+__all__ = ["SectionBase", "SectionBaseConfig"]
 
 
 # Types
-SectionConfigItem = Union[str, List[str], "SectionBase"]
-SectionConfigItemList = List[SectionConfigItem]
-SectionConfigItems = Dict[int, SectionConfigItemList]
+SectionConfigItem = Union[str, list[str], "SectionBase"]
+SectionConfigItemList = list[SectionConfigItem]
+SectionConfigItems = dict[int, SectionConfigItemList]
 
 
 class SectionBaseConfig:  # pylint: disable=too-few-public-methods
@@ -146,9 +146,9 @@ class SectionBaseConfig:  # pylint: disable=too-few-public-methods
         return self._items
 
     @property
-    def lines(self) -> List[str]:
+    def lines(self) -> list[str]:
         """Return our configuration lines."""
-        lines: List[str] = []
+        lines: list[str] = []
         # Loop with configuration items in order
         for _, items in sorted(self._items.items()):
             # Loop with each list

@@ -18,9 +18,8 @@
 
 """BIRD OSPF protocol attributes."""
 
-from typing import List, Union
 
-__all__ = ["OSPFRoutePolicyAccept", "OSPFRoutePolicyRedistribute", "OSPFAttributes"]
+__all__ = ["OSPFAttributes", "OSPFRoutePolicyAccept", "OSPFRoutePolicyRedistribute"]
 
 
 class OSPFRoutePolicyAccept:  # pylint: disable=too-few-public-methods
@@ -61,7 +60,7 @@ class OSPFRoutePolicyRedistribute:  # pylint: disable=too-few-public-methods
 
     """
 
-    connected: Union[bool, List[str]]
+    connected: bool | list[str]
     kernel: bool
     kernel_default: bool
     static: bool
