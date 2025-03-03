@@ -2683,7 +2683,7 @@ r1_t_roa4:
       source: RPKI
     bestpath: true
     pref: 100
-    protocol: rpki1
+    protocol: p_rpki
   100.64.103.0/24:
   - ROA.asn: '65999'
     ROA.max: 24
@@ -2692,7 +2692,7 @@ r1_t_roa4:
       source: RPKI
     bestpath: true
     pref: 100
-    protocol: rpki1
+    protocol: p_rpki
 r1_t_roa6:
   fc00:101::/48:
   - ROA.asn: '65100'
@@ -2702,7 +2702,7 @@ r1_t_roa6:
       source: RPKI
     bestpath: true
     pref: 100
-    protocol: rpki1
+    protocol: p_rpki
   fc00:103::/48:
   - ROA.asn: '65999'
     ROA.max: 48
@@ -2711,7 +2711,7 @@ r1_t_roa6:
       source: RPKI
     bestpath: true
     pref: 100
-    protocol: rpki1
+    protocol: p_rpki
 r2_peer_show_r1:
   asn: 65000
   description: BGP session to r1
