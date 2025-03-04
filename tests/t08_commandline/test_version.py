@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2024, AllWorldIT
+# Copyright (c) 2019-2025, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,11 +20,9 @@
 
 # pylint: disable=redefined-outer-name
 
-from typing import List
-
 import birdplan.cmdline
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 def test_load_from_string() -> None:

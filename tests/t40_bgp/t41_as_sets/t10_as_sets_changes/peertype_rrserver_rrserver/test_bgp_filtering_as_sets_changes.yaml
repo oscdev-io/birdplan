@@ -39,8 +39,6 @@ r1_peer_show_e1:
         output_filter: f_bgp_AS65000_e1_peer_export
         preference: 100
         proto: BGP
-        routes_exported: 0
-        routes_imported: 0
         source_address: 100.64.0.1
         state: up
         table: t_bgp4_AS65000_e1_peer
@@ -63,8 +61,6 @@ r1_peer_show_e1:
         output_filter: f_bgp_AS65000_e1_peer_export
         preference: 100
         proto: BGP
-        routes_exported: 0
-        routes_imported: 0
         source_address: fc00:100::1
         state: up
         table: t_bgp6_AS65000_e1_peer
@@ -101,8 +97,6 @@ r1_peer_summary:
           output_filter: f_bgp_AS65000_e1_peer_export
           preference: 100
           proto: BGP
-          routes_exported: 0
-          routes_imported: 0
           source_address: 100.64.0.1
           state: up
           table: t_bgp4_AS65000_e1_peer
@@ -126,8 +120,6 @@ r1_peer_summary:
           output_filter: f_bgp_AS65000_e1_peer_export
           preference: 100
           proto: BGP
-          routes_exported: 0
-          routes_imported: 0
           source_address: fc00:100::1
           state: up
           table: t_bgp6_AS65000_e1_peer

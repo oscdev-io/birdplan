@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2024, AllWorldIT
+# Copyright (c) 2019-2025, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ import logging
 import os
 import time
 from ipaddress import IPv4Address, IPv6Address
-from typing import Dict, List
 
 import pytest
 from nsnetsim.bird_router_node import BirdRouterNode
@@ -47,7 +46,7 @@ class Test:
 
     num_bird_routers = 2500
 
-    def test_setup(self, sim, testpath, tmpdir, enable_performance_test):  # noqa: CFQ001 # pylint: disable=too-many-locals
+    def test_setup(self, sim, testpath, tmpdir, enable_performance_test):  # pylint: disable=too-many-locals
         """Set up our test."""
 
         # Make sure --enable-performance-test was specified
@@ -208,7 +207,7 @@ class Test:
         pytest.fail("OH NO")
 
     def _configure_bird(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-        self, router_id: str, asn: str, source4: str, source6: str, peers: List[Dict[str, str]]
+        self, router_id: str, asn: str, source4: str, source6: str, peers: list[dict[str, str]]
     ):
         """Configure a BIRD router."""
 
@@ -248,8 +247,8 @@ bgp:
         # Return BIRD config
         return birdplan_config
 
-    def _configure_exabgp(  # noqa: CFQ002 # pylint: disable=too-many-arguments,too-many-positional-arguments
-        self, sim: Simulation, router_id: str, asn: str, source4: str, source6: str, peer: Dict[str, str]
+    def _configure_exabgp(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self, sim: Simulation, router_id: str, asn: str, source4: str, source6: str, peer: dict[str, str]
     ):
         """Configure an ExaBGP."""
 

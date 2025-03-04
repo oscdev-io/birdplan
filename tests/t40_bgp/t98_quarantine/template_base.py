@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2024, AllWorldIT
+# Copyright (c) 2019-2025, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 # pylint: disable=import-error,too-few-public-methods
 
 """BGP quarantine test case template."""
+
+import time
 
 from ...basetests import BirdPlanBaseTestCase
 
@@ -57,6 +59,9 @@ class TemplateBase(BirdPlanBaseTestCase):
     def test_quarantine(self, sim, tmpdir):
         """Graceful shutdown test to customize template."""
         self._test_quarantine(sim, tmpdir)
+        # NK: Wait for routes to settle
+        if sim.delay:
+            time.sleep(sim.delay)
 
     # Here is where the customizations take place per testcase
     def _test_quarantine(self, sim, tmpdir):

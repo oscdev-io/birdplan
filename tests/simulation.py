@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (C) 2019-2024, AllWorldIT.
+# Copyright (C) 2019-2025, AllWorldIT.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import os
 import pathlib
 import pprint
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from nsnetsim.generic_node import GenericNode
 from nsnetsim.topology import Topology
@@ -38,20 +38,20 @@ __all__ = ["Simulation"]
 class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-public-methods
     """Simulation class, storing the topology and nodes."""
 
-    _configs: Dict[str, BirdPlan]
-    _report: Dict[str, str]
+    _configs: dict[str, BirdPlan]
+    _report: dict[str, str]
     # All the variables we're testing and their values from the simulation
-    _variables: Dict[str, str]
+    _variables: dict[str, str]
 
     # Test directory
-    _test_dir: Optional[str]
+    _test_dir: str | None
     # Current test being run
-    _test_file: Optional[str]
+    _test_file: str | None
 
-    _expected_data: Optional[Dict[str, Any]]
+    _expected_data: dict[str, Any] | None
 
-    _conffiles: Dict[str, str]
-    _logfiles: Dict[str, str]
+    _conffiles: dict[str, str]
+    _logfiles: dict[str, str]
     _topology: Topology
     _delay: int
 
@@ -150,7 +150,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
         """Add a variable to our expected content list."""
         self._variables[name] = content
 
-    def report(self) -> List[Tuple[str, str]]:
+    def report(self) -> list[tuple[str, str]]:
         """Build a report for the current test."""
 
         items = []
@@ -161,7 +161,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
 
         return items
 
-    def report_logs(self) -> List[Tuple[str, str]]:
+    def report_logs(self) -> list[tuple[str, str]]:
         """Build a report, containing our log file contents."""
 
         items = []
@@ -173,13 +173,13 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
                 items.append((name, "-- NOT CREATED --"))
                 continue
             # If it does exist add its contents to our items
-            with open(filename, "r", encoding="UTF-8") as logfile:
+            with open(filename, encoding="UTF-8") as logfile:
                 contents = logfile.read()
             items.append((name, contents))
 
         return items
 
-    def report_configs(self) -> List[Tuple[str, str]]:
+    def report_configs(self) -> list[tuple[str, str]]:
         """Build a report, containing our config file contents."""
 
         items = []
@@ -192,9 +192,9 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
                 continue
             # If it does exist loop with each line, number it and add
             contents = ""
-            with open(filename, "r", encoding="UTF-8") as conffile:
+            with open(filename, encoding="UTF-8") as conffile:
                 for lineno, line in enumerate(conffile.readlines()):
-                    contents += f"{lineno+1}: {line}"
+                    contents += f"{lineno + 1}: {line}"
             # Add report
             items.append((name, contents))
 
@@ -244,7 +244,7 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
             # If this is a birdplan config file, write it out
             if "birdplan" in conffile_name:
                 # We need to replace some options that are variable so files don't change between runs
-                with open(sim_conffile_path, "r", encoding="UTF-8") as config_file:
+                with open(sim_conffile_path, encoding="UTF-8") as config_file:
                     conf_lines = config_file.readlines()
                 with open(expected_conf_filepath, "w", encoding="UTF-8") as config_file:
                     for line in conf_lines:
@@ -261,12 +261,12 @@ class Simulation:  # pylint: disable=too-many-instance-attributes,too-many-publi
         return f"{self.test_dir}/{expected_data_filename}"
 
     @property
-    def conffiles(self) -> Dict[str, str]:
+    def conffiles(self) -> dict[str, str]:
         """Return our configuration files."""
         return self._conffiles
 
     @property
-    def logfiles(self) -> Dict[str, str]:
+    def logfiles(self) -> dict[str, str]:
         """Return our log files."""
         return self._logfiles
 

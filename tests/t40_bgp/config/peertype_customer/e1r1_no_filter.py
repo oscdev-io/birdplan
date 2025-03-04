@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2024, AllWorldIT
+# Copyright (c) 2019-2025, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 # pylint: disable=import-error,too-few-public-methods
 
 """BGP configuration for basic setup between e1 and r1 with no filter."""
+
 __all__ = ["PeerTypeConfig"]
 
 

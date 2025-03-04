@@ -127,8 +127,10 @@ r1_inet6:
 r1_master4:
   0.0.0.0/0:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: false
     nexthops:
     - gateway: 100.201.0.3
@@ -136,23 +138,22 @@ r1_master4:
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.121.0.0/24:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - gateway: 100.201.0.3
@@ -160,88 +161,85 @@ r1_master4:
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.122.0.0/24:
   - attributes:
-      Kernel.metric: 0
-      Kernel.scope: link
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_scope: link
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - interface: eth2
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.123.0.0/31:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     pref: 10
     prefix_type: blackhole
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.131.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.132.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.133.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     pref: 200
     prefix_type: blackhole
     protocol: static4
-    type:
-    - static
-    - univ
   100.201.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
 r1_master6:
   ::/0:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: false
     nexthops:
     - gateway: fc00:201::3
@@ -249,33 +247,32 @@ r1_master6:
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   fc00:121::/48:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - gateway: fc00:201::3
@@ -283,77 +280,74 @@ r1_master6:
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:122::/48:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - interface: eth2
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:123::/127:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     pref: 10
     prefix_type: blackhole
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:131::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:132::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:133::/64:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     pref: 200
     prefix_type: blackhole
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:201::/48:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
 r1_t_kernel4:
   0.0.0.0/0:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: false
     nexthops:
     - gateway: 100.201.0.3
@@ -361,23 +355,22 @@ r1_t_kernel4:
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.121.0.0/24:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - gateway: 100.201.0.3
@@ -385,68 +378,65 @@ r1_t_kernel4:
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.122.0.0/24:
   - attributes:
-      Kernel.metric: 0
-      Kernel.scope: link
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_scope: link
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - interface: eth2
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.123.0.0/31:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     pref: 10
     prefix_type: blackhole
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.131.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.132.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.133.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     pref: 200
     prefix_type: blackhole
     protocol: static4
-    type:
-    - static
-    - univ
 r1_t_kernel6:
   ::/0:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: false
     nexthops:
     - gateway: fc00:201::3
@@ -454,23 +444,22 @@ r1_t_kernel6:
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:121::/48:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - gateway: fc00:201::3
@@ -478,67 +467,64 @@ r1_t_kernel6:
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:122::/48:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - interface: eth2
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:123::/127:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     pref: 10
     prefix_type: blackhole
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:131::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:132::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:133::/64:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     pref: 200
     prefix_type: blackhole
     protocol: static6
-    type:
-    - static
-    - univ
 r1_t_rip4:
   0.0.0.0/0:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - gateway: 100.201.0.3
@@ -546,14 +532,13 @@ r1_t_rip4:
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
 r1_t_rip6:
   ::/0:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - gateway: fc00:201::3
@@ -561,91 +546,88 @@ r1_t_rip6:
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
 r1_t_static4:
   0.0.0.0/0:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.131.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.132.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.133.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     pref: 200
     prefix_type: blackhole
     protocol: static4
-    type:
-    - static
-    - univ
 r1_t_static6:
   ::/0:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:131::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:132::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:133::/64:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     pref: 200
     prefix_type: blackhole
     protocol: static6
-    type:
-    - static
-    - univ
 r2_inet:
 - dev: eth0
   dst: default
@@ -700,8 +682,10 @@ r2_inet6:
 r2_master4:
   0.0.0.0/0:
   - attributes:
-      RIP.metric: 3
-      RIP.tag: '0000'
+      preference: 120
+      rip_metric: 3
+      rip_tag: '0000'
+      source: RIP
     bestpath: true
     metric1: 3
     nexthops:
@@ -710,34 +694,33 @@ r2_master4:
     pref: 120
     prefix_type: unicast
     protocol: rip4
-    type:
-    - RIP
-    - univ
   100.102.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
 r2_master6:
   ::/0:
   - attributes:
-      RIP.metric: 3
-      RIP.tag: '0000'
+      preference: 120
+      rip_metric: 3
+      rip_tag: '0000'
+      source: RIP
     bestpath: true
     metric1: 3
     nexthops:
@@ -746,34 +729,33 @@ r2_master6:
     pref: 120
     prefix_type: unicast
     protocol: rip6
-    type:
-    - RIP
-    - univ
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   fc00:102::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
 r2_t_kernel4:
   0.0.0.0/0:
   - attributes:
-      RIP.metric: 3
-      RIP.tag: '0000'
+      preference: 120
+      rip_metric: 3
+      rip_tag: '0000'
+      source: RIP
     bestpath: true
     metric1: 3
     nexthops:
@@ -782,14 +764,13 @@ r2_t_kernel4:
     pref: 120
     prefix_type: unicast
     protocol: rip4
-    type:
-    - RIP
-    - univ
 r2_t_kernel6:
   ::/0:
   - attributes:
-      RIP.metric: 3
-      RIP.tag: '0000'
+      preference: 120
+      rip_metric: 3
+      rip_tag: '0000'
+      source: RIP
     bestpath: true
     metric1: 3
     nexthops:
@@ -798,14 +779,13 @@ r2_t_kernel6:
     pref: 120
     prefix_type: unicast
     protocol: rip6
-    type:
-    - RIP
-    - univ
 r2_t_rip4:
   0.0.0.0/0:
   - attributes:
-      RIP.metric: 3
-      RIP.tag: '0000'
+      preference: 120
+      rip_metric: 3
+      rip_tag: '0000'
+      source: RIP
     bestpath: true
     metric1: 3
     nexthops:
@@ -814,14 +794,13 @@ r2_t_rip4:
     pref: 120
     prefix_type: unicast
     protocol: rip4
-    type:
-    - RIP
-    - univ
 r2_t_rip6:
   ::/0:
   - attributes:
-      RIP.metric: 3
-      RIP.tag: '0000'
+      preference: 120
+      rip_metric: 3
+      rip_tag: '0000'
+      source: RIP
     bestpath: true
     metric1: 3
     nexthops:
@@ -830,9 +809,6 @@ r2_t_rip6:
     pref: 120
     prefix_type: unicast
     protocol: rip6
-    type:
-    - RIP
-    - univ
 r3_inet:
 - dev: eth0
   dst: 100.102.0.0/24
@@ -855,26 +831,26 @@ r3_inet6:
   protocol: kernel
 r3_master4:
   100.102.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
 r3_master6:
   fc00:102::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
 r3_t_kernel4: {}
 r3_t_kernel6: {}
 r3_t_rip4: {}

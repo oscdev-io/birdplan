@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (C) 2019-2024, AllWorldIT.
+# Copyright (C) 2019-2025, AllWorldIT.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import pytest
 
 from .simulation import Simulation
 
-__all__ = ["Helpers", "CustomPytestRegex"]
+__all__ = ["CustomPytestRegex", "Helpers"]
 
 
 # Make sure basetests has its asserts rewritten
@@ -46,10 +46,10 @@ def pytest_addoption(parser):
 
     parser.addoption("--write-expected", action="store_true", default=False, help="Write out expected test results.")
     parser.addoption(
-        "--no-wait",
-        action="store_true",
-        default=False,
-        help="Do not wait during write-expected tests (used for updates to results).",
+        "--sim-wait",
+        type=int,
+        default=10,
+        help="Number of seconds to wait for the simulation to start. Default 10 (seconds).",
     )
     parser.addoption(
         "--enable-performance-test", action="store_true", default=False, help="WARNING: This will spawn 2,500 BIRD routers"
@@ -172,11 +172,10 @@ def pytest_runtest_makereport(item, call):
                     setattr(item.parent, "_previousfailed", item)  # noqa: B010
 
         # If the test passed, clear the report data
-        else:
-            # Grab sim and clear the report
-            if hasattr(item, "fixturenames") and "sim" in item.fixturenames:
-                sim = item.funcargs["sim"]
-                sim.clear_report()
+        # Grab sim and clear the report
+        elif hasattr(item, "fixturenames") and "sim" in item.fixturenames:
+            sim = item.funcargs["sim"]
+            sim.clear_report()
 
 
 def pytest_runtest_setup(item):
@@ -206,9 +205,11 @@ def fixture_sim(request):
     # Create the simulation
     simulation = Simulation()
 
-    # Check if we're delaying checking of results
-    if request.config.getoption("--write-expected") and not request.config.getoption("--no-wait"):
-        simulation.delay = 20
+    # Check if we're delaying the simulation
+    sim_delay = 0
+    if request.config.getoption("--write-expected"):
+        sim_delay = request.config.getoption("--sim-wait")
+    simulation.delay = sim_delay
 
     # Yield the simulation to the test
     yield simulation

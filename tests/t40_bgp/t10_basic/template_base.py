@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2024, AllWorldIT
+# Copyright (c) 2019-2025, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -74,13 +74,13 @@ class TemplateBase(BirdPlanBaseTestCase):
         self._exabgpcli(
             sim,
             "e1",
-            ["neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 " f"large-community [ {large_communities} ]"],
+            [f"neighbor 100.64.0.1 announce route 100.64.101.0/24 next-hop 100.64.0.2 large-community [ {large_communities} ]"],
         )
 
         self._exabgpcli(
             sim,
             "e1",
-            ["neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 large-community " f"[ {large_communities} ]"],
+            [f"neighbor fc00:100::1 announce route fc00:101::/48 next-hop fc00:100::2 large-community [ {large_communities} ]"],
         )
 
     def test_bird_status(self, sim):

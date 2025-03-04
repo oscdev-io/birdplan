@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2024, AllWorldIT
+# Copyright (c) 2019-2025, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -81,10 +81,7 @@ class Template(TemplateBase):
             self._exabgpcli(
                 sim,
                 "e2",
-                [
-                    "neighbor fc00:100::1 announce route ::/0 next-hop fc00:100::3 as-path [ 65002 ] "
-                    "large-community [ 65000:3:4 ]"
-                ],
+                ["neighbor fc00:100::1 announce route ::/0 next-hop fc00:100::3 as-path [ 65002 ] large-community [ 65000:3:4 ]"],
             )
 
         self._exabgpcli(

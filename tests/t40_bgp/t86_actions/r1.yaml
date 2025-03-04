@@ -1,0 +1,40 @@
+router_id: 0.0.0.1
+log_file: "@LOGFILE@"
+
+bgp:
+  asn: 65000
+@TEMPLATE_GLOBAL_CONFIG@
+@GLOBAL_CONFIG@
+  peers:
+
+    e1:
+      asn: 65000
+      type: rrserver
+      description: BGP session to e1
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.3
+      neighbor6: fc00:100::3
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+@EXTRA_E1_CONFIG@
+
+
+    r2:
+      asn: @PEER_ASN@
+      type: @PEER_TYPE@
+      description: BGP session to r2
+      source_address4: 100.64.0.1
+      source_address6: fc00:100::1
+      neighbor4: 100.64.0.2
+      neighbor6: fc00:100::2
+      connect_delay_time: 2
+      connect_retry_time: 2
+      error_wait_time: 2,5
+      redistribute:
+        originated: True
+@EXTRA_R2_CONFIG@
+@TEMPLATE_EXTRA_CONFIG@
+@TEMPLATE_PEER_CONFIG@
+@PEER_CONFIG@

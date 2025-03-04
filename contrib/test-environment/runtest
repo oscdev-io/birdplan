@@ -9,22 +9,22 @@ pacman -Q stayrtr
 cd /root/birdplan || :
 echo "Excuting in '$(pwd)'..."
 
-ARGS=("$@")
+ARGS=()
+# Determine if we're skipping jobs or not
+skip_jobs=
+for arg in "$@"; do
+    case $arg in
+        --no-jobs)
+            skip_jobs=1
+            ;;
+        *)
+            ARGS+=("$arg")
+            ;;
+    esac
+done
 
-# Work out what args we're passing
-default_args="1"
-if [ ${#ARGS[@]} -gt 0 ]; then
-    default_args=""
-fi
-# If we have a single argument, we can still use default args
-if [ ${#ARGS[@]} -eq 1 ]; then
-    # As long as its not --write-expected
-    if [ "${ARGS[0]}" == "--write-expected" ]; then
-        default_args="1"
-    fi
-fi
-# Finally check if we are actually using our default args
-if [ -n "$default_args" ]; then
+# Check if we're using jobs by checking if they being skipped
+if [ -z "$skip_jobs" ]; then
     cpus=$(nproc)
     jobcount=$((cpus / 2))
     ARGS+=(--numprocesses="$jobcount" --dist=loadfile)

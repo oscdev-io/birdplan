@@ -175,8 +175,10 @@ r1_inet6:
 r1_master4:
   0.0.0.0/0:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: false
     nexthops:
     - gateway: 100.201.0.3
@@ -184,33 +186,32 @@ r1_master4:
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.101.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   100.121.0.0/24:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - gateway: 100.201.0.3
@@ -218,95 +219,92 @@ r1_master4:
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.122.0.0/24:
   - attributes:
-      Kernel.metric: 0
-      Kernel.scope: link
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_scope: link
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - interface: eth2
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.123.0.0/31:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     pref: 10
     prefix_type: blackhole
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.131.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.132.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.133.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     pref: 200
     prefix_type: blackhole
     protocol: static4
-    type:
-    - static
-    - univ
   100.201.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   100.211.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth10
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -315,14 +313,13 @@ r1_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r1_master6:
   ::/0:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: false
     nexthops:
     - gateway: fc00:201::3
@@ -330,31 +327,30 @@ r1_master6:
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -363,23 +359,22 @@ r1_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:101::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   fc00:121::/48:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - gateway: fc00:201::3
@@ -387,82 +382,77 @@ r1_master6:
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:122::/48:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - interface: eth2
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:123::/127:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     pref: 10
     prefix_type: blackhole
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:131::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:132::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:133::/64:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     pref: 200
     prefix_type: blackhole
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:201::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   fc00:211::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth10
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
 r1_ospf_summary:
   ospf4:
     channel: ipv4
@@ -490,91 +480,93 @@ r1_ospf_summary:
     table: t_ospf6
 r1_t_direct4_ospf:
   100.101.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4_ospf
-    type:
-    - device
-    - univ
   100.201.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 240
     prefix_type: unicast
     protocol: direct4_ospf
-    type:
-    - device
-    - univ
   100.211.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth10
     pref: 240
     prefix_type: unicast
     protocol: direct4_ospf
-    type:
-    - device
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4_ospf
-    type:
-    - device
-    - univ
 r1_t_direct6_ospf:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6_ospf
-    type:
-    - device
-    - univ
   fc00:101::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6_ospf
-    type:
-    - device
-    - univ
   fc00:201::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 240
     prefix_type: unicast
     protocol: direct6_ospf
-    type:
-    - device
-    - univ
   fc00:211::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth10
     pref: 240
     prefix_type: unicast
     protocol: direct6_ospf
-    type:
-    - device
-    - univ
 r1_t_kernel4:
   0.0.0.0/0:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: false
     nexthops:
     - gateway: 100.201.0.3
@@ -582,23 +574,22 @@ r1_t_kernel4:
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.121.0.0/24:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - gateway: 100.201.0.3
@@ -606,66 +597,63 @@ r1_t_kernel4:
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.122.0.0/24:
   - attributes:
-      Kernel.metric: 0
-      Kernel.scope: link
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_scope: link
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - interface: eth2
     pref: 10
     prefix_type: unicast
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.123.0.0/31:
   - attributes:
-      Kernel.metric: 0
-      Kernel.source: RTS_DEVICE
+      krt_metric: 0
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     pref: 10
     prefix_type: blackhole
     protocol: kernel4
-    type:
-    - inherit
-    - univ
   100.131.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: 100.201.0.2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.132.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static4
-    type:
-    - static
-    - univ
   100.133.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     pref: 200
     prefix_type: blackhole
     protocol: static4
-    type:
-    - static
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -674,14 +662,13 @@ r1_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r1_t_kernel6:
   ::/0:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: false
     nexthops:
     - gateway: fc00:201::3
@@ -689,22 +676,21 @@ r1_t_kernel6:
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -713,13 +699,12 @@ r1_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:121::/48:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - gateway: fc00:201::3
@@ -727,105 +712,102 @@ r1_t_kernel6:
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:122::/48:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     nexthops:
     - interface: eth2
     pref: 10
     prefix_type: unicast
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:123::/127:
   - attributes:
-      Kernel.metric: 1024
-      Kernel.source: RTS_DEVICE
+      krt_metric: 1024
+      krt_source: RTS_DEVICE
+      preference: 10
+      source: inherit
     bestpath: true
     pref: 10
     prefix_type: blackhole
     protocol: kernel6
-    type:
-    - inherit
-    - univ
   fc00:131::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - gateway: fc00:201::2
       interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:132::/48:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 200
     prefix_type: unicast
     protocol: static6
-    type:
-    - static
-    - univ
   fc00:133::/64:
-  - bestpath: true
+  - attributes:
+      preference: 200
+      source: static
+    bestpath: true
     pref: 200
     prefix_type: blackhole
     protocol: static6
-    type:
-    - static
-    - univ
 r1_t_ospf4:
   100.101.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct4_ospf
-    type:
-    - device
-    - univ
   100.201.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 240
     prefix_type: unicast
     protocol: direct4_ospf
-    type:
-    - device
-    - univ
   100.211.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth10
     pref: 240
     prefix_type: unicast
     protocol: direct4_ospf
-    type:
-    - device
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4_ospf
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -834,22 +816,21 @@ r1_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r1_t_ospf6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6_ospf
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -858,39 +839,36 @@ r1_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:101::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth1
     pref: 240
     prefix_type: unicast
     protocol: direct6_ospf
-    type:
-    - device
-    - univ
   fc00:201::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth2
     pref: 240
     prefix_type: unicast
     protocol: direct6_ospf
-    type:
-    - device
-    - univ
   fc00:211::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth10
     pref: 240
     prefix_type: unicast
     protocol: direct6_ospf
-    type:
-    - device
-    - univ
 r2_inet:
 - dev: eth0
   dst: 100.64.0.0/24
@@ -965,10 +943,12 @@ r2_inet6:
 r2_master4:
   100.101.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -980,15 +960,14 @@ r2_master4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.201.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1000,15 +979,14 @@ r2_master4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.211.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1020,21 +998,20 @@ r2_master4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1043,22 +1020,21 @@ r2_master4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r2_master6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: false
     metric1: 10
     nexthops:
@@ -1067,15 +1043,14 @@ r2_master6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:101::/64:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1087,15 +1062,14 @@ r2_master6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   fc00:201::/64:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1107,15 +1081,14 @@ r2_master6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   fc00:211::/64:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1127,9 +1100,6 @@ r2_master6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r2_ospf_summary:
   ospf4:
     channel: ipv4
@@ -1158,10 +1128,12 @@ r2_ospf_summary:
 r2_t_kernel4:
   100.101.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1173,15 +1145,14 @@ r2_t_kernel4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.201.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1193,15 +1164,14 @@ r2_t_kernel4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.211.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1213,12 +1183,11 @@ r2_t_kernel4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1227,13 +1196,12 @@ r2_t_kernel4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r2_t_kernel6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1242,15 +1210,14 @@ r2_t_kernel6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:101::/64:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1262,15 +1229,14 @@ r2_t_kernel6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   fc00:201::/64:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1282,15 +1248,14 @@ r2_t_kernel6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   fc00:211::/64:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1302,16 +1267,15 @@ r2_t_kernel6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
 r2_t_ospf4:
   100.101.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1323,15 +1287,14 @@ r2_t_ospf4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.201.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1343,15 +1306,14 @@ r2_t_ospf4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.211.0.0/24:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1363,12 +1325,11 @@ r2_t_ospf4:
     prefix_type: unicast
     protocol: ospf4
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   100.64.0.0/24:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1377,13 +1338,12 @@ r2_t_ospf4:
     pref: 150
     prefix_type: unicast
     protocol: ospf4
-    type:
-    - OSPF
-    - univ
 r2_t_ospf6:
   fc00:100::/64:
   - attributes:
-      OSPF.metric1: 10
+      ospf_metric1: 10
+      preference: 150
+      source: OSPF
     bestpath: true
     metric1: 10
     nexthops:
@@ -1392,15 +1352,14 @@ r2_t_ospf6:
     pref: 150
     prefix_type: unicast
     protocol: ospf6
-    type:
-    - OSPF
-    - univ
   fc00:101::/64:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1412,15 +1371,14 @@ r2_t_ospf6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   fc00:201::/64:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1432,15 +1390,14 @@ r2_t_ospf6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ
   fc00:211::/64:
   - attributes:
-      OSPF.metric1: 10
-      OSPF.metric2: 10000
-      OSPF.router_id: 0.0.0.1
-      OSPF.tag: '0x00000000'
+      ospf_metric1: 10
+      ospf_metric2: 10000
+      ospf_router_id: 0.0.0.1
+      ospf_tag: '0x00000000'
+      preference: 150
+      source: OSPF-E2
     bestpath: true
     metric1: 10
     metric2: 10000
@@ -1452,6 +1409,3 @@ r2_t_ospf6:
     prefix_type: unicast
     protocol: ospf6
     router_id: 0.0.0.1
-    type:
-    - OSPF-E2
-    - univ

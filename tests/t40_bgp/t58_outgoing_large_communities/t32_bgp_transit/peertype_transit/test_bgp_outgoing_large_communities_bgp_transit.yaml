@@ -20,26 +20,26 @@ r2_inet6:
   protocol: kernel
 r2_master4:
   100.64.0.0/24:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct4
-    type:
-    - device
-    - univ
 r2_master6:
   fc00:100::/64:
-  - bestpath: true
+  - attributes:
+      preference: 240
+      source: device
+    bestpath: true
     nexthops:
     - interface: eth0
     pref: 240
     prefix_type: unicast
     protocol: direct6
-    type:
-    - device
-    - univ
 r2_peer_show_r1:
   asn: 65000
   description: BGP session to r1

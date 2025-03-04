@@ -23,7 +23,7 @@ r2_peer_show_r1:
         igp_table: master4
         import_limit: 100
         import_limit_action: restart
-        info: connect
+        info: active/connect
         info_extra: 'socket: no route to host'
         input_filter: f_bgp_AS65000_r1_peer_import
         last_error: 'socket: no route to host'
@@ -47,7 +47,7 @@ r2_peer_show_r1:
         igp_table: master6
         import_limit: 100
         import_limit_action: restart
-        info: connect
+        info: active/connect
         input_filter: f_bgp_AS65000_r1_peer_import
         local_as: 65001
         name: bgp6_AS65000_r1
@@ -83,7 +83,7 @@ r2_peer_summary:
           igp_table: master4
           import_limit: 100
           import_limit_action: restart
-          info: connect
+          info: active/connect
           info_extra: 'socket: no route to host'
           input_filter: f_bgp_AS65000_r1_peer_import
           last_error: 'socket: no route to host'
@@ -108,7 +108,7 @@ r2_peer_summary:
           igp_table: master6
           import_limit: 100
           import_limit_action: restart
-          info: connect
+          info: active/connect
           input_filter: f_bgp_AS65000_r1_peer_import
           local_as: 65001
           name: bgp6_AS65000_r1

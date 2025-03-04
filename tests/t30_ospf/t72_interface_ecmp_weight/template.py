@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2024, AllWorldIT
+# Copyright (c) 2019-2025, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 # pylint: disable=import-error,too-few-public-methods
 
 """OSPF test case for interface ECMP weight."""
+
+import time
 
 from ...basetests import BirdPlanBaseTestCase
 
@@ -125,6 +127,9 @@ class Template(BirdPlanBaseTestCase):
     def test_interface_attributes(self, sim, tmpdir):
         """OSPF interface ECMP weight test to customize template."""
         self._test_interface_attributes(sim, tmpdir)
+        # NK: Wait again after interface attribute change to wait for settling
+        if sim.delay:
+            time.sleep(sim.delay)
 
     # Here is where the customizations take place per testcase
     def _test_interface_attributes(self, sim, tmpdir):

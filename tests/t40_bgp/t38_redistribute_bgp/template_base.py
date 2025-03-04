@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Copyright (c) 2019-2024, AllWorldIT
+# Copyright (c) 2019-2025, AllWorldIT
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ class TemplateBase(BirdPlanBaseTestCase):
         sim.node("r1").run_ip(["route", "add", "blackhole", "100.123.0.0/31"])
         sim.node("r1").run_ip(["route", "add", "blackhole", "fc00:123::/127"])
 
-    def test_announce_routes(self, sim):  # noqa: CFQ001
+    def test_announce_routes(self, sim):
         """Hook to add in routes if we need to."""
 
         # Own route
