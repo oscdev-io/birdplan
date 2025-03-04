@@ -58,6 +58,8 @@ packages = [
     { include = "birdplan" }
 ]
 
+[tool.setuptools.dynamic]
+version = {attr = "birdplan.version.__version__"}
 
 [tool.black]
 line-length = 132
