@@ -329,7 +329,7 @@ class PluginCollection:
 
             # Grab all the sub directories of the current package path directory
             sub_dirs = []
-            for sub_dir in os.listdir(pkg_path):
+            for sub_dir in os.listdir(pkg_path):  # noqa: PTH208
                 # If the subdir starts with a ., ignore it
                 if sub_dir.startswith("."):
                     continue

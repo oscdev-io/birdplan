@@ -80,7 +80,7 @@ show-fixes = true
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["COM812", "D202", "D203", "D211", "D212", "EM101", "EM102", "ISC001", "TID252", "TRY003"]
+ignore = ["COM812", "D202", "D203", "D211", "D212", "EM101", "EM102", "ISC001", "TID252", "TRY003", "LOG015"]
 fixable = ["ALL"]
 unfixable = []
 exclude = [
