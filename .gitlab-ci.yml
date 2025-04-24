@@ -65,6 +65,7 @@ test_job:
   # Run tests
   - export cpus=$(nproc)
   - export jobcount=$((cpus / 2))
+  - if [ $jobcount -gt 16 ]; then jobcount=16; fi
   - tox -- --numprocesses=$jobcount --dist=loadfile $EXTRA_TEST_OPTS
   - tox run -e cov-html
   artifacts:
