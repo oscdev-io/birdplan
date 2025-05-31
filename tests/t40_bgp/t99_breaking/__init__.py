@@ -1,1 +1,0 @@
-"""BIRD breaking point tests."""
