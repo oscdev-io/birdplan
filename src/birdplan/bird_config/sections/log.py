@@ -43,7 +43,7 @@ class SectionLogging(SectionBase):
         if log_file:
             self.conf.add(f'log "{log_file}" {{ info, warning, fatal }};')
         else:
-            self.conf.add("log stderr { info, warning fatal };")
+            self.conf.add("log stderr { info, warning, fatal };")
         # Check if we're in debug mode
         if self.birdconfig_globals.debug:
             self.conf.add("debug protocols { states, routes, filters, interfaces, events };")
