@@ -131,7 +131,7 @@ bgp:
       asn: 65000
       type: internal
       accept:
-        default: True
+        bgp_transit_default: True
 ...
 ```
 
