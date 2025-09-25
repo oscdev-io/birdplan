@@ -471,8 +471,10 @@ def main() -> None:
 
     try:
         birdplan_cmdline.run(sys.argv[1:])
-    except BirdPlanError:
+    except BirdPlanError as err:
         if birdplan_cmdline.is_json:
-            pass
+            result: dict[str, str] = {"status": "error", "message": f"{err}"}
+            print(json.dumps(result))
         else:
+            print(f"ERROR: {err}", file=sys.stderr)
             sys.exit(1)
